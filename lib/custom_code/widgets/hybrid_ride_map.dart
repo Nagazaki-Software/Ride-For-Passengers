@@ -84,6 +84,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
   void didUpdateWidget(covariant HybridRideMap oldWidget) {
     super.didUpdateWidget(oldWidget);
     _refreshLayers();
+    _animateToUserIfNeeded();
   }
 
   @override
@@ -106,6 +107,13 @@ class _HybridRideMapState extends State<HybridRideMap> {
       final pos = await Geolocator.getCurrentPosition();
       if (!mounted) return;
       setState(() => _me = pos);
+
+      // Ensure the map centers on the user's initial position and
+      // draws any required markers or polylines as soon as a
+      // location is available. This keeps behaviour consistent
+      // across iOS (Apple Maps) and Android (Google Maps).
+      _animateToUserIfNeeded();
+      _refreshLayers();
 
       _posSub?.cancel();
       _posSub = Geolocator.getPositionStream(
