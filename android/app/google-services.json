@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "1075126726259",
+    "project_id": "quick-b108e",
+    "storage_bucket": "quick-b108e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:edf0afe80c2eec3cc68406",
+        "android_client_info": {
+          "package_name": "com.nagazakisoftware.quick"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-d7jf1bbbqmeaec6k64c55gf70bv7j8q6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nagazakisoftware.quick",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-cir1ukqao3meie2jmcpf18tbq402i5cp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.rideforpassengers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:75084ead412803f7c68406",
+        "android_client_info": {
+          "package_name": "com.quicky.rideforpassengers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-ft6obq2krrppg5n5g3ejfuh26nnl9a4c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quicky.rideforpassengers",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-cir1ukqao3meie2jmcpf18tbq402i5cp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.rideforpassengers"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
