@@ -31,6 +31,16 @@ class FFAppState extends ChangeNotifier {
               prefs.getInt('ff_locationTimestamp')!)
           : _locationTimestamp;
     });
+    _safeInit(() {
+      _fraseInicial = prefs.getString('ff_fraseInicial') ?? _fraseInicial;
+    });
+    _safeInit(() {
+      _locationsPorPerto =
+          prefs.getStringList('ff_locationsPorPerto') ?? _locationsPorPerto;
+    });
+    _safeInit(() {
+      _pagesNavBar = prefs.getString('ff_pagesNavBar') ?? _pagesNavBar;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -75,6 +85,55 @@ class FFAppState extends ChangeNotifier {
     value != null
         ? prefs.setInt('ff_locationTimestamp', value.millisecondsSinceEpoch)
         : prefs.remove('ff_locationTimestamp');
+  }
+
+  String _fraseInicial = 'Welcome to Ride';
+  String get fraseInicial => _fraseInicial;
+  set fraseInicial(String value) {
+    _fraseInicial = value;
+    prefs.setString('ff_fraseInicial', value);
+  }
+
+  List<String> _locationsPorPerto = [];
+  List<String> get locationsPorPerto => _locationsPorPerto;
+  set locationsPorPerto(List<String> value) {
+    _locationsPorPerto = value;
+    prefs.setStringList('ff_locationsPorPerto', value);
+  }
+
+  void addToLocationsPorPerto(String value) {
+    locationsPorPerto.add(value);
+    prefs.setStringList('ff_locationsPorPerto', _locationsPorPerto);
+  }
+
+  void removeFromLocationsPorPerto(String value) {
+    locationsPorPerto.remove(value);
+    prefs.setStringList('ff_locationsPorPerto', _locationsPorPerto);
+  }
+
+  void removeAtIndexFromLocationsPorPerto(int index) {
+    locationsPorPerto.removeAt(index);
+    prefs.setStringList('ff_locationsPorPerto', _locationsPorPerto);
+  }
+
+  void updateLocationsPorPertoAtIndex(
+    int index,
+    String Function(String) updateFn,
+  ) {
+    locationsPorPerto[index] = updateFn(_locationsPorPerto[index]);
+    prefs.setStringList('ff_locationsPorPerto', _locationsPorPerto);
+  }
+
+  void insertAtIndexInLocationsPorPerto(int index, String value) {
+    locationsPorPerto.insert(index, value);
+    prefs.setStringList('ff_locationsPorPerto', _locationsPorPerto);
+  }
+
+  String _pagesNavBar = 'home';
+  String get pagesNavBar => _pagesNavBar;
+  set pagesNavBar(String value) {
+    _pagesNavBar = value;
+    prefs.setString('ff_pagesNavBar', value);
   }
 }
 

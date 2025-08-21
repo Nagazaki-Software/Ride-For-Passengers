@@ -76,28 +76,28 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       refreshListenable: appStateNotifier,
       navigatorKey: appNavigatorKey,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? HomeWidget() : GetStartedWidget(),
+          appStateNotifier.loggedIn ? Home5Widget() : GetStarted00Widget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
           builder: (context, _) =>
-              appStateNotifier.loggedIn ? HomeWidget() : GetStartedWidget(),
+              appStateNotifier.loggedIn ? Home5Widget() : GetStarted00Widget(),
         ),
         FFRoute(
-          name: GetStartedWidget.routeName,
-          path: GetStartedWidget.routePath,
-          builder: (context, params) => GetStartedWidget(),
+          name: GetStarted00Widget.routeName,
+          path: GetStarted00Widget.routePath,
+          builder: (context, params) => GetStarted00Widget(),
         ),
         FFRoute(
-          name: ContinueAsWidget.routeName,
-          path: ContinueAsWidget.routePath,
-          builder: (context, params) => ContinueAsWidget(),
+          name: ContinueAs1Widget.routeName,
+          path: ContinueAs1Widget.routePath,
+          builder: (context, params) => ContinueAs1Widget(),
         ),
         FFRoute(
-          name: ProfileWidget.routeName,
-          path: ProfileWidget.routePath,
-          builder: (context, params) => ProfileWidget(
+          name: CreateProfile2Widget.routeName,
+          path: CreateProfile2Widget.routePath,
+          builder: (context, params) => CreateProfile2Widget(
             quickyPlataform: params.getParam(
               'quickyPlataform',
               ParamType.String,
@@ -105,59 +105,94 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           ),
         ),
         FFRoute(
-          name: VerifyAccountWidget.routeName,
-          path: VerifyAccountWidget.routePath,
-          builder: (context, params) => VerifyAccountWidget(),
+          name: VerifyAccount3Widget.routeName,
+          path: VerifyAccount3Widget.routePath,
+          builder: (context, params) => VerifyAccount3Widget(),
         ),
         FFRoute(
-          name: HomeWidget.routeName,
-          path: HomeWidget.routePath,
-          builder: (context, params) => HomeWidget(),
+          name: Home5Widget.routeName,
+          path: Home5Widget.routePath,
+          builder: (context, params) => Home5Widget(),
         ),
         FFRoute(
-          name: ChoosePassWidget.routeName,
-          path: ChoosePassWidget.routePath,
-          builder: (context, params) => ChoosePassWidget(),
+          name: ChoosePass4Widget.routeName,
+          path: ChoosePass4Widget.routePath,
+          builder: (context, params) => ChoosePass4Widget(),
         ),
         FFRoute(
-          name: RideShareWidget.routeName,
-          path: RideShareWidget.routePath,
-          builder: (context, params) => RideShareWidget(),
+          name: RideShare6Widget.routeName,
+          path: RideShare6Widget.routePath,
+          builder: (context, params) => RideShare6Widget(),
         ),
         FFRoute(
-          name: PaymentDriveWidget.routeName,
-          path: PaymentDriveWidget.routePath,
-          builder: (context, params) => PaymentDriveWidget(),
+          name: PaymentRide7Widget.routeName,
+          path: PaymentRide7Widget.routePath,
+          builder: (context, params) => PaymentRide7Widget(),
         ),
         FFRoute(
-          name: FindingDriveWidget.routeName,
-          path: FindingDriveWidget.routePath,
-          builder: (context, params) => FindingDriveWidget(),
+          name: FindingDrive8Widget.routeName,
+          path: FindingDrive8Widget.routePath,
+          builder: (context, params) => FindingDrive8Widget(),
         ),
         FFRoute(
-          name: PickingYouWidget.routeName,
-          path: PickingYouWidget.routePath,
-          builder: (context, params) => PickingYouWidget(),
+          name: PickingYou9Widget.routeName,
+          path: PickingYou9Widget.routePath,
+          builder: (context, params) => PickingYou9Widget(),
         ),
         FFRoute(
-          name: LoginWidget.routeName,
-          path: LoginWidget.routePath,
-          builder: (context, params) => LoginWidget(),
+          name: Login0Widget.routeName,
+          path: Login0Widget.routePath,
+          builder: (context, params) => Login0Widget(),
         ),
         FFRoute(
-          name: RideProgressWidget.routeName,
-          path: RideProgressWidget.routePath,
-          builder: (context, params) => RideProgressWidget(),
+          name: RideProgress10Widget.routeName,
+          path: RideProgress10Widget.routePath,
+          builder: (context, params) => RideProgress10Widget(),
         ),
         FFRoute(
-          name: RideProgressCopyWidget.routeName,
-          path: RideProgressCopyWidget.routePath,
-          builder: (context, params) => RideProgressCopyWidget(),
+          name: RideProgressCopy11Widget.routeName,
+          path: RideProgressCopy11Widget.routePath,
+          builder: (context, params) => RideProgressCopy11Widget(),
         ),
         FFRoute(
-          name: HomeCopyWidget.routeName,
-          path: HomeCopyWidget.routePath,
-          builder: (context, params) => HomeCopyWidget(),
+          name: HowDriveDo12Widget.routeName,
+          path: HowDriveDo12Widget.routePath,
+          builder: (context, params) => HowDriveDo12Widget(),
+        ),
+        FFRoute(
+          name: Rewards13Widget.routeName,
+          path: Rewards13Widget.routePath,
+          builder: (context, params) => Rewards13Widget(),
+        ),
+        FFRoute(
+          name: ScheduleRide14Widget.routeName,
+          path: ScheduleRide14Widget.routePath,
+          builder: (context, params) => ScheduleRide14Widget(),
+        ),
+        FFRoute(
+          name: Profile15Widget.routeName,
+          path: Profile15Widget.routePath,
+          builder: (context, params) => Profile15Widget(),
+        ),
+        FFRoute(
+          name: PaymentMothods16Widget.routeName,
+          path: PaymentMothods16Widget.routePath,
+          builder: (context, params) => PaymentMothods16Widget(),
+        ),
+        FFRoute(
+          name: Rewards17Widget.routeName,
+          path: Rewards17Widget.routePath,
+          builder: (context, params) => Rewards17Widget(),
+        ),
+        FFRoute(
+          name: Activity18Widget.routeName,
+          path: Activity18Widget.routePath,
+          builder: (context, params) => Activity18Widget(),
+        ),
+        FFRoute(
+          name: Preferences19Widget.routeName,
+          path: Preferences19Widget.routePath,
+          builder: (context, params) => Preferences19Widget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -328,7 +363,7 @@ class FFRoute {
 
           if (requireAuth && !appStateNotifier.loggedIn) {
             appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
-            return '/getStarted';
+            return '/getStarted00';
           }
           return null;
         },
