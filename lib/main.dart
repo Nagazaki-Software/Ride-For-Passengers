@@ -10,13 +10,6 @@ import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 
-import 'package:flutter/scheduler.dart' show SchedulerBinding;
-
-
-
-// IMPORTANTE: traz as suas custom actions (start/stop location)
-import '/custom_code/actions/index.dart'; // startLocationStreamSimple / stopLocationStreamSimple
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -27,90 +20,10 @@ void main() async {
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => appState,
-      child: _AppBootstrap(child: MyApp()),
-    ),
-  );
-}
-
-/// Envolve o app e gerencia o ciclo de vida para ligar/desligar o stream.
-/// - Liga ao iniciar (primeiro frame)
-/// - Pausa quando o app vai para background
-/// - Retoma quando volta para foreground
-class _AppBootstrap extends StatefulWidget {
-  const _AppBootstrap({required this.child});
-  final Widget child;
-
-  @override
-  State<_AppBootstrap> createState() => _AppBootstrapState();
-}
-
-class _AppBootstrapState extends State<_AppBootstrap>
-    with WidgetsBindingObserver {
-  bool _started = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    // Garante que chamamos o start depois que o primeiro frame montar o contexto.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await _startLocationSafe();
-    });
-  }
-
-  Future<void> _startLocationSafe() async {
-    if (_started) return;
-    _started = true;
-
-    try {
-      // Inicia o stream em foreground (app estilo Uber = sempre ligado ao abrir)
-      await startLocationStreamSimple(context);
-    } catch (e) {
-      // Se algo falhar, não derruba o app; logue se quiser
-      // debugPrint('startLocationStreamSimple error: $e');
-      _started = false; // permite tentar novamente se precisar
-    }
-  }
-
-  Future<void> _stopLocationSafe() async {
-    try {
-      await stopLocationStreamSimple(context);
-    } catch (_) {}
-    _started = false;
-  }
-
-  /// Observa mudanças de estado do app para pausar/retomar localização em tempo real.
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Foreground = resumed; Background = paused/detached/inactive (web pode variar)
-    if (state == AppLifecycleState.resumed) {
-      // Voltou ao foreground → retoma se não estiver ativo
-      _startLocationSafe();
-    } else if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached ||
-        state == AppLifecycleState.inactive) {
-      // Saiu do foreground → para para economizar e seguir "foreground-only"
-      _stopLocationSafe();
-    }
-    super.didChangeAppLifecycleState(state);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _stopLocationSafe();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Envolve o app para termos um contexto válido nas actions
-    return widget.child;
-  }
+  runApp(ChangeNotifierProvider(
+    create: (context) => appState,
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {

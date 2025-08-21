@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:async';
-import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 // Google (Android)
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
@@ -27,8 +28,8 @@ class HybridRideMap extends StatefulWidget {
     required this.users,
     required this.width,
     required this.height,
-    this.destLat, // <<< agora nullable
-    this.destLng, // <<< agora nullable
+    this.destLat,
+    this.destLng,
     this.nearbyRadiusMeters = 1500,
     this.encodedPolyline,
   }) : super(key: key);
@@ -38,8 +39,8 @@ class HybridRideMap extends StatefulWidget {
   final double width;
   final double height;
 
-  final double? destLat; // nullable
-  final double? destLng; // nullable
+  final double? destLat;
+  final double? destLng;
   final double nearbyRadiusMeters;
   final String? encodedPolyline;
 
@@ -60,6 +61,9 @@ class _HybridRideMapState extends State<HybridRideMap> {
   final Set<gmap.Polyline> _gPolylines = {};
   final Set<amap.Polyline> _aPolylines = {};
 
+  bool _locationReady = false;
+  bool _cameraCenteredOnce = false;
+
   static const String _googleGreyStyle = r'''[
   {"elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
   {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
@@ -75,6 +79,10 @@ class _HybridRideMapState extends State<HybridRideMap> {
   {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0f0f0f"}]}
 ]''';
 
+  bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+  bool get _isAndroid =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
   @override
   void initState() {
     super.initState();
@@ -85,7 +93,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
   void didUpdateWidget(covariant HybridRideMap oldWidget) {
     super.didUpdateWidget(oldWidget);
     _refreshLayers();
-    _animateToUserIfNeeded();
   }
 
   @override
@@ -111,21 +118,73 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
       final pos =
           await bg.BackgroundGeolocation.getCurrentPosition(persist: false);
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // await Geolocator.openLocationSettings();
+      }
+
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.deniedForever ||
+          perm == LocationPermission.denied) {
+        if (mounted) setState(() => _locationReady = false);
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
       if (!mounted) return;
-      setState(() => _me = pos);
 
       _animateToUserIfNeeded();
+      setState(() {
+        _me = pos;
+        _locationReady = true;
+      });
+
+      _posSub?.cancel();
+      Position? lastEmit;
+      DateTime lastTime = DateTime.fromMillisecondsSinceEpoch(0);
+      _posSub = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+          distanceFilter: 5,
+        ),
+      ).listen((p) {
+        if (!mounted) return;
+
+        final now = DateTime.now();
+        final tooSoon = now.difference(lastTime).inMilliseconds < 600;
+        final similar = lastEmit != null &&
+            (Geolocator.distanceBetween(lastEmit!.latitude, lastEmit!.longitude,
+                    p.latitude, p.longitude) <
+                1.5);
+
+        if (tooSoon || similar) return;
+
+        lastEmit = p;
+        lastTime = now;
+
+        setState(() => _me = p);
+        _animateToUserIfNeeded();
+        _refreshLayers();
+      });
+
+      _animateToUserIfNeeded(initial: true);
       _refreshLayers();
     } catch (e) {
       debugPrint('Location error: $e');
     }
   }
 
-  void _animateToUserIfNeeded() {
+  void _animateToUserIfNeeded({bool initial = false}) {
     if (_me == null) return;
     final lat = _me!.coords.latitude, lng = _me!.coords.longitude;
 
-    if (Platform.isIOS) {
+    if (!initial && _cameraCenteredOnce) return;
+
+    if (_isIOS) {
       final c = _aController;
       if (c == null) return;
       c.moveCamera(
@@ -133,7 +192,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
           amap.CameraPosition(target: amap.LatLng(lat, lng), zoom: 15),
         ),
       );
-    } else {
+    } else if (_isAndroid) {
       final c = _gController;
       if (c == null) return;
       c.animateCamera(
@@ -142,19 +201,21 @@ class _HybridRideMapState extends State<HybridRideMap> {
         ),
       );
     }
+
+    _cameraCenteredOnce = true;
   }
 
   void _refreshLayers() {
-    if (Platform.isIOS) {
+    if (_isIOS) {
       _buildAppleAnnotationsFromUsers();
       _buildAppleRoutePolyline();
-    } else {
+    } else if (_isAndroid) {
       _buildGoogleMarkersFromUsers();
       _buildGoogleRoutePolyline();
     }
+    if (mounted) setState(() {});
   }
 
-  // ---------- Helpers de UsersRecord + parsing seguro ----------
   dynamic _readField(UsersRecord u, String key) {
     try {
       if (u.snapshotData.containsKey(key)) return u.snapshotData[key];
@@ -170,12 +231,12 @@ class _HybridRideMapState extends State<HybridRideMap> {
   }
 
   _DriverPos? _extractDriverPos(UsersRecord u) {
-    final loc = _readField(u, 'location'); // LatLng do FF
+    final loc = _readField(u, 'location'); // FlutterFlow LatLng
     if (loc is LatLng) {
-      if (loc.latitude.isFinite && loc.longitude.isFinite) {
-        return _DriverPos(lat: loc.latitude, lng: loc.longitude);
+      final la = loc.latitude, lo = loc.longitude;
+      if (la.isFinite && lo.isFinite) {
+        return _DriverPos(lat: la, lng: lo);
       }
-      return null;
     }
     final lat = _asDouble(_readField(u, 'lat'));
     final lng = _asDouble(_readField(u, 'lng'));
@@ -199,11 +260,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
   // ---------- ANDROID (Google) ----------
   void _buildGoogleMarkersFromUsers() {
     _gMarkers.clear();
-
-    if (_me == null || widget.users.isEmpty) {
-      if (mounted) setState(() {});
-      return;
-    }
+    if (_me == null || widget.users.isEmpty) return;
 
     final userLat = _me!.coords.latitude;
     final userLng = _me!.coords.longitude;
@@ -232,19 +289,13 @@ class _HybridRideMapState extends State<HybridRideMap> {
         ),
       );
     }
-
-    if (mounted) setState(() {});
   }
 
   void _buildGoogleRoutePolyline() {
     _gPolylines.clear();
 
-    // Sem destino válido? Nada de rota.
     final hasDest = (widget.destLat != null && widget.destLng != null);
-    if (!widget.rideRequested || _me == null || !hasDest) {
-      if (mounted) setState(() {});
-      return;
-    }
+    if (!widget.rideRequested || _me == null || !hasDest) return;
 
     final user = gmap.LatLng(_me!.coords.latitude, _me!.coords.longitude);
     final destG = gmap.LatLng(widget.destLat!, widget.destLng!);
@@ -253,7 +304,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     List<gmap.LatLng> gpts;
     if (encoded.isNotEmpty && encoded.toLowerCase() != 'null') {
       final decoded = _safeDecode(encoded);
-      if (decoded != null && decoded.isNotEmpty) {
+      if (decoded.isNotEmpty) {
         gpts =
             decoded.map((p) => gmap.LatLng(p.latitude, p.longitude)).toList();
       } else {
@@ -272,18 +323,12 @@ class _HybridRideMapState extends State<HybridRideMap> {
         geodesic: true,
       ),
     );
-
-    if (mounted) setState(() {});
   }
 
-  // ---------- iOS (Apple) 1.4.0 ----------
+  // ---------- iOS (Apple) ----------
   void _buildAppleAnnotationsFromUsers() {
     _aAnnotations.clear();
-
-    if (_me == null || widget.users.isEmpty) {
-      if (mounted) setState(() {});
-      return;
-    }
+    if (_me == null || widget.users.isEmpty) return;
 
     final userLat = _me!.coords.latitude;
     final userLng = _me!.coords.longitude;
@@ -312,18 +357,13 @@ class _HybridRideMapState extends State<HybridRideMap> {
         ),
       );
     }
-
-    if (mounted) setState(() {});
   }
 
   void _buildAppleRoutePolyline() {
     _aPolylines.clear();
 
     final hasDest = (widget.destLat != null && widget.destLng != null);
-    if (!widget.rideRequested || _me == null || !hasDest) {
-      if (mounted) setState(() {});
-      return;
-    }
+    if (!widget.rideRequested || _me == null || !hasDest) return;
 
     final user = amap.LatLng(_me!.coords.latitude, _me!.coords.longitude);
     final destA = amap.LatLng(widget.destLat!, widget.destLng!);
@@ -332,7 +372,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     List<amap.LatLng> apts;
     if (encoded.isNotEmpty && encoded.toLowerCase() != 'null') {
       final decoded = _safeDecode(encoded);
-      if (decoded != null && decoded.isNotEmpty) {
+      if (decoded.isNotEmpty) {
         apts =
             decoded.map((p) => amap.LatLng(p.latitude, p.longitude)).toList();
       } else {
@@ -344,47 +384,47 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
     _aPolylines.add(
       amap.Polyline(
-        polylineId: amap.PolylineId('route'),
+        polylineId: amap.PolylineId('route'), // sem const
         points: apts,
-        width: 5,
+        width: 5, // Apple usa width/color (1.4.0)
         color: Colors.orangeAccent,
       ),
     );
-
-    if (mounted) setState(() {});
   }
 
-  // --- SAFE decoder: não derruba se a string estiver ruim ---
-  List<_LatLng>? _safeDecode(String encoded) {
+  List<_LatLng> _safeDecode(String encoded) {
     try {
       return _decodePolyline(encoded);
     } catch (e) {
       debugPrint('Polyline decode error: $e');
-      return null;
+      return const <_LatLng>[];
     }
   }
 
-  // --- Polyline decoder ---
   List<_LatLng> _decodePolyline(String encoded) {
     final poly = <_LatLng>[];
     int index = 0, lat = 0, lng = 0;
-    while (index < encoded.length) {
+    final len = encoded.length;
+
+    while (index < len) {
       int b, shift = 0, result = 0;
       do {
+        if (index >= len) return poly;
         b = encoded.codeUnitAt(index++) - 63;
         result |= (b & 0x1f) << shift;
         shift += 5;
-      } while (b >= 0x20 && index < encoded.length);
+      } while (b >= 0x20);
       final dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
       lat += dlat;
 
       shift = 0;
       result = 0;
       do {
+        if (index >= len) return poly;
         b = encoded.codeUnitAt(index++) - 63;
         result |= (b & 0x1f) << shift;
         shift += 5;
-      } while (b >= 0x20 && index < encoded.length);
+      } while (b >= 0x20);
       final dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
       lng += dlng;
 
@@ -398,12 +438,16 @@ class _HybridRideMapState extends State<HybridRideMap> {
     final startLat = _me?.coords.latitude ?? widget.destLat ?? 0.0;
     final startLng = _me?.coords.longitude ?? widget.destLng ?? 0.0;
     final hasStart = startLat.isFinite && startLng.isFinite;
+    final hasMe =
+        _me != null && _me!.latitude.isFinite && _me!.longitude.isFinite;
+    final hasDest = widget.destLat != null && widget.destLng != null;
 
-    final initialPos = hasStart
-        ? gmap.CameraPosition(target: gmap.LatLng(startLat, startLng), zoom: 14)
-        : const gmap.CameraPosition(target: gmap.LatLng(0, 0), zoom: 1);
+    final startLat =
+        hasMe ? _me!.latitude : (hasDest ? widget.destLat! : -15.793889);
+    final startLng =
+        hasMe ? _me!.longitude : (hasDest ? widget.destLng! : -47.882778);
 
-    if (Platform.isIOS) {
+    if (_isIOS) {
       return SizedBox(
         width: widget.width,
         height: widget.height,
@@ -411,13 +455,12 @@ class _HybridRideMapState extends State<HybridRideMap> {
           borderRadius: BorderRadius.circular(12),
           child: amap.AppleMap(
             initialCameraPosition: amap.CameraPosition(
-              target: amap.LatLng(
-                  initialPos.target.latitude, initialPos.target.longitude),
-              zoom: initialPos.zoom,
+              target: amap.LatLng(startLat, startLng),
+              zoom: hasMe ? 14 : 4,
             ),
             onMapCreated: (c) => _aController = c,
             mapType: amap.MapType.standard,
-            myLocationEnabled: true,
+            myLocationEnabled: _locationReady,
             annotations: _aAnnotations,
             polylines: _aPolylines,
           ),
@@ -431,14 +474,18 @@ class _HybridRideMapState extends State<HybridRideMap> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: gmap.GoogleMap(
-          initialCameraPosition: initialPos,
+          initialCameraPosition: gmap.CameraPosition(
+            target: gmap.LatLng(startLat, startLng),
+            zoom: hasMe ? 14 : 4,
+          ),
           onMapCreated: (c) async {
             _gController = c;
             try {
               await c.setMapStyle(_googleGreyStyle);
             } catch (_) {}
+            _animateToUserIfNeeded(initial: true);
           },
-          myLocationEnabled: true,
+          myLocationEnabled: _locationReady,
           myLocationButtonEnabled: false,
           compassEnabled: false,
           buildingsEnabled: false,
@@ -454,11 +501,11 @@ class _HybridRideMapState extends State<HybridRideMap> {
 class _LatLng {
   final double latitude;
   final double longitude;
-  _LatLng(this.latitude, this.longitude);
+  const _LatLng(this.latitude, this.longitude);
 }
 
 class _DriverPos {
   final double lat;
   final double lng;
-  _DriverPos({required this.lat, required this.lng});
+  const _DriverPos({required this.lat, required this.lng});
 }
