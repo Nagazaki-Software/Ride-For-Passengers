@@ -17,8 +17,9 @@ import 'package:flutter/foundation.dart'
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 // Apple (iOS)
 import 'package:apple_maps_flutter/apple_maps_flutter.dart' as amap;
-
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart'
+    as bg;
 
 class HybridRideMap extends StatefulWidget {
   const HybridRideMap({
@@ -51,8 +52,8 @@ class _HybridRideMapState extends State<HybridRideMap> {
   gmap.GoogleMapController? _gController;
   amap.AppleMapController? _aController;
 
-  Position? _me;
-  StreamSubscription<Position>? _posSub;
+  bg.Location? _me;
+  Function(bg.Location)? _locCallback;
 
   final Set<gmap.Marker> _gMarkers = {};
   final Set<amap.Annotation> _aAnnotations = {};
@@ -96,12 +97,27 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   @override
   void dispose() {
-    _posSub?.cancel();
+    if (_locCallback != null) {
+      bg.BackgroundGeolocation.removeListener(_locCallback!);
+    }
     super.dispose();
   }
 
   Future<void> _ensureLocation() async {
     try {
+      if (_locCallback != null) {
+        bg.BackgroundGeolocation.removeListener(_locCallback!);
+      }
+      _locCallback = (bg.Location loc) {
+        if (!mounted) return;
+        setState(() => _me = loc);
+        _animateToUserIfNeeded();
+        _refreshLayers();
+      };
+      bg.BackgroundGeolocation.onLocation(_locCallback!);
+
+      final pos =
+          await bg.BackgroundGeolocation.getCurrentPosition(persist: false);
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         // await Geolocator.openLocationSettings();
@@ -121,6 +137,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
           desiredAccuracy: LocationAccuracy.best);
       if (!mounted) return;
 
+      _animateToUserIfNeeded();
       setState(() {
         _me = pos;
         _locationReady = true;
@@ -163,7 +180,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   void _animateToUserIfNeeded({bool initial = false}) {
     if (_me == null) return;
-    final lat = _me!.latitude, lng = _me!.longitude;
+    final lat = _me!.coords.latitude, lng = _me!.coords.longitude;
 
     if (!initial && _cameraCenteredOnce) return;
 
@@ -245,8 +262,8 @@ class _HybridRideMapState extends State<HybridRideMap> {
     _gMarkers.clear();
     if (_me == null || widget.users.isEmpty) return;
 
-    final userLat = _me!.latitude;
-    final userLng = _me!.longitude;
+    final userLat = _me!.coords.latitude;
+    final userLng = _me!.coords.longitude;
 
     for (int i = 0; i < widget.users.length; i++) {
       final u = widget.users[i];
@@ -280,7 +297,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     final hasDest = (widget.destLat != null && widget.destLng != null);
     if (!widget.rideRequested || _me == null || !hasDest) return;
 
-    final user = gmap.LatLng(_me!.latitude, _me!.longitude);
+    final user = gmap.LatLng(_me!.coords.latitude, _me!.coords.longitude);
     final destG = gmap.LatLng(widget.destLat!, widget.destLng!);
 
     final encoded = (widget.encodedPolyline ?? '').trim();
@@ -313,8 +330,8 @@ class _HybridRideMapState extends State<HybridRideMap> {
     _aAnnotations.clear();
     if (_me == null || widget.users.isEmpty) return;
 
-    final userLat = _me!.latitude;
-    final userLng = _me!.longitude;
+    final userLat = _me!.coords.latitude;
+    final userLng = _me!.coords.longitude;
 
     for (int i = 0; i < widget.users.length; i++) {
       final u = widget.users[i];
@@ -348,7 +365,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     final hasDest = (widget.destLat != null && widget.destLng != null);
     if (!widget.rideRequested || _me == null || !hasDest) return;
 
-    final user = amap.LatLng(_me!.latitude, _me!.longitude);
+    final user = amap.LatLng(_me!.coords.latitude, _me!.coords.longitude);
     final destA = amap.LatLng(widget.destLat!, widget.destLng!);
 
     final encoded = (widget.encodedPolyline ?? '').trim();
@@ -418,6 +435,9 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   @override
   Widget build(BuildContext context) {
+    final startLat = _me?.coords.latitude ?? widget.destLat ?? 0.0;
+    final startLng = _me?.coords.longitude ?? widget.destLng ?? 0.0;
+    final hasStart = startLat.isFinite && startLng.isFinite;
     final hasMe =
         _me != null && _me!.latitude.isFinite && _me!.longitude.isFinite;
     final hasDest = widget.destLat != null && widget.destLng != null;
