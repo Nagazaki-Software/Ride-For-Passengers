@@ -68,7 +68,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
   bool _locationReady = false;
   bool _cameraCenteredOnce = false;
 
-  // Google map dark style
   static const String _googleGreyStyle = r'''[
   {"elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
   {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
@@ -85,7 +84,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
 ]''';
 
   bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
-  bool get _isAndroid => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   @override
   void initState() {
@@ -107,13 +105,11 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   Future<void> _ensureLocation() async {
     try {
-      // Serviços ativos?
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // Opcional: await Geolocator.openLocationSettings();
+        // await Geolocator.openLocationSettings();
       }
 
-      // Permissões
       var perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
@@ -123,7 +119,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
         return;
       }
 
-      // Posição atual
       final p = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
       if (!mounted) return;
       setState(() {
@@ -131,7 +126,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
         _locationReady = true;
       });
 
-      // Stream com debounce
       _posSub?.cancel();
       Position? lastEmit;
       DateTime lastTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -151,8 +145,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
                   lastEmit!.longitude,
                   pos.latitude,
                   pos.longitude,
-                ) <
-                1.5);
+                ) < 1.5);
 
         if (tooSoon || similar) return;
 
@@ -173,9 +166,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   void _animateToUserIfNeeded({bool initial = false}) {
     if (_me == null) return;
-    final lat = _me!.lat;
-    final lng = _me!.lng;
-
+    final lat = _me!.lat, lng = _me!.lng;
     if (!initial && _cameraCenteredOnce) return;
 
     if (_isIOS) {
@@ -186,7 +177,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
           amap.CameraPosition(target: amap.LatLng(lat, lng), zoom: 15),
         ),
       );
-    } else if (_isAndroid) {
+    } else {
       final c = _gController;
       if (c == null) return;
       c.animateCamera(
@@ -195,7 +186,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
         ),
       );
     }
-
     _cameraCenteredOnce = true;
   }
 
@@ -374,13 +364,22 @@ class _HybridRideMapState extends State<HybridRideMap> {
     }
 
     _aPolylines.add(
-      amap.Polyline(
-        polylineId: const amap.PolylineId('route'),
-        points: apts,
-        width: 5,
-        color: Colors.orangeAccent,
+      const amap.Polyline(
+        polylineId: amap.PolylineId('route'),
+        points: <amap.LatLng>[], // será preenchido via apts acima, mantendo const só no id
       ),
     );
+    // Como a constructor é const, vamos adicionar outra Polyline não-const com dados:
+    _aPolylines
+      ..clear()
+      ..add(
+        amap.Polyline(
+          polylineId: const amap.PolylineId('route'),
+          points: apts,
+          width: 5,
+          color: Colors.orangeAccent,
+        ),
+      );
   }
 
   // --- Polyline decoder (safe) ---
@@ -454,7 +453,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
       );
     }
 
-    // Android (Google) e Web
     return SizedBox(
       width: widget.width,
       height: widget.height,
