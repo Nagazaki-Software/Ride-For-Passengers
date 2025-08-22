@@ -12,11 +12,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
-// Google (Android)
+// Google (Android/Web)
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 // Apple (iOS)
 import 'package:apple_maps_flutter/apple_maps_flutter.dart' as amap;
-
 // Localização (foreground/web)
 import 'package:geolocator/geolocator.dart';
 
@@ -204,11 +203,11 @@ class _HybridRideMapState extends State<HybridRideMap> {
     if (_isIOS) {
       _buildAppleAnnotationsFromUsers();
       _buildAppleRoutePolyline();
-    } else if (_isAndroid) {
+    } else {
       _buildGoogleMarkersFromUsers();
       _buildGoogleRoutePolyline();
     }
-    if (mounted) setState(() {}); // uma única atualização visual
+    if (mounted) setState(() {});
   }
 
   // ---------- Helpers de UsersRecord ----------
@@ -253,7 +252,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     return true;
   }
 
-  // ---------- ANDROID (Google) ----------
+  // ---------- ANDROID/WEB (Google) ----------
   void _buildGoogleMarkersFromUsers() {
     _gMarkers.clear();
     if (_me == null || widget.users.isEmpty) return;
