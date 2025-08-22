@@ -12,11 +12,11 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
-// Google (Android/Web)
+// Google (Android)
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 // Apple (iOS)
 import 'package:apple_maps_flutter/apple_maps_flutter.dart' as amap;
-// Localização (foreground/web)
+
 import 'package:geolocator/geolocator.dart';
 
 class HybridRideMap extends StatefulWidget {
@@ -46,17 +46,11 @@ class HybridRideMap extends StatefulWidget {
   State<HybridRideMap> createState() => _HybridRideMapState();
 }
 
-class _Point {
-  final double lat;
-  final double lng;
-  const _Point(this.lat, this.lng);
-}
-
 class _HybridRideMapState extends State<HybridRideMap> {
   gmap.GoogleMapController? _gController;
   amap.AppleMapController? _aController;
 
-  _Point? _me;
+  Position? _me;
   StreamSubscription<Position>? _posSub;
 
   final Set<gmap.Marker> _gMarkers = {};
@@ -68,6 +62,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
   bool _locationReady = false;
   bool _cameraCenteredOnce = false;
 
+  // Estilo escuro do Google
   static const String _googleGreyStyle = r'''[
   {"elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
   {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
@@ -84,6 +79,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
 ]''';
 
   bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+  bool get _isAndroid => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   @override
   void initState() {
@@ -105,11 +101,13 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   Future<void> _ensureLocation() async {
     try {
+      // Serviço ligado?
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // await Geolocator.openLocationSettings();
+        // Opcional: await Geolocator.openLocationSettings();
       }
 
+      // Permissões
       var perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
@@ -119,13 +117,15 @@ class _HybridRideMapState extends State<HybridRideMap> {
         return;
       }
 
-      final p = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+      final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
       if (!mounted) return;
+
       setState(() {
-        _me = _Point(p.latitude, p.longitude);
+        _me = pos;
         _locationReady = true;
       });
 
+      // Stream com debounce simples
       _posSub?.cancel();
       Position? lastEmit;
       DateTime lastTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -134,7 +134,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
           accuracy: LocationAccuracy.best,
           distanceFilter: 5,
         ),
-      ).listen((pos) {
+      ).listen((p) {
         if (!mounted) return;
 
         final now = DateTime.now();
@@ -143,16 +143,17 @@ class _HybridRideMapState extends State<HybridRideMap> {
             (Geolocator.distanceBetween(
                   lastEmit!.latitude,
                   lastEmit!.longitude,
-                  pos.latitude,
-                  pos.longitude,
-                ) < 1.5);
+                  p.latitude,
+                  p.longitude,
+                ) <
+                1.5);
 
         if (tooSoon || similar) return;
 
-        lastEmit = pos;
+        lastEmit = p;
         lastTime = now;
 
-        setState(() => _me = _Point(pos.latitude, pos.longitude));
+        setState(() => _me = p);
         _animateToUserIfNeeded();
         _refreshLayers();
       });
@@ -166,7 +167,9 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   void _animateToUserIfNeeded({bool initial = false}) {
     if (_me == null) return;
-    final lat = _me!.lat, lng = _me!.lng;
+    final lat = _me!.latitude, lng = _me!.longitude;
+
+    // Só centraliza automaticamente uma vez
     if (!initial && _cameraCenteredOnce) return;
 
     if (_isIOS) {
@@ -177,7 +180,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
           amap.CameraPosition(target: amap.LatLng(lat, lng), zoom: 15),
         ),
       );
-    } else {
+    } else if (_isAndroid) {
       final c = _gController;
       if (c == null) return;
       c.animateCamera(
@@ -186,6 +189,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
         ),
       );
     }
+
     _cameraCenteredOnce = true;
   }
 
@@ -193,14 +197,14 @@ class _HybridRideMapState extends State<HybridRideMap> {
     if (_isIOS) {
       _buildAppleAnnotationsFromUsers();
       _buildAppleRoutePolyline();
-    } else {
+    } else if (_isAndroid) {
       _buildGoogleMarkersFromUsers();
       _buildGoogleRoutePolyline();
     }
-    if (mounted) setState(() {});
+    if (mounted) setState(() {}); // única atualização visual
   }
 
-  // ---------- Helpers de UsersRecord ----------
+  // ---------- Helpers de UsersRecord + parsing seguro ----------
   dynamic _readField(UsersRecord u, String key) {
     try {
       if (u.snapshotData.containsKey(key)) return u.snapshotData[key];
@@ -242,13 +246,13 @@ class _HybridRideMapState extends State<HybridRideMap> {
     return true;
   }
 
-  // ---------- ANDROID/WEB (Google) ----------
+  // ---------- ANDROID (Google) ----------
   void _buildGoogleMarkersFromUsers() {
     _gMarkers.clear();
     if (_me == null || widget.users.isEmpty) return;
 
-    final userLat = _me!.lat;
-    final userLng = _me!.lng;
+    final userLat = _me!.latitude;
+    final userLng = _me!.longitude;
 
     for (int i = 0; i < widget.users.length; i++) {
       final u = widget.users[i];
@@ -281,18 +285,16 @@ class _HybridRideMapState extends State<HybridRideMap> {
     final hasDest = (widget.destLat != null && widget.destLng != null);
     if (!widget.rideRequested || _me == null || !hasDest) return;
 
-    final user = gmap.LatLng(_me!.lat, _me!.lng);
+    final user = gmap.LatLng(_me!.latitude, _me!.longitude);
     final destG = gmap.LatLng(widget.destLat!, widget.destLng!);
 
     final encoded = (widget.encodedPolyline ?? '').trim();
     List<gmap.LatLng> gpts;
     if (encoded.isNotEmpty && encoded.toLowerCase() != 'null') {
       final decoded = _safeDecode(encoded);
-      if (decoded.isNotEmpty) {
-        gpts = decoded.map((p) => gmap.LatLng(p.latitude, p.longitude)).toList();
-      } else {
-        gpts = [user, destG];
-      }
+      gpts = decoded.isNotEmpty
+          ? decoded.map((p) => gmap.LatLng(p.latitude, p.longitude)).toList()
+          : [user, destG];
     } else {
       gpts = [user, destG];
     }
@@ -313,8 +315,8 @@ class _HybridRideMapState extends State<HybridRideMap> {
     _aAnnotations.clear();
     if (_me == null || widget.users.isEmpty) return;
 
-    final userLat = _me!.lat;
-    final userLng = _me!.lng;
+    final userLat = _me!.latitude;
+    final userLng = _me!.longitude;
 
     for (int i = 0; i < widget.users.length; i++) {
       final u = widget.users[i];
@@ -347,42 +349,32 @@ class _HybridRideMapState extends State<HybridRideMap> {
     final hasDest = (widget.destLat != null && widget.destLng != null);
     if (!widget.rideRequested || _me == null || !hasDest) return;
 
-    final user = amap.LatLng(_me!.lat, _me!.lng);
+    final user = amap.LatLng(_me!.latitude, _me!.longitude);
     final destA = amap.LatLng(widget.destLat!, widget.destLng!);
 
     final encoded = (widget.encodedPolyline ?? '').trim();
     List<amap.LatLng> apts;
     if (encoded.isNotEmpty && encoded.toLowerCase() != 'null') {
       final decoded = _safeDecode(encoded);
-      if (decoded.isNotEmpty) {
-        apts = decoded.map((p) => amap.LatLng(p.latitude, p.longitude)).toList();
-      } else {
-        apts = [user, destA];
-      }
+      apts = decoded.isNotEmpty
+          ? decoded.map((p) => amap.LatLng(p.latitude, p.longitude)).toList()
+          : [user, destA];
     } else {
       apts = [user, destA];
     }
 
+    // IMPORTANTE: NENHUM 'const' aqui.
     _aPolylines.add(
-      const amap.Polyline(
+      amap.Polyline(
         polylineId: amap.PolylineId('route'),
-        points: <amap.LatLng>[], // será preenchido via apts acima, mantendo const só no id
+        points: apts,
+        width: 5, // apple_maps_flutter usa 'width'
+        color: Colors.orangeAccent,
       ),
     );
-    // Como a constructor é const, vamos adicionar outra Polyline não-const com dados:
-    _aPolylines
-      ..clear()
-      ..add(
-        amap.Polyline(
-          polylineId: const amap.PolylineId('route'),
-          points: apts,
-          width: 5,
-          color: Colors.orangeAccent,
-        ),
-      );
   }
 
-  // --- Polyline decoder (safe) ---
+  // --- SAFE decoder ---
   List<_LatLng> _safeDecode(String encoded) {
     try {
       return _decodePolyline(encoded);
@@ -392,6 +384,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     }
   }
 
+  // --- Polyline decoder ---
   List<_LatLng> _decodePolyline(String encoded) {
     final poly = <_LatLng>[];
     int index = 0, lat = 0, lng = 0;
@@ -426,11 +419,29 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   @override
   Widget build(BuildContext context) {
-    final hasMe = _me != null && _me!.lat.isFinite && _me!.lng.isFinite;
+    // Web: evita plugin nativo
+    if (kIsWeb) {
+      return Container(
+        width: widget.width,
+        height: widget.height,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: FlutterFlowTheme.of(context).secondaryBackground,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: FlutterFlowTheme.of(context).alternate),
+        ),
+        child: Text(
+          'Mapa nativo indisponível na Web nesta build',
+          style: FlutterFlowTheme.of(context).labelLarge,
+        ),
+      );
+    }
+
+    final hasMe = _me != null && _me!.latitude.isFinite && _me!.longitude.isFinite;
     final hasDest = widget.destLat != null && widget.destLng != null;
 
-    final startLat = hasMe ? _me!.lat : (hasDest ? widget.destLat! : -15.793889);
-    final startLng = hasMe ? _me!.lng : (hasDest ? widget.destLng! : -47.882778);
+    final startLat = hasMe ? _me!.latitude : (hasDest ? widget.destLat! : -15.793889);
+    final startLng = hasMe ? _me!.longitude : (hasDest ? widget.destLng! : -47.882778);
 
     if (_isIOS) {
       return SizedBox(
@@ -453,6 +464,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
       );
     }
 
+    // Android (Google)
     return SizedBox(
       width: widget.width,
       height: widget.height,
