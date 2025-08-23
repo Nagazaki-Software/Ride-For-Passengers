@@ -1,3 +1,5 @@
+// android/settings.gradle
+
 pluginManagement {
     def flutterSdkPath = {
         def properties = new Properties()
@@ -13,36 +15,33 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        // >>> Necessário para background_fetch / flutter_background_geolocation
+        // Necessário para background_fetch / flutter_background_geolocation
         maven { url "https://maven.transistorsoft.com" }
-        // (opcional) espelho, caso a URL acima seja bloqueada no ambiente
+        // (opcional) espelho
         // maven { url "https://maven.transistorsoft.com/maven2" }
     }
 }
 
-//
-// Recomendado em projetos com AGP 7+/8+:
-// garante que dependências sejam resolvidas via 'settings.gradle'
-//
-dependencyResolutionManagement {
-    // Pode ser FAIL_ON_PROJECT_REPOS em alguns templates;
-    // PREFER_SETTINGS evita ignorar 'allprojects.repositories' do build.gradle antigo.
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-    repositories {
-        google()
-        mavenCentral()
-        // >>> repositório da Transistorsoft
-        maven { url "https://maven.transistorsoft.com" }
-        // maven { url "https://maven.transistorsoft.com/maven2" }
-    }
-}
-
+// 👉 O bloco `plugins {}` TEM que vir antes de `dependencyResolutionManagement {}`.
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
     id "com.android.application" version "8.7.3" apply false
     id "org.jetbrains.kotlin.android" version "2.1.0" apply false
-    // Dica: 4.3.8 é antigo; se tiver warning com AGP 8.x, suba para 4.4.2+
+    // Se o AGP avisar, pode subir para 4.4.2+
     id "com.google.gms.google-services" version "4.3.8" apply false
+}
+
+// Agora sim, depois do `plugins {}`:
+dependencyResolutionManagement {
+    // Deixe o settings resolver os repositórios
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Repositório Transistorsoft (obrigatório p/ artefatos ts*)
+        maven { url "https://maven.transistorsoft.com" }
+        // maven { url "https://maven.transistorsoft.com/maven2" }
+    }
 }
 
 include ":app"
