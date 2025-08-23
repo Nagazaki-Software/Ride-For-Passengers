@@ -14,7 +14,10 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        // ⚠️ NÃO precisa do repo da Transistorsoft aqui.
+        // Repositórios do Flutter (evita "io.flutter:*" não encontrado)
+        maven { url "${flutterSdkPath}/bin/cache/artifacts/engine" }
+        maven { url "https://storage.googleapis.com/download.flutter.io" }
+        // ⚠️ NÃO precisa da Transistorsoft aqui.
     }
 }
 
@@ -26,16 +29,20 @@ plugins {
 }
 
 dependencyResolutionManagement {
+    // Para garantir que esse arquivo manda nos repositórios:
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
+        // Repositórios do Flutter (de novo aqui porque dependências são resolvidas neste bloco)
+        maven { url "${flutterSdkPath}/bin/cache/artifacts/engine" }
+        maven { url "https://storage.googleapis.com/download.flutter.io" }
 
-        // ✅ Use a Transistorsoft SOMENTE para o grupo com.transistorsoft
+        // Transistorsoft apenas para o grupo com.transistorsoft
         exclusiveContent {
             forRepository {
                 maven { url "https://maven.transistorsoft.com" }
-                // fallback opcional:
+                // fallback opcional: descomente se a URL acima não responder
                 // maven { url "https://maven.transistorsoft.com/maven2" }
             }
             filter {
