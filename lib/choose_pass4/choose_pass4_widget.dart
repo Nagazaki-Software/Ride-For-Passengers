@@ -1,4 +1,4 @@
-import '/components/placeholder_payment_widget.dart';
+import '/components/card_payment_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -1549,7 +1549,21 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                       child: Padding(
                                         padding:
                                             MediaQuery.viewInsetsOf(context),
-                                        child: PlaceholderPaymentWidget(),
+                                        child: CardPaymentWidget(
+                                          value: () {
+                                            if (_model.click == 'day') {
+                                              return 5.0;
+                                            } else if (_model.click == 'week') {
+                                              return 8.0;
+                                            } else if (_model.click ==
+                                                'month') {
+                                              return 10.0;
+                                            } else {
+                                              return 0.0;
+                                            }
+                                          }(),
+                                          passe: _model.click!,
+                                        ),
                                       ),
                                     );
                                   },

@@ -41,6 +41,18 @@ class FFAppState extends ChangeNotifier {
     _safeInit(() {
       _pagesNavBar = prefs.getString('ff_pagesNavBar') ?? _pagesNavBar;
     });
+    _safeInit(() {
+      _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
+    });
+    _safeInit(() {
+      _cardExpiry = prefs.getString('ff_cardExpiry') ?? _cardExpiry;
+    });
+    _safeInit(() {
+      _cardCvv = prefs.getString('ff_cardCvv') ?? _cardCvv;
+    });
+    _safeInit(() {
+      _cardHolder = prefs.getString('ff_cardHolder') ?? _cardHolder;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -134,6 +146,34 @@ class FFAppState extends ChangeNotifier {
   set pagesNavBar(String value) {
     _pagesNavBar = value;
     prefs.setString('ff_pagesNavBar', value);
+  }
+
+  String _cardNumber = '';
+  String get cardNumber => _cardNumber;
+  set cardNumber(String value) {
+    _cardNumber = value;
+    prefs.setString('ff_cardNumber', value);
+  }
+
+  String _cardExpiry = '';
+  String get cardExpiry => _cardExpiry;
+  set cardExpiry(String value) {
+    _cardExpiry = value;
+    prefs.setString('ff_cardExpiry', value);
+  }
+
+  String _cardCvv = '';
+  String get cardCvv => _cardCvv;
+  set cardCvv(String value) {
+    _cardCvv = value;
+    prefs.setString('ff_cardCvv', value);
+  }
+
+  String _cardHolder = '';
+  String get cardHolder => _cardHolder;
+  set cardHolder(String value) {
+    _cardHolder = value;
+    prefs.setString('ff_cardHolder', value);
   }
 }
 

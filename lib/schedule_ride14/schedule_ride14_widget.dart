@@ -112,11 +112,11 @@ class _ScheduleRide14WidgetState extends State<ScheduleRide14Widget> {
                               Container(
                                 width: MediaQuery.sizeOf(context).width * 0.9,
                                 height:
-                                    MediaQuery.sizeOf(context).height * 0.65,
+                                    MediaQuery.sizeOf(context).height * 0.72,
                                 child: custom_widgets.ScheduleCaledarRide(
                                   width: MediaQuery.sizeOf(context).width * 0.9,
                                   height:
-                                      MediaQuery.sizeOf(context).height * 0.65,
+                                      MediaQuery.sizeOf(context).height * 0.72,
                                   initialDate: getCurrentTimestamp,
                                 ),
                               ),

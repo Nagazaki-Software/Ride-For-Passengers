@@ -66,6 +66,11 @@ class UsersRecord extends FirestoreRecord {
   bool get driverOnline => _driverOnline ?? false;
   bool hasDriverOnline() => _driverOnline != null;
 
+  // "passe" field.
+  String? _passe;
+  String get passe => _passe ?? '';
+  bool hasPasse() => _passe != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -77,6 +82,7 @@ class UsersRecord extends FirestoreRecord {
     _saldo = castToType<double>(snapshotData['saldo']);
     _driver = snapshotData['driver'] as bool?;
     _driverOnline = snapshotData['driverOnline'] as bool?;
+    _passe = snapshotData['passe'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -122,6 +128,7 @@ Map<String, dynamic> createUsersRecordData({
   double? saldo,
   bool? driver,
   bool? driverOnline,
+  String? passe,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -134,6 +141,7 @@ Map<String, dynamic> createUsersRecordData({
       'saldo': saldo,
       'driver': driver,
       'driverOnline': driverOnline,
+      'passe': passe,
     }.withoutNulls,
   );
 
@@ -155,7 +163,8 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         listEquality.equals(e1?.plataform, e2?.plataform) &&
         e1?.saldo == e2?.saldo &&
         e1?.driver == e2?.driver &&
-        e1?.driverOnline == e2?.driverOnline;
+        e1?.driverOnline == e2?.driverOnline &&
+        e1?.passe == e2?.passe;
   }
 
   @override
@@ -169,7 +178,8 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.plataform,
         e?.saldo,
         e?.driver,
-        e?.driverOnline
+        e?.driverOnline,
+        e?.passe
       ]);
 
   @override

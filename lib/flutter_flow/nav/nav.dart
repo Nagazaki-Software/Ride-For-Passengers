@@ -193,6 +193,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: Preferences19Widget.routeName,
           path: Preferences19Widget.routePath,
           builder: (context, params) => Preferences19Widget(),
+        ),
+        FFRoute(
+          name: Activity20Widget.routeName,
+          path: Activity20Widget.routePath,
+          builder: (context, params) => Activity20Widget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

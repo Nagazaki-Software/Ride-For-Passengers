@@ -22,3 +22,4 @@ export '/payment_mothods16/payment_mothods16_widget.dart'
 export '/rewards17/rewards17_widget.dart' show Rewards17Widget;
 export '/activity18/activity18_widget.dart' show Activity18Widget;
 export '/preferences19/preferences19_widget.dart' show Preferences19Widget;
+export '/activity20/activity20_widget.dart' show Activity20Widget;
