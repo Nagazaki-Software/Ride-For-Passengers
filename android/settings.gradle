@@ -8,39 +8,40 @@ pluginManagement {
         assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
         return flutterSdkPath
     }()
-
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
-        // Necessário para background_fetch / flutter_background_geolocation
-        maven { url "https://maven.transistorsoft.com" }
-        // (opcional) espelho
-        // maven { url "https://maven.transistorsoft.com/maven2" }
+        // ⚠️ NÃO precisa do repo da Transistorsoft aqui.
     }
 }
 
-// 👉 O bloco `plugins {}` TEM que vir antes de `dependencyResolutionManagement {}`.
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
     id "com.android.application" version "8.7.3" apply false
     id "org.jetbrains.kotlin.android" version "2.1.0" apply false
-    // Se o AGP avisar, pode subir para 4.4.2+
     id "com.google.gms.google-services" version "4.3.8" apply false
 }
 
-// Agora sim, depois do `plugins {}`:
 dependencyResolutionManagement {
-    // Deixe o settings resolver os repositórios
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
-        // Repositório Transistorsoft (obrigatório p/ artefatos ts*)
-        maven { url "https://maven.transistorsoft.com" }
-        // maven { url "https://maven.transistorsoft.com/maven2" }
+
+        // ✅ Use a Transistorsoft SOMENTE para o grupo com.transistorsoft
+        exclusiveContent {
+            forRepository {
+                maven { url "https://maven.transistorsoft.com" }
+                // fallback opcional:
+                // maven { url "https://maven.transistorsoft.com/maven2" }
+            }
+            filter {
+                includeGroup "com.transistorsoft"
+            }
+        }
     }
 }
 
