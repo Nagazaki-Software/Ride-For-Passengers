@@ -1,42 +1,14 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:workmanager/workmanager.dart';
-
-const fetchTask = 'periodic-fetch';
-
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    // TODO: coloque seu fetch/sync aqui.
-    // Ex: chamar sua API e salvar no Firestore/SQLite.
-    debugPrint('[WorkManager] Rodando task: $task');
-    return Future.value(true);
-  });
-}
+import 'background_tasks.dart'; // importa o arquivo acima
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Registra o job apenas no Android (AAB é Android; iOS tem outras regras)
   if (!kIsWeb && Platform.isAndroid) {
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: kDebugMode,
-    );
-
-    await Workmanager().registerPeriodicTask(
-      'fetch-id-15min',
-      fetchTask,
-      frequency: const Duration(minutes: 15), // mínimo do Android
-      initialDelay: const Duration(minutes: 5),
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-        requiresBatteryNotLow: false,
-        requiresCharging: false,
-      ),
-      backoffPolicy: BackoffPolicy.linear,
-      backoffPolicyDelay: const Duration(minutes: 5),
-    );
+    await registerBackgroundFetch();
   }
 
   runApp(const MyApp());
