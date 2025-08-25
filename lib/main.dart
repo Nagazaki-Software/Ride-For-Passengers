@@ -1,119 +1,55 @@
-import 'package:provider/provider.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:workmanager/workmanager.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
-import 'auth/firebase_auth/firebase_user_provider.dart';
-import 'auth/firebase_auth/auth_util.dart';
+const fetchTask = 'periodic-fetch';
 
-import 'backend/firebase/firebase_config.dart';
-import 'flutter_flow/flutter_flow_util.dart';
-import 'flutter_flow/internationalization.dart';
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    // TODO: coloque seu fetch/sync aqui.
+    // Ex: chamar sua API e salvar no Firestore/SQLite.
+    debugPrint('[WorkManager] Rodando task: $task');
+    return Future.value(true);
+  });
+}
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  usePathUrlStrategy();
 
-  await initFirebase();
+  if (!kIsWeb && Platform.isAndroid) {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
 
-  final appState = FFAppState(); // Initialize FFAppState
-  await appState.initializePersistedState();
-
-  runApp(ChangeNotifierProvider(
-    create: (context) => appState,
-    child: MyApp(),
-  ));
-}
-
-class MyApp extends StatefulWidget {
-  // This widget is the root of your application.
-  @override
-  State<MyApp> createState() => _MyAppState();
-
-  static _MyAppState of(BuildContext context) =>
-      context.findAncestorStateOfType<_MyAppState>()!;
-}
-
-class _MyAppState extends State<MyApp> {
-  Locale? _locale;
-
-  ThemeMode _themeMode = ThemeMode.system;
-
-  late AppStateNotifier _appStateNotifier;
-  late GoRouter _router;
-  String getRoute([RouteMatch? routeMatch]) {
-    final RouteMatch lastMatch =
-        routeMatch ?? _router.routerDelegate.currentConfiguration.last;
-    final RouteMatchList matchList = lastMatch is ImperativeRouteMatch
-        ? lastMatch.matches
-        : _router.routerDelegate.currentConfiguration;
-    return matchList.uri.toString();
-  }
-
-  List<String> getRouteStack() =>
-      _router.routerDelegate.currentConfiguration.matches
-          .map((e) => getRoute(e))
-          .toList();
-  late Stream<BaseAuthUser> userStream;
-
-  final authUserSub = authenticatedUserStream.listen((_) {});
-
-  @override
-  void initState() {
-    super.initState();
-
-    _appStateNotifier = AppStateNotifier.instance;
-    _router = createRouter(_appStateNotifier);
-    userStream = rideForPassengersFirebaseUserStream()
-      ..listen((user) {
-        _appStateNotifier.update(user);
-      });
-    jwtTokenStream.listen((_) {});
-    Future.delayed(
-      Duration(milliseconds: 1000),
-      () => _appStateNotifier.stopShowingSplashImage(),
+    await Workmanager().registerPeriodicTask(
+      'fetch-id-15min',
+      fetchTask,
+      frequency: const Duration(minutes: 15), // mínimo do Android
+      initialDelay: const Duration(minutes: 5),
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+      ),
+      backoffPolicy: BackoffPolicy.linear,
+      backoffPolicyDelay: const Duration(minutes: 5),
     );
   }
 
-  @override
-  void dispose() {
-    authUserSub.cancel();
+  runApp(const MyApp());
+}
 
-    super.dispose();
-  }
-
-  void setLocale(String language) {
-    safeSetState(() => _locale = createLocale(language));
-  }
-
-  void setThemeMode(ThemeMode mode) => safeSetState(() {
-        _themeMode = mode;
-      });
-
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Ride For Passengers',
-      localizationsDelegates: [
-        FFLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        FallbackMaterialLocalizationDelegate(),
-        FallbackCupertinoLocalizationDelegate(),
-      ],
-      locale: _locale,
-      supportedLocales: const [
-        Locale('en'),
-      ],
-      theme: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: false,
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(child: Text('WorkManager ligado ✅')),
       ),
-      themeMode: _themeMode,
-      routerConfig: _router,
     );
   }
 }
