@@ -10,13 +10,8 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
-
-// Google (Android)
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
-// Apple (iOS)
-import 'package:apple_maps_flutter/apple_maps_flutter.dart' as amap;
-
 import 'package:geolocator/geolocator.dart';
 
 class HybridRideMap extends StatefulWidget {
@@ -53,7 +48,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
   StreamSubscription<Position>? _posSub;
 
   final Set<gmap.Marker> _gMarkers = {};
-
   final Set<gmap.Polyline> _gPolylines = {};
 
   bool _locationReady = false;
@@ -75,9 +69,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
   {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0f0f0f"}]}
 ]''';
 
-  bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
-  bool get _isAndroid => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
-
   @override
   void initState() {
     super.initState();
@@ -85,7 +76,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
   }
 
   @override
-  void didUpdateWidget(covariant HybridRideMap oldWidget) {
+  void didUpdateWidget(covariant hybrid_ride_map oldWidget) {
     super.didUpdateWidget(oldWidget);
     _refreshLayers();
   }
@@ -98,13 +89,9 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   Future<void> _ensureLocation() async {
     try {
-      // Serviço ligado?
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        // Opcional: await Geolocator.openLocationSettings();
-      }
+      // Se quiser: if (!serviceEnabled) await Geolocator.openLocationSettings();
 
-      // Permissões
       var perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
@@ -164,19 +151,18 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   void _animateToUserIfNeeded({bool initial = false}) {
     if (_me == null) return;
-    final lat = _me!.latitude, lng = _me!.longitude;
-
-    // Só centraliza automaticamente uma vez
     if (!initial && _cameraCenteredOnce) return;
-
     final c = _gController;
     if (c == null) return;
+
     c.animateCamera(
       gmap.CameraUpdate.newCameraPosition(
-        gmap.CameraPosition(target: gmap.LatLng(lat, lng), zoom: 15),
+        gmap.CameraPosition(
+          target: gmap.LatLng(_me!.latitude, _me!.longitude),
+          zoom: 15,
+        ),
       ),
     );
-
     _cameraCenteredOnce = true;
   }
 
@@ -184,14 +170,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
     _buildGoogleMarkersFromUsers();
     _buildGoogleRoutePolyline();
     if (mounted) setState(() {});
-    if (_isIOS) {
-      _buildAppleAnnotationsFromUsers();
-      _buildAppleRoutePolyline();
-    } else if (_isAndroid) {
-      _buildGoogleMarkersFromUsers();
-      _buildGoogleRoutePolyline();
-    }
-    if (mounted) setState(() {}); // única atualização visual
   }
 
   // ---------- Helpers de UsersRecord + parsing seguro ----------
@@ -300,70 +278,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
     );
   }
 
-  // ---------- iOS (Apple) ----------
-  void _buildAppleAnnotationsFromUsers() {
-    _aAnnotations.clear();
-    if (_me == null || widget.users.isEmpty) return;
-
-    final userLat = _me!.latitude;
-    final userLng = _me!.longitude;
-
-    for (int i = 0; i < widget.users.length; i++) {
-      final u = widget.users[i];
-      if (!_isOnline(u)) continue;
-
-      final pos = _extractDriverPos(u);
-      if (pos == null) continue;
-
-      final distM = Geolocator.distanceBetween(userLat, userLng, pos.lat, pos.lng);
-      if (distM > widget.nearbyRadiusMeters) continue;
-
-      final veryNear = distM < 120.0;
-
-      _aAnnotations.add(
-        amap.Annotation(
-          annotationId: amap.AnnotationId('driver_$i'),
-          position: amap.LatLng(pos.lat, pos.lng),
-          infoWindow: amap.InfoWindow(
-            title: veryNear ? 'Driver (nearby)' : 'Driver',
-            snippet: veryNear ? '≈ ${distM.toStringAsFixed(0)} m' : 'Nearby',
-          ),
-        ),
-      );
-    }
-  }
-
-  void _buildAppleRoutePolyline() {
-    _aPolylines.clear();
-
-    final hasDest = (widget.destLat != null && widget.destLng != null);
-    if (!widget.rideRequested || _me == null || !hasDest) return;
-
-    final user = amap.LatLng(_me!.latitude, _me!.longitude);
-    final destA = amap.LatLng(widget.destLat!, widget.destLng!);
-
-    final encoded = (widget.encodedPolyline ?? '').trim();
-    List<amap.LatLng> apts;
-    if (encoded.isNotEmpty && encoded.toLowerCase() != 'null') {
-      final decoded = _safeDecode(encoded);
-      apts = decoded.isNotEmpty
-          ? decoded.map((p) => amap.LatLng(p.latitude, p.longitude)).toList()
-          : [user, destA];
-    } else {
-      apts = [user, destA];
-    }
-
-    // IMPORTANTE: NENHUM 'const' aqui.
-    _aPolylines.add(
-      amap.Polyline(
-        polylineId: amap.PolylineId('route'),
-        points: apts,
-        width: 5, // apple_maps_flutter usa 'width'
-        color: Colors.orangeAccent,
-      ),
-    );
-  }
-
   // --- SAFE decoder ---
   List<_LatLng> _safeDecode(String encoded) {
     try {
@@ -409,7 +323,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
   @override
   Widget build(BuildContext context) {
-    // Web: evita plugin nativo
     if (kIsWeb) {
       return Container(
         width: widget.width,
@@ -433,28 +346,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
     final startLat = hasMe ? _me!.latitude : (hasDest ? widget.destLat! : -15.793889);
     final startLng = hasMe ? _me!.longitude : (hasDest ? widget.destLng! : -47.882778);
 
-    if (_isIOS) {
-      return SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: amap.AppleMap(
-            initialCameraPosition: amap.CameraPosition(
-              target: amap.LatLng(startLat, startLng),
-              zoom: hasMe ? 14 : 4,
-            ),
-            onMapCreated: (c) => _aController = c,
-            mapType: amap.MapType.standard,
-            myLocationEnabled: _locationReady,
-            annotations: _aAnnotations,
-            polylines: _aPolylines,
-          ),
-        ),
-      );
-    }
-
-    // Android (Google)
     return SizedBox(
       width: widget.width,
       height: widget.height,
