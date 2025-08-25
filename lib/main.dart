@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'background_tasks.dart'; // importa o arquivo acima
+import 'background_tasks.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Registra o job apenas no Android (AAB é Android; iOS tem outras regras)
   if (!kIsWeb && Platform.isAndroid) {
     await registerBackgroundFetch();
   }
-
   runApp(const MyApp());
 }
 
