@@ -48,16 +48,13 @@ class HybridRideMap extends StatefulWidget {
 
 class _HybridRideMapState extends State<HybridRideMap> {
   gmap.GoogleMapController? _gController;
-  amap.AppleMapController? _aController;
 
   Position? _me;
   StreamSubscription<Position>? _posSub;
 
   final Set<gmap.Marker> _gMarkers = {};
-  final Set<amap.Annotation> _aAnnotations = {};
 
   final Set<gmap.Polyline> _gPolylines = {};
-  final Set<amap.Polyline> _aPolylines = {};
 
   bool _locationReady = false;
   bool _cameraCenteredOnce = false;
@@ -172,28 +169,21 @@ class _HybridRideMapState extends State<HybridRideMap> {
     // Só centraliza automaticamente uma vez
     if (!initial && _cameraCenteredOnce) return;
 
-    if (_isIOS) {
-      final c = _aController;
-      if (c == null) return;
-      c.moveCamera(
-        amap.CameraUpdate.newCameraPosition(
-          amap.CameraPosition(target: amap.LatLng(lat, lng), zoom: 15),
-        ),
-      );
-    } else if (_isAndroid) {
-      final c = _gController;
-      if (c == null) return;
-      c.animateCamera(
-        gmap.CameraUpdate.newCameraPosition(
-          gmap.CameraPosition(target: gmap.LatLng(lat, lng), zoom: 15),
-        ),
-      );
-    }
+    final c = _gController;
+    if (c == null) return;
+    c.animateCamera(
+      gmap.CameraUpdate.newCameraPosition(
+        gmap.CameraPosition(target: gmap.LatLng(lat, lng), zoom: 15),
+      ),
+    );
 
     _cameraCenteredOnce = true;
   }
 
   void _refreshLayers() {
+    _buildGoogleMarkersFromUsers();
+    _buildGoogleRoutePolyline();
+    if (mounted) setState(() {});
     if (_isIOS) {
       _buildAppleAnnotationsFromUsers();
       _buildAppleRoutePolyline();
@@ -246,7 +236,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     return true;
   }
 
-  // ---------- ANDROID (Google) ----------
+  // ---------- GOOGLE MAPS ----------
   void _buildGoogleMarkersFromUsers() {
     _gMarkers.clear();
     if (_me == null || widget.users.isEmpty) return;
