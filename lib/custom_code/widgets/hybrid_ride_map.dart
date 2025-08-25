@@ -15,8 +15,6 @@ import 'package:flutter/foundation.dart'
 
 // Google (Android)
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
-// Apple (iOS)
-import 'package:apple_maps_flutter/apple_maps_flutter.dart' as amap;
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart'
     as bg;
@@ -50,16 +48,13 @@ class HybridRideMap extends StatefulWidget {
 
 class _HybridRideMapState extends State<HybridRideMap> {
   gmap.GoogleMapController? _gController;
-  amap.AppleMapController? _aController;
 
   bg.Location? _me;
   Function(bg.Location)? _locCallback;
 
   final Set<gmap.Marker> _gMarkers = {};
-  final Set<amap.Annotation> _aAnnotations = {};
 
   final Set<gmap.Polyline> _gPolylines = {};
-  final Set<amap.Polyline> _aPolylines = {};
 
   bool _locationReady = false;
   bool _cameraCenteredOnce = false;
@@ -79,9 +74,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
   {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0f0f0f"}]}
 ]''';
 
-  bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
-  bool get _isAndroid =>
-      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   @override
   void initState() {
@@ -184,35 +176,20 @@ class _HybridRideMapState extends State<HybridRideMap> {
 
     if (!initial && _cameraCenteredOnce) return;
 
-    if (_isIOS) {
-      final c = _aController;
-      if (c == null) return;
-      c.moveCamera(
-        amap.CameraUpdate.newCameraPosition(
-          amap.CameraPosition(target: amap.LatLng(lat, lng), zoom: 15),
-        ),
-      );
-    } else if (_isAndroid) {
-      final c = _gController;
-      if (c == null) return;
-      c.animateCamera(
-        gmap.CameraUpdate.newCameraPosition(
-          gmap.CameraPosition(target: gmap.LatLng(lat, lng), zoom: 15),
-        ),
-      );
-    }
+    final c = _gController;
+    if (c == null) return;
+    c.animateCamera(
+      gmap.CameraUpdate.newCameraPosition(
+        gmap.CameraPosition(target: gmap.LatLng(lat, lng), zoom: 15),
+      ),
+    );
 
     _cameraCenteredOnce = true;
   }
 
   void _refreshLayers() {
-    if (_isIOS) {
-      _buildAppleAnnotationsFromUsers();
-      _buildAppleRoutePolyline();
-    } else if (_isAndroid) {
-      _buildGoogleMarkersFromUsers();
-      _buildGoogleRoutePolyline();
-    }
+    _buildGoogleMarkersFromUsers();
+    _buildGoogleRoutePolyline();
     if (mounted) setState(() {});
   }
 
@@ -257,7 +234,7 @@ class _HybridRideMapState extends State<HybridRideMap> {
     return true;
   }
 
-  // ---------- ANDROID (Google) ----------
+  // ---------- GOOGLE MAPS ----------
   void _buildGoogleMarkersFromUsers() {
     _gMarkers.clear();
     if (_me == null || widget.users.isEmpty) return;
@@ -325,73 +302,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
     );
   }
 
-  // ---------- iOS (Apple) ----------
-  void _buildAppleAnnotationsFromUsers() {
-    _aAnnotations.clear();
-    if (_me == null || widget.users.isEmpty) return;
-
-    final userLat = _me!.coords.latitude;
-    final userLng = _me!.coords.longitude;
-
-    for (int i = 0; i < widget.users.length; i++) {
-      final u = widget.users[i];
-      if (!_isOnline(u)) continue;
-
-      final pos = _extractDriverPos(u);
-      if (pos == null) continue;
-
-      final distM =
-          Geolocator.distanceBetween(userLat, userLng, pos.lat, pos.lng);
-      if (distM > widget.nearbyRadiusMeters) continue;
-
-      final veryNear = distM < 120.0;
-
-      _aAnnotations.add(
-        amap.Annotation(
-          annotationId: amap.AnnotationId('driver_$i'),
-          position: amap.LatLng(pos.lat, pos.lng),
-          infoWindow: amap.InfoWindow(
-            title: veryNear ? 'Driver (nearby)' : 'Driver',
-            snippet: veryNear ? '≈ ${distM.toStringAsFixed(0)} m' : 'Nearby',
-          ),
-        ),
-      );
-    }
-  }
-
-  void _buildAppleRoutePolyline() {
-    _aPolylines.clear();
-
-    final hasDest = (widget.destLat != null && widget.destLng != null);
-    if (!widget.rideRequested || _me == null || !hasDest) return;
-
-    final user = amap.LatLng(_me!.coords.latitude, _me!.coords.longitude);
-    final destA = amap.LatLng(widget.destLat!, widget.destLng!);
-
-    final encoded = (widget.encodedPolyline ?? '').trim();
-    List<amap.LatLng> apts;
-    if (encoded.isNotEmpty && encoded.toLowerCase() != 'null') {
-      final decoded = _safeDecode(encoded);
-      if (decoded.isNotEmpty) {
-        apts =
-            decoded.map((p) => amap.LatLng(p.latitude, p.longitude)).toList();
-      } else {
-        apts = [user, destA];
-      }
-    } else {
-      apts = [user, destA];
-    }
-
-    _aPolylines.add(
-      amap.Polyline(
-        polylineId: amap.PolylineId('route'), // sem const
-        points: apts,
-        width: 5, // Apple usa width/color (1.4.0)
-        color: Colors.orangeAccent,
-      ),
-    );
-  }
-
   List<_LatLng> _safeDecode(String encoded) {
     try {
       return _decodePolyline(encoded);
@@ -446,27 +356,6 @@ class _HybridRideMapState extends State<HybridRideMap> {
         hasMe ? _me!.latitude : (hasDest ? widget.destLat! : -15.793889);
     final startLng =
         hasMe ? _me!.longitude : (hasDest ? widget.destLng! : -47.882778);
-
-    if (_isIOS) {
-      return SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: amap.AppleMap(
-            initialCameraPosition: amap.CameraPosition(
-              target: amap.LatLng(startLat, startLng),
-              zoom: hasMe ? 14 : 4,
-            ),
-            onMapCreated: (c) => _aController = c,
-            mapType: amap.MapType.standard,
-            myLocationEnabled: _locationReady,
-            annotations: _aAnnotations,
-            polylines: _aPolylines,
-          ),
-        ),
-      );
-    }
 
     return SizedBox(
       width: widget.width,
