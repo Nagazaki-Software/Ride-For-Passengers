@@ -285,9 +285,22 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           tokenizationKey: 'sandbox_ck9vkcgg_brg8dhjg5tqpw496',
                           chargeOnConfirm: widget.pagamento,
                           onTextField: (creditCardTextfield) async {
-                            FFAppState()
-                                .addToCreditCardSalves(creditCardTextfield);
-                            safeSetState(() {});
+                            FFAppState().update(() {
+                              FFAppState().cardNumber =
+                                  getJsonField(creditCardTextfield, r'$.number')
+                                      .toString();
+                              FFAppState().cardExpiry =
+                                  getJsonField(creditCardTextfield, r'$.expiry')
+                                      .toString();
+                              FFAppState().cardCvv =
+                                  getJsonField(creditCardTextfield, r'$.cvv')
+                                      .toString();
+                              FFAppState().cardHolder =
+                                  getJsonField(creditCardTextfield, r'$.holder')
+                                      .toString();
+                              FFAppState().addToCreditCardSalves(
+                                  creditCardTextfield);
+                            });
                           },
                         ),
                       ),
