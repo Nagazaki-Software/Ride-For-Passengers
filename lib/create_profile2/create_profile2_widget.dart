@@ -110,6 +110,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                           await selectMediaWithSourceBottomSheet(
                         context: context,
                         maxHeight: 600.00,
+                        imageQuality: 68,
                         allowPhoto: true,
                         backgroundColor:
                             FlutterFlowTheme.of(context).primaryText,
@@ -120,7 +121,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                           selectedMedia.every((m) =>
                               validateFileFormat(m.storagePath, context))) {
                         safeSetState(
-                            () => _model.isDataUploading_uploadDataF7h = true);
+                            () => _model.isDataUploading_uploadData0f7h = true);
                         var selectedUploadedFiles = <FFUploadedFile>[];
 
                         var downloadUrls = <String>[];
@@ -145,15 +146,15 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               .map((u) => u!)
                               .toList();
                         } finally {
-                          _model.isDataUploading_uploadDataF7h = false;
+                          _model.isDataUploading_uploadData0f7h = false;
                         }
                         if (selectedUploadedFiles.length ==
                                 selectedMedia.length &&
                             downloadUrls.length == selectedMedia.length) {
                           safeSetState(() {
-                            _model.uploadedLocalFile_uploadDataF7h =
+                            _model.uploadedLocalFile_uploadData0f7h =
                                 selectedUploadedFiles.first;
-                            _model.uploadedFileUrl_uploadDataF7h =
+                            _model.uploadedFileUrl_uploadData0f7h =
                                 downloadUrls.first;
                           });
                         } else {
@@ -206,7 +207,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: Image.network(
-                                  _model.uploadedFileUrl_uploadDataF7h,
+                                  _model.uploadedFileUrl_uploadData0f7h,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -245,8 +246,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                   colors: [
                                     FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -449,8 +449,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -630,8 +629,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -811,8 +809,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -1013,8 +1010,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.0, -1.0),
@@ -1028,8 +1024,6 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 options: functions.nationalityList(),
                                 onChanged: (val) => safeSetState(
                                     () => _model.dropDownValue1 = val),
-                                width: 200.0,
-                                height: 40.0,
                                 textStyle: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -1266,7 +1260,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               ...createUsersRecordData(
                                 displayName:
                                     '${_model.textController1.text} ${_model.textController2.text}',
-                                photoUrl: _model.uploadedFileUrl_uploadDataF7h,
+                                photoUrl: _model.uploadedFileUrl_uploadData0f7h,
                               ),
                               ...mapToFirestore(
                                 {

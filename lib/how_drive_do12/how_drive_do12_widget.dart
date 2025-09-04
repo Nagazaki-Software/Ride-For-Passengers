@@ -1227,7 +1227,7 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                       .secondary,
                                                                   FlutterFlowTheme.of(
                                                                           context)
-                                                                      .primaryBackground
+                                                                      .accent1
                                                                 ],
                                                                 stops: [
                                                                   0.0,
@@ -1296,7 +1296,7 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                       .secondary,
                                                                   FlutterFlowTheme.of(
                                                                           context)
-                                                                      .primaryBackground
+                                                                      .accent1
                                                                 ],
                                                                 stops: [
                                                                   0.0,
@@ -1365,7 +1365,7 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                       .secondary,
                                                                   FlutterFlowTheme.of(
                                                                           context)
-                                                                      .primaryBackground
+                                                                      .accent1
                                                                 ],
                                                                 stops: [
                                                                   0.0,
@@ -2167,7 +2167,7 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                               .secondary,
                                                           FlutterFlowTheme.of(
                                                                   context)
-                                                              .primaryBackground
+                                                              .accent1
                                                         ],
                                                         stops: [0.0, 1.0],
                                                         begin:

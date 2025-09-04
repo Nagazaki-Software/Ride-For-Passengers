@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 
 import '/backend/schema/util/firestore_util.dart';
-import '/backend/schema/util/schema_util.dart';
 
 import 'index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -66,6 +65,21 @@ class UsersRecord extends FirestoreRecord {
   bool get driverOnline => _driverOnline ?? false;
   bool hasDriverOnline() => _driverOnline != null;
 
+  // "passe" field.
+  String? _passe;
+  String get passe => _passe ?? '';
+  bool hasPasse() => _passe != null;
+
+  // "location" field.
+  LatLng? _location;
+  LatLng? get location => _location;
+  bool hasLocation() => _location != null;
+
+  // "ridePoints" field.
+  int? _ridePoints;
+  int get ridePoints => _ridePoints ?? 0;
+  bool hasRidePoints() => _ridePoints != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -77,6 +91,9 @@ class UsersRecord extends FirestoreRecord {
     _saldo = castToType<double>(snapshotData['saldo']);
     _driver = snapshotData['driver'] as bool?;
     _driverOnline = snapshotData['driverOnline'] as bool?;
+    _passe = snapshotData['passe'] as String?;
+    _location = snapshotData['location'] as LatLng?;
+    _ridePoints = castToType<int>(snapshotData['ridePoints']);
   }
 
   static CollectionReference get collection =>
@@ -122,6 +139,9 @@ Map<String, dynamic> createUsersRecordData({
   double? saldo,
   bool? driver,
   bool? driverOnline,
+  String? passe,
+  LatLng? location,
+  int? ridePoints,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -134,6 +154,9 @@ Map<String, dynamic> createUsersRecordData({
       'saldo': saldo,
       'driver': driver,
       'driverOnline': driverOnline,
+      'passe': passe,
+      'location': location,
+      'ridePoints': ridePoints,
     }.withoutNulls,
   );
 
@@ -155,7 +178,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         listEquality.equals(e1?.plataform, e2?.plataform) &&
         e1?.saldo == e2?.saldo &&
         e1?.driver == e2?.driver &&
-        e1?.driverOnline == e2?.driverOnline;
+        e1?.driverOnline == e2?.driverOnline &&
+        e1?.passe == e2?.passe &&
+        e1?.location == e2?.location &&
+        e1?.ridePoints == e2?.ridePoints;
   }
 
   @override
@@ -169,7 +195,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.plataform,
         e?.saldo,
         e?.driver,
-        e?.driverOnline
+        e?.driverOnline,
+        e?.passe,
+        e?.location,
+        e?.ridePoints
       ]);
 
   @override

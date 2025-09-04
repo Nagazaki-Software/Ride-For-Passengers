@@ -3,8 +3,6 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/custom_code/actions/index.dart' as actions;
-import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/permissions_util.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +87,7 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).tertiary,
+        backgroundColor: FlutterFlowTheme.of(context).primaryText,
         body: Container(
           width: MediaQuery.sizeOf(context).width * 1.0,
           height: MediaQuery.sizeOf(context).height * 1.0,
@@ -181,62 +179,6 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
                                     ),
                               ),
                             ].divide(SizedBox(width: 8.0)),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Container(
-                                    width: 56.0,
-                                    height: 24.0,
-                                    child: custom_widgets.Botaoswitch(
-                                      width: 56.0,
-                                      height: 24.0,
-                                      labelOn: 'ON',
-                                      labelOff: 'OFF',
-                                      initialValue: true,
-                                      onChange: (onSelected) async {
-                                        if (onSelected) {
-                                          await actions
-                                              .startLocationStreamSimple(
-                                            context,
-                                          );
-                                        } else {
-                                          await actions
-                                              .stopLocationStreamSimple(
-                                            context,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Text(
-                                    'Autolocation',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                          color: Color(0xBFF1F4F8),
-                                          fontSize: 10.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.normal,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ],
                           ),
                         ],
                       ),
@@ -371,45 +313,54 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
                                 ),
                               ),
                             ),
-                            Container(
-                              width: 300.0,
-                              height: 44.0,
-                              decoration: BoxDecoration(
-                                color: Color(0xFF303033),
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 2.0,
-                                    color: Color(0x48FFFFFF),
-                                    offset: Offset(
-                                      0.0,
-                                      -1.0,
-                                    ),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(20.0),
-                                  bottomRight: Radius.circular(20.0),
-                                  topLeft: Radius.circular(20.0),
-                                  topRight: Radius.circular(20.0),
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(Login0Widget.routeName);
+                              },
+                              child: Container(
+                                width: 300.0,
+                                height: 44.0,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF303033),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 2.0,
+                                      color: Color(0x48FFFFFF),
+                                      offset: Offset(
+                                        0.0,
+                                        -1.0,
+                                      ),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(20.0),
+                                    bottomRight: Radius.circular(20.0),
+                                    topLeft: Radius.circular(20.0),
+                                    topRight: Radius.circular(20.0),
+                                  ),
                                 ),
-                              ),
-                              alignment: AlignmentDirectional(0.0, 0.0),
-                              child: Text(
-                                'Log in',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.poppins(
+                                alignment: AlignmentDirectional(0.0, 0.0),
+                                child: Text(
+                                  'Log in',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        fontSize: 18.0,
+                                        letterSpacing: 0.0,
                                         fontWeight: FontWeight.w600,
                                         fontStyle: FontStyle.italic,
                                       ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 18.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontStyle: FontStyle.italic,
-                                    ),
+                                ),
                               ),
                             ),
                           ],

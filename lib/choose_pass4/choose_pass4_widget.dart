@@ -1,4 +1,4 @@
-import '/components/placeholder_payment_widget.dart';
+import '/components/card_payment_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -328,7 +328,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                             _model.instantTimer =
                                                 InstantTimer.periodic(
                                               duration:
-                                                  Duration(milliseconds: 1000),
+                                                  Duration(milliseconds: 500),
                                               callback: (timer) async {
                                                 _model.click = 'day';
                                                 safeSetState(() {});
@@ -360,7 +360,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                 FlutterFlowTheme.of(context)
                                                     .secondaryBackground,
                                                 FlutterFlowTheme.of(context)
-                                                    .primaryBackground
+                                                    .accent1
                                               ],
                                               stops: [0.0, 1.0],
                                               begin: AlignmentDirectional(
@@ -669,8 +669,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                     colors: [
                                       FlutterFlowTheme.of(context)
                                           .secondaryBackground,
-                                      FlutterFlowTheme.of(context)
-                                          .primaryBackground
+                                      FlutterFlowTheme.of(context).accent1
                                     ],
                                     stops: [0.0, 0.5],
                                     begin: AlignmentDirectional(0.17, -1.0),
@@ -766,7 +765,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                     }
                                     _model.instantTimerweek =
                                         InstantTimer.periodic(
-                                      duration: Duration(milliseconds: 1000),
+                                      duration: Duration(milliseconds: 500),
                                       callback: (timer) async {
                                         _model.click = 'week';
                                         safeSetState(() {});
@@ -794,8 +793,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                       colors: [
                                         FlutterFlowTheme.of(context)
                                             .secondaryBackground,
-                                        FlutterFlowTheme.of(context)
-                                            .primaryBackground
+                                        FlutterFlowTheme.of(context).accent1
                                       ],
                                       stops: [0.0, 1.0],
                                       begin: AlignmentDirectional(0.91, -1.0),
@@ -1047,7 +1045,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                   FlutterFlowTheme.of(context)
                                                       .secondaryBackground,
                                                   FlutterFlowTheme.of(context)
-                                                      .primaryBackground
+                                                      .accent1
                                                 ],
                                                 stops: [0.0, 1.0],
                                                 begin: AlignmentDirectional(
@@ -1380,7 +1378,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                       ),
                       child: Padding(
                         padding:
-                            EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 8.0),
+                            EdgeInsetsDirectional.fromSTEB(10.0, 8.0, 0.0, 8.0),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1549,7 +1547,22 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                       child: Padding(
                                         padding:
                                             MediaQuery.viewInsetsOf(context),
-                                        child: PlaceholderPaymentWidget(),
+                                        child: CardPaymentWidget(
+                                          value: () {
+                                            if (_model.click == 'day') {
+                                              return 5.0;
+                                            } else if (_model.click == 'week') {
+                                              return 8.0;
+                                            } else if (_model.click ==
+                                                'month') {
+                                              return 10.0;
+                                            } else {
+                                              return 0.0;
+                                            }
+                                          }(),
+                                          passe: _model.click!,
+                                          pagamento: true,
+                                        ),
                                       ),
                                     );
                                   },

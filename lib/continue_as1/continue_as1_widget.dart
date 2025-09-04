@@ -413,7 +413,8 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                                   .alternate,
                                         ),
                                         child: Checkbox(
-                                          value: _model.checkboxValue1 ??= true,
+                                          value: _model.checkboxValue1 ??=
+                                              _model.click == 'im visiting',
                                           onChanged: (_model.click ==
                                                   'im bahamian')
                                               ? null
@@ -650,7 +651,8 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                                   .alternate,
                                         ),
                                         child: Checkbox(
-                                          value: _model.checkboxValue2 ??= true,
+                                          value: _model.checkboxValue2 ??=
+                                              _model.click == 'im bahamian',
                                           onChanged: (_model.click ==
                                                   'im visiting')
                                               ? null

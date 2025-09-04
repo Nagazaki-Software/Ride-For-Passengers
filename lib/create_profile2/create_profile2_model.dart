@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 class CreateProfile2Model extends FlutterFlowModel<CreateProfile2Widget> {
   ///  State fields for stateful widgets in this page.
 
-  bool isDataUploading_uploadDataF7h = false;
-  FFUploadedFile uploadedLocalFile_uploadDataF7h =
+  bool isDataUploading_uploadData0f7h = false;
+  FFUploadedFile uploadedLocalFile_uploadData0f7h =
       FFUploadedFile(bytes: Uint8List.fromList([]));
-  String uploadedFileUrl_uploadDataF7h = '';
+  String uploadedFileUrl_uploadData0f7h = '';
 
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode1;

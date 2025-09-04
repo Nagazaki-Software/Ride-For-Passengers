@@ -98,7 +98,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                   ),
                               colors: [
                                 FlutterFlowTheme.of(context).secondary,
-                                FlutterFlowTheme.of(context).primaryBackground,
+                                FlutterFlowTheme.of(context).accent1,
                                 Color(0xFFF2E0B3)
                               ],
                               gradientDirection: GradientDirection.btt,
@@ -191,8 +191,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                           ),
                                       colors: [
                                         FlutterFlowTheme.of(context).secondary,
-                                        FlutterFlowTheme.of(context)
-                                            .primaryBackground
+                                        FlutterFlowTheme.of(context).accent1
                                       ],
                                       gradientDirection: GradientDirection.ltr,
                                       gradientType: GradientType.linear,
@@ -427,7 +426,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                                             .secondary,
                                                         FlutterFlowTheme.of(
                                                                 context)
-                                                            .primaryBackground
+                                                            .accent1
                                                       ],
                                                       gradientDirection:
                                                           GradientDirection.ltr,

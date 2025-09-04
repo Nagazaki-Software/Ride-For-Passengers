@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'flutter_flow/request_manager.dart';
+import '/backend/backend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'flutter_flow/flutter_flow_util.dart';
 
 class FFAppState extends ChangeNotifier {
   static FFAppState _instance = FFAppState._internal();
@@ -39,7 +42,43 @@ class FFAppState extends ChangeNotifier {
           prefs.getStringList('ff_locationsPorPerto') ?? _locationsPorPerto;
     });
     _safeInit(() {
-      _pagesNavBar = prefs.getString('ff_pagesNavBar') ?? _pagesNavBar;
+      _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
+    });
+    _safeInit(() {
+      _cardExpiry = prefs.getString('ff_cardExpiry') ?? _cardExpiry;
+    });
+    _safeInit(() {
+      _cardCvv = prefs.getString('ff_cardCvv') ?? _cardCvv;
+    });
+    _safeInit(() {
+      _cardHolder = prefs.getString('ff_cardHolder') ?? _cardHolder;
+    });
+    _safeInit(() {
+      _latlngAtual =
+          latLngFromString(prefs.getString('ff_latlngAtual')) ?? _latlngAtual;
+    });
+    _safeInit(() {
+      _passangers = prefs.getInt('ff_passangers') ?? _passangers;
+    });
+    _safeInit(() {
+      _creditCardSalves = prefs.getStringList('ff_creditCardSalves')?.map((x) {
+            try {
+              return jsonDecode(x);
+            } catch (e) {
+              print("Can't decode persisted json. Error: $e.");
+              return {};
+            }
+          }).toList() ??
+          _creditCardSalves;
+    });
+    _safeInit(() {
+      if (prefs.containsKey('ff_defaultCard')) {
+        try {
+          _defaultCard = jsonDecode(prefs.getString('ff_defaultCard') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
     });
   }
 
@@ -133,8 +172,138 @@ class FFAppState extends ChangeNotifier {
   String get pagesNavBar => _pagesNavBar;
   set pagesNavBar(String value) {
     _pagesNavBar = value;
-    prefs.setString('ff_pagesNavBar', value);
   }
+
+  String _cardNumber = '';
+  String get cardNumber => _cardNumber;
+  set cardNumber(String value) {
+    _cardNumber = value;
+    prefs.setString('ff_cardNumber', value);
+  }
+
+  String _cardExpiry = '';
+  String get cardExpiry => _cardExpiry;
+  set cardExpiry(String value) {
+    _cardExpiry = value;
+    prefs.setString('ff_cardExpiry', value);
+  }
+
+  String _cardCvv = '';
+  String get cardCvv => _cardCvv;
+  set cardCvv(String value) {
+    _cardCvv = value;
+    prefs.setString('ff_cardCvv', value);
+  }
+
+  String _cardHolder = '';
+  String get cardHolder => _cardHolder;
+  set cardHolder(String value) {
+    _cardHolder = value;
+    prefs.setString('ff_cardHolder', value);
+  }
+
+  LatLng? _latlngAtual = LatLng(25.0443312, -77.3503609);
+  LatLng? get latlngAtual => _latlngAtual;
+  set latlngAtual(LatLng? value) {
+    _latlngAtual = value;
+    value != null
+        ? prefs.setString('ff_latlngAtual', value.serialize())
+        : prefs.remove('ff_latlngAtual');
+  }
+
+  LatLng? _latlangAondeVaiIr;
+  LatLng? get latlangAondeVaiIr => _latlangAondeVaiIr;
+  set latlangAondeVaiIr(LatLng? value) {
+    _latlangAondeVaiIr = value;
+  }
+
+  String _locationAondeEleEsta = '';
+  String get locationAondeEleEsta => _locationAondeEleEsta;
+  set locationAondeEleEsta(String value) {
+    _locationAondeEleEsta = value;
+  }
+
+  String _locationWhereTo = 'Where to?';
+  String get locationWhereTo => _locationWhereTo;
+  set locationWhereTo(String value) {
+    _locationWhereTo = value;
+  }
+
+  String _listPerto = '';
+  String get listPerto => _listPerto;
+  set listPerto(String value) {
+    _listPerto = value;
+  }
+
+  int _passangers = 0;
+  int get passangers => _passangers;
+  set passangers(int value) {
+    _passangers = value;
+    prefs.setInt('ff_passangers', value);
+  }
+
+  List<dynamic> _creditCardSalves = [];
+  List<dynamic> get creditCardSalves => _creditCardSalves;
+  set creditCardSalves(List<dynamic> value) {
+    _creditCardSalves = value;
+    prefs.setStringList(
+        'ff_creditCardSalves', value.map((x) => jsonEncode(x)).toList());
+  }
+
+  void addToCreditCardSalves(dynamic value) {
+    creditCardSalves.add(value);
+    prefs.setStringList('ff_creditCardSalves',
+        _creditCardSalves.map((x) => jsonEncode(x)).toList());
+  }
+
+  void removeFromCreditCardSalves(dynamic value) {
+    creditCardSalves.remove(value);
+    prefs.setStringList('ff_creditCardSalves',
+        _creditCardSalves.map((x) => jsonEncode(x)).toList());
+  }
+
+  void removeAtIndexFromCreditCardSalves(int index) {
+    creditCardSalves.removeAt(index);
+    prefs.setStringList('ff_creditCardSalves',
+        _creditCardSalves.map((x) => jsonEncode(x)).toList());
+  }
+
+  void updateCreditCardSalvesAtIndex(
+    int index,
+    dynamic Function(dynamic) updateFn,
+  ) {
+    creditCardSalves[index] = updateFn(_creditCardSalves[index]);
+    prefs.setStringList('ff_creditCardSalves',
+        _creditCardSalves.map((x) => jsonEncode(x)).toList());
+  }
+
+  void insertAtIndexInCreditCardSalves(int index, dynamic value) {
+    creditCardSalves.insert(index, value);
+    prefs.setStringList('ff_creditCardSalves',
+        _creditCardSalves.map((x) => jsonEncode(x)).toList());
+  }
+
+  dynamic _defaultCard;
+  dynamic get defaultCard => _defaultCard;
+  set defaultCard(dynamic value) {
+    _defaultCard = value;
+    prefs.setString('ff_defaultCard', jsonEncode(value));
+  }
+
+  final _recentTripsManager = StreamRequestManager<List<RideOrdersRecord>>();
+  Stream<List<RideOrdersRecord>> recentTrips({
+    String? uniqueQueryKey,
+    bool? overrideCache,
+    required Stream<List<RideOrdersRecord>> Function() requestFn,
+  }) =>
+      _recentTripsManager.performRequest(
+        uniqueQueryKey: uniqueQueryKey,
+        overrideCache: overrideCache,
+        requestFn: requestFn,
+      );
+  void clearRecentTripsCache() => _recentTripsManager.clear();
+  void clearRecentTripsCacheKey(String? uniqueKey) =>
+      _recentTripsManager.clearRequest(uniqueKey);
 }
 
 void _safeInit(Function() initializeField) {

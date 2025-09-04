@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1075126726259-cir1ukqao3meie2jmcpf18tbq402i5cp.apps.googleusercontent.com</string>
+	<string>1075126726259-urf25s0r8b482p7hom8bibaulcrari90.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1075126726259-cir1ukqao3meie2jmcpf18tbq402i5cp</string>
+	<string>com.googleusercontent.apps.1075126726259-urf25s0r8b482p7hom8bibaulcrari90</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>1075126726259-d7jf1bbbqmeaec6k64c55gf70bv7j8q6.apps.googleusercontent.com</string>
+	<string>1075126726259-51l3g8gcgjhqhi549aqk7bauk0ij4dv1.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAMjglEQzNq_48vtTpES-cBUKq5WGLTkCY</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.quicky.rideforpassengers</string>
+	<string>com.quicky.ridebahamas</string>
 	<key>PROJECT_ID</key>
 	<string>quick-b108e</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1075126726259:ios:43120cab5fc077e1c68406</string>
+	<string>1:1075126726259:ios:13ffc7b252b21b3dc68406</string>
 </dict>
 </plist>

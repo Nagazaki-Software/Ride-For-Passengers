@@ -1,4 +1,5 @@
 import '/components/navbar_widget.dart';
+import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'home5_widget.dart' show Home5Widget;
@@ -7,9 +8,15 @@ import 'package:flutter/material.dart';
 class Home5Model extends FlutterFlowModel<Home5Widget> {
   ///  Local state fields for this page.
 
-  String? rideChoose;
+  String rideChoose = 'ride';
 
   bool rideForConfirm = false;
+
+  LatLng? location;
+
+  LatLng? locationAtual;
+
+  String? perto;
 
   ///  State fields for stateful widgets in this page.
 
@@ -17,18 +24,12 @@ class Home5Model extends FlutterFlowModel<Home5Widget> {
   List<dynamic>? locationPerto;
   // Stores action output result for [Custom Action - localGreetingAction] action in Home5 widget.
   String? fraseInicial;
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode;
-  TextEditingController? textController;
-  String? Function(BuildContext, String?)? textControllerValidator;
-  // Stores action output result for [Custom Action - googlePlacesAutocomplete] action in TextField widget.
-  List<dynamic>? googlemaps;
-  // Stores action output result for [Custom Action - geocodeAddress] action in TextField widget.
-  dynamic geolocatoraddress;
+  // State field(s) for GoogleMap widget.
+  LatLng? googleMapsCenter;
+  final googleMapsController = Completer<GoogleMapController>();
   // Stores action output result for [Custom Action - geocodeAddress] action in Container widget.
   dynamic geolocatoraddressonchoose;
-  // Stores action output result for [Custom Action - geocodeAddress] action in Container widget.
-  dynamic geolocatoraddressontap;
+  DateTime? datePicked;
   // Model for navbar component.
   late NavbarModel navbarModel;
 
@@ -39,9 +40,6 @@ class Home5Model extends FlutterFlowModel<Home5Widget> {
 
   @override
   void dispose() {
-    textFieldFocusNode?.dispose();
-    textController?.dispose();
-
     navbarModel.dispose();
   }
 }

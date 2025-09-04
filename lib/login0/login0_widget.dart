@@ -583,8 +583,7 @@ class _Login0WidgetState extends State<Login0Widget> {
                                   width: 300.0,
                                   height: 44.0,
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
+                                    color: FlutterFlowTheme.of(context).accent1,
                                     boxShadow: [
                                       BoxShadow(
                                         blurRadius: 2.0,
