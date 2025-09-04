@@ -270,7 +270,7 @@ class _Home5WidgetState extends State<Home5Widget>
     context.watch<FFAppState>();
     if (currentUserLocationValue == null) {
       return Container(
-        color: FlutterFlowTheme.of(context).primaryBackground,
+        color: FlutterFlowTheme.of(context).primaryText,
         child: Center(
           child: SizedBox(
             width: 50.0,
@@ -304,7 +304,7 @@ class _Home5WidgetState extends State<Home5Widget>
                     LatLng(13.106061, -59.613158),
                 markerColor: GoogleMarkerColor.violet,
                 mapType: MapType.normal,
-                style: GoogleMapStyle.standard,
+                style: GoogleMapStyle.night,
                 initialZoom: 14.0,
                 allowInteraction: true,
                 allowZoom: false,
