@@ -681,37 +681,28 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
     if (!_mapReady || _controller == null) return;
     if (_pendingFit) return;
     _pendingFit = true;
-    Future<void>.delayed(const Duration(milliseconds: 120), () async {
+    Future<void>.delayed(const Duration(milliseconds: 200), () async {
       _pendingFit = false;
-      await _fitToContent(padding: 60);
+      await animateToRoute(padding: 60);
     });
   }
 
-  Future<void> _fitToContent({double padding = 60}) async {
+  Future<void> animateToRoute({double padding = 60}) async {
     if (_controller == null) return;
     final pts = <gmaps.LatLng>[];
     for (final pl in _polylines) pts.addAll(pl.points);
     for (final m in _markers) pts.add(m.position);
     if (pts.isEmpty) return;
 
-    double minLat = pts.first.latitude, maxLat = pts.first.latitude;
-    double minLng = pts.first.longitude, maxLng = pts.first.longitude;
-    for (final p in pts) {
-      if (p.latitude < minLat) minLat = p.latitude;
-      if (p.latitude > maxLat) maxLat = p.latitude;
-      if (p.longitude < minLng) minLng = p.longitude;
-      if (p.longitude > maxLng) maxLng = p.longitude;
-    }
+    final bounds = _boundsFromLatLngs(pts);
+    if (bounds == null) return;
 
-    final bounds = (minLat == maxLat || minLng == maxLng)
-        ? gmaps.LatLngBounds(
-            southwest: gmaps.LatLng(minLat - 0.001, minLng - 0.001),
-            northeast: gmaps.LatLng(maxLat + 0.001, maxLng + 0.001),
-          )
-        : gmaps.LatLngBounds(
-            southwest: gmaps.LatLng(minLat, minLng),
-            northeast: gmaps.LatLng(maxLat, maxLng),
-          );
+    if (bounds.northeast == bounds.southwest) {
+      await _controller!.animateCamera(
+        gmaps.CameraUpdate.newLatLngZoom(bounds.northeast, 15),
+      );
+      return;
+    }
 
     try {
       await _controller!.animateCamera(
@@ -727,6 +718,22 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
         } catch (_) {}
       });
     }
+  }
+
+  gmaps.LatLngBounds? _boundsFromLatLngs(List<gmaps.LatLng> pts) {
+    if (pts.isEmpty) return null;
+    double minLat = pts.first.latitude, maxLat = pts.first.latitude;
+    double minLng = pts.first.longitude, maxLng = pts.first.longitude;
+    for (final p in pts) {
+      if (p.latitude < minLat) minLat = p.latitude;
+      if (p.latitude > maxLat) maxLat = p.latitude;
+      if (p.longitude < minLng) minLng = p.longitude;
+      if (p.longitude > maxLng) maxLng = p.longitude;
+    }
+    return gmaps.LatLngBounds(
+      southwest: gmaps.LatLng(minLat, minLng),
+      northeast: gmaps.LatLng(maxLat, maxLng),
+    );
   }
 
   // ---------------- ROTA USER->DEST ----------------
@@ -801,64 +808,8 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
       infoWindow: const gmaps.InfoWindow(title: 'Destino'),
     ));
 
-    // 1) BACKGROUND estático: rota inteira
-    _polylines.add(_poly(
-      _route,
-      id: 'route_bg',
-      zIndex: 7,
-      color: widget.routeColor.withOpacity(0.35),
-      width: (widget.routeWidth + 2).clamp(4, 9),
-    ));
-
-    // 2) Snake animada
-    _visibleRoute = [_route.first, _route.first];
-    _polylines.add(_poly(
-      _visibleRoute,
-      id: 'route_main',
-      zIndex: 8,
-      color: widget.routeColor,
-      width: widget.routeWidth.clamp(3, 7),
-    ));
-    setState(() {});
-
-    final dist = _totalDist;
-    final durMs = (1600 + (dist / 1200) * 2400).clamp(1600, 5000).toInt();
-
-    _routeAnim ??= AnimationController(vsync: this);
-    _routeAnim!.duration = Duration(milliseconds: durMs);
-
-    _routeCurve?.removeListener(_routeCurveListener);
-    _routeCurve =
-        CurvedAnimation(parent: _routeAnim!, curve: Curves.easeInOutCubic)
-          ..addListener(_routeCurveListener);
-
-    // failsafe
-    _routeFailSafe = Timer(Duration(milliseconds: durMs + 600), () {
-      if (!mounted) return;
-      _polylines.removeWhere((pl) => pl.polylineId.value == 'route_main');
-      _polylines.add(_poly(
-        _route,
-        id: 'route_main',
-        zIndex: 8,
-        color: widget.routeColor,
-        width: widget.routeWidth.clamp(3, 7),
-      ));
-      setState(() {});
-    });
-
-    _routeAnim!.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _routeFailSafe?.cancel();
-      }
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _routeAnim!
-          ..reset()
-          ..forward(from: 0);
-      }
-    });
+    // Atualiza polylines da rota e inicia animação
+    updateRoute(_route.map((e) => LatLng(e.latitude, e.longitude)).toList());
   }
 
   void _routeCurveListener() {
@@ -897,6 +848,86 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
     return vis;
   }
 
+  // Atualiza rota a partir de uma lista de pontos e reinicia animação
+  void updateRoute(List<LatLng> points) {
+    _polylines.removeWhere((pl) =>
+        pl.polylineId.value == 'route_main' ||
+        pl.polylineId.value == 'route_bg');
+
+    _route = points.map(_gm).toList();
+    if (_route.length < 2) {
+      _visibleRoute = _route;
+      _cumDist = [];
+      _totalDist = 0;
+      setState(() {});
+      return;
+    }
+
+    _buildCumDist(_route);
+
+    _visibleRoute = [_route.first, _route.first];
+    _polylines.add(_poly(
+      _route,
+      id: 'route_bg',
+      zIndex: 7,
+      color: widget.routeColor.withOpacity(0.35),
+      width: (widget.routeWidth + 2).clamp(4, 9),
+    ));
+    _polylines.add(_poly(
+      _visibleRoute,
+      id: 'route_main',
+      zIndex: 8,
+      color: widget.routeColor,
+      width: widget.routeWidth.clamp(3, 7),
+    ));
+
+    setState(() {});
+    _startRouteAnimation();
+    _scheduleFit();
+  }
+
+  void _startRouteAnimation() {
+    final dist = _totalDist;
+    final durMs =
+        (1600 + (dist / 1200) * 2400).clamp(1600, 5000).toInt();
+
+    _routeAnim ??= AnimationController(vsync: this);
+    _routeAnim!.duration = Duration(milliseconds: durMs);
+
+    _routeCurve?.removeListener(_routeCurveListener);
+    _routeCurve =
+        CurvedAnimation(parent: _routeAnim!, curve: Curves.easeInOutCubic)
+          ..addListener(_routeCurveListener);
+
+    _routeFailSafe?.cancel();
+    _routeFailSafe = Timer(Duration(milliseconds: durMs + 600), () {
+      if (!mounted) return;
+      _polylines.removeWhere((pl) => pl.polylineId.value == 'route_main');
+      _polylines.add(_poly(
+        _route,
+        id: 'route_main',
+        zIndex: 8,
+        color: widget.routeColor,
+        width: widget.routeWidth.clamp(3, 7),
+      ));
+      setState(() {});
+    });
+
+    _routeAnim!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _routeFailSafe?.cancel();
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _routeAnim!
+          ..reset()
+          ..forward(from: 0);
+      }
+    });
+  }
+
   gmaps.Polyline _poly(
     List<gmaps.LatLng> pts, {
     required String id,
@@ -914,13 +945,6 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
         endCap: gmaps.Cap.roundCap,
         jointType: gmaps.JointType.round,
         geodesic: true,
-        // A non-const list is required here because PatternItem constructors
-        // are not compile-time constants. Using `const` caused a build failure
-        // when the polyline was compiled for iOS.
-        patterns: [
-          gmaps.PatternItem.dash(20),
-          gmaps.PatternItem.gap(10),
-        ],
       );
 
   // ---------------- Lifecycle ----------------
