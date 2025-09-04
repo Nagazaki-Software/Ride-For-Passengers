@@ -914,7 +914,10 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
         endCap: gmaps.Cap.roundCap,
         jointType: gmaps.JointType.round,
         geodesic: true,
-        patterns: const [
+        // A non-const list is required here because PatternItem constructors
+        // are not compile-time constants. Using `const` caused a build failure
+        // when the polyline was compiled for iOS.
+        patterns: [
           gmaps.PatternItem.dash(20),
           gmaps.PatternItem.gap(10),
         ],
