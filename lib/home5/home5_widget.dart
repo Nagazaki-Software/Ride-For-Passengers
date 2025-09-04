@@ -292,30 +292,14 @@ class _Home5WidgetState extends State<Home5Widget>
       child: Scaffold(
         key: scaffoldKey,
         resizeToAvoidBottomInset: false,
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         backgroundColor: FlutterFlowTheme.of(context).primaryText,
         body: Stack(
+          clipBehavior: Clip.hardEdge,
           children: [
-            Opacity(
-              opacity: 0.0,
-              child: FlutterFlowGoogleMap(
-                controller: _model.googleMapsController,
-                onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
-                initialLocation: _model.googleMapsCenter ??=
-                    LatLng(13.106061, -59.613158),
-                markerColor: GoogleMarkerColor.violet,
-                mapType: MapType.normal,
-                style: GoogleMapStyle.night,
-                initialZoom: 14.0,
-                allowInteraction: true,
-                allowZoom: false,
-                showZoomControls: false,
-                showLocation: true,
-                showCompass: false,
-                showMapToolbar: false,
-                showTraffic: false,
-                centerMapOnMarkerTap: false,
-                mapTakesGesturePreference: false,
-              ),
+            const Positioned.fill(
+              child: ColoredBox(color: Colors.black),
             ),
             PointerInterceptor(
               intercepting: isWeb,
