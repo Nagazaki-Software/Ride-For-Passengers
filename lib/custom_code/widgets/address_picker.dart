@@ -460,15 +460,21 @@ class _AddressPickerState extends State<AddressPicker> {
       setState(() => _isListening = false);
       return;
     }
-    setState(() => _isListening = true);
+    _destFocus.requestFocus();
+    setState(() {
+      _isListening = true;
+      _editingPickup = false;
+    });
     await _speech.listen(
       listenMode: stt.ListenMode.dictation,
       onResult: (res) {
         final text = res.recognizedWords.trim();
-        _destCtrl.text = text; // sempre mostra o texto NO CAMPO
+        _destCtrl
+          ..text = text
+          ..selection = TextSelection.fromPosition(
+              TextPosition(offset: text.length));
         setState(() {});
         if (text.isNotEmpty) {
-          _editingPickup = false;
           _kickSearch(); // puxa sugestões com bias no user
         }
       },
