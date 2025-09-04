@@ -319,6 +319,7 @@ class _CardFormFFState extends State<CardFormFF> {
       'expYear': data.year, // "YYYY"
 
       // Informação não sensível, útil pro UI
+      'cvv': data.cvv,
       'cvvLength': data.cvv.length,
 
       // Status/form

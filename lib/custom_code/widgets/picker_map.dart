@@ -914,6 +914,10 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
         endCap: gmaps.Cap.roundCap,
         jointType: gmaps.JointType.round,
         geodesic: true,
+        patterns: const [
+          gmaps.PatternItem.dash(20),
+          gmaps.PatternItem.gap(10),
+        ],
       );
 
   // ---------------- Lifecycle ----------------
