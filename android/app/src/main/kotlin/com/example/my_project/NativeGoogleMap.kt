@@ -28,6 +28,10 @@ class NativeGoogleMap(
     init {
         channel.setMethodCallHandler(this)
         mapView.onCreate(null)
+        // Ensure the MapView lifecycle is properly started so the
+        // GoogleMap instance can render correctly.
+        // Some devices require onStart to be invoked before onResume.
+        mapView.onStart()
         mapView.onResume()
         mapView.getMapAsync { g ->
             googleMap = g
@@ -43,6 +47,10 @@ class NativeGoogleMap(
     override fun getView(): View = mapView
 
     override fun dispose() {
+        // Mirror the lifecycle methods called in init to avoid
+        // memory leaks and ensure the map cleans up correctly.
+        mapView.onPause()
+        mapView.onStop()
         mapView.onDestroy()
     }
 
