@@ -1112,7 +1112,12 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
 
   void _maybeReveal() {
     if (!_veilVisible) return;
-    if (_styleReady && _firstIdle && mounted) {
+    // Reveal the map as soon as the style is ready. Previously this method
+    // also waited for the first camera idle callback, which could prevent the
+    // map from ever showing if that event wasn't fired. By removing that
+    // requirement we ensure the veil is lifted immediately after the map is
+    // created, allowing the map to be visible right when the widget starts.
+    if (_styleReady && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() => _veilVisible = false);
       });
