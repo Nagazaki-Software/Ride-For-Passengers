@@ -12,6 +12,9 @@ import GoogleMaps
   ) -> Bool {
     GMSServices.provideAPIKey("AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ")
     GeneratedPluginRegistrant.register(with: self)
+    if let registrar = self.registrar(forPlugin: "native-google-map") {
+      registrar.register(NativeGoogleMapFactory(messenger: registrar.messenger()), withId: "native-google-map")
+    }
     BTAppContextSwitcher.setReturnURLScheme("com.quicky.ridebahamas.braintree")
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

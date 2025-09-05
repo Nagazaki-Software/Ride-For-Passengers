@@ -7,6 +7,8 @@ import 'index.dart'; // Imports other custom widgets
 import '/custom_code/actions/index.dart'; // Imports custom actions
 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'native_google_map.dart';
 // Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
@@ -93,6 +95,7 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
   final _polylines = <gmaps.Polyline>{};
   final _markers = <gmaps.Marker>{};
   gmaps.GoogleMapController? _controller;
+  NativeGoogleMapController? _nativeController;
 
   // cache de ícones
   final Map<String, gmaps.BitmapDescriptor> _iconCache = {};
@@ -143,6 +146,30 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
 ''';
 
   gmaps.LatLng _gm(LatLng p) => gmaps.LatLng(p.latitude, p.longitude);
+
+  LatLng _center() {
+    if (widget.destination == null) return widget.userLocation;
+    return LatLng(
+      (widget.userLocation.latitude + widget.destination!.latitude) / 2.0,
+      (widget.userLocation.longitude + widget.destination!.longitude) / 2.0,
+    );
+  }
+
+  Future<void> _syncNativeMap() async {
+    if (_nativeController == null) return;
+    final c = _center();
+    await _nativeController!.moveCamera(c, widget.destination == null ? 13.0 : 12.5);
+    await _nativeController!.setMarkers(_markers.map((m) => {
+      "id": m.markerId.value,
+      "lat": m.position.latitude,
+      "lng": m.position.longitude,
+      "rotation": m.rotation,
+    }).toList());
+    if (_polylines.isNotEmpty) {
+      final pts = _polylines.first.points.map((p) => [p.latitude, p.longitude]).toList();
+      await _nativeController!.setPolylines(pts);
+    }
+  }
 
   // ---------------- ÍCONES ----------------
 
@@ -1013,6 +1040,8 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
             (widget.userLocation.longitude + widget.destination!.longitude) /
                 2.0,
           );
+    final ffCenter = LatLng(center.latitude, center.longitude);
+    final useNative = !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
     return SizedBox(
       width: width,
@@ -1023,35 +1052,48 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
         child: Stack(
           children: [
             Positioned.fill(child: ColoredBox(color: Colors.black)),
-            gmaps.GoogleMap(
-              initialCameraPosition: gmaps.CameraPosition(
-                target: center,
+            if (useNative)
+              NativeGoogleMap(
+                initialPosition: ffCenter,
                 zoom: widget.destination == null ? 13.0 : 12.5,
-                tilt: 0,
+                onMapCreated: (c) async {
+                  _nativeController = c;
+                  _mapReady = true;
+                  _maybeReveal();
+                  _scheduleFit();
+                  await _syncNativeMap();
+                },
+              )
+            else
+              gmaps.GoogleMap(
+                initialCameraPosition: gmaps.CameraPosition(
+                  target: center,
+                  zoom: widget.destination == null ? 13.0 : 12.5,
+                  tilt: 0,
+                ),
+                polylines: _polylines,
+                markers: _markers,
+                compassEnabled: true,
+                myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
+                buildingsEnabled: true,
+                mapToolbarEnabled: false,
+                onMapCreated: (c) async {
+                  _controller = c;
+                  try {
+                    await c.setMapStyle(_darkMapStyle);
+                  } catch (_) {}
+                  _styleReady = true;
+                  _mapReady = true;
+                  _maybeReveal();
+                  _scheduleFit();
+                },
+                onCameraIdle: () {
+                  _firstIdle = true;
+                  _maybeReveal();
+                },
+                mapType: gmaps.MapType.normal,
               ),
-              polylines: _polylines,
-              markers: _markers,
-              compassEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              buildingsEnabled: true,
-              mapToolbarEnabled: false,
-              onMapCreated: (c) async {
-                _controller = c;
-                try {
-                  await c.setMapStyle(_darkMapStyle);
-                } catch (_) {}
-                _styleReady = true;
-                _mapReady = true;
-                _maybeReveal();
-                _scheduleFit();
-              },
-              onCameraIdle: () {
-                _firstIdle = true;
-                _maybeReveal();
-              },
-              mapType: gmaps.MapType.normal,
-            ),
             IgnorePointer(
               child: AnimatedOpacity(
                 opacity: _veilVisible ? 1.0 : 0.0,
