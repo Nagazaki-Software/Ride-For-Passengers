@@ -1059,6 +1059,8 @@ class _PickerMapState extends State<PickerMap> with TickerProviderStateMixin {
                 onMapCreated: (c) async {
                   _nativeController = c;
                   _mapReady = true;
+                  _styleReady = true;
+                  _firstIdle = true;
                   _maybeReveal();
                   _scheduleFit();
                   await _syncNativeMap();
