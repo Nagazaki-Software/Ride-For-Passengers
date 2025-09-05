@@ -31,8 +31,7 @@ class Home5Widget extends StatefulWidget {
   State<Home5Widget> createState() => _Home5WidgetState();
 }
 
-class _Home5WidgetState extends State<Home5Widget>
-    with TickerProviderStateMixin {
+class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin {
   late Home5Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -53,33 +52,34 @@ class _Home5WidgetState extends State<Home5Widget>
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      currentUserLocationValue =
-          await getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0));
+      // Obtém localização atual do usuário (ou [0.0, 0.0] se não disponível).
+      currentUserLocationValue = await getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0));
+      // Busca locais importantes próximos (ação customizada).
       _model.locationPerto = await actions.googlePlacesNearbyImportant(
         context,
-        'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+        'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',  // Chave de API Google
         currentUserLocationValue!,
         3000,
         '',
         'us',
         6,
       );
+      // Define saudação inicial (ação customizada).
       _model.fraseInicial = await actions.localGreetingAction();
       FFAppState().fraseInicial = _model.fraseInicial!;
+      // Armazena nomes dos locais próximos no estado.
       FFAppState().locationsPorPerto = _model.locationPerto!
-          .map((e) => getJsonField(
-                e,
-                r'''$.name''',
-              ))
+          .map((e) => getJsonField(e, r'''$.name'''))
           .toList()
           .map((e) => e.toString())
           .toList()
-          .toList()
           .cast<String>();
+      // Armazena localização atual no estado.
       FFAppState().latlngAtual = currentUserLocationValue;
-      FFAppState().update(() {});
+      FFAppState().update(() {});  // Notifica listeners para reconstruir UI.
     });
 
+    // Tenta obter localização em cache para usar imediatamente se disponível.
     getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0), cached: true)
         .then((loc) => safeSetState(() => currentUserLocationValue = loc));
     animationsMap.addAll({
@@ -261,13 +261,15 @@ class _Home5WidgetState extends State<Home5Widget>
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Ouve mudanças no estado do aplicativo (FFAppState).
     context.watch<FFAppState>();
+
+    // Enquanto a localização atual não for obtida, mostra tela de carregamento.
     if (currentUserLocationValue == null) {
       return Container(
         color: FlutterFlowTheme.of(context).primaryText,
@@ -284,8 +286,10 @@ class _Home5WidgetState extends State<Home5Widget>
       );
     }
 
+    // Após obter a localização, constrói a interface principal.
     return GestureDetector(
       onTap: () {
+        // Oculta teclado se estiver aberto ao clicar fora.
         FocusScope.of(context).unfocus();
         FocusManager.instance.primaryFocus?.unfocus();
       },
@@ -298,28 +302,25 @@ class _Home5WidgetState extends State<Home5Widget>
         body: Stack(
           clipBehavior: Clip.hardEdge,
           children: [
+            // Fundo preto para ocupar toda a tela atrás do mapa.
             const Positioned.fill(
               child: ColoredBox(color: Colors.black),
             ),
+            // Mapa do Google (PickerMap) dentro de um PointerInterceptor para compatibilidade web.
             PointerInterceptor(
-              intercepting: isWeb,
+              intercepting: isWeb,  // Intercepta ponteiros no web (para permitir scroll no mapa).
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 60.0),
                 child: AuthUserStreamWidget(
                   builder: (context) => StreamBuilder<List<UsersRecord>>(
+                    // Busca registros de usuários que são motoristas online.
                     stream: queryUsersRecord(
                       queryBuilder: (usersRecord) => usersRecord
-                          .where(
-                            'driver',
-                            isEqualTo: true,
-                          )
-                          .where(
-                            'driverOnline',
-                            isEqualTo: true,
-                          ),
+                          .where('driver', isEqualTo: true)
+                          .where('driverOnline', isEqualTo: true),
                     ),
                     builder: (context, snapshot) {
-                      // Customize what your widget looks like when it's loading.
+                      // Enquanto carrega motoristas, mostra spinner.
                       if (!snapshot.hasData) {
                         return Center(
                           child: SizedBox(
@@ -332,9 +333,10 @@ class _Home5WidgetState extends State<Home5Widget>
                           ),
                         );
                       }
-                      List<UsersRecord> pickerMapUsersRecordList =
-                          snapshot.data!;
+                      // Lista de usuários (motoristas) obtida.
+                      List<UsersRecord> pickerMapUsersRecordList = snapshot.data!;
 
+                      // Container ocupando a tela inteira com o widget de mapa.
                       return Container(
                         width: MediaQuery.sizeOf(context).width * 1.0,
                         height: MediaQuery.sizeOf(context).height * 1.0,
@@ -342,29 +344,35 @@ class _Home5WidgetState extends State<Home5Widget>
                           width: MediaQuery.sizeOf(context).width * 1.0,
                           height: MediaQuery.sizeOf(context).height * 1.0,
                           userLocation: FFAppState().latlngAtual!,
-                          googleApiKey:
-                              'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+                          googleApiKey: 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
                           driversRefs: pickerMapUsersRecordList
                               .map((e) => e.reference)
                               .toList(),
                           destination: FFAppState().latlangAondeVaiIr,
                           refreshMs: 6000,
                           destinationMarkerPngUrl:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
+                              'https://storage.googleapis.com/flutterflow-io-'
+                              '6f20.appspot.com/projects/ride-'
+                              '899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
                           userPhotoUrl: currentUserPhoto,
                           userMarkerSize: 40,
                           userName: currentUserDisplayName,
-                          routeColor:
-                              FlutterFlowTheme.of(context).secondaryBackground,
+                          routeColor: FlutterFlowTheme.of(context).secondaryBackground,
                           routeWidth: 2,
                           borderRadius: 0.0,
                           driverIconWidth: 70,
                           driverTaxiIconAsset:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                              'https://storage.googleapis.com/flutterflow-io-'
+                              '6f20.appspot.com/projects/ride-'
+                              '899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                           driverDriverIconUrl:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+                              'https://storage.googleapis.com/flutterflow-io-'
+                              '6f20.appspot.com/projects/ride-'
+                              '899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
                           driverTaxiIconUrl:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                              'https://storage.googleapis.com/flutterflow-io-'
+                              '6f20.appspot.com/projects/ride-'
+                              '899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                         ),
                       );
                     },
@@ -372,11 +380,13 @@ class _Home5WidgetState extends State<Home5Widget>
                 ),
               ),
             ),
+            // Overlay de componentes da UI sobre o mapa (topo e base).
             PointerInterceptor(
               intercepting: isWeb,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  // Gradiente de fundo para o topo (efeito de sombra sobre o mapa).
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -390,37 +400,32 @@ class _Home5WidgetState extends State<Home5Widget>
                     child: Align(
                       alignment: AlignmentDirectional(0.0, 0.0),
                       child: Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 0.0),
+                        padding: EdgeInsetsDirectional.fromSTEB(0.0, 14.0, 0.0, 0.0),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
+                            // Barra superior com foto do usuário e saudação.
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  18.0, 35.0, 18.0, 0.0),
+                              padding: EdgeInsetsDirectional.fromSTEB(18.0, 35.0, 18.0, 0.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
+                                      // Avatar do usuário (ou iniciais se não houver foto).
                                       Container(
                                         width: 70.0,
                                         height: 70.0,
                                         decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
+                                          color: FlutterFlowTheme.of(context).primaryText,
                                           boxShadow: [
                                             BoxShadow(
                                               blurRadius: 4.0,
                                               color: Color(0x33000000),
-                                              offset: Offset(
-                                                0.0,
-                                                2.0,
-                                              ),
+                                              offset: Offset(0.0, 2.0),
                                             )
                                           ],
                                           shape: BoxShape.circle,
@@ -446,44 +451,24 @@ class _Home5WidgetState extends State<Home5Widget>
                                             ),
                                             if (currentUserPhoto == '')
                                               Align(
-                                                alignment: AlignmentDirectional(
-                                                    0.0, 0.0),
+                                                alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: AuthUserStreamWidget(
                                                   builder: (context) => Text(
-                                                    functions.partesDoName(
-                                                        currentUserDisplayName),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
+                                                    functions.partesDoName(currentUserDisplayName),
+                                                    style: FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                          font: GoogleFonts.poppins(
+                                                            fontWeight: FlutterFlowTheme.of(context)
+                                                                .bodyMedium
+                                                                .fontWeight,
+                                                            fontStyle: FlutterFlowTheme.of(context)
+                                                                .bodyMedium
+                                                                .fontStyle,
                                                           ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .alternate,
+                                                          color: FlutterFlowTheme.of(context).alternate,
                                                           fontSize: 18.0,
                                                           letterSpacing: 3.0,
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
                                                         ),
                                                   ),
                                                 ),
@@ -491,71 +476,42 @@ class _Home5WidgetState extends State<Home5Widget>
                                           ],
                                         ),
                                       ),
+                                      // Saudação e nome do usuário.
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             FFAppState().fraseInicial,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
+                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                   font: GoogleFonts.poppins(
                                                     fontWeight: FontWeight.w600,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
+                                                    fontStyle: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
                                                   ),
                                                   color: Color(0xFF696C6F),
                                                   fontSize: 12.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
                                                 ),
                                           ),
                                           AuthUserStreamWidget(
                                             builder: (context) => Text(
                                               currentUserDisplayName,
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  .bodyMedium
-                                                  .override(
+                                              style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                     font: GoogleFonts.poppins(
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
+                                                      fontWeight: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                      fontStyle: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .fontStyle,
                                                     ),
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .alternate,
+                                                    color: FlutterFlowTheme.of(context).alternate,
                                                     fontSize: 16.0,
                                                     letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontWeight,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
                                                   ),
                                             ),
                                           ),
@@ -563,24 +519,22 @@ class _Home5WidgetState extends State<Home5Widget>
                                       ),
                                     ].divide(SizedBox(width: 10.0)),
                                   ),
+                                  // Botão de menu (ícone de hamburguer).
                                   Stack(
                                     children: [
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Stack(
                                             children: [
+                                              // Fundo do botão (com sombra).
                                               Container(
                                                 width: 38.0,
                                                 height: 38.0,
                                                 decoration: BoxDecoration(
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primaryText,
+                                                  color: FlutterFlowTheme.of(context).primaryText,
                                                   boxShadow: [
                                                     BoxShadow(
                                                       blurRadius: 10.0,
@@ -588,19 +542,15 @@ class _Home5WidgetState extends State<Home5Widget>
                                                       offset: Offset(5.0, 0.0),
                                                     )
                                                   ],
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(20.0),
-                                                    bottomRight:
-                                                        Radius.circular(20.0),
-                                                    topLeft:
-                                                        Radius.circular(20.0),
-                                                    topRight:
-                                                        Radius.circular(20.0),
+                                                  borderRadius: BorderRadius.only(
+                                                    bottomLeft: Radius.circular(20.0),
+                                                    bottomRight: Radius.circular(20.0),
+                                                    topLeft: Radius.circular(20.0),
+                                                    topRight: Radius.circular(20.0),
                                                   ),
                                                 ),
                                               ),
+                                              // Ícone de menu.
                                               Container(
                                                 width: 38.0,
                                                 height: 38.0,
@@ -610,31 +560,20 @@ class _Home5WidgetState extends State<Home5Widget>
                                                     BoxShadow(
                                                       blurRadius: 6.0,
                                                       color: Color(0x48FFFFFF),
-                                                      offset: Offset(
-                                                        -2.0,
-                                                        -1.0,
-                                                      ),
+                                                      offset: Offset(-2.0, -1.0),
                                                     )
                                                   ],
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(20.0),
-                                                    bottomRight:
-                                                        Radius.circular(20.0),
-                                                    topLeft:
-                                                        Radius.circular(20.0),
-                                                    topRight:
-                                                        Radius.circular(20.0),
+                                                  borderRadius: BorderRadius.only(
+                                                    bottomLeft: Radius.circular(20.0),
+                                                    bottomRight: Radius.circular(20.0),
+                                                    topLeft: Radius.circular(20.0),
+                                                    topRight: Radius.circular(20.0),
                                                   ),
                                                 ),
-                                                alignment: AlignmentDirectional(
-                                                    0.0, 0.0),
+                                                alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Icon(
                                                   Icons.menu,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryBackground,
+                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
                                                   size: 18.0,
                                                 ),
                                               ),
@@ -647,18 +586,19 @@ class _Home5WidgetState extends State<Home5Widget>
                                 ].divide(SizedBox(width: 12.0)),
                               ),
                             ),
+                            // Campo de seleção de destino (textfield "Where to?").
                             Stack(
                               alignment: AlignmentDirectional(0.0, -1.0),
                               children: [
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 8.0, 0.0, 0.0),
+                                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                                   child: InkWell(
                                     splashColor: Colors.transparent,
                                     focusColor: Colors.transparent,
                                     hoverColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
                                     onTap: () async {
+                                      // Abre modal bottom sheet para selecionar local de destino.
                                       await showModalBottomSheet(
                                         isScrollControlled: true,
                                         backgroundColor: Colors.transparent,
@@ -668,12 +608,10 @@ class _Home5WidgetState extends State<Home5Widget>
                                           return GestureDetector(
                                             onTap: () {
                                               FocusScope.of(context).unfocus();
-                                              FocusManager.instance.primaryFocus
-                                                  ?.unfocus();
+                                              FocusManager.instance.primaryFocus?.unfocus();
                                             },
                                             child: Padding(
-                                              padding: MediaQuery.viewInsetsOf(
-                                                  context),
+                                              padding: MediaQuery.viewInsetsOf(context),
                                               child: SelectLocationWidget(
                                                 escolha: 'textfield',
                                               ),
@@ -683,53 +621,29 @@ class _Home5WidgetState extends State<Home5Widget>
                                       ).then((value) => safeSetState(() {}));
                                     },
                                     child: Container(
-                                      width: MediaQuery.sizeOf(context).width *
-                                          0.9,
+                                      width: MediaQuery.sizeOf(context).width * 0.9,
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primary,
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
+                                        color: FlutterFlowTheme.of(context).primary,
+                                        borderRadius: BorderRadius.circular(12.0),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    10.0, 8.0, 0.0, 8.0),
+                                            padding: EdgeInsetsDirectional.fromSTEB(10.0, 8.0, 0.0, 8.0),
                                             child: Text(
                                               FFAppState().locationWhereTo,
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  .bodyMedium
-                                                  .override(
+                                              style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                     font: GoogleFonts.poppins(
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
+                                                      fontWeight: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                      fontStyle: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .fontStyle,
                                                     ),
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryText,
+                                                    color: FlutterFlowTheme.of(context).secondaryText,
                                                     letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontWeight,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
                                                   ),
                                             ),
                                           ),
@@ -738,43 +652,32 @@ class _Home5WidgetState extends State<Home5Widget>
                                     ),
                                   ),
                                 ),
+                                // Tempo estimado de chegada do motorista (canto superior direito do campo).
                                 Align(
                                   alignment: AlignmentDirectional(1.0, -1.0),
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 12.0, 0.0),
+                                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 12.0, 0.0),
                                     child: Container(
                                       width: 48.0,
                                       height: 18.0,
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context)
-                                            .alternate,
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        color: FlutterFlowTheme.of(context).alternate,
+                                        borderRadius: BorderRadius.circular(16.0),
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
                                         '3 min',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
+                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
                                               font: GoogleFonts.poppins(
                                                 fontWeight: FontWeight.w500,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                                fontStyle: FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .tertiary,
+                                              color: FlutterFlowTheme.of(context).tertiary,
                                               fontSize: 10.0,
                                               letterSpacing: 0.0,
                                               fontWeight: FontWeight.w500,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
                                             ),
                                       ),
                                     ),
@@ -782,138 +685,94 @@ class _Home5WidgetState extends State<Home5Widget>
                                 ),
                               ],
                             ),
+                            // Lista horizontal de lugares importantes por perto (botões chips).
                             Align(
                               alignment: AlignmentDirectional(-1.0, -1.0),
                               child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    17.0, 6.0, 12.0, 0.0),
+                                padding: EdgeInsetsDirectional.fromSTEB(17.0, 6.0, 12.0, 0.0),
                                 child: Builder(
                                   builder: (context) {
-                                    final pertos =
-                                        FFAppState().locationsPorPerto.toList();
+                                    final pertos = FFAppState().locationsPorPerto.toList();
 
                                     return SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        children: List.generate(pertos.length,
-                                            (pertosIndex) {
-                                          final pertosItem =
-                                              pertos[pertosIndex];
+                                        children: List.generate(pertos.length, (pertosIndex) {
+                                          final pertosItem = pertos[pertosIndex];
                                           return InkWell(
                                             splashColor: Colors.transparent,
                                             focusColor: Colors.transparent,
                                             hoverColor: Colors.transparent,
                                             highlightColor: Colors.transparent,
                                             onTap: () async {
-                                              if (FFAppState().listPerto ==
-                                                  pertosItem) {
-                                                FFAppState().latlangAondeVaiIr =
-                                                    null;
+                                              // Ao clicar em um chip de local próximo:
+                                              if (FFAppState().listPerto == pertosItem) {
+                                                // Se já estiver selecionado, limpa seleção (remove destino).
+                                                FFAppState().latlangAondeVaiIr = null;
                                                 FFAppState().listPerto = '';
-                                                FFAppState().locationWhereTo =
-                                                    'Where to?';
+                                                FFAppState().locationWhereTo = 'Where to?';
                                                 safeSetState(() {});
                                               } else {
+                                                // Se diferente, geocodifica endereço selecionado e define como destino.
                                                 _model.geolocatoraddressonchoose =
-                                                    await actions
-                                                        .geocodeAddress(
+                                                    await actions.geocodeAddress(
                                                   context,
                                                   'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
                                                   pertosItem,
                                                 );
-                                                FFAppState().latlangAondeVaiIr =
-                                                    functions
-                                                        .formatStringToLantLng(
-                                                            getJsonField(
-                                                              _model
-                                                                  .geolocatoraddressonchoose,
-                                                              r'''$.lat''',
-                                                            ).toString(),
-                                                            getJsonField(
-                                                              _model
-                                                                  .geolocatoraddressonchoose,
-                                                              r'''$.lng''',
-                                                            ).toString());
-                                                FFAppState().listPerto =
-                                                    pertosItem;
-                                                FFAppState().locationWhereTo =
-                                                    pertosItem;
+                                                FFAppState().latlangAondeVaiIr = functions.formatStringToLantLng(
+                                                    getJsonField(_model.geolocatoraddressonchoose, r'''$.lat''')
+                                                        .toString(),
+                                                    getJsonField(_model.geolocatoraddressonchoose, r'''$.lng''')
+                                                        .toString());
+                                                FFAppState().listPerto = pertosItem;
+                                                FFAppState().locationWhereTo = pertosItem;
                                                 safeSetState(() {});
                                               }
-
+                                              // Força atualização do estado para refletir mudanças na UI.
                                               safeSetState(() {});
                                             },
                                             child: Container(
                                               height: 26.0,
                                               decoration: BoxDecoration(
                                                 color: valueOrDefault<Color>(
-                                                  FFAppState().listPerto ==
-                                                          pertosItem
-                                                      ? FlutterFlowTheme.of(
-                                                              context)
-                                                          .accent1
-                                                      : FlutterFlowTheme.of(
-                                                              context)
-                                                          .primary,
-                                                  FlutterFlowTheme.of(context)
-                                                      .accent1,
+                                                  FFAppState().listPerto == pertosItem
+                                                      ? FlutterFlowTheme.of(context).accent1
+                                                      : FlutterFlowTheme.of(context).primary,
+                                                  FlutterFlowTheme.of(context).accent1,
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(16.0),
+                                                borderRadius: BorderRadius.circular(16.0),
                                               ),
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
+                                              alignment: AlignmentDirectional(0.0, 0.0),
                                               child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        6.0, 0.0, 6.0, 0.0),
+                                                padding: EdgeInsetsDirectional.fromSTEB(6.0, 0.0, 6.0, 0.0),
                                                 child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Text(
                                                       pertosItem,
-                                                      style:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font: GoogleFonts
-                                                                    .poppins(
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                color: Color(
-                                                                    0xFF585858),
-                                                                fontSize: 10.0,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
+                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                            font: GoogleFonts.poppins(
+                                                              fontWeight: FlutterFlowTheme.of(context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                              fontStyle: FlutterFlowTheme.of(context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                            ),
+                                                            color: Color(0xFF585858),
+                                                            fontSize: 10.0,
+                                                            letterSpacing: 0.0,
+                                                          ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                             ),
                                           ).animateOnActionTrigger(
-                                              animationsMap[
-                                                  'containerOnActionTriggerAnimation1']!,
-                                              hasBeenTriggered:
-                                                  hasContainerTriggered1);
+                                              animationsMap['containerOnActionTriggerAnimation1']!,
+                                              hasBeenTriggered: hasContainerTriggered1);
                                         }).divide(SizedBox(width: 8.0)),
                                       ),
                                     );
@@ -926,7 +785,9 @@ class _Home5WidgetState extends State<Home5Widget>
                       ),
                     ),
                   ),
+                  // Espaçamento flexível para empurrar conteúdo para o topo (se necessário).
                   Spacer(flex: 10),
+                  // Painel inferior com estimativas e opções (só aparece se um destino estiver selecionado).
                   Align(
                     alignment: AlignmentDirectional(0.0, 1.0),
                     child: Column(
@@ -934,17 +795,13 @@ class _Home5WidgetState extends State<Home5Widget>
                       children: [
                         if (FFAppState().latlangAondeVaiIr != null)
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 28.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 28.0),
                             child: Container(
                               width: MediaQuery.sizeOf(context).width * 0.86,
                               height: 182.0,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [
-                                    Color(0xFF333333),
-                                    FlutterFlowTheme.of(context).primary
-                                  ],
+                                  colors: [Color(0xFF333333), FlutterFlowTheme.of(context).primary],
                                   stops: [0.0, 0.8],
                                   begin: AlignmentDirectional(0.0, -1.0),
                                   end: AlignmentDirectional(0, 1.0),
@@ -957,36 +814,24 @@ class _Home5WidgetState extends State<Home5Widget>
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
+                                      // Linha de título e valor estimado da corrida.
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
                                               Text(
                                                 'Ride Estimative',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                       font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.w300,
-                                                        fontStyle:
-                                                            FontStyle.italic,
+                                                        fontWeight: FontWeight.w300,
+                                                        fontStyle: FontStyle.italic,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .alternate,
+                                                      color: FlutterFlowTheme.of(context).alternate,
                                                       fontSize: 16.0,
                                                       letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontStyle:
-                                                          FontStyle.italic,
                                                     ),
                                               ),
                                             ],
@@ -994,81 +839,48 @@ class _Home5WidgetState extends State<Home5Widget>
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              FutureBuilder<
-                                                  List<RideOrdersRecord>>(
-                                                future:
-                                                    queryRideOrdersRecordOnce(),
+                                              // Cálculo do custo médio da corrida (ação custom_function).
+                                              FutureBuilder<List<RideOrdersRecord>>(
+                                                future: queryRideOrdersRecordOnce(),
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
                                                         width: 50.0,
                                                         height: 50.0,
-                                                        child:
-                                                            SpinKitDoubleBounce(
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .accent1,
+                                                        child: SpinKitDoubleBounce(
+                                                          color: FlutterFlowTheme.of(context).accent1,
                                                           size: 50.0,
                                                         ),
                                                       ),
                                                     );
                                                   }
-                                                  List<RideOrdersRecord>
-                                                      textRideOrdersRecordList =
-                                                      snapshot.data!;
+                                                  List<RideOrdersRecord> textRideOrdersRecordList = snapshot.data!;
 
                                                   return GradientText(
-                                                    functions
-                                                        .mediaCorridaNesseKm(
-                                                            FFAppState()
-                                                                .latlngAtual!,
-                                                            FFAppState()
-                                                                .latlangAondeVaiIr!,
-                                                            textRideOrdersRecordList
-                                                                .toList())
+                                                    functions.mediaCorridaNesseKm(
+                                                            FFAppState().latlngAtual!,
+                                                            FFAppState().latlangAondeVaiIr!,
+                                                            textRideOrdersRecordList.toList())
                                                         .toString(),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                          font: GoogleFonts.poppins(
+                                                            fontWeight: FontWeight.w500,
+                                                            fontStyle: FlutterFlowTheme.of(context)
+                                                                .bodyMedium
+                                                                .fontStyle,
                                                           ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondary,
+                                                          color: FlutterFlowTheme.of(context).secondary,
                                                           fontSize: 16.0,
                                                           letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
                                                         ),
                                                     colors: [
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .accent1,
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .secondary,
+                                                      FlutterFlowTheme.of(context).accent1,
+                                                      FlutterFlowTheme.of(context).secondary,
                                                       Color(0xFFF2E6D5)
                                                     ],
-                                                    gradientDirection:
-                                                        GradientDirection.ttb,
-                                                    gradientType:
-                                                        GradientType.linear,
+                                                    gradientDirection: GradientDirection.ttb,
+                                                    gradientType: GradientType.linear,
                                                   );
                                                 },
                                               ),
@@ -1076,41 +888,25 @@ class _Home5WidgetState extends State<Home5Widget>
                                           ),
                                         ],
                                       ),
+                                      // Linha de tempo estimado (rótulo e valor).
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
                                               Text(
                                                 'Time',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                       font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.w300,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
+                                                        fontWeight: FontWeight.w300,
+                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .fontStyle,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .secondaryText,
+                                                      color: FlutterFlowTheme.of(context).secondaryText,
                                                       letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
                                                     ),
                                               ),
                                             ],
@@ -1120,186 +916,110 @@ class _Home5WidgetState extends State<Home5Widget>
                                             children: [
                                               Text(
                                                 '3 min',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                       font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.w300,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
+                                                        fontWeight: FontWeight.w300,
+                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .fontStyle,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .secondaryText,
+                                                      color: FlutterFlowTheme.of(context).secondaryText,
                                                       letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
                                                     ),
                                               ),
                                             ],
                                           ),
                                         ],
                                       ),
+                                      // Divisor de linha.
                                       Container(
                                         width: 336.0,
                                         height: 1.0,
                                         decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .alternate,
+                                          color: FlutterFlowTheme.of(context).alternate,
                                         ),
                                       ),
+                                      // Linha de distância (se disponível).
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    20.0, 0.0, 0.0, 0.0),
+                                            padding: EdgeInsetsDirectional.fromSTEB(20.0, 0.0, 0.0, 0.0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
-                                                if ((_model.location != null) ||
-                                                    (_model.locationAtual !=
-                                                        null))
+                                                if ((_model.location != null) || (_model.locationAtual != null))
                                                   GradientText(
                                                     valueOrDefault<String>(
-                                                      functions.latlngForKm(
-                                                          FFAppState()
-                                                              .latlngAtual!,
-                                                          FFAppState()
-                                                              .latlangAondeVaiIr!),
+                                                      functions.latlngForKm(FFAppState().latlngAtual!,
+                                                          FFAppState().latlangAondeVaiIr!),
                                                       '2.4 Km',
                                                     ),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontStyle: FontStyle
-                                                                .italic,
+                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                          font: GoogleFonts.poppins(
+                                                            fontWeight: FontWeight.w500,
+                                                            fontStyle: FontStyle.italic,
                                                           ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondary,
+                                                          color: FlutterFlowTheme.of(context).secondary,
                                                           letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FontStyle.italic,
                                                         ),
                                                     colors: [
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .accent1,
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .secondary
+                                                      FlutterFlowTheme.of(context).accent1,
+                                                      FlutterFlowTheme.of(context).secondary
                                                     ],
-                                                    gradientDirection:
-                                                        GradientDirection.rtl,
-                                                    gradientType:
-                                                        GradientType.linear,
+                                                    gradientDirection: GradientDirection.rtl,
+                                                    gradientType: GradientType.linear,
                                                   ),
                                               ],
                                             ),
                                           ),
+                                          // Botão de seleção de data (calendário).
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               InkWell(
                                                 splashColor: Colors.transparent,
                                                 focusColor: Colors.transparent,
                                                 hoverColor: Colors.transparent,
-                                                highlightColor:
-                                                    Colors.transparent,
+                                                highlightColor: Colors.transparent,
                                                 onTap: () async {
-                                                  final _datePickedDate =
-                                                      await showDatePicker(
+                                                  final _datePickedDate = await showDatePicker(
                                                     context: context,
-                                                    initialDate:
-                                                        getCurrentTimestamp,
-                                                    firstDate:
-                                                        getCurrentTimestamp,
+                                                    initialDate: getCurrentTimestamp,
+                                                    firstDate: getCurrentTimestamp,
                                                     lastDate: DateTime(2050),
                                                     builder: (context, child) {
                                                       return wrapInMaterialDatePickerTheme(
                                                         context,
                                                         child!,
                                                         headerBackgroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
+                                                            FlutterFlowTheme.of(context).primary,
                                                         headerForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .info,
+                                                            FlutterFlowTheme.of(context).info,
                                                         headerTextStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .headlineLarge
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
+                                                            FlutterFlowTheme.of(context).headlineLarge.override(
+                                                                  font: GoogleFonts.poppins(
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontStyle: FlutterFlowTheme.of(context)
                                                                         .headlineLarge
                                                                         .fontStyle,
                                                                   ),
-                                                                  fontSize:
-                                                                      32.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .headlineLarge
-                                                                      .fontStyle,
+                                                                  fontSize: 32.0,
+                                                                  letterSpacing: 0.0,
                                                                 ),
                                                         pickerBackgroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryBackground,
+                                                            FlutterFlowTheme.of(context).secondaryBackground,
                                                         pickerForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
+                                                            FlutterFlowTheme.of(context).primaryText,
                                                         selectedDateTimeBackgroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
+                                                            FlutterFlowTheme.of(context).primary,
                                                         selectedDateTimeForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .info,
+                                                            FlutterFlowTheme.of(context).info,
                                                         actionButtonForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
+                                                            FlutterFlowTheme.of(context).primaryText,
                                                         iconSize: 24.0,
                                                       );
                                                     },
@@ -1307,132 +1027,84 @@ class _Home5WidgetState extends State<Home5Widget>
 
                                                   if (_datePickedDate != null) {
                                                     safeSetState(() {
-                                                      _model.datePicked =
-                                                          DateTime(
+                                                      _model.datePicked = DateTime(
                                                         _datePickedDate.year,
                                                         _datePickedDate.month,
                                                         _datePickedDate.day,
                                                       );
                                                     });
-                                                  } else if (_model
-                                                          .datePicked !=
-                                                      null) {
+                                                  } else if (_model.datePicked != null) {
                                                     safeSetState(() {
-                                                      _model.datePicked =
-                                                          getCurrentTimestamp;
+                                                      _model.datePicked = getCurrentTimestamp;
                                                     });
                                                   }
                                                 },
                                                 child: Container(
                                                   height: 24.0,
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .alternate,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            2.0),
+                                                    color: FlutterFlowTheme.of(context).alternate,
+                                                    borderRadius: BorderRadius.circular(2.0),
                                                   ),
                                                   child: Padding(
-                                                    padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(4.0, 0.0,
-                                                                4.0, 0.0),
+                                                    padding: EdgeInsetsDirectional.fromSTEB(4.0, 0.0, 4.0, 0.0),
                                                     child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
+                                                      mainAxisSize: MainAxisSize.min,
                                                       children: [
                                                         Icon(
                                                           Icons.date_range,
-                                                          color:
-                                                              Color(0xC2414141),
+                                                          color: Color(0xC2414141),
                                                           size: 14.0,
                                                         ),
                                                         Text(
-                                                          _model.datePicked !=
-                                                                  null
+                                                          _model.datePicked != null
                                                               ? dateTimeFormat(
                                                                   "yMd",
-                                                                  _model
-                                                                      .datePicked,
-                                                                  locale: FFLocalizations.of(
-                                                                          context)
-                                                                      .languageCode,
+                                                                  _model.datePicked,
+                                                                  locale: FFLocalizations.of(context).languageCode,
                                                                 )
                                                               : dateTimeFormat(
                                                                   "yMd",
                                                                   getCurrentTimestamp,
-                                                                  locale: FFLocalizations.of(
-                                                                          context)
-                                                                      .languageCode,
+                                                                  locale: FFLocalizations.of(context).languageCode,
                                                                 ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font: GoogleFonts
-                                                                    .poppins(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
+                                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                font: GoogleFonts.poppins(
+                                                                  fontWeight: FontWeight.w500,
+                                                                  fontStyle: FlutterFlowTheme.of(context)
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: Color(
-                                                                    0xC2242424),
+                                                                color: Color(0xC2242424),
                                                                 fontSize: 8.0,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                                letterSpacing: 0.0,
                                                               ),
                                                         ),
-                                                      ]
-                                                          .divide(SizedBox(
-                                                              width: 4.0))
-                                                          .around(SizedBox(
-                                                              width: 4.0)),
+                                                      ].divide(SizedBox(width: 4.0)).around(SizedBox(width: 4.0)),
                                                     ),
                                                   ),
                                                 ),
                                               ),
+                                              // Botão de quantidade de passageiros.
                                               InkWell(
                                                 splashColor: Colors.transparent,
                                                 focusColor: Colors.transparent,
                                                 hoverColor: Colors.transparent,
-                                                highlightColor:
-                                                    Colors.transparent,
+                                                highlightColor: Colors.transparent,
                                                 onTap: () async {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation2'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered2 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation2']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                  // Animação no clique do botão.
+                                                  if (animationsMap['containerOnActionTriggerAnimation2'] != null) {
+                                                    safeSetState(() => hasContainerTriggered2 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation2']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
-                                                  if (FFAppState().passangers ==
-                                                      8) {
+                                                  // Incrementa ou reseta o número de passageiros (1 a 8).
+                                                  if (FFAppState().passangers == 8) {
                                                     FFAppState().passangers = 1;
                                                     safeSetState(() {});
                                                   } else {
-                                                    FFAppState().passangers =
-                                                        FFAppState()
-                                                                .passangers +
-                                                            1;
+                                                    FFAppState().passangers = FFAppState().passangers + 1;
                                                     safeSetState(() {});
                                                   }
                                                 },
@@ -1440,120 +1112,73 @@ class _Home5WidgetState extends State<Home5Widget>
                                                   width: 80.0,
                                                   height: 24.0,
                                                   decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .alternate,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            2.0),
+                                                    color: FlutterFlowTheme.of(context).alternate,
+                                                    borderRadius: BorderRadius.circular(2.0),
                                                   ),
                                                   child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
+                                                    mainAxisSize: MainAxisSize.max,
+                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                     children: [
                                                       Icon(
                                                         Icons.person_outline,
-                                                        color:
-                                                            Color(0xC2414141),
+                                                        color: Color(0xC2414141),
                                                         size: 14.0,
                                                       ),
                                                       Text(
-                                                        '${valueOrDefault<String>(
-                                                          FFAppState()
-                                                              .passangers
-                                                              .toString(),
-                                                          '1',
-                                                        )} passengers',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: Color(
-                                                                      0xC2242424),
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        '${valueOrDefault<String>(FFAppState().passangers.toString(), '1')} passengers',
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FontWeight.w500,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: Color(0xC2242424),
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
-                                                    ].divide(
-                                                        SizedBox(width: 4.0)),
+                                                    ].divide(SizedBox(width: 4.0)),
                                                   ),
                                                 ),
                                               ).animateOnActionTrigger(
-                                                  animationsMap[
-                                                      'containerOnActionTriggerAnimation2']!,
-                                                  hasBeenTriggered:
-                                                      hasContainerTriggered2),
+                                                  animationsMap['containerOnActionTriggerAnimation2']!,
+                                                  hasBeenTriggered: hasContainerTriggered2),
                                             ].divide(SizedBox(width: 10.0)),
                                           ),
                                         ],
                                       ),
+                                      // Linha de seleção de tipo de corrida (Ride, XL, Luxury).
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 2.0),
+                                        padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 2.0),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                           children: [
+                                            // Botão "Ride".
                                             InkWell(
                                               splashColor: Colors.transparent,
                                               focusColor: Colors.transparent,
                                               hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
+                                              highlightColor: Colors.transparent,
                                               onTap: () async {
-                                                if (_model.rideChoose ==
-                                                    'ride') {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation3'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered3 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation3']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                if (_model.rideChoose == 'ride') {
+                                                  // Animação no clique (se já estava selecionado, anima assim mesmo).
+                                                  if (animationsMap['containerOnActionTriggerAnimation3'] != null) {
+                                                    safeSetState(() => hasContainerTriggered3 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation3']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
                                                 } else {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation3'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered3 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation3']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                  // Animação de seleção e define como tipo 'ride'.
+                                                  if (animationsMap['containerOnActionTriggerAnimation3'] != null) {
+                                                    safeSetState(() => hasContainerTriggered3 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation3']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
                                                   _model.rideChoose = 'ride';
                                                   safeSetState(() {});
@@ -1567,161 +1192,91 @@ class _Home5WidgetState extends State<Home5Widget>
                                                     BoxShadow(
                                                       blurRadius: 4.0,
                                                       color: Color(0x33000000),
-                                                      offset: Offset(
-                                                        0.0,
-                                                        2.0,
-                                                      ),
+                                                      offset: Offset(0.0, 2.0),
                                                     )
                                                   ],
                                                   gradient: LinearGradient(
                                                     colors: [
-                                                      _model.rideChoose ==
-                                                              'ride'
+                                                      _model.rideChoose == 'ride'
                                                           ? Color(0xFFF4B000)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText,
-                                                      _model.rideChoose ==
-                                                              'ride'
+                                                          : FlutterFlowTheme.of(context).primaryText,
+                                                      _model.rideChoose == 'ride'
                                                           ? Color(0xFFEE8B05)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText
+                                                          : FlutterFlowTheme.of(context).primaryText
                                                     ],
                                                     stops: [0.0, 1.0],
-                                                    begin: AlignmentDirectional(
-                                                        0.03, -1.0),
-                                                    end: AlignmentDirectional(
-                                                        -0.03, 1.0),
+                                                    begin: AlignmentDirectional(0.03, -1.0),
+                                                    end: AlignmentDirectional(-0.03, 1.0),
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
+                                                  borderRadius: BorderRadius.circular(10.0),
                                                 ),
                                                 child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          5.0, 5.0, 0.0, 0.0),
+                                                  padding: EdgeInsetsDirectional.fromSTEB(5.0, 5.0, 0.0, 0.0),
                                                   child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    mainAxisSize: MainAxisSize.max,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         'Ride ',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .alternate,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: FlutterFlowTheme.of(context).alternate,
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
                                                       Text(
                                                         '3 min',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: FlutterFlowTheme.of(context).secondaryText,
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
                                               ),
                                             ).animateOnActionTrigger(
-                                                animationsMap[
-                                                    'containerOnActionTriggerAnimation3']!,
-                                                hasBeenTriggered:
-                                                    hasContainerTriggered3),
+                                                animationsMap['containerOnActionTriggerAnimation3']!,
+                                                hasBeenTriggered: hasContainerTriggered3),
+                                            // Botão "XL".
                                             InkWell(
                                               splashColor: Colors.transparent,
                                               focusColor: Colors.transparent,
                                               hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
+                                              highlightColor: Colors.transparent,
                                               onTap: () async {
                                                 if (_model.rideChoose == 'xl') {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation4'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered4 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation4']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                  if (animationsMap['containerOnActionTriggerAnimation4'] != null) {
+                                                    safeSetState(() => hasContainerTriggered4 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation4']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
                                                 } else {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation4'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered4 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation4']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                  if (animationsMap['containerOnActionTriggerAnimation4'] != null) {
+                                                    safeSetState(() => hasContainerTriggered4 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation4']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
                                                   _model.rideChoose = 'xl';
                                                   safeSetState(() {});
@@ -1735,160 +1290,91 @@ class _Home5WidgetState extends State<Home5Widget>
                                                     BoxShadow(
                                                       blurRadius: 4.0,
                                                       color: Color(0x33000000),
-                                                      offset: Offset(
-                                                        0.0,
-                                                        2.0,
-                                                      ),
+                                                      offset: Offset(0.0, 2.0),
                                                     )
                                                   ],
                                                   gradient: LinearGradient(
                                                     colors: [
                                                       _model.rideChoose == 'xl'
                                                           ? Color(0xFFF4B000)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText,
+                                                          : FlutterFlowTheme.of(context).primaryText,
                                                       _model.rideChoose == 'xl'
                                                           ? Color(0xFFEE8B05)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText
+                                                          : FlutterFlowTheme.of(context).primaryText
                                                     ],
                                                     stops: [0.0, 1.0],
-                                                    begin: AlignmentDirectional(
-                                                        0.03, -1.0),
-                                                    end: AlignmentDirectional(
-                                                        -0.03, 1.0),
+                                                    begin: AlignmentDirectional(0.03, -1.0),
+                                                    end: AlignmentDirectional(-0.03, 1.0),
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
+                                                  borderRadius: BorderRadius.circular(10.0),
                                                 ),
                                                 child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          5.0, 5.0, 0.0, 0.0),
+                                                  padding: EdgeInsetsDirectional.fromSTEB(5.0, 5.0, 0.0, 0.0),
                                                   child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    mainAxisSize: MainAxisSize.max,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         'XL',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .alternate,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: FlutterFlowTheme.of(context).alternate,
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
                                                       Text(
                                                         '6 min',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: FlutterFlowTheme.of(context).secondaryText,
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
                                               ),
                                             ).animateOnActionTrigger(
-                                                animationsMap[
-                                                    'containerOnActionTriggerAnimation4']!,
-                                                hasBeenTriggered:
-                                                    hasContainerTriggered4),
+                                                animationsMap['containerOnActionTriggerAnimation4']!,
+                                                hasBeenTriggered: hasContainerTriggered4),
+                                            // Botão "Luxury".
                                             InkWell(
                                               splashColor: Colors.transparent,
                                               focusColor: Colors.transparent,
                                               hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
+                                              highlightColor: Colors.transparent,
                                               onTap: () async {
-                                                if (_model.rideChoose ==
-                                                    'luxury') {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation5'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered5 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation5']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                if (_model.rideChoose == 'luxury') {
+                                                  if (animationsMap['containerOnActionTriggerAnimation5'] != null) {
+                                                    safeSetState(() => hasContainerTriggered5 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation5']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
                                                 } else {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation5'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered5 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation5']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                  if (animationsMap['containerOnActionTriggerAnimation5'] != null) {
+                                                    safeSetState(() => hasContainerTriggered5 = true);
+                                                    SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                        await animationsMap['containerOnActionTriggerAnimation5']!
+                                                            .controller
+                                                            .forward(from: 0.0));
                                                   }
                                                   _model.rideChoose = 'luxury';
                                                   safeSetState(() {});
@@ -1902,159 +1388,95 @@ class _Home5WidgetState extends State<Home5Widget>
                                                     BoxShadow(
                                                       blurRadius: 4.0,
                                                       color: Color(0x33000000),
-                                                      offset: Offset(
-                                                        0.0,
-                                                        2.0,
-                                                      ),
+                                                      offset: Offset(0.0, 2.0),
                                                     )
                                                   ],
                                                   gradient: LinearGradient(
                                                     colors: [
-                                                      _model.rideChoose ==
-                                                              'luxury'
+                                                      _model.rideChoose == 'luxury'
                                                           ? Color(0xFFF4B000)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText,
-                                                      _model.rideChoose ==
-                                                              'luxury'
+                                                          : FlutterFlowTheme.of(context).primaryText,
+                                                      _model.rideChoose == 'luxury'
                                                           ? Color(0xFFEE8B05)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText
+                                                          : FlutterFlowTheme.of(context).primaryText
                                                     ],
                                                     stops: [0.0, 1.0],
-                                                    begin: AlignmentDirectional(
-                                                        0.03, -1.0),
-                                                    end: AlignmentDirectional(
-                                                        -0.03, 1.0),
+                                                    begin: AlignmentDirectional(0.03, -1.0),
+                                                    end: AlignmentDirectional(-0.03, 1.0),
                                                   ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
+                                                  borderRadius: BorderRadius.circular(10.0),
                                                 ),
                                                 child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          5.0, 5.0, 0.0, 0.0),
+                                                  padding: EdgeInsetsDirectional.fromSTEB(5.0, 5.0, 0.0, 0.0),
                                                   child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    mainAxisSize: MainAxisSize.max,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
                                                         'Luxury',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .alternate,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: FlutterFlowTheme.of(context).alternate,
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
                                                       Text(
                                                         '10 min',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: FlutterFlowTheme.of(context).secondaryText,
+                                                              fontSize: 8.0,
+                                                              letterSpacing: 0.0,
+                                                            ),
                                                       ),
                                                     ],
                                                   ),
                                                 ),
                                               ),
                                             ).animateOnActionTrigger(
-                                                animationsMap[
-                                                    'containerOnActionTriggerAnimation5']!,
-                                                hasBeenTriggered:
-                                                    hasContainerTriggered5),
+                                                animationsMap['containerOnActionTriggerAnimation5']!,
+                                                hasBeenTriggered: hasContainerTriggered5),
                                           ],
                                         ),
                                       ),
+                                      // Linha de botões de confirmação (Confirm Ride e Ride Share).
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: [
+                                          // Botão "Confirm Ride".
                                           InkWell(
                                             splashColor: Colors.transparent,
                                             focusColor: Colors.transparent,
                                             hoverColor: Colors.transparent,
                                             highlightColor: Colors.transparent,
                                             onTap: () async {
+                                              // Atualiza localização atual (caso tenha mudado).
                                               currentUserLocationValue =
-                                                  await getCurrentUserLocation(
-                                                      defaultLocation:
-                                                          LatLng(0.0, 0.0));
-                                              if (animationsMap[
-                                                      'containerOnActionTriggerAnimation6'] !=
-                                                  null) {
-                                                safeSetState(() =>
-                                                    hasContainerTriggered6 =
-                                                        true);
-                                                SchedulerBinding.instance
-                                                    .addPostFrameCallback(
-                                                        (_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation6']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                                  await getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0));
+                                              if (animationsMap['containerOnActionTriggerAnimation6'] != null) {
+                                                safeSetState(() => hasContainerTriggered6 = true);
+                                                SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                    await animationsMap['containerOnActionTriggerAnimation6']!
+                                                        .controller
+                                                        .forward(from: 0.0));
                                               }
-
+                                              // Navega para tela de pagamento, passando parâmetros.
                                               context.pushNamed(
                                                 PaymentRide7Widget.routeName,
                                                 queryParameters: {
@@ -2063,27 +1485,20 @@ class _Home5WidgetState extends State<Home5Widget>
                                                     ParamType.String,
                                                   ),
                                                   'latlngAtual': serializeParam(
-                                                    FFAppState().latlngAtual !=
-                                                            null
-                                                        ? FFAppState()
-                                                            .latlngAtual
+                                                    FFAppState().latlngAtual != null
+                                                        ? FFAppState().latlngAtual
                                                         : currentUserLocationValue,
                                                     ParamType.LatLng,
                                                   ),
-                                                  'latlngWhereTo':
-                                                      serializeParam(
-                                                    FFAppState()
-                                                        .latlangAondeVaiIr,
+                                                  'latlngWhereTo': serializeParam(
+                                                    FFAppState().latlangAondeVaiIr,
                                                     ParamType.LatLng,
                                                   ),
                                                 }.withoutNulls,
                                                 extra: <String, dynamic>{
-                                                  kTransitionInfoKey:
-                                                      TransitionInfo(
+                                                  kTransitionInfoKey: TransitionInfo(
                                                     hasTransition: true,
-                                                    transitionType:
-                                                        PageTransitionType
-                                                            .leftToRight,
+                                                    transitionType: PageTransitionType.leftToRight,
                                                   ),
                                                 },
                                               );
@@ -2092,75 +1507,47 @@ class _Home5WidgetState extends State<Home5Widget>
                                               width: 120.0,
                                               height: 30.0,
                                               decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .accent1,
-                                                borderRadius:
-                                                    BorderRadius.circular(6.0),
+                                                color: FlutterFlowTheme.of(context).accent1,
+                                                borderRadius: BorderRadius.circular(6.0),
                                               ),
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
+                                              alignment: AlignmentDirectional(0.0, 0.0),
                                               child: Text(
                                                 'Confirm Ride  ',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                       font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FontStyle.italic,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontStyle: FontStyle.italic,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
+                                                      color: FlutterFlowTheme.of(context).primary,
                                                       fontSize: 10.0,
                                                       letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FontStyle.italic,
                                                     ),
                                               ),
                                             ),
                                           ).animateOnActionTrigger(
-                                              animationsMap[
-                                                  'containerOnActionTriggerAnimation6']!,
-                                              hasBeenTriggered:
-                                                  hasContainerTriggered6),
+                                              animationsMap['containerOnActionTriggerAnimation6']!,
+                                              hasBeenTriggered: hasContainerTriggered6),
+                                          // Botão "Ride Share".
                                           InkWell(
                                             splashColor: Colors.transparent,
                                             focusColor: Colors.transparent,
                                             hoverColor: Colors.transparent,
                                             highlightColor: Colors.transparent,
                                             onTap: () async {
-                                              if (animationsMap[
-                                                      'containerOnActionTriggerAnimation7'] !=
-                                                  null) {
-                                                safeSetState(() =>
-                                                    hasContainerTriggered7 =
-                                                        true);
-                                                SchedulerBinding.instance
-                                                    .addPostFrameCallback(
-                                                        (_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation7']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
+                                              if (animationsMap['containerOnActionTriggerAnimation7'] != null) {
+                                                safeSetState(() => hasContainerTriggered7 = true);
+                                                SchedulerBinding.instance.addPostFrameCallback((_) async =>
+                                                    await animationsMap['containerOnActionTriggerAnimation7']!
+                                                        .controller
+                                                        .forward(from: 0.0));
                                               }
-
+                                              // Navega para tela de ride share.
                                               context.pushNamed(
                                                 RideShare6Widget.routeName,
                                                 extra: <String, dynamic>{
-                                                  kTransitionInfoKey:
-                                                      TransitionInfo(
+                                                  kTransitionInfoKey: TransitionInfo(
                                                     hasTransition: true,
-                                                    transitionType:
-                                                        PageTransitionType
-                                                            .rightToLeft,
+                                                    transitionType: PageTransitionType.rightToLeft,
                                                   ),
                                                 },
                                               );
@@ -2169,56 +1556,38 @@ class _Home5WidgetState extends State<Home5Widget>
                                               width: 120.0,
                                               height: 30.0,
                                               decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .alternate,
-                                                borderRadius:
-                                                    BorderRadius.circular(6.0),
+                                                color: FlutterFlowTheme.of(context).alternate,
+                                                borderRadius: BorderRadius.circular(6.0),
                                               ),
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
+                                              alignment: AlignmentDirectional(0.0, 0.0),
                                               child: Text(
                                                 'Ride Share',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                       font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FontStyle.italic,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontStyle: FontStyle.italic,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
+                                                      color: FlutterFlowTheme.of(context).primary,
                                                       fontSize: 10.0,
                                                       letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FontStyle.italic,
                                                     ),
                                               ),
                                             ),
                                           ).animateOnActionTrigger(
-                                              animationsMap[
-                                                  'containerOnActionTriggerAnimation7']!,
-                                              hasBeenTriggered:
-                                                  hasContainerTriggered7),
+                                              animationsMap['containerOnActionTriggerAnimation7']!,
+                                              hasBeenTriggered: hasContainerTriggered7),
                                         ],
                                       ),
                                     ].divide(SizedBox(height: 5.0)),
                                   ),
                                 ),
                               ),
-                            ).animateOnPageLoad(
-                                animationsMap['containerOnPageLoadAnimation']!),
+                            ).animateOnPageLoad(animationsMap['containerOnPageLoadAnimation']!),
                           ),
                       ],
                     ),
                   ),
+                  // Barra de navegação inferior (NavbarWidget).
                   wrapWithModel(
                     model: _model.navbarModel,
                     updateCallback: () => safeSetState(() {}),
