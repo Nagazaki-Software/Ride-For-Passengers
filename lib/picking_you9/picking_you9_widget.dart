@@ -81,7 +81,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             GradientText(
-                              'Enisson',
+                              FFLocalizations.of(context).getText(
+                                '5je20q5p' /* Enisson */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -105,7 +107,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                               gradientType: GradientType.linear,
                             ),
                             Text(
-                              'will be Pickign you up!',
+                              FFLocalizations.of(context).getText(
+                                '3qv6jswv' /* will be Pickign you up! */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -142,7 +146,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
-                                          'The car is Black',
+                                          FFLocalizations.of(context).getText(
+                                            'qt5jd6p3' /* The car is Black */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -169,7 +175,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                       ],
                                     ),
                                     GradientText(
-                                      'Nissan Sierra',
+                                      FFLocalizations.of(context).getText(
+                                        '3wqi91u3' /* Nissan Sierra */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -202,7 +210,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Text(
-                                      'see the exact photo of the car',
+                                      FFLocalizations.of(context).getText(
+                                        '0nk5tyw0' /* see the exact photo of the car */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -357,7 +367,11 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                                           .spaceAround,
                                                   children: [
                                                     Text(
-                                                      'Price:',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'e37jdfz4' /* Price: */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -390,7 +404,11 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                                               ),
                                                     ),
                                                     GradientText(
-                                                      '\$ 14',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'jgnhjnec' /* $ 14 */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -454,7 +472,11 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     Text(
-                                                      'Driver level:',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        '3mcyiiij' /* Driver level: */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -531,7 +553,11 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             10.0, 0.0, 0.0, 0.0),
                                         child: Text(
-                                          'Approximate time\nfor pickup',
+                                          FFLocalizations.of(context).getText(
+                                            'caqmcadz' /* Approximate time
+for pickup */
+                                            ,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -567,7 +593,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             10.0, 0.0, 0.0, 0.0),
                                         child: Text(
-                                          '7 min.',
+                                          FFLocalizations.of(context).getText(
+                                            'xx1l04g3' /* 7 min. */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -628,7 +656,10 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'Cancel Ride',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'b1xjlh7i' /* Cancel Ride */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -679,7 +710,10 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget> {
                                                 alignment: AlignmentDirectional(
                                                     0.0, 0.0),
                                                 child: Text(
-                                                  '3 min',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'xfrabvwf' /* 3 min */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium

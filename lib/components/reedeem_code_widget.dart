@@ -76,7 +76,9 @@ class _ReedeemCodeWidgetState extends State<ReedeemCodeWidget> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GradientText(
-                  'Redeem Code',
+                  FFLocalizations.of(context).getText(
+                    's1uomlvm' /* Redeem Code */,
+                  ),
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
                         font: GoogleFonts.poppins(
                           fontWeight: FlutterFlowTheme.of(context)
@@ -99,7 +101,9 @@ class _ReedeemCodeWidgetState extends State<ReedeemCodeWidget> {
                   gradientType: GradientType.linear,
                 ),
                 Text(
-                  'Enter your promo code to unlock rewards',
+                  FFLocalizations.of(context).getText(
+                    'nltifqqs' /* Enter your promo code to unloc... */,
+                  ),
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         font: GoogleFonts.poppins(
@@ -129,7 +133,9 @@ class _ReedeemCodeWidgetState extends State<ReedeemCodeWidget> {
                   textInputAction: TextInputAction.done,
                   obscureText: false,
                   decoration: InputDecoration(
-                    labelText: 'Enter Code',
+                    labelText: FFLocalizations.of(context).getText(
+                      'rzb08l6k' /* Enter Code */,
+                    ),
                     labelStyle: FlutterFlowTheme.of(context)
                         .bodyMedium
                         .override(
@@ -218,7 +224,9 @@ class _ReedeemCodeWidgetState extends State<ReedeemCodeWidget> {
                   onPressed: () {
                     print('Button pressed ...');
                   },
-                  text: 'Redeem Now',
+                  text: FFLocalizations.of(context).getText(
+                    'ne7nv3wl' /* Redeem Now */,
+                  ),
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 50.0,
@@ -263,7 +271,9 @@ class _ReedeemCodeWidgetState extends State<ReedeemCodeWidget> {
                   size: 16.0,
                 ),
                 Text(
-                  'Codes are case-sensitive',
+                  FFLocalizations.of(context).getText(
+                    'qw2otgy2' /* Codes are case-sensitive */,
+                  ),
                   style: FlutterFlowTheme.of(context).labelSmall.override(
                         font: GoogleFonts.poppins(
                           fontWeight: FlutterFlowTheme.of(context)

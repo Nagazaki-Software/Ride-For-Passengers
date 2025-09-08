@@ -173,7 +173,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                             Align(
                               alignment: AlignmentDirectional(0.0, 0.0),
                               child: Text(
-                                'Rewards',
+                                FFLocalizations.of(context).getText(
+                                  'su7qf2zb' /* Rewards */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -215,7 +217,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Your points',
+                                      FFLocalizations.of(context).getText(
+                                        'wbr3phxt' /* Your points */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -362,7 +366,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           0.0, 0.0, 0.0, 4.0),
                                       child: Text(
-                                        'pts',
+                                        FFLocalizations.of(context).getText(
+                                          'ilp1lgby' /* pts */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -541,7 +547,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            'Redeem',
+                                            FFLocalizations.of(context).getText(
+                                              'zqt4hblc' /* Redeem */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -584,7 +592,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                         alignment:
                                             AlignmentDirectional(0.0, 0.0),
                                         child: Text(
-                                          'Ways to earn',
+                                          FFLocalizations.of(context).getText(
+                                            '5mq8zqpu' /* Ways to earn */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -638,7 +648,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'All',
+                              FFLocalizations.of(context).getText(
+                                'tvbaxszw' /* All */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -667,7 +679,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Perks',
+                              FFLocalizations.of(context).getText(
+                                '8dszkbh1' /* Perks */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -697,7 +711,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Boots',
+                              FFLocalizations.of(context).getText(
+                                '3uex1c8l' /* Boots */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -727,7 +743,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'History',
+                              FFLocalizations.of(context).getText(
+                                '96bzsfhg' /* History */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -769,7 +787,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       16.0, 0.0, 0.0, 0.0),
                                   child: Text(
-                                    'Featured perks',
+                                    FFLocalizations.of(context).getText(
+                                      '2e574kgd' /* Featured perks */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -964,7 +984,11 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                               AlignmentDirectional(
                                                                   0.0, 0.0),
                                                           child: Text(
-                                                            'Select',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                              '3ti2j4mr' /* Select */,
+                                                            ),
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -1093,7 +1117,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       16.0, 0.0, 0.0, 0.0),
                                   child: Text(
-                                    'Ways to earn',
+                                    FFLocalizations.of(context).getText(
+                                      '1bqtmbqv' /* Ways to earn */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -1148,7 +1174,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                'Invite a friend (+500 pts)',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'dsmzg6rv' /* Invite a friend (+500 pts) */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyLarge
@@ -1259,7 +1288,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Select',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '1273n14s' /* Select */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1311,7 +1343,11 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      'Share your cade QCKY-72',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        '10sy7axv' /* Share your cade QCKY-72 */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -1386,7 +1422,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                'Daily chec-in (+10 pts)',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'kzrg8q93' /* Daily chec-in (+10 pts) */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyLarge
@@ -1497,7 +1536,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Select',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '6uw2h1uq' /* Select */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1549,7 +1591,11 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      'Come back tomorrow',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        '3bbdyb63' /* Come back tomorrow */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -1616,7 +1662,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       16.0, 0.0, 0.0, 0.0),
                                   child: Text(
-                                    'Recent activity',
+                                    FFLocalizations.of(context).getText(
+                                      'a0cnh7a8' /* Recent activity */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -1664,7 +1712,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'Completed ride',
+                                          FFLocalizations.of(context).getText(
+                                            '770e7m0x' /* Completed ride */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -1698,7 +1748,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Text(
-                                              'Aug 11',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'yyccpg0t' /* Aug 11 */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -1732,7 +1785,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                   ),
                                             ),
                                             Text(
-                                              '+120 pts',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'dfcn9v5r' /* +120 pts */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -1796,7 +1852,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'Promo: Summer10',
+                                          FFLocalizations.of(context).getText(
+                                            'jmax77kp' /* Promo: Summer10 */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -1830,7 +1888,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Text(
-                                              'Aug 9',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '4s9iesq2' /* Aug 9 */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -1864,7 +1925,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                   ),
                                             ),
                                             Text(
-                                              '+300 pts',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '7qm0i1gl' /* +300 pts */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -1928,7 +1992,9 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'Invite bonus',
+                                          FFLocalizations.of(context).getText(
+                                            'njz0jd2c' /* Invite bonus */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -1962,7 +2028,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             Text(
-                                              'Aug 6',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'hxb0pm94' /* Aug 6 */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -1996,7 +2065,10 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                   ),
                                             ),
                                             Text(
-                                              '+500 pts',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'cdj74baj' /* +500 pts */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium

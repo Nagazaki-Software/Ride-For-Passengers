@@ -262,6 +262,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               collectionNamePath: ['rideOrders'],
             ),
           ),
+        ),
+        FFRoute(
+          name: Support22CopyWidget.routeName,
+          path: Support22CopyWidget.routePath,
+          builder: (context, params) => Support22CopyWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

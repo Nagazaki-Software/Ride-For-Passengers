@@ -134,7 +134,9 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Good morning',
+                                          FFLocalizations.of(context).getText(
+                                            'lr48bqhi' /* Good morning */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -379,7 +381,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Toyota Blue',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'jwaka0cu' /* Toyota Blue */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -417,7 +422,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         .spaceEvenly,
                                                 children: [
                                                   Text(
-                                                    'Ride #001',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'z0dk4g6w' /* Ride #001 */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -447,7 +455,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Time Riding',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'dx9ybt05' /* Time Riding */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -485,7 +496,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         .spaceEvenly,
                                                 children: [
                                                   Text(
-                                                    '\$ 18',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'jybkqopa' /* $ 18 */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -515,7 +529,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    '3 min',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'kdn0ne01' /* 3 min */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -658,7 +675,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    'Toyota Blue',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'h3gpg2bn' /* Toyota Blue */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -696,7 +716,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         .spaceEvenly,
                                                 children: [
                                                   Text(
-                                                    'Ride #001',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'i16xsfsv' /* Ride #001 */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -726,7 +749,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Time Riding',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '48mblm0o' /* Time Riding */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -764,7 +790,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         .spaceEvenly,
                                                 children: [
                                                   Text(
-                                                    '\$ 18',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'kuy6lmdi' /* $ 18 */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -794,7 +823,10 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    '3 min',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '5tljf2t2' /* 3 min */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -937,7 +969,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                             .fromSTEB(0.0, 10.0,
                                                                 0.0, 0.0),
                                                     child: Text(
-                                                      'How did your Drive do?',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'k1d3rqsi' /* How did your Drive do? */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -1073,7 +1109,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                   .primaryBackground,
                                                             ),
                                                             Text(
-                                                              'Good morning',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                'tkx4qpfn' /* Good morning */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1166,7 +1206,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                   0.0,
                                                                   0.0),
                                                       child: Text(
-                                                        'What stood out?',
+                                                        FFLocalizations.of(
+                                                                context)
+                                                            .getText(
+                                                          'x48xuwe6' /* What stood out? */,
+                                                        ),
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1251,7 +1295,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'Clean car',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                'dqb50lny' /* Clean car */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1320,7 +1368,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'Friendly',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                'j8kpx085' /* Friendly */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1389,7 +1441,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'Safe driving',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                '0ifvcqvr' /* Safe driving */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1448,7 +1504,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                               AlignmentDirectional(
                                                                   0.0, 0.0),
                                                           child: Text(
-                                                            'Good Comminication',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                              '0189y9y1' /* Good Comminication */,
+                                                            ),
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -1497,7 +1557,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                               AlignmentDirectional(
                                                                   0.0, 0.0),
                                                           child: Text(
-                                                            'Smells Good',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                              'ythpoatx' /* Smells Good */,
+                                                            ),
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -1546,7 +1610,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                               AlignmentDirectional(
                                                                   0.0, 0.0),
                                                           child: Text(
-                                                            'Smooth Route',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                              'jt6em587' /* Smooth Route */,
+                                                            ),
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -1603,7 +1671,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                   0.0,
                                                                   0.0),
                                                       child: Text(
-                                                        'Anything to improve (optional)',
+                                                        FFLocalizations.of(
+                                                                context)
+                                                            .getText(
+                                                          'p2lokd5y' /* Anything to improve (optional) */,
+                                                        ),
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1670,7 +1742,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'Driving style',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                'bs4xoh2z' /* Driving style */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1719,7 +1795,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'Communication',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                'd2feyucr' /* Communication */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1768,7 +1848,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                 AlignmentDirectional(
                                                                     0.0, 0.0),
                                                             child: Text(
-                                                              'Navigation',
+                                                              FFLocalizations.of(
+                                                                      context)
+                                                                  .getText(
+                                                                't06puv4m' /* Navigation */,
+                                                              ),
                                                               style: FlutterFlowTheme
                                                                       .of(context)
                                                                   .bodyMedium
@@ -1827,7 +1911,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                               AlignmentDirectional(
                                                                   0.0, 0.0),
                                                           child: Text(
-                                                            'Car cleanliness',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                              'e02ll9l0' /* Car cleanliness */,
+                                                            ),
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -1876,7 +1964,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                               AlignmentDirectional(
                                                                   0.0, 0.0),
                                                           child: Text(
-                                                            'Punctuality',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                              'j86ul9ig' /* Punctuality */,
+                                                            ),
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -2028,7 +2120,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                                           .fontStyle,
                                                                     ),
                                                             hintText:
-                                                                'Type text...',
+                                                                FFLocalizations.of(
+                                                                        context)
+                                                                    .getText(
+                                                              'ki2wpb69' /* Type text... */,
+                                                            ),
                                                             hintStyle:
                                                                 FlutterFlowTheme.of(
                                                                         context)
@@ -2185,7 +2281,11 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
                                                         AlignmentDirectional(
                                                             0.0, 0.0),
                                                     child: Text(
-                                                      '.',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'vne67lca' /* . */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)

@@ -6,3 +6,4 @@ export 'local_greeting_action.dart' show localGreetingAction;
 export 'geocode_address.dart' show geocodeAddress;
 export 'latlng_to_string.dart' show latlngToString;
 export 'process_card_payload.dart' show processCardPayload;
+export 'verifique_random_number.dart' show verifiqueRandomNumber;

@@ -109,7 +109,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                             Align(
                               alignment: AlignmentDirectional(0.0, 0.0),
                               child: Text(
-                                'Safety Toolkit',
+                                FFLocalizations.of(context).getText(
+                                  'jngjtzbz' /* Safety Toolkit */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -156,7 +158,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Trusted contacts',
+                                      FFLocalizations.of(context).getText(
+                                        's4uicmrm' /* Trusted contacts */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -187,7 +191,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                   ],
                                 ),
                                 Text(
-                                  'People who can get your live ETA and trip alerts.',
+                                  FFLocalizations.of(context).getText(
+                                    'ql2n2e35' /* People who can get your live E... */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -243,7 +249,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                         alignment:
                                             AlignmentDirectional(0.0, 0.0),
                                         child: Text(
-                                          'Add contact',
+                                          FFLocalizations.of(context).getText(
+                                            'gvv0vhl6' /* Add contact */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -310,7 +318,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                               alignment: AlignmentDirectional(
                                                   -1.0, -1.0),
                                               child: Text(
-                                                'Sofia P.',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'u2gdlfw2' /* Sofia P. */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyLarge
@@ -398,7 +409,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                               alignment: AlignmentDirectional(
                                                   -1.0, -1.0),
                                               child: Text(
-                                                'Sofia P.',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'g8tmomdj' /* Sofia P. */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyLarge
@@ -487,7 +501,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Text(
-                                      'Share ETA defaults',
+                                      FFLocalizations.of(context).getText(
+                                        'lcpevj41' /* Share ETA defaults */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -527,7 +543,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Automaticaly share on every trip.',
+                                          FFLocalizations.of(context).getText(
+                                            'ln84fa5q' /* Automaticaly share on every tr... */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -559,7 +577,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                               ),
                                         ),
                                         Text(
-                                          'Share with trusted contacts',
+                                          FFLocalizations.of(context).getText(
+                                            'xshsh38w' /* Share with trusted contacts */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -612,7 +632,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Share with emergency contact',
+                                      FFLocalizations.of(context).getText(
+                                        'e7s5y36r' /* Share with emergency contact */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -691,7 +713,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Emergency information',
+                                          FFLocalizations.of(context).getText(
+                                            '9irhu2te' /* Emergency information */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -722,7 +746,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                               ),
                                         ),
                                         Text(
-                                          'Only used in case of an emergency',
+                                          FFLocalizations.of(context).getText(
+                                            '72twndx6' /* Only used in case of an emerge... */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -792,7 +818,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Save',
+                                        FFLocalizations.of(context).getText(
+                                          'd1w74ruw' /* Save */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -900,7 +928,11 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                                       .fontStyle,
                                                                 ),
                                                         hintText:
-                                                            'Emergency contact name',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                          'nb9rc4s8' /* Emergency contact name */,
+                                                        ),
                                                         hintStyle:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1127,7 +1159,11 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                                       .fontStyle,
                                                                 ),
                                                         hintText:
-                                                            'Phone number',
+                                                            FFLocalizations.of(
+                                                                    context)
+                                                                .getText(
+                                                          'o4lsplzm' /* Phone number */,
+                                                        ),
                                                         hintStyle:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1296,7 +1332,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Privacy information',
+                                  FFLocalizations.of(context).getText(
+                                    'k5puq8fp' /* Privacy information */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -1322,7 +1360,9 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                       ),
                                 ),
                                 Text(
-                                  'Manage location and data settings',
+                                  FFLocalizations.of(context).getText(
+                                    '8b82z4zp' /* Manage location and data setti... */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -1390,7 +1430,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'L',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'lkc1tsvh' /* L */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1436,7 +1479,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Location services',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'ikjz5p87' /* Location services */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1471,7 +1517,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Allow while using the app',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '0qfv00ai' /* Allow while using the app */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1563,7 +1612,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'D',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'rbtosb0o' /* D */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1609,7 +1661,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Data sharing',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'bd79p8gc' /* Data sharing */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium

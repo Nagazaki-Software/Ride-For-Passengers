@@ -183,7 +183,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                       Align(
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Choose your pass',
+                          FFLocalizations.of(context).getText(
+                            '62n8c2s0' /* Choose your pass */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -253,7 +255,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Day Pass',
+                                        FFLocalizations.of(context).getText(
+                                          'aztno95n' /* Day Pass */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
@@ -378,7 +382,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            'Select',
+                                            FFLocalizations.of(context).getText(
+                                              'ap2qguhl' /* Select */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -418,7 +424,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        '\$5',
+                                        FFLocalizations.of(context).getText(
+                                          '2c7511xj' /* $5 */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
@@ -459,7 +467,10 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Unlimited rides today + \$3 per ride fuel fee',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '85t1uv66' /* Unlimited rides today + $3 per... */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyLarge
@@ -544,7 +555,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            'Week Pass',
+                                            FFLocalizations.of(context).getText(
+                                              'ybtz024k' /* Week Pass */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -579,7 +592,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            '\$8',
+                                            FFLocalizations.of(context).getText(
+                                              'xo1ob6ng' /* $8 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -614,7 +629,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'Unlimited rides today + \$7 per ride fuel fee',
+                                            FFLocalizations.of(context).getText(
+                                              'fzf0vq27' /* Unlimited rides today + $7 per... */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyLarge
                                                 .override(
@@ -687,7 +704,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                   child: Padding(
                                     padding: EdgeInsets.all(4.0),
                                     child: Text(
-                                      'Recommended',
+                                      FFLocalizations.of(context).getText(
+                                        'dsbnwvxg' /* Recommended */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -808,7 +827,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                   ),
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Text(
-                                    'Select',
+                                    FFLocalizations.of(context).getText(
+                                      'ss88el5s' /* Select */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -933,7 +954,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'Month Pass',
+                                          FFLocalizations.of(context).getText(
+                                            'x4d1o852' /* Month Pass */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyLarge
                                               .override(
@@ -1065,7 +1088,10 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                             alignment:
                                                 AlignmentDirectional(0.0, 0.0),
                                             child: Text(
-                                              'Select',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'yh52ifb4' /* Select */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -1107,7 +1133,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '\$10',
+                                          FFLocalizations.of(context).getText(
+                                            'fzc219qz' /* $10 */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyLarge
                                               .override(
@@ -1149,7 +1177,10 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                'Unlimited rides for 30 days + \$3 fuel fee',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'owjc7pvd' /* Unlimited rides for 30 days + ... */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyLarge
@@ -1230,7 +1261,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                       ),
                       alignment: AlignmentDirectional(0.0, 0.0),
                       child: Text(
-                        'Click here to try it for free for 1 day',
+                        FFLocalizations.of(context).getText(
+                          'e56s6ui2' /* Click here to try it for free ... */,
+                        ),
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               font: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
@@ -1290,7 +1323,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                   Align(
                                     alignment: AlignmentDirectional(-1.0, -1.0),
                                     child: Text(
-                                      'Auto-renew',
+                                      FFLocalizations.of(context).getText(
+                                        'prrhxcs8' /* Auto-renew */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyLarge
                                           .override(
@@ -1328,7 +1363,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                               ),
                             ),
                             Text(
-                              'Applies to Week/Month passes',
+                              FFLocalizations.of(context).getText(
+                                'm3whqe67' /* Applies to Week/Month passes */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -1394,7 +1431,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                   Align(
                                     alignment: AlignmentDirectional(-1.0, -1.0),
                                     child: Text(
-                                      'What is included?',
+                                      FFLocalizations.of(context).getText(
+                                        'o92dxp15' /* What is included? */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyLarge
                                           .override(
@@ -1421,7 +1460,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                               ),
                             ),
                             Text(
-                              'Unlimited rides with an active pass',
+                              FFLocalizations.of(context).getText(
+                                'gmh5ry67' /* Unlimited rides with an active... */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -1441,7 +1482,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                   ),
                             ),
                             Text(
-                              'Each ride has a \$3 fuel fee',
+                              FFLocalizations.of(context).getText(
+                                'jhkq5kpo' /* Each ride has a $3 fuel fee */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -1461,7 +1504,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                   ),
                             ),
                             Text(
-                              'Cancel anytime (prorate on Month only).',
+                              FFLocalizations.of(context).getText(
+                                '3n3wfprk' /* Cancel anytime (prorate on Mon... */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -1497,7 +1542,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Help',
+                              FFLocalizations.of(context).getText(
+                                'qnne6q0t' /* Help */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -1593,7 +1640,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  'Continue',
+                                  FFLocalizations.of(context).getText(
+                                    'j4x9hd45' /* Continue */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(

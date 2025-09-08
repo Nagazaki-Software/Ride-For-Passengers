@@ -276,28 +276,52 @@ String latlngForKm(
   LatLng latlngAtual,
   LatLng latlngWhereTo,
 ) {
-  const double earthRadius = 6371.0;
-
-  double degreesToRadians(double degrees) {
-    return degrees * math.pi / 180;
+  // 1) Curto-circuito: se for o mesmo ponto, zero.
+  if (latlngAtual.latitude == latlngWhereTo.latitude &&
+      latlngAtual.longitude == latlngWhereTo.longitude) {
+    return '0 m';
   }
 
-  final double dLat =
-      degreesToRadians(latlngWhereTo.latitude - latlngAtual.latitude);
+  // 2) Raio médio da Terra (km)
+  const double earthRadiusKm = 6371.0;
+
+  // 3) Utilitários
+  double _degToRad(double deg) => deg * (math.pi / 180.0);
+
+  // 4) Diferenças em radianos
+  final double dLat = _degToRad(latlngWhereTo.latitude - latlngAtual.latitude);
   final double dLng =
-      degreesToRadians(latlngWhereTo.longitude - latlngAtual.longitude);
+      _degToRad(latlngWhereTo.longitude - latlngAtual.longitude);
 
+  // 5) Latitude em radianos
+  final double lat1 = _degToRad(latlngAtual.latitude);
+  final double lat2 = _degToRad(latlngWhereTo.latitude);
+
+  // 6) Haversine
   final double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-      math.cos(degreesToRadians(latlngAtual.latitude)) *
-          math.cos(degreesToRadians(latlngWhereTo.latitude)) *
-          math.sin(dLng / 2) *
-          math.sin(dLng / 2);
+      math.cos(lat1) * math.cos(lat2) * math.sin(dLng / 2) * math.sin(dLng / 2);
 
-  final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  // Proteção contra possíveis problemas numéricos
+  final double aClamped = a.clamp(0.0, 1.0);
+  final double c = 2 * math.atan2(math.sqrt(aClamped), math.sqrt(1 - aClamped));
 
-  final double distance = earthRadius * c;
+  // 7) Distância em km
+  final double distanceKm = earthRadiusKm * c;
 
-  return '${distance.toStringAsFixed(1)} km';
+  // 8) Tratamento de NaN/∞
+  if (distanceKm.isNaN || distanceKm.isInfinite) {
+    // Se chegou aqui, tem algo estranho nas coordenadas.
+    // Retorne algo seguro e logue se quiser.
+    return '0 m';
+  }
+
+  // 9) Formatação amigável
+  if (distanceKm < 1.0) {
+    final int meters = (distanceKm * 1000).round();
+    return '$meters m';
+  } else {
+    return '${distanceKm.toStringAsFixed(1)} km';
+  }
 }
 
 int quantasRidesNesteMes(
@@ -372,72 +396,228 @@ double mediaCorridaNesseKm(
   LatLng latlngDestino,
   List<RideOrdersRecord> order,
 ) {
-  // --- Parâmetros ajustáveis ---
-  const double toleranciaRelativa = 0.20; // ±20% da distância alvo
-  const double raioTerraKm = 6371.0; // Haversine
-  const double minDistKm = 0.05; // Evita divisão por zero (~50m)
+  // ===== Parâmetros de cálculo =====
+  const double toleranciaRelativa =
+      0.20; // ±20% do alvo p/ considerar "semelhante"
+  const double minDistFiltroKm =
+      0.05; // evita dividir por ~zero ao ler histórico
+  const double minCobrancaKm = 1.0; // distância mínima cobrada (garante > 0)
+  const double pi180 = math.pi / 180.0;
 
-  double _deg2rad(double deg) => deg * (math.pi / 180.0);
+  // Fallback GLOBAL (mesma moeda de rideValue)
+  // Ajuste estes números p/ sua cidade/app:
+  const double basePadrao = 5.0; // tarifa base
+  const double ppkPadrao = 3.5; // preço por km
 
-  // Distância Haversine em km entre dois LatLng
-  double _distanciaKm(LatLng a, LatLng b) {
-    final dLat = _deg2rad(b.latitude - a.latitude);
-    final dLon = _deg2rad(b.longitude - a.longitude);
-    final la1 = _deg2rad(a.latitude);
-    final la2 = _deg2rad(b.latitude);
-
+  // --- Haversine inline ---
+  double haversineKm(LatLng a, LatLng b) {
+    final dLat = (b.latitude - a.latitude) * pi180;
+    final dLon = (b.longitude - a.longitude) * pi180;
+    final la1 = a.latitude * pi180;
+    final la2 = b.latitude * pi180;
     final hav = math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(la1) * math.cos(la2) * math.sin(dLon / 2) * math.sin(dLon / 2);
-
-    final c = 2 * math.atan2(math.sqrt(hav), math.sqrt(1 - hav));
-    return raioTerraKm * c;
+    return 6371.0 * 2 * math.atan2(math.sqrt(hav), math.sqrt(1 - hav));
   }
 
-  // Distância do trecho solicitado
-  final alvoKm = _distanciaKm(laltngOrigem, latlngDestino);
-  if (alvoKm < minDistKm) {
-    // Trecho muito curto (ou pontos iguais) — não dá para estimar preço por km.
-    return 0.0;
-  }
+  // Distância solicitada e "km cobrados" (nunca menor que minCobrancaKm)
+  final double alvoKm = haversineKm(laltngOrigem, latlngDestino);
+  final double kmCobrados = math.max(alvoKm, minCobrancaKm);
 
-  // Coleta preço/km de cada corrida válida
-  final List<double> precoPorKmTodas = [];
-  final List<double> precoPorKmSemelhantes = [];
+  // Coleta de PPKs do histórico
+  final List<double> ppkTodas = <double>[];
+  final List<double> ppkSemelhantes = <double>[];
 
   for (final o in order) {
-    // Proteções contra nulos / dados incompletos
-    final origem = o.latlngAtual; // origem histórica
-    final destino = o.latlng; // destino histórico
-    final valor = o.rideValue; // preço total da corrida
+    final LatLng? origem = o.latlngAtual;
+    final LatLng? destino = o.latlng;
+    final num? valorNum = o.rideValue; // pode vir int/double do Firestore
+    if (origem == null || destino == null || valorNum == null) continue;
 
-    if (origem == null || destino == null || valor == null) continue;
+    final double valor = valorNum.toDouble();
     if (valor <= 0) continue;
 
-    final distKm = _distanciaKm(origem, destino);
-    if (distKm < minDistKm) continue; // ignora corridas com ~0 km
+    final double distKm = haversineKm(origem, destino);
+    if (distKm < minDistFiltroKm) continue;
 
-    final ppk = valor / distKm; // preço por km dessa corrida
-    precoPorKmTodas.add(ppk);
+    final double ppk = valor / distKm;
+    if (ppk.isFinite && ppk > 0) {
+      ppkTodas.add(ppk);
 
-    final delta = (distKm - alvoKm).abs();
-    if (delta <= alvoKm * toleranciaRelativa) {
-      precoPorKmSemelhantes.add(ppk);
+      final double delta = (distKm - alvoKm).abs();
+      if (alvoKm == 0) {
+        // Se o alvo é 0 (mesmo lugar), use a janela em torno de minCobrancaKm
+        if ((distKm - minCobrancaKm).abs() <=
+            minCobrancaKm * toleranciaRelativa) {
+          ppkSemelhantes.add(ppk);
+        }
+      } else if (delta <= alvoKm * toleranciaRelativa) {
+        ppkSemelhantes.add(ppk);
+      }
     }
   }
 
-  // Se houver corridas com distância semelhante, usa a média delas.
-  // Caso contrário, usa média geral como fallback.
-  double _media(List<double> xs) =>
+  // Estatísticas robustas
+  double media(List<double> xs) =>
       xs.isEmpty ? 0.0 : xs.reduce((a, b) => a + b) / xs.length;
 
-  final mediaPpkSemelhantes = _media(precoPorKmSemelhantes);
-  final mediaPpkGeral = _media(precoPorKmTodas);
+  double mediana(List<double> xs) {
+    if (xs.isEmpty) return 0.0;
+    final s = [...xs]..sort();
+    final m = s.length ~/ 2;
+    return s.length.isOdd ? s[m] : (s[m - 1] + s[m]) / 2.0;
+    // (Mediana é menos sensível a outliers do que a média)
+  }
 
-  final ppkUsado =
-      mediaPpkSemelhantes > 0 ? mediaPpkSemelhantes : mediaPpkGeral;
+  // Preferir mediana das semelhantes; senão, mediana geral; senão, média geral
+  final double ppkSemMed = mediana(ppkSemelhantes);
+  final double ppkGeralMed = mediana(ppkTodas);
+  final double ppkGeralAvg = media(ppkTodas);
 
-  if (ppkUsado <= 0) return 0.0; // Sem dados suficientes
+  final double ppkHist = (ppkSemMed > 0.0)
+      ? ppkSemMed
+      : (ppkGeralMed > 0.0 ? ppkGeralMed : ppkGeralAvg);
 
-  // Estimativa final: preço médio por km * distância alvo
-  return ppkUsado * alvoKm;
+  if (ppkHist > 0.0) {
+    return ppkHist * kmCobrados;
+  }
+
+  // Sem histórico útil? Cai no fallback GLOBAL (nunca 0.0)
+  return basePadrao + ppkPadrao * kmCobrados;
+}
+
+List<String> nassauList() {
+  const east = <String>[
+    'Blair Estates',
+    'Eastern Road',
+    'Sans Souci',
+    'Winton Heights',
+    'Winton Meadows',
+    'Elizabeth Estates',
+    'Seabreeze Estates',
+    'Gleniston Gardens',
+    'Johnson Road Estates',
+    'Fox Hill',
+    'Nassau Village',
+    'Yamacraw',
+    'Yamacraw Beach Estates',
+    'Port New Providence',
+    'Palm Cay',
+    'Treasure Cove',
+    'Montagu Area',
+    'High Vista',
+    'Little Blair',
+    'Village Road Area',
+  ];
+
+  const middle = <String>[
+    'Downtown Nassau',
+    'Centreville',
+    'Fort Fincastle/Queen’s Staircase',
+    'Fort Charlotte/Chippingham',
+    'Palmdale',
+    'Oakes Field',
+    'Big Pond Subdivision',
+    'Englerston',
+    'Bain Town',
+    'Grants Town',
+    'St. Barnabas',
+    'Mason’s Addition',
+    'East Street Corridor',
+    'Wulff Road Corridor',
+    'Shirley Street Area',
+  ];
+
+  const west = <String>[
+    'Cable Beach',
+    'Delaporte Point',
+    'Sandyport',
+    'Sea Beach Estates',
+    'Highland Park',
+    'Skyline Drive',
+    'Westridge',
+    'South Westridge',
+    'Balmoral',
+    'Prospect Ridge',
+    'Old Fort Bay',
+    'Lyford Cay',
+    'Albany',
+    'Mount Pleasant Village',
+    'Venetian West',
+    'West Winds',
+    'Serenity',
+    'Charlotteville',
+    'Turnberry',
+    'Tropical Gardens',
+    'Gambier',
+    'Love Beach',
+    'Adelaide Village',
+    'Coral Harbour',
+    'South Ocean Estates',
+    'Coral Heights',
+  ];
+
+  // Lista única sem prefixos (boa pra Dropdown, Chips, etc.)
+  return <String>[
+    ...east,
+    ...middle,
+    ...west,
+  ];
+}
+
+String estimativeTime(
+  LatLng latlngOrigem,
+  LatLng latlngDestino,
+) {
+  // Velocidade média assumida (km/h). Ajuste conforme seu caso de uso.
+  const double averageSpeedKmh = 40.0;
+
+  // Se coordenadas iguais, tempo zero.
+  if (latlngOrigem.latitude == latlngDestino.latitude &&
+      latlngOrigem.longitude == latlngDestino.longitude) {
+    return '0 minutes';
+  }
+
+  // --- Haversine para distância em km ---
+  double _degToRad(double deg) => deg * (math.pi / 180.0);
+  const double earthRadiusKm = 6371.0;
+
+  final double dLat = _degToRad(latlngDestino.latitude - latlngOrigem.latitude);
+  final double dLon =
+      _degToRad(latlngDestino.longitude - latlngOrigem.longitude);
+
+  final double lat1 = _degToRad(latlngOrigem.latitude);
+  final double lat2 = _degToRad(latlngDestino.latitude);
+
+  final double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+      math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) * math.sin(dLon / 2);
+  final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+  final double distanceKm = earthRadiusKm * c;
+
+  // --- Tempo estimado ---
+  // horas = km / (km/h)
+  final double hours = distanceKm / averageSpeedKmh;
+
+  // Arredonda para cima para evitar "0 minutes" quando há deslocamento.
+  int totalMinutes = (hours * 60).ceil();
+
+  // Segurança: nunca negativo.
+  if (totalMinutes < 0) totalMinutes = 0;
+
+  // Formatação em inglês: "x minutes" ou "x hour(s) y minute(s)"
+  if (totalMinutes < 60) {
+    final unit = totalMinutes == 1 ? 'minute' : 'minutes';
+    return '$totalMinutes $unit';
+  } else {
+    final int h = totalMinutes ~/ 60;
+    final int m = totalMinutes % 60;
+    final String hUnit = h == 1 ? 'hour' : 'hours';
+    if (m == 0) {
+      return '$h $hUnit';
+    } else {
+      final String mUnit = m == 1 ? 'minute' : 'minutes';
+      return '$h $hUnit $m $mUnit';
+    }
+  }
 }

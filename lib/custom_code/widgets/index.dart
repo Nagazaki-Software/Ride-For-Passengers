@@ -6,7 +6,6 @@ export 'radiobuttompayment.dart' show Radiobuttompayment;
 export 'schedule_caledar_ride.dart' show ScheduleCaledarRide;
 export 'card_form_f_f.dart' show CardFormFF;
 export 'picker_map.dart' show PickerMap;
-export 'native_google_map.dart' show NativeGoogleMap, NativeGoogleMapController;
 export 'poly_map.dart' show PolyMap;
 export 'route_list_item.dart' show RouteListItem;
 export 'picker_view_more.dart' show PickerViewMore;

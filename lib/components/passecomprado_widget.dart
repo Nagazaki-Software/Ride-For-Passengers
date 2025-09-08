@@ -92,7 +92,9 @@ class _PassecompradoWidgetState extends State<PassecompradoWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Purchase made!',
+                    FFLocalizations.of(context).getText(
+                      '4kxujjm3' /* Purchase made! */,
+                    ),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).headlineMedium.override(
                           font: GoogleFonts.poppins(
@@ -136,7 +138,9 @@ class _PassecompradoWidgetState extends State<PassecompradoWidget> {
                 onPressed: () async {
                   context.goNamed(Home5Widget.routeName);
                 },
-                text: 'Start traveling',
+                text: FFLocalizations.of(context).getText(
+                  '0ec3dum2' /* Start traveling */,
+                ),
                 options: FFButtonOptions(
                   width: double.infinity,
                   height: 50.0,

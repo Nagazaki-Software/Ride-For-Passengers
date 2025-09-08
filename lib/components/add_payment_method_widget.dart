@@ -93,7 +93,9 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
                     ),
                   ),
                   Text(
-                    'Add Payment Method',
+                    FFLocalizations.of(context).getText(
+                      '31sjcapr' /* Add Payment Method */,
+                    ),
                     style: FlutterFlowTheme.of(context).bodyLarge.override(
                           font: GoogleFonts.poppins(
                             fontWeight: FlutterFlowTheme.of(context)

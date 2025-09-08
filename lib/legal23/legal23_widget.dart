@@ -66,7 +66,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
-                                'Legal',
+                                FFLocalizations.of(context).getText(
+                                  'hhw0z19p' /* Legal */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -142,7 +144,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Terms of Service',
+                                            FFLocalizations.of(context).getText(
+                                              'jsidnl6t' /* Terms of Service */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -175,7 +179,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Last update Aug 2025',
+                                            FFLocalizations.of(context).getText(
+                                              'pwqhmift' /* Last update Aug 2025 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -253,7 +259,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Privacy Policy',
+                                            FFLocalizations.of(context).getText(
+                                              'vkgu3h3p' /* Privacy Policy */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -286,7 +294,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Data, permissions, retention',
+                                            FFLocalizations.of(context).getText(
+                                              'ies7u0dn' /* Data, permissions, retention */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -364,7 +374,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Licenses',
+                                            FFLocalizations.of(context).getText(
+                                              'xtmleio1' /* Licenses */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -397,7 +409,9 @@ class _Legal23WidgetState extends State<Legal23Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Open-souce attributions',
+                                            FFLocalizations.of(context).getText(
+                                              'qpuvteeq' /* Open-souce attributions */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(

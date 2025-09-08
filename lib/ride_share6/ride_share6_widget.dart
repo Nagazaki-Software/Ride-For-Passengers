@@ -108,7 +108,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   Align(
                                     alignment: AlignmentDirectional(0.0, 0.0),
                                     child: Text(
-                                      'Ride Share',
+                                      FFLocalizations.of(context).getText(
+                                        'c2ku81ov' /* Ride Share */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -137,7 +139,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           ],
                         ),
                         Text(
-                          'Invite riders to split the fare or let us auto-match nearby riders.',
+                          FFLocalizations.of(context).getText(
+                            'vd485i7w' /* Invite riders to split the far... */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -213,7 +217,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ),
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Text(
-                                    'Invite friends',
+                                    FFLocalizations.of(context).getText(
+                                      '5dxw36ml' /* Invite friends */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -361,7 +367,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            'QR',
+                                            FFLocalizations.of(context).getText(
+                                              '9ensgtkt' /* QR */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -403,7 +411,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         alignment:
                                             AlignmentDirectional(0.0, 0.0),
                                         child: Text(
-                                          'Link',
+                                          FFLocalizations.of(context).getText(
+                                            'yglrvlqu' /* Link */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -441,7 +451,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 4.0, 0.0, 0.0),
                                   child: Text(
-                                    'Auto-match nearby riders',
+                                    FFLocalizations.of(context).getText(
+                                      'wme97if5' /* Auto-match nearby riders */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyLarge
                                         .override(
@@ -526,7 +538,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Participants',
+                                  FFLocalizations.of(context).getText(
+                                    'ax3wm89h' /* Participants */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -584,7 +598,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           padding: EdgeInsetsDirectional.fromSTEB(
                               2.0, 0.0, 0.0, 0.0),
                           child: Text(
-                            'Tab to remove • “- -“ are open spots',
+                            FFLocalizations.of(context).getText(
+                              'niwa8eid' /* Tab to remove • “- -“ are open... */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -639,7 +655,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Riders splitting',
+                                  FFLocalizations.of(context).getText(
+                                    'us6osckg' /* Riders splitting */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -684,7 +702,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Equal split',
+                                        FFLocalizations.of(context).getText(
+                                          'wpvhw4cs' /* Equal split */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -716,7 +736,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Custom %',
+                                        FFLocalizations.of(context).getText(
+                                          'enexrc8j' /* Custom % */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -743,7 +765,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ].divide(SizedBox(width: 8.0)),
                                 ),
                                 Text(
-                                  'Hold 1 extra seat for your friend',
+                                  FFLocalizations.of(context).getText(
+                                    'nvqck3af' /* Hold 1 extra seat for your fri... */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -831,7 +855,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'Your share',
+                                            FFLocalizations.of(context).getText(
+                                              'qycpjvd7' /* Your share */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -870,7 +896,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            '+3 min detour',
+                                            FFLocalizations.of(context).getText(
+                                              'a0l4grqi' /* +3 min detour */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -920,7 +948,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            '\$6.50',
+                                            FFLocalizations.of(context).getText(
+                                              'm8s3ygc5' /* $6.50 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -950,7 +980,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'of \$19.50 total',
+                                            FFLocalizations.of(context).getText(
+                                              'j447514y' /* of $19.50 total */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -996,7 +1028,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           padding: EdgeInsetsDirectional.fromSTEB(
                               2.0, 0.0, 0.0, 0.0),
                           child: Text(
-                            'Price updates if route or riders change before pickuo.',
+                            FFLocalizations.of(context).getText(
+                              's3y7hgro' /* Price updates if route or ride... */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -1051,7 +1085,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Privacy',
+                                  FFLocalizations.of(context).getText(
+                                    'y5mje1pu' /* Privacy */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -1088,7 +1124,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Invite link only',
+                                        FFLocalizations.of(context).getText(
+                                          '031obrr6' /* Invite link only */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -1123,7 +1161,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Open to nearby',
+                                        FFLocalizations.of(context).getText(
+                                          'kqvwz04w' /* Open to nearby */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -1175,7 +1215,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         ),
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Confirm Ride Share',
+                          FFLocalizations.of(context).getText(
+                            'ntglhxb6' /* Confirm Ride Share */,
+                          ),
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     font: GoogleFonts.poppins(
@@ -1207,7 +1249,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         ),
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Skip for now',
+                          FFLocalizations.of(context).getText(
+                            '4br05fcj' /* Skip for now */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -1235,7 +1279,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         padding:
                             EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),
                         child: Text(
-                          'Next: Matching - Get picked up faster',
+                          FFLocalizations.of(context).getText(
+                            'ltqpaty4' /* Next: Matching - Get picked up... */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(

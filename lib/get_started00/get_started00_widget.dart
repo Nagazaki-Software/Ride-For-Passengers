@@ -158,7 +158,9 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
                                 ),
                               ),
                               Text(
-                                'Help',
+                                FFLocalizations.of(context).getText(
+                                  'fut5gxq5' /* Help */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -269,7 +271,9 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Get Started',
+                              FFLocalizations.of(context).getText(
+                                '1md17r3l' /* Get Started */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -345,7 +349,9 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  'Log in',
+                                  FFLocalizations.of(context).getText(
+                                    '0268rezm' /* Log in */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -405,7 +411,9 @@ class _GetStarted00WidgetState extends State<GetStarted00Widget>
                                 ).then((value) => safeSetState(() {}));
                               },
                               child: Text(
-                                'Registration via social network',
+                                FFLocalizations.of(context).getText(
+                                  'kfv3agpt' /* Registration via social networ... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(

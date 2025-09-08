@@ -31,3 +31,4 @@ export '/my_pass24/my_pass24_widget.dart' show MyPass24Widget;
 export '/create_profile2_copy/create_profile2_copy_widget.dart'
     show CreateProfile2CopyWidget;
 export '/view_detalhes/view_detalhes_widget.dart' show ViewDetalhesWidget;
+export '/support22_copy/support22_copy_widget.dart' show Support22CopyWidget;

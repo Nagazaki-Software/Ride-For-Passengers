@@ -87,9 +87,10 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
           initialDestination: 'Where to?',
           title: 'Select Location',
           confirmText: 'Confirm',
-          countriesCsv: 'bs, br',
+          countriesCsv: 'bs, br, us',
           language: 'en',
           latlngUser: currentUserLocationValue,
+          quickPicksDefaultToDestination: true,
           onConfirm: (result) async {
             _model.jsonAddresss = result;
             safeSetState(() {});

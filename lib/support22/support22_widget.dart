@@ -66,7 +66,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
-                                'Support',
+                                FFLocalizations.of(context).getText(
+                                  'kqm6j0hk' /* Support */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -142,7 +144,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'FAQs',
+                                            FFLocalizations.of(context).getText(
+                                              '2vzif50n' /* FAQs */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -175,7 +179,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Payments, trips, safety',
+                                            FFLocalizations.of(context).getText(
+                                              '1uhzt6s2' /* Payments, trips, safety */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -253,7 +259,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Contact support',
+                                            FFLocalizations.of(context).getText(
+                                              '9e88djne' /* Contact support */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -286,7 +294,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Chat or email',
+                                            FFLocalizations.of(context).getText(
+                                              '8ogawjnk' /* Chat or email */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -364,7 +374,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Report a problem',
+                                            FFLocalizations.of(context).getText(
+                                              'jw1umjwk' /* Report a problem */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -397,7 +409,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Trip or app issues',
+                                            FFLocalizations.of(context).getText(
+                                              'kakc9sbx' /* Trip or app issues */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -475,7 +489,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Receipts',
+                                            FFLocalizations.of(context).getText(
+                                              'blghjnr6' /* Receipts */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -508,7 +524,9 @@ class _Support22WidgetState extends State<Support22Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Download monthly receipts',
+                                            FFLocalizations.of(context).getText(
+                                              'hjcz7ec1' /* Download monthly receipts */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(

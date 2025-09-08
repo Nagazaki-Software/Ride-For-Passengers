@@ -63,7 +63,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                           Align(
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'My Pass',
+                              FFLocalizations.of(context).getText(
+                                'uib448s6' /* My Pass */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -110,7 +112,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Current pass',
+                                    FFLocalizations.of(context).getText(
+                                      'wxxitr4a' /* Current pass */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -139,7 +143,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         ),
                                   ),
                                   Text(
-                                    'Renews in 4 days',
+                                    FFLocalizations.of(context).getText(
+                                      'pzp7olg7' /* Renews in 4 days */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -174,7 +180,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Week Pass',
+                                    FFLocalizations.of(context).getText(
+                                      'fowq72un' /* Week Pass */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -200,7 +208,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                     padding: EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 0.0, 0.0),
                                     child: Text(
-                                      '\$8',
+                                      FFLocalizations.of(context).getText(
+                                        '72o093g6' /* $8 */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -249,7 +259,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Upgarde',
+                                        FFLocalizations.of(context).getText(
+                                          'f5zikyh4' /* Upgarde */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -284,7 +296,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Cancel',
+                                        FFLocalizations.of(context).getText(
+                                          'w7o0iil6' /* Cancel */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -336,7 +350,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     16.0, 0.0, 0.0, 0.0),
                                 child: Text(
-                                  'Recent charges',
+                                  FFLocalizations.of(context).getText(
+                                    '4uvo83zt' /* Recent charges */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -383,7 +399,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Week Pass',
+                                        FFLocalizations.of(context).getText(
+                                          '3hi9mb26' /* Week Pass */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -415,7 +433,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'Aug 14',
+                                            FFLocalizations.of(context).getText(
+                                              'ozzk62hx' /* Aug 14 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -448,7 +468,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            '\$8',
+                                            FFLocalizations.of(context).getText(
+                                              'nr5yyifm' /* $8 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -511,7 +533,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Ride fuel fee',
+                                        FFLocalizations.of(context).getText(
+                                          'z992rxdy' /* Ride fuel fee */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -543,7 +567,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'Aug 13',
+                                            FFLocalizations.of(context).getText(
+                                              '9bk1aovq' /* Aug 13 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -576,7 +602,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            '\$3',
+                                            FFLocalizations.of(context).getText(
+                                              '0doc2pj2' /* $3 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -639,7 +667,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Ride fuel fee',
+                                        FFLocalizations.of(context).getText(
+                                          '66bb7n84' /* Ride fuel fee */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -671,7 +701,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'Aug 12',
+                                            FFLocalizations.of(context).getText(
+                                              '2ucud5zz' /* Aug 12 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -704,7 +736,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            '\$3',
+                                            FFLocalizations.of(context).getText(
+                                              'r632cxuw' /* $3 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -791,7 +825,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                       alignment:
                                           AlignmentDirectional(-1.0, -1.0),
                                       child: Text(
-                                        'Pass details',
+                                        FFLocalizations.of(context).getText(
+                                          'cgsiqzdh' /* Pass details */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyLarge
                                             .override(
@@ -819,7 +855,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                 ),
                               ),
                               Text(
-                                'Unlimited rides with an active pass.',
+                                FFLocalizations.of(context).getText(
+                                  'sw46jeqd' /* Unlimited rides with an active... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -839,7 +877,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                     ),
                               ),
                               Text(
-                                'Fuel fee: \$3 per ride.',
+                                FFLocalizations.of(context).getText(
+                                  '5yavjdgg' /* Fuel fee: $3 per ride. */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -859,7 +899,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                     ),
                               ),
                               Text(
-                                'Auto-renew optional on Week/Month.',
+                                FFLocalizations.of(context).getText(
+                                  'pzzzzj20' /* Auto-renew optional on Week/Mo... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -879,7 +921,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                                     ),
                               ),
                               Text(
-                                'No surge princing: limited to standand vehicles.',
+                                FFLocalizations.of(context).getText(
+                                  'wo8ckfat' /* No surge princing: limited to ... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -919,7 +963,9 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
                         ),
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Done',
+                          FFLocalizations.of(context).getText(
+                            '9to0c6rc' /* Done */,
+                          ),
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     font: GoogleFonts.poppins(

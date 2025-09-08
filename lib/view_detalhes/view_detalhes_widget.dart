@@ -279,7 +279,9 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            'Ride Details',
+                                            FFLocalizations.of(context).getText(
+                                              '4yu7sj41' /* Ride Details */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -362,7 +364,11 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      'Hello World',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'iz2j389z' /* Hello World */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -395,7 +401,11 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                               ),
                                                     ),
                                                     Text(
-                                                      'Hello World',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'jdpmld2g' /* Hello World */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -460,7 +470,11 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                         size: 14.0,
                                                       ),
                                                       Text(
-                                                        '3 Passengers',
+                                                        FFLocalizations.of(
+                                                                context)
+                                                            .getText(
+                                                          'ebfq3cwb' /* 3 Passengers */,
+                                                        ),
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -578,7 +592,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                'Waiting Driver',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '8sawn9sw' /* Waiting Driver */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -678,7 +695,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Ride ',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'wbiofvcr' /* Ride  */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -715,7 +735,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                       ),
                                                 ),
                                                 Text(
-                                                  '3 min',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'uwhlgefd' /* 3 min */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -809,7 +832,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'XL',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'pgnwl373' /* XL */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -846,7 +872,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                       ),
                                                 ),
                                                 Text(
-                                                  '6 min',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'j4xqnnjt' /* 6 min */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -940,7 +969,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Luxury',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'mjc14hof' /* Luxury */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -977,7 +1009,10 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                                                       ),
                                                 ),
                                                 Text(
-                                                  '10 min',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    '5w3pklo1' /* 10 min */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium

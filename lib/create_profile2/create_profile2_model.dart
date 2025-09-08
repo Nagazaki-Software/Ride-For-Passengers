@@ -1,3 +1,4 @@
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/index.dart';
@@ -36,6 +37,10 @@ class CreateProfile2Model extends FlutterFlowModel<CreateProfile2Widget> {
   // State field(s) for DropDown widget.
   String? dropDownValue2;
   FormFieldController<String>? dropDownValueController2;
+  // Stores action output result for [Firestore Query - Query a collection] action in Container widget.
+  List<UsersRecord>? users;
+  // Stores action output result for [Custom Action - verifiqueRandomNumber] action in Container widget.
+  String? randomNumber;
 
   @override
   void initState(BuildContext context) {

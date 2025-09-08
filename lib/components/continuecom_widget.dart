@@ -75,7 +75,9 @@ class _ContinuecomWidgetState extends State<ContinuecomWidget> {
               alignment: AlignmentDirectional(0.0, 0.0),
             ),
             Text(
-              'Continue with',
+              FFLocalizations.of(context).getText(
+                'j0lphagc' /* Continue with */,
+              ),
               textAlign: TextAlign.center,
               style: FlutterFlowTheme.of(context).headlineSmall.override(
                     font: GoogleFonts.poppins(

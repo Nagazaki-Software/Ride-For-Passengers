@@ -85,7 +85,9 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Payment error',
+                    FFLocalizations.of(context).getText(
+                      '14yzkw68' /* Payment error */,
+                    ),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).headlineSmall.override(
                           font: GoogleFonts.poppins(
@@ -103,7 +105,9 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                         ),
                   ),
                   Text(
-                    'We couldn\'t process your payment. Please check your card details and try again.',
+                    FFLocalizations.of(context).getText(
+                      'd2jpav0r' /* We couldn't process your payme... */,
+                    ),
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.poppins(
@@ -132,7 +136,9 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                     onPressed: () async {
                       Navigator.pop(context);
                     },
-                    text: 'Try again',
+                    text: FFLocalizations.of(context).getText(
+                      'l3q1bael' /* Try again */,
+                    ),
                     options: FFButtonOptions(
                       width: double.infinity,
                       height: 48.0,
@@ -171,7 +177,9 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                     onPressed: () async {
                       context.safePop();
                     },
-                    text: 'Cancel',
+                    text: FFLocalizations.of(context).getText(
+                      '8zf35a1x' /* Cancel */,
+                    ),
                     options: FFButtonOptions(
                       width: double.infinity,
                       height: 48.0,

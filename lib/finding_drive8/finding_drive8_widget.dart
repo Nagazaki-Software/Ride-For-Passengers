@@ -202,7 +202,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Text(
-                                        '?',
+                                        FFLocalizations.of(context).getText(
+                                          '6t1vj4fp' /* ? */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -232,7 +234,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                             ),
                                       ),
                                       Text(
-                                        'Help',
+                                        FFLocalizations.of(context).getText(
+                                          'fvekpq8i' /* Help */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -270,7 +274,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
-                                          'Finding your drive',
+                                          FFLocalizations.of(context).getText(
+                                            'dzgg1k15' /* Finding your drive */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -301,7 +307,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    '7 free cars avaliable in your area',
+                                    FFLocalizations.of(context).getText(
+                                      '1ws76v5h' /* 7 free cars avaliable in your ... */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -407,7 +415,10 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Matching...',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'yh8ymsh0' /* Matching... */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -443,7 +454,10 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                       ),
                                                 ),
                                                 Text(
-                                                  'Looking for the closest drive',
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'qfyfz06g' /* Looking for the closest drive */,
+                                                  ),
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -485,7 +499,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                         ],
                                       ),
                                       Text(
-                                        'Approx time 4 min',
+                                        FFLocalizations.of(context).getText(
+                                          'l549hc6p' /* Approx time 4 min */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -551,7 +567,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           12.0, 0.0, 0.0, 0.0),
                                       child: Text(
-                                        'Get picked up faster',
+                                        FFLocalizations.of(context).getText(
+                                          'ju9weu1g' /* Get picked up faster */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -594,7 +612,10 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '+ \$10',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'ylwofv54' /* + $10 */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -630,7 +651,10 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                     ),
                                               ),
                                               Text(
-                                                'in 2 min',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '554nwd7h' /* in 2 min */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -706,7 +730,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Cancel',
+                              FFLocalizations.of(context).getText(
+                                's5ftc24v' /* Cancel */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

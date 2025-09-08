@@ -1,4 +1,3 @@
-import '/backend/backend.dart';
 import '/components/navbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -16,12 +15,6 @@ class ScheduleRide14Model extends FlutterFlowModel<ScheduleRide14Widget> {
 
   ///  State fields for stateful widgets in this page.
 
-  // State field(s) for TextField widget.
-  FocusNode? textFieldFocusNode;
-  TextEditingController? textController;
-  String? Function(BuildContext, String?)? textControllerValidator;
-  // Stores action output result for [Backend Call - Create Document] action in Container widget.
-  RideOrdersRecord? orderRef;
   // Model for navbar component.
   late NavbarModel navbarModel;
 
@@ -32,9 +25,6 @@ class ScheduleRide14Model extends FlutterFlowModel<ScheduleRide14Widget> {
 
   @override
   void dispose() {
-    textFieldFocusNode?.dispose();
-    textController?.dispose();
-
     navbarModel.dispose();
   }
 }

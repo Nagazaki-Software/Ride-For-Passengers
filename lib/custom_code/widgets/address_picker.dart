@@ -22,11 +22,13 @@ import '/flutter_flow/lat_lng.dart' show LatLng;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 /// ------------------------------------------------------------ AddressPicker
-/// v4.4 - Title italic - Uses latlngUser (FlutterFlow LatLng) - Pickup
-/// auto-filled (reverse geocode) como TEXTO - Quick picks + Nearby SEM
-/// placeholder chato; aparecem ANTES de digitar - Autocomplete com bias no
-/// user location - Labels abaixo; NUNCA “Where to?” no destino - Mic por
-/// TOQUE (tap-to-speak), ícone SEMPRE visível - Flat payload
+/// v4.5 - Quick Picks preenchem DESTINO por padrão antes de digitar/falar -
+/// Param quickPicksDefaultToDestination=true - Ao tocar em chip sem foco nos
+/// campos -> seta Destination (Where to?) - Mantém comportamento esperado
+/// quando o usuário foca explicitamente Pickup Outras features mantidas: -
+/// Reverse geocode do pickup (texto), autocomplete com bias na user location
+/// - Labels abaixo; SEM “Where to?” no destino; mic sempre visível
+/// (tap-to-speak)
 class AddressPicker extends StatefulWidget {
   const AddressPicker({
     super.key,
@@ -42,6 +44,7 @@ class AddressPicker extends StatefulWidget {
     this.confirmText = 'Confirm',
     this.onConfirm,
     this.latlngUser,
+    this.quickPicksDefaultToDestination = true, // 👈 NOVO
   });
 
   final double? width;
@@ -60,6 +63,10 @@ class AddressPicker extends StatefulWidget {
 
   /// User location (FlutterFlow LatLng)
   final LatLng? latlngUser;
+
+  /// Se true, Quick Picks (chips) preenchem o DESTINO por padrão quando
+  /// o usuário ainda não focou em nenhum campo (pré-digitação/fala).
+  final bool quickPicksDefaultToDestination; // 👈 NOVO
 
   @override
   State<AddressPicker> createState() => _AddressPickerState();
@@ -305,8 +312,9 @@ class _AddressPickerState extends State<AddressPicker> {
       if (resp.statusCode != 200) return null;
       final data = json.decode(resp.body) as Map<String, dynamic>;
       final status = (data['status'] ?? '').toString();
-      if (status != 'OK' || (data['results'] as List?)?.isEmpty != false)
+      if (status != 'OK' || (data['results'] as List?)?.isEmpty != false) {
         return null;
+      }
       final first = (data['results'] as List).first as Map<String, dynamic>;
       final formatted = (first['formatted_address'] ?? '').toString();
       return PickedPlace(
@@ -440,15 +448,26 @@ class _AddressPickerState extends State<AddressPicker> {
   Future<void> _onPickNearby(_NearbyPlace n) async {
     final details = await _fetchDetailsById(n.placeId, fallbackDesc: n.name);
     if (details == null) return;
-    if (_editingPickup) {
+
+    // ---------------- NOVA LÓGICA ----------------
+    // Antes de digitar/falar (sem foco), os chips devem preencher o DESTINO.
+    final noFieldFocused = !_pickupFocus.hasFocus && !_destFocus.hasFocus;
+
+    // useDest = (sem foco E preferimos destino) OU (usuário já está no destino)
+    final bool useDest =
+        (noFieldFocused && widget.quickPicksDefaultToDestination) ||
+            !_editingPickup;
+
+    if (useDest) {
+      _destination = details;
+      _destCtrl.text = details.mainText;
+      setState(() {});
+    } else {
+      // Caso o usuário tenha focado explicitamente o Pickup, respeitamos.
       _pickup = details;
       _pickupCtrl.text = details.mainText;
       _destFocus.requestFocus();
       setState(() => _editingPickup = false);
-    } else {
-      _destination = details;
-      _destCtrl.text = details.mainText;
-      setState(() {});
     }
   }
 
@@ -460,21 +479,15 @@ class _AddressPickerState extends State<AddressPicker> {
       setState(() => _isListening = false);
       return;
     }
-    _destFocus.requestFocus();
-    setState(() {
-      _isListening = true;
-      _editingPickup = false;
-    });
+    setState(() => _isListening = true);
     await _speech.listen(
       listenMode: stt.ListenMode.dictation,
       onResult: (res) {
         final text = res.recognizedWords.trim();
-        _destCtrl
-          ..text = text
-          ..selection = TextSelection.fromPosition(
-              TextPosition(offset: text.length));
+        _destCtrl.text = text; // sempre mostra o texto NO CAMPO
         setState(() {});
         if (text.isNotEmpty) {
+          _editingPickup = false;
           _kickSearch(); // puxa sugestões com bias no user
         }
       },
@@ -559,7 +572,7 @@ class _AddressPickerState extends State<AddressPicker> {
 
             const SizedBox(height: 10),
 
-            // Quick picks (chips)
+            // Quick picks (chips) — aparecem ANTES de digitar/falar
             if (_hasUserLL)
               _QuickPicks(
                 nearby: _nearby,
@@ -737,8 +750,9 @@ class _QuickPicks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (loading || error != null || nearby.isEmpty)
+    if (loading || error != null || nearby.isEmpty) {
       return const SizedBox.shrink();
+    }
     final picks = nearby.take(8).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

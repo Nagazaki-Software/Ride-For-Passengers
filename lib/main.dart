@@ -10,9 +10,6 @@ import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 
-
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -20,19 +17,15 @@ void main() async {
 
   await initFirebase();
 
+  await FFLocalizations.initialize();
+
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
 
-  // 👉 pinta a tela inteira de #242424 antes do primeiro frame
-  runApp(
-    ColoredBox(
-      color: const Color(0xFF242424),
-      child: ChangeNotifierProvider(
-        create: (context) => appState,
-        child: MyApp(), // sua MyApp gerada pelo FlutterFlow
-      ),
-    ),
-  );
+  runApp(ChangeNotifierProvider(
+    create: (context) => appState,
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -45,7 +38,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale? _locale;
+  Locale? _locale = FFLocalizations.getStoredLocale();
 
   ThemeMode _themeMode = ThemeMode.system;
 
@@ -94,6 +87,7 @@ class _MyAppState extends State<MyApp> {
 
   void setLocale(String language) {
     safeSetState(() => _locale = createLocale(language));
+    FFLocalizations.storeLocale(language);
   }
 
   void setThemeMode(ThemeMode mode) => safeSetState(() {
@@ -116,6 +110,10 @@ class _MyAppState extends State<MyApp> {
       locale: _locale,
       supportedLocales: const [
         Locale('en'),
+        Locale('pt'),
+        Locale('de'),
+        Locale('fr'),
+        Locale('es'),
       ],
       theme: ThemeData(
         brightness: Brightness.light,

@@ -50,6 +50,11 @@ class ScheduleCaledarRide extends StatefulWidget {
     /// Callback ao escolher horário: devolve o DateTime (dia+hora).
     this.onSelected,
 
+    /// (Alterado) Builder para um widget extra no final, recebendo a seleção atual.
+    /// Recebe:
+    ///   - `date`: se houver hora escolhida -> dia+hora; senão -> dia às 00:00.
+    this.widgetAbaixo,
+
     /// OBRIGATÓRIO: abre página passando o DocumentReference do pedido existente.
     required this.abrirPage,
   });
@@ -63,6 +68,9 @@ class ScheduleCaledarRide extends StatefulWidget {
 
   /// Callback de seleção (sem botão confirmar).
   final Future Function(DateTime? date)? onSelected;
+
+  /// (Alterado) Builder opcional que recebe a seleção atual.
+  final Widget Function(DateTime? date)? widgetAbaixo;
 
   /// Navegação: exige DocumentReference do pedido.
   final Future Function(DocumentReference orderRef) abrirPage;
@@ -104,7 +112,7 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
     _ordersByDay = {};
     final list = widget.order ?? const <RideOrdersRecord>[];
     for (final o in list) {
-      final DateTime? d = o.dia; // <-- ajuste se seu campo tiver outro nome
+      final DateTime? d = o.dia; // ajuste se o campo tiver outro nome
       if (d == null) continue;
       final key = DateTime(d.year, d.month, d.day);
       (_ordersByDay[key] ??= <RideOrdersRecord>[]).add(o);
@@ -190,6 +198,18 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
 
   DateTime _merge(DateTime d, TimeOfDay t) =>
       DateTime(d.year, d.month, d.day, t.hour, t.minute);
+
+  /// Seleção atual como DateTime:
+  /// - se existir hora, retorna dia+hora
+  /// - senão, retorna o dia às 00:00
+  DateTime? _currentSelection() {
+    if (_selectedDate == null) return null;
+    if (_selectedTime == null) {
+      return DateTime(
+          _selectedDate!.year, _selectedDate!.month, _selectedDate!.day);
+    }
+    return _merge(_selectedDate!, _selectedTime!);
+  }
 
   // ---------- UI ----------
   Widget _buildHeader(BuildContext context) {
@@ -286,6 +306,7 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
               _selectedDate = day;
               _selectedTime = null; // mudou o dia, zera a hora
             });
+            // como o build será chamado, o widgetAbaixo receberá a nova seleção automaticamente
           },
           child: Center(
             child: Stack(
@@ -383,8 +404,7 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
           InkWell(
             onTap: () async {
               setState(() => _selectedTime = t);
-              final dt =
-                  (_selectedDate != null) ? _merge(_selectedDate!, t) : null;
+              final dt = _merge(_selectedDate!, t);
 
               // dispara callback de seleção (se tiver)
               if (widget.onSelected != null) {
@@ -400,11 +420,9 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
                   } catch (e) {
                     debugPrint('Erro ao abrir página: $e');
                   }
-                } else {
-                  // não há pedido neste horário -> nada a fazer aqui
-                  // (se quiser criar e depois navegar, crie o doc e então chame abrirPage(ref))
                 }
               }
+              // o widgetAbaixo vai receber o novo dt via build
             },
             borderRadius: BorderRadius.circular(14),
             child: Container(
@@ -494,10 +512,11 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
 
   @override
   Widget build(BuildContext context) {
+    final selection = _currentSelection(); // <- usado para o widgetAbaixo
+
     // Altura “infinita”: sem height fixo e sem scroll interno.
     return Container(
       width: widget.width ?? double.infinity,
-      // height: widget.height, // propositalmente não usado
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: _CalColors.card,
@@ -518,6 +537,12 @@ class _ScheduleCaledarRideState extends State<ScheduleCaledarRide> {
             _buildPeriodSelector(),
             const SizedBox(height: 12),
             _buildTimeChips(context),
+
+            // ---------- (Alterado) Slot para widget extra abaixo ----------
+            if (widget.widgetAbaixo != null) ...[
+              const SizedBox(height: 12),
+              widget.widgetAbaixo!(selection),
+            ],
           ],
         ),
       ),

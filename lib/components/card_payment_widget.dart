@@ -98,7 +98,9 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Payment Method',
+                    FFLocalizations.of(context).getText(
+                      'p8t6d1h2' /* Payment Method */,
+                    ),
                     style: FlutterFlowTheme.of(context).headlineMedium.override(
                           font: GoogleFonts.poppins(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -115,7 +117,9 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                         ),
                   ),
                   Text(
-                    'Choose your preferred payment option',
+                    FFLocalizations.of(context).getText(
+                      'a008km1g' /* Choose your preferred payment ... */,
+                    ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.poppins(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -147,7 +151,9 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           onPressed: () {
                             print('Button pressed ...');
                           },
-                          text: 'Pay with Google Pay',
+                          text: FFLocalizations.of(context).getText(
+                            '0skbwu9o' /* Pay with Google Pay */,
+                          ),
                           icon: FaIcon(
                             FontAwesomeIcons.googlePay,
                             size: 30.0,
@@ -198,7 +204,9 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           onPressed: () {
                             print('Button pressed ...');
                           },
-                          text: 'Pay with Apple Pay',
+                          text: FFLocalizations.of(context).getText(
+                            '0cdaev13' /* Pay with Apple Pay */,
+                          ),
                           icon: FaIcon(
                             FontAwesomeIcons.applePay,
                             size: 30.0,
@@ -255,7 +263,9 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Credit Card Information',
+                    FFLocalizations.of(context).getText(
+                      '9j9a154z' /* Credit Card Information */,
+                    ),
                     style: FlutterFlowTheme.of(context).titleMedium.override(
                           font: GoogleFonts.poppins(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -284,24 +294,13 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           passe: widget.passe!,
                           tokenizationKey: 'sandbox_ck9vkcgg_brg8dhjg5tqpw496',
                           chargeOnConfirm: widget.pagamento,
+                          closeOnSave: true,
                           onTextField: (creditCardTextfield) async {
-                            FFAppState().update(() {
-                              FFAppState().cardNumber =
-                                  getJsonField(creditCardTextfield, r'$.number')
-                                      .toString();
-                              FFAppState().cardExpiry =
-                                  getJsonField(creditCardTextfield, r'$.expiry')
-                                      .toString();
-                              FFAppState().cardCvv =
-                                  getJsonField(creditCardTextfield, r'$.cvv')
-                                      .toString();
-                              FFAppState().cardHolder =
-                                  getJsonField(creditCardTextfield, r'$.holder')
-                                      .toString();
-                              FFAppState().addToCreditCardSalves(
-                                  creditCardTextfield);
-                            });
+                            FFAppState()
+                                .addToCreditCardSalves(creditCardTextfield);
+                            safeSetState(() {});
                           },
+                          onSave: (jsonReturn) async {},
                         ),
                       ),
                     ].divide(SizedBox(height: 12.0)),

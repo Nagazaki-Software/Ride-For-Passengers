@@ -82,7 +82,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'You Arrived at',
+                              FFLocalizations.of(context).getText(
+                                'eaie6vqv' /* You Arrived at */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -102,7 +104,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                         ),
                       ),
                       GradientText(
-                        'Prince Charles #27',
+                        FFLocalizations.of(context).getText(
+                          'cnfdqzgs' /* Prince Charles #27 */,
+                        ),
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               font: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w600,
@@ -184,7 +188,10 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                                 MainAxisAlignment.spaceAround,
                                             children: [
                                               Text(
-                                                'Price:',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'ckrrb152' /* Price: */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -219,7 +226,10 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                                     ),
                                               ),
                                               GradientText(
-                                                '\$ 14',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '1lubjluw' /* $ 14 */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -277,7 +287,10 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                'Enisson',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '5kl2pu5g' /* Enisson */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -300,7 +313,10 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                                     ),
                                               ),
                                               GradientText(
-                                                'Godoy',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'ezetpl5s' /* Godoy */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -344,7 +360,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Approximate time',
+                                      FFLocalizations.of(context).getText(
+                                        'gxcs6ol3' /* Approximate time */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -392,7 +410,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           .primaryBackground,
                                     ),
                                     Text(
-                                      'Approximate ETA',
+                                      FFLocalizations.of(context).getText(
+                                        '5zkt1mw3' /* Approximate ETA */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -421,7 +441,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           ),
                                     ),
                                     GradientText(
-                                      '4:30pm',
+                                      FFLocalizations.of(context).getText(
+                                        'asucpsxw' /* 4:30pm */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -491,7 +513,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            'Add  Stop',
+                                            FFLocalizations.of(context).getText(
+                                              '1nghdhg5' /* Add  Stop */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -543,7 +567,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Add  Stop',
+                                        FFLocalizations.of(context).getText(
+                                          'h5b7qu2x' /* Add  Stop */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(

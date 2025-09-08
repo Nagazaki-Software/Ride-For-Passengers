@@ -75,7 +75,9 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Share QR Code',
+                  FFLocalizations.of(context).getText(
+                    'e24qs45k' /* Share QR Code */,
+                  ),
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
                         font: GoogleFonts.poppins(
@@ -123,7 +125,9 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
                   ),
                 ),
                 Text(
-                  'Scan this code to connect',
+                  FFLocalizations.of(context).getText(
+                    'iebu9yur' /* Scan this code to connect */,
+                  ),
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         font: GoogleFonts.poppins(
@@ -145,7 +149,9 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
                   onPressed: () {
                     print('Button pressed ...');
                   },
-                  text: 'Share QR Code',
+                  text: FFLocalizations.of(context).getText(
+                    '55ffv6b0' /* Share QR Code */,
+                  ),
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 48.0,

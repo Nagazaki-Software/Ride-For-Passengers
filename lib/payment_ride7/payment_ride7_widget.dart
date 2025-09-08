@@ -84,7 +84,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                         Align(
                           alignment: AlignmentDirectional(0.0, 0.0),
                           child: Text(
-                            'Payment for this ride',
+                            FFLocalizations.of(context).getText(
+                              '48il5165' /* Payment for this ride */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -144,7 +146,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
-                                          'Tourist pass: Week (\$8)',
+                                          FFLocalizations.of(context).getText(
+                                            'p8t3hsvx' /* Tourist pass: Week ($8) */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -181,7 +185,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
-                                          'Valid: Aug 20',
+                                          FFLocalizations.of(context).getText(
+                                            'p6e8yole' /* Valid: Aug 20 */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -229,7 +235,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
-                                          'Fuel fee: 3 per ride',
+                                          FFLocalizations.of(context).getText(
+                                            'axid08n7' /* Fuel fee: 3 per ride */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -266,7 +274,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
-                                          'Charged on Visa *****4343',
+                                          FFLocalizations.of(context).getText(
+                                            'l5w20jdh' /* Charged on Visa *****4343 */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -354,7 +364,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                       ),
                                     ),
                                     Text(
-                                      'Pay in app (Recommendad)',
+                                      FFLocalizations.of(context).getText(
+                                        'lpcumiyr' /* Pay in app (Recommendad) */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -430,7 +442,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                       ),
                                     ),
                                     Text(
-                                      'Pay driver directly',
+                                      FFLocalizations.of(context).getText(
+                                        'ow1d3q6k' /* Pay driver directly */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -565,7 +579,10 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                                     .labelMedium
                                                     .fontStyle,
                                           ),
-                                      hintText: 'e.g., meet at Hotel lobby',
+                                      hintText:
+                                          FFLocalizations.of(context).getText(
+                                        'vse9hbic' /* e.g., meet at Hotel lobby */,
+                                      ),
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .labelMedium
                                           .override(
@@ -771,7 +788,10 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                                       r'''$.numberMasked''',
                                                     ))
                                                   Text(
-                                                    'This Default ',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'q0r0r5ua' /* This Default  */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -875,7 +895,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                             padding: EdgeInsetsDirectional.fromSTEB(
                                 5.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              'Optinal tip (at pickup)',
+                              FFLocalizations.of(context).getText(
+                                'nxuhtebu' /* Optinal tip (at pickup) */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -915,7 +937,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  '\$1',
+                                  FFLocalizations.of(context).getText(
+                                    'gd3kce3k' /* $1 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -951,7 +975,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  '\$2',
+                                  FFLocalizations.of(context).getText(
+                                    '994bahd0' /* $2 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -987,7 +1013,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  '\$3',
+                                  FFLocalizations.of(context).getText(
+                                    'esljy9on' /* $3 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -1023,7 +1051,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  'No tip',
+                                  FFLocalizations.of(context).getText(
+                                    'm9wj15bb' /* No tip */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -1178,7 +1208,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  'Confirm & Pay',
+                                  FFLocalizations.of(context).getText(
+                                    '6r67s6mb' /* Confirm & Pay */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -1207,7 +1239,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'You´ll be charged after ride',
+                              FFLocalizations.of(context).getText(
+                                'n1vblhdo' /* You´ll be charged after ride */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -1242,7 +1276,9 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget> {
                         mainAxisSize: MainAxisSize.max,
                         children: [
                           Text(
-                            'After this step -> Matching',
+                            FFLocalizations.of(context).getText(
+                              'zdfdyn5j' /* After this step -> Matching */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(

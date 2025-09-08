@@ -83,7 +83,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                       Align(
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Profile',
+                          FFLocalizations.of(context).getText(
+                            'ax91qqgd' /* Profile */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -170,7 +172,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                         Align(
                           alignment: AlignmentDirectional(0.0, 0.0),
                           child: Text(
-                            ' Insert a Photo of you here',
+                            FFLocalizations.of(context).getText(
+                              'cqlk16nf' /*  Insert a Photo of you here */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -281,7 +285,10 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                                         .labelMedium
                                                         .fontStyle,
                                               ),
-                                          hintText: ' Type your name here',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            'km88iw07' /*  Type your name here */,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -392,7 +399,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Give it your best shot at spelling it right',
+                                FFLocalizations.of(context).getText(
+                                  'pxniyo6o' /* Give it your best shot at spel... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -453,7 +462,10 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           isDense: true,
-                                          hintText: ' Type your surname here',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            'rnriatbp' /*  Type your surname here */,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -564,7 +576,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Just a Formality',
+                                FFLocalizations.of(context).getText(
+                                  'r4ck9a3f' /* Just a Formality */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -625,7 +639,10 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           isDense: true,
-                                          hintText: ' Type your email here',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            'gdxpiltb' /*  Type your email here */,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -736,7 +753,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Your best email so we can verify it is you',
+                                FFLocalizations.of(context).getText(
+                                  'ngpztzel' /* Your best email so we can veri... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -800,7 +819,12 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                             !_model.textFieldPasswordVisibility,
                                         decoration: InputDecoration(
                                           isDense: true,
-                                          hintText: ' Insert a password\n',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            '3ty7nvod' /*  Insert a password
+ */
+                                            ,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -928,7 +952,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Don´t worry if you forget, we´ll be here to \nremind you  when you do.',
+                                FFLocalizations.of(context).getText(
+                                  'eu23ys5x' /* Don´t worry if you forget, we´... */,
+                                ),
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -964,6 +990,7 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               width: MediaQuery.sizeOf(context).width * 0.85,
                               height: 40.0,
                               decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context).alternate,
                                 boxShadow: [
                                   BoxShadow(
                                     blurRadius: 4.0,
@@ -974,66 +1001,56 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                     ),
                                   )
                                 ],
-                                gradient: LinearGradient(
-                                  colors: [
-                                    FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context).accent1
-                                  ],
-                                  stops: [0.0, 1.0],
-                                  begin: AlignmentDirectional(0.0, -1.0),
-                                  end: AlignmentDirectional(0, 1.0),
-                                ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
-                              child: FlutterFlowDropDown<String>(
-                                controller: _model.dropDownValueController1 ??=
-                                    FormFieldController<String>(null),
-                                options: functions.nationalityList(),
-                                onChanged: (val) => safeSetState(
-                                    () => _model.dropDownValue1 = val),
-                                width: 200.0,
-                                height: 40.0,
-                                textStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    12.0, 0.0, 10.0, 0.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      FFLocalizations.of(context).getText(
+                                        '30wuyuwo' /* Upload a Photo of your ID */,
                                       ),
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      fontSize: 16.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
+                                      style: FlutterFlowTheme.of(context)
                                           .bodyMedium
-                                          .fontStyle,
+                                          .override(
+                                            font: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                            fontSize: 16.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.w500,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+                                          ),
                                     ),
-                                hintText: 'Choose your nationality',
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  size: 24.0,
+                                    Icon(
+                                      Icons.camera_alt_outlined,
+                                      color:
+                                          FlutterFlowTheme.of(context).tertiary,
+                                      size: 23.0,
+                                    ),
+                                  ],
                                 ),
-                                elevation: 2.0,
-                                borderColor: Colors.transparent,
-                                borderWidth: 0.0,
-                                borderRadius: 8.0,
-                                margin: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 12.0, 0.0),
-                                hidesUnderline: true,
-                                isOverButton: false,
-                                isSearchable: false,
-                                isMultiSelect: false,
                               ),
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Let us know where your accent is from!',
+                                FFLocalizations.of(context).getText(
+                                  '0o76z2zr' /* Bahaman Passport, Driver's lic... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -1092,11 +1109,11 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                   ),
                                   FlutterFlowDropDown<String>(
                                     controller:
-                                        _model.dropDownValueController2 ??=
+                                        _model.dropDownValueController ??=
                                             FormFieldController<String>(null),
                                     options: functions.stateUsList(),
                                     onChanged: (val) => safeSetState(
-                                        () => _model.dropDownValue2 = val),
+                                        () => _model.dropDownValue = val),
                                     width: double.infinity,
                                     height: 40.0,
                                     textStyle: FlutterFlowTheme.of(context)
@@ -1119,7 +1136,10 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                                   .bodyMedium
                                                   .fontStyle,
                                         ),
-                                    hintText: ' Select your U.S State',
+                                    hintText:
+                                        FFLocalizations.of(context).getText(
+                                      'chuireog' /*  Select Your Nassau Zone */,
+                                    ),
                                     icon: Icon(
                                       Icons.keyboard_arrow_down_rounded,
                                       color:
@@ -1144,7 +1164,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Ignore this step if you are not American.',
+                                FFLocalizations.of(context).getText(
+                                  'tidzlbeg' /* East, Middle or West */,
+                                ),
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -1230,6 +1252,7 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                 displayName:
                                     '${_model.textController1.text} ${_model.textController2.text}',
                                 photoUrl: _model.uploadedFileUrl_uploadDataF7h,
+                                email: '',
                               ),
                               ...mapToFirestore(
                                 {
@@ -1266,7 +1289,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Next',
+                              FFLocalizations.of(context).getText(
+                                'adtc7pns' /* Next */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

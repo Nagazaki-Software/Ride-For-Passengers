@@ -243,7 +243,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Verified ID',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'g30tee4i' /* Verified ID */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -288,7 +291,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'Zone: Nassau',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'ty0dxium' /* Zone: Nassau */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -333,7 +339,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    'English',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'fgdknidq' /* English */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -441,7 +450,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'S',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'm7hx9uxx' /* S */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -487,7 +499,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Payment methods',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'j8inhljm' /* Payment methods */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -522,7 +537,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Card on file: Visa 4343',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'fof2w31u' /* Card on file: Visa 4343 */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -623,7 +641,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'R',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'x43zkuef' /* R */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -669,7 +690,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Rewards',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '5vaa9l88' /* Rewards */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -704,7 +728,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    '2450 points, 3 perks',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'g96msyuj' /* 2450 points, 3 perks */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -805,7 +832,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'A',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'i6q9uqth' /* A */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -851,7 +881,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Activity',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'bf8junkg' /* Activity */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -886,7 +919,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Trips and receipts',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'cp8sp621' /* Trips and receipts */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1006,7 +1042,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'P',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'qhm7lt4p' /* P */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1052,7 +1091,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Preferences',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'toqqidie' /* Preferences */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1087,7 +1129,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Language, accessibility, notifications',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'lto0jo84' /* Language, accessibility, notif... */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1189,7 +1234,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'T',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'buh7qs0p' /* T */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1235,7 +1283,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Safety Toolkit',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'fo2feead' /* Safety Toolkit */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1270,7 +1321,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'Trusted contacts, share ETA defaults',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '5wjcdyl2' /* Trusted contacts, share ETA de... */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1371,7 +1425,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'S',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'zd7pkc5q' /* S */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1417,7 +1474,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Support',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'y0k4zyj0' /* Support */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1452,7 +1512,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'FAQs and contact support',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '6dgl5sxs' /* FAQs and contact support */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1553,7 +1616,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                               alignment: AlignmentDirectional(
                                                   0.0, 0.0),
                                               child: Text(
-                                                'L',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '5ccwvf7m' /* L */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1599,7 +1665,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    'Legal',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'mu19yv2j' /* Legal */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1634,7 +1703,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    'FAQs and contact support',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      'c7123jp4' /* FAQs and contact support */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1762,7 +1834,9 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            'M',
+                                            FFLocalizations.of(context).getText(
+                                              'd61haj9w' /* M */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -1807,7 +1881,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                'My Passes',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'o9mkn436' /* My Passes */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1842,7 +1919,10 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     ),
                                               ),
                                               Text(
-                                                'Click here to mansge or cancel your Pass',
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'k5oxfzxg' /* Click here to mansge or cancel... */,
+                                                ),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -1914,7 +1994,9 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Log out',
+                              FFLocalizations.of(context).getText(
+                                '7ou1tpcp' /* Log out */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

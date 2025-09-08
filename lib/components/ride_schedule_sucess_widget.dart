@@ -79,7 +79,9 @@ class _RideScheduleSucessWidgetState extends State<RideScheduleSucessWidget> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Ride Scheduled Successfully!',
+                  FFLocalizations.of(context).getText(
+                    '8y5h9zq6' /* Ride Scheduled Successfully! */,
+                  ),
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
                         font: GoogleFonts.poppins(
@@ -101,7 +103,9 @@ class _RideScheduleSucessWidgetState extends State<RideScheduleSucessWidget> {
                       ),
                 ),
                 Text(
-                  'Your ride has been confirmed and the driver will arrive at the scheduled time.',
+                  FFLocalizations.of(context).getText(
+                    'chvb97s2' /* Your ride has been confirmed a... */,
+                  ),
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         font: GoogleFonts.poppins(
@@ -137,7 +141,9 @@ class _RideScheduleSucessWidgetState extends State<RideScheduleSucessWidget> {
                       }.withoutNulls,
                     );
                   },
-                  text: 'View Details',
+                  text: FFLocalizations.of(context).getText(
+                    'r7qclgc3' /* View Details */,
+                  ),
                   options: FFButtonOptions(
                     width: 150.0,
                     height: 48.0,
@@ -170,7 +176,9 @@ class _RideScheduleSucessWidgetState extends State<RideScheduleSucessWidget> {
                   onPressed: () async {
                     Navigator.pop(context);
                   },
-                  text: 'Done',
+                  text: FFLocalizations.of(context).getText(
+                    'n2ek8gmc' /* Done */,
+                  ),
                   options: FFButtonOptions(
                     width: 150.0,
                     height: 48.0,

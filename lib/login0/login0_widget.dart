@@ -137,7 +137,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                   ),
                                 ),
                                 Text(
-                                  'Help',
+                                  FFLocalizations.of(context).getText(
+                                    'm895k4ns' /* Help */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -191,7 +193,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                       ),
                                     ),
                                     Text(
-                                      'Autolocation',
+                                      FFLocalizations.of(context).getText(
+                                        'bdcuihas' /* Autolocation */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -305,7 +309,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: 'Email address',
+                                  hintText: FFLocalizations.of(context).getText(
+                                    'tj04hhzt' /* Email address */,
+                                  ),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -435,7 +441,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: 'Password',
+                                  hintText: FFLocalizations.of(context).getText(
+                                    '5oebsvgd' /* Password */,
+                                  ),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -603,7 +611,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                   ),
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Text(
-                                    'Log in',
+                                    FFLocalizations.of(context).getText(
+                                      'h8805fpm' /* Log in */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(
@@ -660,7 +670,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                 ).then((value) => safeSetState(() {}));
                               },
                               child: Text(
-                                'Don´t have an account?',
+                                FFLocalizations.of(context).getText(
+                                  'e5wx6dwp' /* Don´t have an account? */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -712,7 +724,9 @@ class _Login0WidgetState extends State<Login0Widget> {
                                 ).then((value) => safeSetState(() {}));
                               },
                               child: Text(
-                                'Sign up',
+                                FFLocalizations.of(context).getText(
+                                  'jymms9a4' /* Sign up */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(

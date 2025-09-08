@@ -67,7 +67,9 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
-                                'Payment methods',
+                                FFLocalizations.of(context).getText(
+                                  'vcm0xkg1' /* Payment methods */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -142,7 +144,9 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Visa****4343',
+                                            FFLocalizations.of(context).getText(
+                                              'lwod9ywo' /* Visa****4343 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -175,7 +179,9 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Default',
+                                            FFLocalizations.of(context).getText(
+                                              'l3m2kc2f' /* Default */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -241,7 +247,9 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                         ),
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: GradientText(
-                          'Set Visa as default',
+                          FFLocalizations.of(context).getText(
+                            'uq9wjxi0' /* Set Visa as default */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -282,7 +290,9 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                         ),
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: GradientText(
-                          'Add new payment method',
+                          FFLocalizations.of(context).getText(
+                            'ieajvxxe' /* Add new payment method */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(

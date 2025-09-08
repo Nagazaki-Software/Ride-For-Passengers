@@ -16,9 +16,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		6436409A27A31CD800820AF7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6436409C27A31CD800820AF7 /* InfoPlist.strings */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
-                97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-                B3A1E8CB27F0A1F800000002 /* NativeGoogleMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A1E8CB27F0A1F800000001 /* NativeGoogleMap.swift */; };
-                B3A1E8CB27F0A1F800000004 /* NativeGoogleMapFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A1E8CB27F0A1F800000003 /* NativeGoogleMapFactory.swift */; };
+		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -51,12 +49,15 @@
 		97C146FB1CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		6436409F27A31CD800820AF7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6436409727A31CD300820AF7 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6436409E27A31CD200820AF7 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6436409D27A31CD000820AF7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6436409027A31CD600820AF7 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-                A9C17DEFA21738E5FBD7F54A /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
-                B8285832C7E7A3262A5A897C /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-                FA9015B13AC8FF8CBD8DD673 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
-                B3A1E8CB27F0A1F800000001 /* NativeGoogleMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeGoogleMap.swift; sourceTree = "<group>"; };
-                B3A1E8CB27F0A1F800000003 /* NativeGoogleMapFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeGoogleMapFactory.swift; sourceTree = "<group>"; };
+		A9C17DEFA21738E5FBD7F54A /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		B8285832C7E7A3262A5A897C /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA9015B13AC8FF8CBD8DD673 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,14 +126,12 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
-                                6436409C27A31CD800820AF7 /* InfoPlist.strings */,
-                                44A671D42BC7AFBA0042F967 /* PrivacyInfo.xcprivacy */,
-                                B3A1E8CB27F0A1F800000001 /* NativeGoogleMap.swift */,
-                                B3A1E8CB27F0A1F800000003 /* NativeGoogleMapFactory.swift */,
-                        );
-                        path = Runner;
-                        sourceTree = "<group>";
-                };
+				6436409C27A31CD800820AF7 /* InfoPlist.strings */,
+				44A671D42BC7AFBA0042F967 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Runner;
+			sourceTree = "<group>";
+		};
 		CC79BB5F4B7E86C62E930C2C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -188,6 +187,10 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				pt,
+				de,
+				fr,
+				es,
 				Base,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
@@ -308,21 +311,23 @@
 		97C146EA1CF9000F007C117D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-                        files = (
-                                74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
-                                1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
-                                B3A1E8CB27F0A1F800000002 /* NativeGoogleMap.swift in Sources */,
-                                B3A1E8CB27F0A1F800000004 /* NativeGoogleMapFactory.swift in Sources */,
-                        );
-                        runOnlyForDeploymentPostprocessing = 0;
-                };
+			files = (
+				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
 		6436409C27A31CD800820AF7 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-
+				6436409F27A31CD800820AF7 /* en */,
+				6436409727A31CD300820AF7 /* pt */,
+				6436409E27A31CD200820AF7 /* de */,
+				6436409D27A31CD000820AF7 /* fr */,
+				6436409027A31CD600820AF7 /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";

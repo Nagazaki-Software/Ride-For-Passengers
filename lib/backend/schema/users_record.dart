@@ -80,6 +80,21 @@ class UsersRecord extends FirestoreRecord {
   int get ridePoints => _ridePoints ?? 0;
   bool hasRidePoints() => _ridePoints != null;
 
+  // "codeUser" field.
+  String? _codeUser;
+  String get codeUser => _codeUser ?? '';
+  bool hasCodeUser() => _codeUser != null;
+
+  // "verifyaccount" field.
+  bool? _verifyaccount;
+  bool get verifyaccount => _verifyaccount ?? false;
+  bool hasVerifyaccount() => _verifyaccount != null;
+
+  // "etnia" field.
+  String? _etnia;
+  String get etnia => _etnia ?? '';
+  bool hasEtnia() => _etnia != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -94,6 +109,9 @@ class UsersRecord extends FirestoreRecord {
     _passe = snapshotData['passe'] as String?;
     _location = snapshotData['location'] as LatLng?;
     _ridePoints = castToType<int>(snapshotData['ridePoints']);
+    _codeUser = snapshotData['codeUser'] as String?;
+    _verifyaccount = snapshotData['verifyaccount'] as bool?;
+    _etnia = snapshotData['etnia'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -142,6 +160,9 @@ Map<String, dynamic> createUsersRecordData({
   String? passe,
   LatLng? location,
   int? ridePoints,
+  String? codeUser,
+  bool? verifyaccount,
+  String? etnia,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -157,6 +178,9 @@ Map<String, dynamic> createUsersRecordData({
       'passe': passe,
       'location': location,
       'ridePoints': ridePoints,
+      'codeUser': codeUser,
+      'verifyaccount': verifyaccount,
+      'etnia': etnia,
     }.withoutNulls,
   );
 
@@ -181,7 +205,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.driverOnline == e2?.driverOnline &&
         e1?.passe == e2?.passe &&
         e1?.location == e2?.location &&
-        e1?.ridePoints == e2?.ridePoints;
+        e1?.ridePoints == e2?.ridePoints &&
+        e1?.codeUser == e2?.codeUser &&
+        e1?.verifyaccount == e2?.verifyaccount &&
+        e1?.etnia == e2?.etnia;
   }
 
   @override
@@ -198,7 +225,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.driverOnline,
         e?.passe,
         e?.location,
-        e?.ridePoints
+        e?.ridePoints,
+        e?.codeUser,
+        e?.verifyaccount,
+        e?.etnia
       ]);
 
   @override

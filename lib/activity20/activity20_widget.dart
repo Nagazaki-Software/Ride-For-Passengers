@@ -71,7 +71,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                             Align(
                               alignment: AlignmentDirectional(-1.0, 0.0),
                               child: Text(
-                                'Activity',
+                                FFLocalizations.of(context).getText(
+                                  '65mjue8s' /* Activity */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -136,7 +138,10 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Rides this month',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'korhfw3u' /* Rides this month */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -267,7 +272,10 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Spend this month',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '5zo3l5ee' /* Spend this month */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -301,7 +309,10 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                                   ),
                                             ),
                                             Text(
-                                              '\$ 214',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'uykp8in3' /* $ 214 */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium
@@ -388,7 +399,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                               ),
                               alignment: AlignmentDirectional(0.0, 0.0),
                               child: Text(
-                                'All',
+                                FFLocalizations.of(context).getText(
+                                  '6n062rjg' /* All */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -461,7 +474,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                 }
                               },
                               child: Text(
-                                'Upcoming',
+                                FFLocalizations.of(context).getText(
+                                  '0vu2v8bi' /* Upcoming */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -534,7 +549,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                               ),
                               alignment: AlignmentDirectional(0.0, 0.0),
                               child: Text(
-                                'Completed',
+                                FFLocalizations.of(context).getText(
+                                  'sz6ef2cr' /* Completed */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -607,7 +624,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                               ),
                               alignment: AlignmentDirectional(0.0, 0.0),
                               child: Text(
-                                'Cancelled',
+                                FFLocalizations.of(context).getText(
+                                  '1g6e8am2' /* Cancelled */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -659,7 +678,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Upcoming ride',
+                                      FFLocalizations.of(context).getText(
+                                        'bzeoj1e7' /* Upcoming ride */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -684,7 +705,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                   ],
                                 ),
                                 Text(
-                                  'Today 4:30 PM  • Bay Street -> Paradise Island',
+                                  FFLocalizations.of(context).getText(
+                                    '9gycapbt' /* Today 4:30 PM  • Bay Street ->... */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -734,7 +757,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                               EdgeInsetsDirectional.fromSTEB(
                                                   14.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            '\$ 18',
+                                            FFLocalizations.of(context).getText(
+                                              '11hntl9n' /* $ 18 */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -777,7 +802,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                               EdgeInsetsDirectional.fromSTEB(
                                                   14.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'ETA 7 min',
+                                            FFLocalizations.of(context).getText(
+                                              'w9p8sory' /* ETA 7 min */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -816,7 +843,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                         alignment:
                                             AlignmentDirectional(0.0, 0.0),
                                         child: Text(
-                                          'Edit',
+                                          FFLocalizations.of(context).getText(
+                                            'e9ctu0o5' /* Edit */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -864,7 +893,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                         alignment:
                                             AlignmentDirectional(0.0, 0.0),
                                         child: Text(
-                                          'Details',
+                                          FFLocalizations.of(context).getText(
+                                            'mlfbk1ox' /* Details */,
+                                          ),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -903,7 +934,9 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                           padding: EdgeInsetsDirectional.fromSTEB(
                               12.0, 0.0, 0.0, 0.0),
                           child: Text(
-                            'Recent trips',
+                            FFLocalizations.of(context).getText(
+                              'hyvc2aw5' /* Recent trips */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -1112,7 +1145,11 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      'Mon • 2.6 km  • 9 min',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'f0cpkwuy' /* Mon • 2.6 km  • 9 min */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -1155,7 +1192,10 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                                 mainAxisSize: MainAxisSize.max,
                                                 children: [
                                                   Text(
-                                                    '\$ 18.40',
+                                                    FFLocalizations.of(context)
+                                                        .getText(
+                                                      '1p4rt4i1' /* $ 18.40 */,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
@@ -1212,7 +1252,11 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                                                         AlignmentDirectional(
                                                             0.0, 0.0),
                                                     child: Text(
-                                                      'Receipt',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'liej22n7' /* Receipt */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
