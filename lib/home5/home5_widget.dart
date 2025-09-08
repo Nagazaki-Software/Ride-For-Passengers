@@ -338,7 +338,7 @@ class _Home5WidgetState extends State<Home5Widget>
                       return Container(
                         width: MediaQuery.sizeOf(context).width * 1.0,
                         height: MediaQuery.sizeOf(context).height * 1.0,
-                        child: custom_widgets.PickerMap(
+                        child: custom_widgets.PickerMapNative(
                           width: MediaQuery.sizeOf(context).width * 1.0,
                           height: MediaQuery.sizeOf(context).height * 1.0,
                           userLocation: FFAppState().latlngAtual!,

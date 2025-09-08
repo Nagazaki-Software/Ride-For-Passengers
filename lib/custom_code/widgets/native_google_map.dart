@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import '/flutter_flow/lat_lng.dart';
 
 typedef NativeMapCreatedCallback = void Function(NativeGoogleMapController controller);
+typedef MapTapCallback = void Function(LatLng position);
 
 class NativeGoogleMap extends StatefulWidget {
   const NativeGoogleMap({
@@ -14,11 +15,15 @@ class NativeGoogleMap extends StatefulWidget {
     required this.initialPosition,
     this.zoom = 14,
     this.onMapCreated,
+    this.onTap,
+    this.onLongPress,
   });
 
   final LatLng initialPosition;
   final double zoom;
   final NativeMapCreatedCallback? onMapCreated;
+  final MapTapCallback? onTap;
+  final MapTapCallback? onLongPress;
 
   @override
   State<NativeGoogleMap> createState() => _NativeGoogleMapState();
@@ -60,8 +65,12 @@ class _NativeGoogleMapState extends State<NativeGoogleMap> {
             onFocus: () => params.onFocusChanged(true),
           );
           controller.create();
-          _controller = NativeGoogleMapController(params.id);
-          widget.onMapCreated?.call(_controller!);
+          _controller = NativeGoogleMapController(params.id)
+            ..onTap = widget.onTap
+            ..onLongPress = widget.onLongPress
+            ..onMapReady = () {
+              widget.onMapCreated?.call(_controller!);
+            };
           return controller;
         },
       );
@@ -72,8 +81,12 @@ class _NativeGoogleMapState extends State<NativeGoogleMap> {
         creationParams: creationParams,
         creationParamsCodec: const StandardMessageCodec(),
         onPlatformViewCreated: (id) {
-          _controller = NativeGoogleMapController(id);
-          widget.onMapCreated?.call(_controller!);
+          _controller = NativeGoogleMapController(id)
+            ..onTap = widget.onTap
+            ..onLongPress = widget.onLongPress
+            ..onMapReady = () {
+              widget.onMapCreated?.call(_controller!);
+            };
         },
       );
     }
@@ -84,9 +97,31 @@ class _NativeGoogleMapState extends State<NativeGoogleMap> {
 
 class NativeGoogleMapController {
   NativeGoogleMapController(int id)
-      : _channel = MethodChannel('native_google_map_' + id.toString());
+      : _channel = MethodChannel('native_google_map_' + id.toString()) {
+    _channel.setMethodCallHandler(_handleCallbacks);
+  }
 
   final MethodChannel _channel;
+
+  MapTapCallback? onTap;
+  MapTapCallback? onLongPress;
+  VoidCallback? onMapReady;
+
+  Future<void> _handleCallbacks(MethodCall call) async {
+    switch (call.method) {
+      case 'onTap':
+        final args = call.arguments as Map;
+        onTap?.call(LatLng(args['lat'] as double, args['lng'] as double));
+        break;
+      case 'onLongPress':
+        final args = call.arguments as Map;
+        onLongPress?.call(LatLng(args['lat'] as double, args['lng'] as double));
+        break;
+      case 'mapReady':
+        onMapReady?.call();
+        break;
+    }
+  }
 
   Future<void> moveCamera(LatLng target, double zoom) async {
     await _channel.invokeMethod('moveCamera', {
@@ -100,7 +135,28 @@ class NativeGoogleMapController {
     await _channel.invokeMethod('setMarkers', {'markers': markers});
   }
 
-  Future<void> setPolylines(List<List<double>> polyline) async {
-    await _channel.invokeMethod('setPolylines', {'polyline': polyline});
+  Future<void> setPolylines(List<List<double>> polyline,
+      {int color = 0xff4285F4, double width = 5}) async {
+    await _channel.invokeMethod('setPolylines', {
+      'polyline': polyline,
+      'color': color,
+      'width': width,
+    });
+  }
+
+  Future<void> setPolygons(List<List<List<double>>> polygons,
+      {int strokeColor = 0xff4285F4,
+      int fillColor = 0x554285F4,
+      double strokeWidth = 1}) async {
+    await _channel.invokeMethod('setPolygons', {
+      'polygons': polygons,
+      'strokeColor': strokeColor,
+      'fillColor': fillColor,
+      'strokeWidth': strokeWidth,
+    });
+  }
+
+  Future<void> setMapStyle(String styleJson) async {
+    await _channel.invokeMethod('setMapStyle', {'style': styleJson});
   }
 }
