@@ -9,7 +9,7 @@ class PickerMapNativeView: NSObject, FlutterPlatformView {
   private var destMarker: GMSMarker?
   private var routePolyline: GMSPolyline?
   private var driverMarkers: [String: GMSMarker] = [:]
-  private var driverIconCache: [String: UIImage] = [:]
+  private var iconCache: [String: UIImage] = [:]
 
   init(frame: CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
     mapView = GMSMapView(frame: frame)
@@ -38,16 +38,14 @@ class PickerMapNativeView: NSObject, FlutterPlatformView {
         mapView.padding = UIEdgeInsets(top: 0, left: 0, bottom: CGFloat(pad), right: 0)
         if userMarker == nil {
           userMarker = GMSMarker(position: pos)
+          userMarker?.icon = GMSMarker.markerImage(with: .blue)
           userMarker?.map = mapView
         }
         userMarker?.position = pos
         if let url = dict["userPhotoUrl"] as? String {
-          DispatchQueue.global().async {
-            let icon = self.imageFromUrl(url: url)
-            DispatchQueue.main.async {
-              if let icon = icon {
-                self.userMarker?.icon = icon
-              }
+          loadIcon(url: url) { icon in
+            if let icon = icon {
+              self.userMarker?.icon = icon
             }
           }
         }
@@ -88,16 +86,13 @@ class PickerMapNativeView: NSObject, FlutterPlatformView {
                 iconUrl = dict["driverDriverIconUrl"] as? String
               }
               let cacheKey = "\(type)_\(iconUrl ?? "")"
-              if let icon = driverIconCache[cacheKey] {
+              if let icon = iconCache[cacheKey] {
                 marker!.icon = icon
               } else if let url = iconUrl {
-                DispatchQueue.global().async {
-                  let img = self.imageFromUrl(url: url)
+                loadIcon(url: url) { img in
                   if let img = img {
-                    self.driverIconCache[cacheKey] = img
-                    DispatchQueue.main.async {
-                      marker!.icon = img
-                    }
+                    self.iconCache[cacheKey] = img
+                    marker!.icon = img
                   }
                 }
               }
@@ -150,6 +145,22 @@ class PickerMapNativeView: NSObject, FlutterPlatformView {
       return nil
     }
     return UIImage(data: data)
+  }
+
+  private func loadIcon(url: String, completion: @escaping (UIImage?) -> Void) {
+    if let cached = iconCache[url] {
+      completion(cached)
+      return
+    }
+    DispatchQueue.global().async {
+      let img = self.imageFromUrl(url: url)
+      if let img = img {
+        self.iconCache[url] = img
+      }
+      DispatchQueue.main.async {
+        completion(img)
+      }
+    }
   }
 }
 

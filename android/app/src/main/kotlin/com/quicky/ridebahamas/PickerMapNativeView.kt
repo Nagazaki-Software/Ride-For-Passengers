@@ -33,7 +33,7 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
   private var destMarker: Marker? = null
   private var routePolyline: Polyline? = null
   private val driverMarkers = mutableMapOf<String, Marker>()
-  private val driverIconCache = mutableMapOf<String, BitmapDescriptor?>()
+  private val iconCache = mutableMapOf<String, BitmapDescriptor?>()
 
   init {
     mapView.onCreate(null)
@@ -79,15 +79,14 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
         // user marker
         val userPhoto = args["userPhotoUrl"] as String?
         if (userMarker == null) {
-          userMarker = map?.addMarker(
-              MarkerOptions().position(pos).anchor(0.5f,0.5f))
+          val opt = MarkerOptions().position(pos).anchor(0.5f,0.5f)
+              .icon(BitmapDescriptorFactory.defaultMarker())
+          userMarker = map?.addMarker(opt)
         }
         userMarker?.position = pos
         userPhoto?.let { url ->
-          thread {
-            descriptorFromUrl(url)?.let { icon ->
-              userMarker?.setIcon(icon)
-            }
+          loadIcon(url) { icon ->
+            if (icon != null) userMarker?.setIcon(icon)
           }
         }
 
@@ -129,13 +128,13 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
                 args["driverDriverIconUrl"] as? String
               }
               val cacheKey = "${type}_${iconUrl ?: ""}"
-              val cached = driverIconCache[cacheKey]
+              val cached = iconCache[cacheKey]
               if (cached != null) {
                 mk.setIcon(cached)
               } else if (iconUrl != null) {
-                thread {
-                  descriptorFromUrl(iconUrl)?.let { icon ->
-                    driverIconCache[cacheKey] = icon
+                loadIcon(iconUrl) { icon ->
+                  if (icon != null) {
+                    iconCache[cacheKey] = icon
                     mk.setIcon(icon)
                   }
                 }
@@ -182,6 +181,19 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
       BitmapDescriptorFactory.fromBitmap(bmp)
     } catch (e: Exception) {
       null
+    }
+  }
+
+  private fun loadIcon(url: String, onLoaded: (BitmapDescriptor?) -> Unit) {
+    val cached = iconCache[url]
+    if (cached != null) {
+      onLoaded(cached)
+      return
+    }
+    thread {
+      val icon = descriptorFromUrl(url)
+      iconCache[url] = icon
+      onLoaded(icon)
     }
   }
 }
