@@ -12,6 +12,9 @@ import GoogleMaps
   ) -> Bool {
     GMSServices.provideAPIKey("AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ")
     GeneratedPluginRegistrant.register(with: self)
+    let controller = window?.rootViewController as! FlutterViewController
+    let factory = PickerMapNativeFactory(messenger: controller.binaryMessenger)
+    self.registrar(forPlugin: "PickerMapNative")?.register(factory, withId: "picker_map_native")
     BTAppContextSwitcher.setReturnURLScheme("com.quicky.ridebahamas.braintree")
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
