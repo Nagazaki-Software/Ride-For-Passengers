@@ -934,1329 +934,974 @@ class _Home5WidgetState extends State<Home5Widget>
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        if (FFAppState().latlangAondeVaiIr != null)
-                          Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 0.0, 0.0, 28.0),
-                            child: Container(
-                              width: MediaQuery.sizeOf(context).width * 0.86,
-                              height: 182.0,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color(0xFF333333),
-                                    FlutterFlowTheme.of(context).primary
-                                  ],
-                                  stops: [0.0, 0.8],
-                                  begin: AlignmentDirectional(0.0, -1.0),
-                                  end: AlignmentDirectional(0, 1.0),
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
+                       // Generated code for this Container Widget...
+if (FFAppState().latlangAondeVaiIr != null)
+  Padding(
+    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 28),
+    child: Container(
+      width: MediaQuery.sizeOf(context).width * 0.86,
+      height: 182,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF333333), FlutterFlowTheme.of(context).primary],
+          stops: [0, 0.8],
+          begin: AlignmentDirectional(0, -1),
+          end: AlignmentDirectional(0, 1),
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Text(
+                        FFLocalizations.of(context).getText(
+                          'ybwe42qc' /* Ride Estimative */,
+                        ),
+                        style: FlutterFlowTheme.of(context)
+                            .bodyMedium
+                            .override(
+                              font: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontStyle: FontStyle.italic,
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  'ybwe42qc' /* Ride Estimative */,
-                                                ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.w300,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .alternate,
-                                                      fontSize: 16.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              FutureBuilder<
-                                                  List<RideOrdersRecord>>(
-                                                future:
-                                                    queryRideOrdersRecordOnce(),
-                                                builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
-                                                  if (!snapshot.hasData) {
-                                                    return Center(
-                                                      child: SizedBox(
-                                                        width: 50.0,
-                                                        height: 50.0,
-                                                        child:
-                                                            SpinKitDoubleBounce(
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .accent1,
-                                                          size: 50.0,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                  List<RideOrdersRecord>
-                                                      textRideOrdersRecordList =
-                                                      snapshot.data!;
-
-                                                  return GradientText(
-                                                    functions
-                                                        .mediaCorridaNesseKm(
-                                                            FFAppState()
-                                                                .latlngAtual!,
-                                                            FFAppState()
-                                                                .latlangAondeVaiIr!,
-                                                            textRideOrdersRecordList
-                                                                .toList())
-                                                        .toString(),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                          ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondary,
-                                                          fontSize: 16.0,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
-                                                        ),
-                                                    colors: [
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .accent1,
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .secondary,
-                                                      Color(0xFFF2E6D5)
-                                                    ],
-                                                    gradientDirection:
-                                                        GradientDirection.ttb,
-                                                    gradientType:
-                                                        GradientType.linear,
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  '76w8fz75' /* Time */,
-                                                ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.w300,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
-                                                      ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .secondaryText,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Text(
-                                                functions.estimativeTime(
-                                                    FFAppState().latlngAtual!,
-                                                    FFAppState()
-                                                        .latlangAondeVaiIr!),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.w300,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
-                                                      ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .secondaryText,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        width: 336.0,
-                                        height: 1.0,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .alternate,
-                                        ),
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    20.0, 0.0, 0.0, 0.0),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                if ((_model.location != null) ||
-                                                    (_model.locationAtual !=
-                                                        null))
-                                                  GradientText(
-                                                    valueOrDefault<String>(
-                                                      functions.latlngForKm(
-                                                          FFAppState()
-                                                              .latlngAtual!,
-                                                          FFAppState()
-                                                              .latlangAondeVaiIr!),
-                                                      '2.4 Km',
-                                                    ),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                          ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondary,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FontStyle.italic,
-                                                        ),
-                                                    colors: [
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .accent1,
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .secondary
-                                                    ],
-                                                    gradientDirection:
-                                                        GradientDirection.rtl,
-                                                    gradientType:
-                                                        GradientType.linear,
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              InkWell(
-                                                splashColor: Colors.transparent,
-                                                focusColor: Colors.transparent,
-                                                hoverColor: Colors.transparent,
-                                                highlightColor:
-                                                    Colors.transparent,
-                                                onTap: () async {
-                                                  final _datePickedDate =
-                                                      await showDatePicker(
-                                                    context: context,
-                                                    initialDate:
-                                                        getCurrentTimestamp,
-                                                    firstDate:
-                                                        getCurrentTimestamp,
-                                                    lastDate: DateTime(2050),
-                                                    builder: (context, child) {
-                                                      return wrapInMaterialDatePickerTheme(
-                                                        context,
-                                                        child!,
-                                                        headerBackgroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                        headerForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .info,
-                                                        headerTextStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .headlineLarge
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .headlineLarge
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  fontSize:
-                                                                      32.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .headlineLarge
-                                                                      .fontStyle,
-                                                                ),
-                                                        pickerBackgroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryBackground,
-                                                        pickerForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                        selectedDateTimeBackgroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                        selectedDateTimeForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .info,
-                                                        actionButtonForegroundColor:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                        iconSize: 24.0,
-                                                      );
-                                                    },
-                                                  );
-
-                                                  if (_datePickedDate != null) {
-                                                    safeSetState(() {
-                                                      _model.datePicked =
-                                                          DateTime(
-                                                        _datePickedDate.year,
-                                                        _datePickedDate.month,
-                                                        _datePickedDate.day,
-                                                      );
-                                                    });
-                                                  } else if (_model
-                                                          .datePicked !=
-                                                      null) {
-                                                    safeSetState(() {
-                                                      _model.datePicked =
-                                                          getCurrentTimestamp;
-                                                    });
-                                                  }
-                                                },
-                                                child: Container(
-                                                  height: 24.0,
-                                                  decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .alternate,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            2.0),
-                                                  ),
-                                                  child: Padding(
-                                                    padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(4.0, 0.0,
-                                                                4.0, 0.0),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.date_range,
-                                                          color:
-                                                              Color(0xC2414141),
-                                                          size: 14.0,
-                                                        ),
-                                                        Text(
-                                                          _model.datePicked !=
-                                                                  null
-                                                              ? dateTimeFormat(
-                                                                  "yMd",
-                                                                  _model
-                                                                      .datePicked,
-                                                                  locale: FFLocalizations.of(
-                                                                          context)
-                                                                      .languageCode,
-                                                                )
-                                                              : dateTimeFormat(
-                                                                  "yMd",
-                                                                  getCurrentTimestamp,
-                                                                  locale: FFLocalizations.of(
-                                                                          context)
-                                                                      .languageCode,
-                                                                ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font: GoogleFonts
-                                                                    .poppins(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                color: Color(
-                                                                    0xC2242424),
-                                                                fontSize: 8.0,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                      ]
-                                                          .divide(SizedBox(
-                                                              width: 4.0))
-                                                          .around(SizedBox(
-                                                              width: 4.0)),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              InkWell(
-                                                splashColor: Colors.transparent,
-                                                focusColor: Colors.transparent,
-                                                hoverColor: Colors.transparent,
-                                                highlightColor:
-                                                    Colors.transparent,
-                                                onTap: () async {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation2'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered2 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation2']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                  if (FFAppState().passangers ==
-                                                      8) {
-                                                    FFAppState().passangers = 1;
-                                                    safeSetState(() {});
-                                                  } else {
-                                                    FFAppState().passangers =
-                                                        FFAppState()
-                                                                .passangers +
-                                                            1;
-                                                    safeSetState(() {});
-                                                  }
-                                                },
-                                                child: Container(
-                                                  width: 80.0,
-                                                  height: 24.0,
-                                                  decoration: BoxDecoration(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .alternate,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            2.0),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        Icons.person_outline,
-                                                        color:
-                                                            Color(0xC2414141),
-                                                        size: 14.0,
-                                                      ),
-                                                      Text(
-                                                        '${valueOrDefault<String>(
-                                                          FFAppState()
-                                                              .passangers
-                                                              .toString(),
-                                                          '1',
-                                                        )} passengers',
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: Color(
-                                                                      0xC2242424),
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                    ].divide(
-                                                        SizedBox(width: 4.0)),
-                                                  ),
-                                                ),
-                                              ).animateOnActionTrigger(
-                                                  animationsMap[
-                                                      'containerOnActionTriggerAnimation2']!,
-                                                  hasBeenTriggered:
-                                                      hasContainerTriggered2),
-                                            ].divide(SizedBox(width: 10.0)),
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 2.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            InkWell(
-                                              splashColor: Colors.transparent,
-                                              focusColor: Colors.transparent,
-                                              hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
-                                              onTap: () async {
-                                                if (_model.rideChoose ==
-                                                    'ride') {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation3'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered3 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation3']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                } else {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation3'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered3 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation3']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                  _model.rideChoose = 'ride';
-                                                  safeSetState(() {});
-                                                }
-                                              },
-                                              child: Container(
-                                                width: 70.0,
-                                                height: 35.0,
-                                                decoration: BoxDecoration(
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      blurRadius: 4.0,
-                                                      color: Color(0x33000000),
-                                                      offset: Offset(
-                                                        0.0,
-                                                        2.0,
-                                                      ),
-                                                    )
-                                                  ],
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      _model.rideChoose ==
-                                                              'ride'
-                                                          ? Color(0xFFF4B000)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText,
-                                                      _model.rideChoose ==
-                                                              'ride'
-                                                          ? Color(0xFFEE8B05)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText
-                                                    ],
-                                                    stops: [0.0, 1.0],
-                                                    begin: AlignmentDirectional(
-                                                        0.03, -1.0),
-                                                    end: AlignmentDirectional(
-                                                        -0.03, 1.0),
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          5.0, 5.0, 0.0, 0.0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        FFLocalizations.of(
-                                                                context)
-                                                            .getText(
-                                                          '6xonkgu6' /* Ride  */,
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .alternate,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        FFLocalizations.of(
-                                                                context)
-                                                            .getText(
-                                                          'hp82na6c' /* 3 min */,
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ).animateOnActionTrigger(
-                                                animationsMap[
-                                                    'containerOnActionTriggerAnimation3']!,
-                                                hasBeenTriggered:
-                                                    hasContainerTriggered3),
-                                            InkWell(
-                                              splashColor: Colors.transparent,
-                                              focusColor: Colors.transparent,
-                                              hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
-                                              onTap: () async {
-                                                if (_model.rideChoose == 'xl') {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation4'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered4 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation4']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                } else {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation4'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered4 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation4']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                  _model.rideChoose = 'xl';
-                                                  safeSetState(() {});
-                                                }
-                                              },
-                                              child: Container(
-                                                width: 70.0,
-                                                height: 35.0,
-                                                decoration: BoxDecoration(
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      blurRadius: 4.0,
-                                                      color: Color(0x33000000),
-                                                      offset: Offset(
-                                                        0.0,
-                                                        2.0,
-                                                      ),
-                                                    )
-                                                  ],
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      _model.rideChoose == 'xl'
-                                                          ? Color(0xFFF4B000)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText,
-                                                      _model.rideChoose == 'xl'
-                                                          ? Color(0xFFEE8B05)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText
-                                                    ],
-                                                    stops: [0.0, 1.0],
-                                                    begin: AlignmentDirectional(
-                                                        0.03, -1.0),
-                                                    end: AlignmentDirectional(
-                                                        -0.03, 1.0),
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          5.0, 5.0, 0.0, 0.0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        FFLocalizations.of(
-                                                                context)
-                                                            .getText(
-                                                          'h5ahsyfq' /* XL */,
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .alternate,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        FFLocalizations.of(
-                                                                context)
-                                                            .getText(
-                                                          'tr0g6iky' /* 6 min */,
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ).animateOnActionTrigger(
-                                                animationsMap[
-                                                    'containerOnActionTriggerAnimation4']!,
-                                                hasBeenTriggered:
-                                                    hasContainerTriggered4),
-                                            InkWell(
-                                              splashColor: Colors.transparent,
-                                              focusColor: Colors.transparent,
-                                              hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
-                                              onTap: () async {
-                                                if (_model.rideChoose ==
-                                                    'luxury') {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation5'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered5 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation5']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                } else {
-                                                  if (animationsMap[
-                                                          'containerOnActionTriggerAnimation5'] !=
-                                                      null) {
-                                                    safeSetState(() =>
-                                                        hasContainerTriggered5 =
-                                                            true);
-                                                    SchedulerBinding.instance
-                                                        .addPostFrameCallback((_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation5']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                                  }
-                                                  _model.rideChoose = 'luxury';
-                                                  safeSetState(() {});
-                                                }
-                                              },
-                                              child: Container(
-                                                width: 70.0,
-                                                height: 35.0,
-                                                decoration: BoxDecoration(
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      blurRadius: 4.0,
-                                                      color: Color(0x33000000),
-                                                      offset: Offset(
-                                                        0.0,
-                                                        2.0,
-                                                      ),
-                                                    )
-                                                  ],
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      _model.rideChoose ==
-                                                              'luxury'
-                                                          ? Color(0xFFF4B000)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText,
-                                                      _model.rideChoose ==
-                                                              'luxury'
-                                                          ? Color(0xFFEE8B05)
-                                                          : FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primaryText
-                                                    ],
-                                                    stops: [0.0, 1.0],
-                                                    begin: AlignmentDirectional(
-                                                        0.03, -1.0),
-                                                    end: AlignmentDirectional(
-                                                        -0.03, 1.0),
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          5.0, 5.0, 0.0, 0.0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        FFLocalizations.of(
-                                                                context)
-                                                            .getText(
-                                                          'drdui58r' /* Luxury */,
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .alternate,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                      Text(
-                                                        FFLocalizations.of(
-                                                                context)
-                                                            .getText(
-                                                          'zkgb4g4y' /* 10 min */,
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font: GoogleFonts
-                                                                      .poppins(
-                                                                    fontWeight: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontWeight,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  fontSize: 8.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ).animateOnActionTrigger(
-                                                animationsMap[
-                                                    'containerOnActionTriggerAnimation5']!,
-                                                hasBeenTriggered:
-                                                    hasContainerTriggered5),
-                                          ],
-                                        ),
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          InkWell(
-                                            splashColor: Colors.transparent,
-                                            focusColor: Colors.transparent,
-                                            hoverColor: Colors.transparent,
-                                            highlightColor: Colors.transparent,
-                                            onTap: () async {
-                                              currentUserLocationValue =
-                                                  await getCurrentUserLocation(
-                                                      defaultLocation:
-                                                          LatLng(0.0, 0.0));
-                                              if (animationsMap[
-                                                      'containerOnActionTriggerAnimation6'] !=
-                                                  null) {
-                                                safeSetState(() =>
-                                                    hasContainerTriggered6 =
-                                                        true);
-                                                SchedulerBinding.instance
-                                                    .addPostFrameCallback(
-                                                        (_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation6']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                              }
-
-                                              context.pushNamed(
-                                                PaymentRide7Widget.routeName,
-                                                queryParameters: {
-                                                  'estilo': serializeParam(
-                                                    _model.rideChoose,
-                                                    ParamType.String,
-                                                  ),
-                                                  'latlngAtual': serializeParam(
-                                                    FFAppState().latlngAtual !=
-                                                            null
-                                                        ? FFAppState()
-                                                            .latlngAtual
-                                                        : currentUserLocationValue,
-                                                    ParamType.LatLng,
-                                                  ),
-                                                  'latlngWhereTo':
-                                                      serializeParam(
-                                                    FFAppState()
-                                                        .latlangAondeVaiIr,
-                                                    ParamType.LatLng,
-                                                  ),
-                                                }.withoutNulls,
-                                                extra: <String, dynamic>{
-                                                  kTransitionInfoKey:
-                                                      TransitionInfo(
-                                                    hasTransition: true,
-                                                    transitionType:
-                                                        PageTransitionType
-                                                            .leftToRight,
-                                                  ),
-                                                },
-                                              );
-                                            },
-                                            child: Container(
-                                              width: 120.0,
-                                              height: 30.0,
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .accent1,
-                                                borderRadius:
-                                                    BorderRadius.circular(6.0),
-                                              ),
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
-                                              child: Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  'iv1ii278' /* Confirm Ride   */,
-                                                ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
-                                                      fontSize: 10.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ),
-                                              ),
-                                            ),
-                                          ).animateOnActionTrigger(
-                                              animationsMap[
-                                                  'containerOnActionTriggerAnimation6']!,
-                                              hasBeenTriggered:
-                                                  hasContainerTriggered6),
-                                          InkWell(
-                                            splashColor: Colors.transparent,
-                                            focusColor: Colors.transparent,
-                                            hoverColor: Colors.transparent,
-                                            highlightColor: Colors.transparent,
-                                            onTap: () async {
-                                              if (animationsMap[
-                                                      'containerOnActionTriggerAnimation7'] !=
-                                                  null) {
-                                                safeSetState(() =>
-                                                    hasContainerTriggered7 =
-                                                        true);
-                                                SchedulerBinding.instance
-                                                    .addPostFrameCallback(
-                                                        (_) async =>
-                                                            await animationsMap[
-                                                                    'containerOnActionTriggerAnimation7']!
-                                                                .controller
-                                                                .forward(
-                                                                    from: 0.0));
-                                              }
-
-                                              context.pushNamed(
-                                                RideShare6Widget.routeName,
-                                                extra: <String, dynamic>{
-                                                  kTransitionInfoKey:
-                                                      TransitionInfo(
-                                                    hasTransition: true,
-                                                    transitionType:
-                                                        PageTransitionType
-                                                            .rightToLeft,
-                                                  ),
-                                                },
-                                              );
-                                            },
-                                            child: Container(
-                                              width: 120.0,
-                                              height: 30.0,
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .alternate,
-                                                borderRadius:
-                                                    BorderRadius.circular(6.0),
-                                              ),
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
-                                              child: Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  'nzvn5ujp' /* Ride Share */,
-                                                ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
-                                                      fontSize: 10.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ),
-                                              ),
-                                            ),
-                                          ).animateOnActionTrigger(
-                                              animationsMap[
-                                                  'containerOnActionTriggerAnimation7']!,
-                                              hasBeenTriggered:
-                                                  hasContainerTriggered7),
-                                        ],
-                                      ),
-                                    ].divide(SizedBox(height: 5.0)),
+                              color: FlutterFlowTheme.of(context).alternate,
+                              fontSize: 16,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.w300,
+                              fontStyle: FontStyle.italic,
+                            ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      FutureBuilder<List<RideOrdersRecord>>(
+                        future: queryRideOrdersRecordOnce(),
+                        builder: (context, snapshot) {
+                          // Customize what your widget looks like when it's loading.
+                          if (!snapshot.hasData) {
+                            return Center(
+                              child: SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: SpinKitDoubleBounce(
+                                  color: FlutterFlowTheme.of(context).accent1,
+                                  size: 50,
+                                ),
+                              ),
+                            );
+                          }
+                          List<RideOrdersRecord> textRideOrdersRecordList =
+                              snapshot.data!;
+                          return GradientText(
+                            formatNumber(
+                              functions.mediaCorridaNesseKm(
+                                  FFAppState().latlngAtual!,
+                                  FFAppState().latlangAondeVaiIr!,
+                                  textRideOrdersRecordList.toList()),
+                              formatType: FormatType.decimal,
+                              decimalType: DecimalType.commaDecimal,
+                              currency: '\$',
+                            ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
                                   ),
+                                  color:
+                                      FlutterFlowTheme.of(context).secondary,
+                                  fontSize: 16,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
                                 ),
+                            colors: [
+                              FlutterFlowTheme.of(context).accent1,
+                              FlutterFlowTheme.of(context).secondary,
+                              Color(0xFFF2E6D5)
+                            ],
+                            gradientDirection: GradientDirection.ttb,
+                            gradientType: GradientType.linear,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Text(
+                        FFLocalizations.of(context).getText(
+                          '76w8fz75' /* Time */,
+                        ),
+                        style: FlutterFlowTheme.of(context)
+                            .bodyMedium
+                            .override(
+                              font: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontStyle,
                               ),
-                            ).animateOnPageLoad(
-                                animationsMap['containerOnPageLoadAnimation']!),
+                              color:
+                                  FlutterFlowTheme.of(context).secondaryText,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.w300,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontStyle,
+                            ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Text(
+                        functions.estimativeTime(FFAppState().latlngAtual!,
+                            FFAppState().latlangAondeVaiIr!),
+                        style: FlutterFlowTheme.of(context)
+                            .bodyMedium
+                            .override(
+                              font: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w300,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontStyle,
+                              ),
+                              color:
+                                  FlutterFlowTheme.of(context).secondaryText,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.w300,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontStyle,
+                            ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Container(
+                width: 336,
+                height: 1,
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).alternate,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        if ((_model.location != null) ||
+                            (_model.locationAtual != null))
+                          GradientText(
+                            valueOrDefault<String>(
+                              functions.latlngForKm(FFAppState().latlngAtual!,
+                                  FFAppState().latlangAondeVaiIr!),
+                              '2.4 Km',
+                            ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  color:
+                                      FlutterFlowTheme.of(context).secondary,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                            colors: [
+                              FlutterFlowTheme.of(context).accent1,
+                              FlutterFlowTheme.of(context).secondary
+                            ],
+                            gradientDirection: GradientDirection.rtl,
+                            gradientType: GradientType.linear,
                           ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          final _datePickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: getCurrentTimestamp,
+                            firstDate: getCurrentTimestamp,
+                            lastDate: DateTime(2050),
+                            builder: (context, child) {
+                              return wrapInMaterialDatePickerTheme(
+                                context,
+                                child!,
+                                headerBackgroundColor:
+                                    FlutterFlowTheme.of(context).primary,
+                                headerForegroundColor:
+                                    FlutterFlowTheme.of(context).info,
+                                headerTextStyle: FlutterFlowTheme.of(context)
+                                    .headlineLarge
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .headlineLarge
+                                                .fontStyle,
+                                      ),
+                                      fontSize: 32,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .headlineLarge
+                                          .fontStyle,
+                                    ),
+                                pickerBackgroundColor:
+                                    FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                pickerForegroundColor:
+                                    FlutterFlowTheme.of(context).primaryText,
+                                selectedDateTimeBackgroundColor:
+                                    FlutterFlowTheme.of(context).primary,
+                                selectedDateTimeForegroundColor:
+                                    FlutterFlowTheme.of(context).info,
+                                actionButtonForegroundColor:
+                                    FlutterFlowTheme.of(context).primaryText,
+                                iconSize: 24,
+                              );
+                            },
+                          );
+                          if (_datePickedDate != null) {
+                            safeSetState(() {
+                              _model.datePicked = DateTime(
+                                _datePickedDate.year,
+                                _datePickedDate.month,
+                                _datePickedDate.day,
+                              );
+                            });
+                          } else if (_model.datePicked != null) {
+                            safeSetState(() {
+                              _model.datePicked = getCurrentTimestamp;
+                            });
+                          }
+                        },
+                        child: Container(
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).alternate,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          child: Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(4, 0, 4, 0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.date_range,
+                                  color: Color(0xC2414141),
+                                  size: 14,
+                                ),
+                                Text(
+                                  _model.datePicked != null
+                                      ? dateTimeFormat(
+                                          "yMd",
+                                          _model.datePicked,
+                                          locale: FFLocalizations.of(context)
+                                              .languageCode,
+                                        )
+                                      : dateTimeFormat(
+                                          "yMd",
+                                          getCurrentTimestamp,
+                                          locale: FFLocalizations.of(context)
+                                              .languageCode,
+                                        ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w500,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: Color(0xC2242424),
+                                        fontSize: 8,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                ),
+                              ]
+                                  .divide(SizedBox(width: 4))
+                                  .around(SizedBox(width: 4)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation2'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered2 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation2']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                          if (FFAppState().passangers == 8) {
+                            FFAppState().passangers = 1;
+                            safeSetState(() {});
+                          } else {
+                            FFAppState().passangers =
+                                FFAppState().passangers + 1;
+                            safeSetState(() {});
+                          }
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).alternate,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                color: Color(0xC2414141),
+                                size: 14,
+                              ),
+                              Text(
+                                '${valueOrDefault<String>(
+                                  FFAppState().passangers.toString(),
+                                  '1',
+                                )} passengers',
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: Color(0xC2242424),
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                            ].divide(SizedBox(width: 4)),
+                          ),
+                        ),
+                      ).animateOnActionTrigger(
+                          animationsMap[
+                              'containerOnActionTriggerAnimation2']!,
+                          hasBeenTriggered: hasContainerTriggered2),
+                    ].divide(SizedBox(width: 10)),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        if (_model.rideChoose == 'ride') {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation3'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered3 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation3']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                        } else {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation3'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered3 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation3']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                          _model.rideChoose = 'ride';
+                          safeSetState(() {});
+                        }
+                      },
+                      child: Container(
+                        width: 70,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 4,
+                              color: Color(0x33000000),
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            )
+                          ],
+                          gradient: LinearGradient(
+                            colors: [
+                              _model.rideChoose == 'ride'
+                                  ? Color(0xFFF4B000)
+                                  : FlutterFlowTheme.of(context).primaryText,
+                              _model.rideChoose == 'ride'
+                                  ? Color(0xFFEE8B05)
+                                  : FlutterFlowTheme.of(context).primaryText
+                            ],
+                            stops: [0, 1],
+                            begin: AlignmentDirectional(0.03, -1),
+                            end: AlignmentDirectional(-0.03, 1),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(5, 5, 0, 0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                FFLocalizations.of(context).getText(
+                                  '6xonkgu6' /* Ride  */,
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontWeight,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                              Text(
+                                FFLocalizations.of(context).getText(
+                                  'hp82na6c' /* 3 min */,
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontWeight,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ).animateOnActionTrigger(
+                        animationsMap['containerOnActionTriggerAnimation3']!,
+                        hasBeenTriggered: hasContainerTriggered3),
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        if (_model.rideChoose == 'xl') {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation4'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered4 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation4']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                        } else {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation4'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered4 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation4']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                          _model.rideChoose = 'xl';
+                          safeSetState(() {});
+                        }
+                      },
+                      child: Container(
+                        width: 70,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 4,
+                              color: Color(0x33000000),
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            )
+                          ],
+                          gradient: LinearGradient(
+                            colors: [
+                              _model.rideChoose == 'xl'
+                                  ? Color(0xFFF4B000)
+                                  : FlutterFlowTheme.of(context).primaryText,
+                              _model.rideChoose == 'xl'
+                                  ? Color(0xFFEE8B05)
+                                  : FlutterFlowTheme.of(context).primaryText
+                            ],
+                            stops: [0, 1],
+                            begin: AlignmentDirectional(0.03, -1),
+                            end: AlignmentDirectional(-0.03, 1),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(5, 5, 0, 0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                FFLocalizations.of(context).getText(
+                                  'h5ahsyfq' /* XL */,
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontWeight,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                              Text(
+                                FFLocalizations.of(context).getText(
+                                  'tr0g6iky' /* 6 min */,
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontWeight,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ).animateOnActionTrigger(
+                        animationsMap['containerOnActionTriggerAnimation4']!,
+                        hasBeenTriggered: hasContainerTriggered4),
+                    InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        if (_model.rideChoose == 'luxury') {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation5'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered5 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation5']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                        } else {
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation5'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered5 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation5']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                          _model.rideChoose = 'luxury';
+                          safeSetState(() {});
+                        }
+                      },
+                      child: Container(
+                        width: 70,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 4,
+                              color: Color(0x33000000),
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            )
+                          ],
+                          gradient: LinearGradient(
+                            colors: [
+                              _model.rideChoose == 'luxury'
+                                  ? Color(0xFFF4B000)
+                                  : FlutterFlowTheme.of(context).primaryText,
+                              _model.rideChoose == 'luxury'
+                                  ? Color(0xFFEE8B05)
+                                  : FlutterFlowTheme.of(context).primaryText
+                            ],
+                            stops: [0, 1],
+                            begin: AlignmentDirectional(0.03, -1),
+                            end: AlignmentDirectional(-0.03, 1),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(5, 5, 0, 0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                FFLocalizations.of(context).getText(
+                                  'drdui58r' /* Luxury */,
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontWeight,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                              Text(
+                                FFLocalizations.of(context).getText(
+                                  'zkgb4g4y' /* 10 min */,
+                                ),
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontWeight,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      fontSize: 8,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ).animateOnActionTrigger(
+                        animationsMap['containerOnActionTriggerAnimation5']!,
+                        hasBeenTriggered: hasContainerTriggered5),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      currentUserLocationValue = await getCurrentUserLocation(
+                          defaultLocation: LatLng(0.0, 0.0));
+                      if (animationsMap[
+                              'containerOnActionTriggerAnimation6'] !=
+                          null) {
+                        safeSetState(() => hasContainerTriggered6 = true);
+                        SchedulerBinding.instance.addPostFrameCallback(
+                            (_) async => await animationsMap[
+                                    'containerOnActionTriggerAnimation6']!
+                                .controller
+                                .forward(from: 0.0));
+                      }
+                      context.pushNamed(
+                        PaymentRide7Widget.routeName,
+                        queryParameters: {
+                          'estilo': serializeParam(
+                            _model.rideChoose,
+                            ParamType.String,
+                          ),
+                          'latlngAtual': serializeParam(
+                            FFAppState().latlngAtual != null
+                                ? FFAppState().latlngAtual
+                                : currentUserLocationValue,
+                            ParamType.LatLng,
+                          ),
+                          'latlngWhereTo': serializeParam(
+                            FFAppState().latlangAondeVaiIr,
+                            ParamType.LatLng,
+                          ),
+                        }.withoutNulls,
+                        extra: <String, dynamic>{
+                          kTransitionInfoKey: TransitionInfo(
+                            hasTransition: true,
+                            transitionType: PageTransitionType.leftToRight,
+                          ),
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: 120,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).accent1,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      alignment: AlignmentDirectional(0, 0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'iv1ii278' /* Confirm Ride   */,
+                        ),
+                        style:
+                            FlutterFlowTheme.of(context).bodyMedium.override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontSize: 10,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                      ),
+                    ),
+                  ).animateOnActionTrigger(
+                      animationsMap['containerOnActionTriggerAnimation6']!,
+                      hasBeenTriggered: hasContainerTriggered6),
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      if (animationsMap[
+                              'containerOnActionTriggerAnimation7'] !=
+                          null) {
+                        safeSetState(() => hasContainerTriggered7 = true);
+                        SchedulerBinding.instance.addPostFrameCallback(
+                            (_) async => await animationsMap[
+                                    'containerOnActionTriggerAnimation7']!
+                                .controller
+                                .forward(from: 0.0));
+                      }
+                      context.pushNamed(
+                        RideShare6Widget.routeName,
+                        extra: <String, dynamic>{
+                          kTransitionInfoKey: TransitionInfo(
+                            hasTransition: true,
+                            transitionType: PageTransitionType.rightToLeft,
+                          ),
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: 120,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).alternate,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      alignment: AlignmentDirectional(0, 0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'nzvn5ujp' /* Ride Share */,
+                        ),
+                        style:
+                            FlutterFlowTheme.of(context).bodyMedium.override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  fontSize: 10,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                      ),
+                    ),
+                  ).animateOnActionTrigger(
+                      animationsMap['containerOnActionTriggerAnimation7']!,
+                      hasBeenTriggered: hasContainerTriggered7),
+                ],
+              ),
+            ].divide(SizedBox(height: 5)),
+          ),
+        ),
+      ),
+    ).animateOnPageLoad(animationsMap['containerOnPageLoadAnimation']!),
+  )
+
                       ],
                     ),
                   ),
