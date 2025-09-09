@@ -33,6 +33,9 @@ class PickerMapNativeView: NSObject, FlutterPlatformView {
          let lng = user["longitude"] as? Double {
         let pos = CLLocationCoordinate2D(latitude: lat, longitude: lng)
         mapView.camera = GMSCameraPosition(latitude: lat, longitude: lng, zoom: 14)
+
+        let pad = dict["brandSafePaddingBottom"] as? Double ?? 0
+        mapView.padding = UIEdgeInsets(top: 0, left: 0, bottom: CGFloat(pad), right: 0)
         if userMarker == nil {
           userMarker = GMSMarker(position: pos)
           userMarker?.map = mapView
