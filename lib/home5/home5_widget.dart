@@ -3,7 +3,6 @@ import '/backend/backend.dart';
 import '/components/navbar_widget.dart';
 import '/components/select_location_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
-import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/actions/index.dart' as actions;
@@ -295,28 +294,6 @@ class _Home5WidgetState extends State<Home5Widget>
         backgroundColor: FlutterFlowTheme.of(context).primaryText,
         body: Stack(
           children: [
-            Opacity(
-              opacity: 0.0,
-              child: FlutterFlowGoogleMap(
-                controller: _model.googleMapsController,
-                onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
-                initialLocation: _model.googleMapsCenter ??=
-                    LatLng(13.106061, -59.613158),
-                markerColor: GoogleMarkerColor.violet,
-                mapType: MapType.normal,
-                style: GoogleMapStyle.standard,
-                initialZoom: 14.0,
-                allowInteraction: true,
-                allowZoom: false,
-                showZoomControls: false,
-                showLocation: true,
-                showCompass: false,
-                showMapToolbar: false,
-                showTraffic: false,
-                centerMapOnMarkerTap: false,
-                mapTakesGesturePreference: false,
-              ),
-            ),
             PointerInterceptor(
               intercepting: isWeb,
               child: Padding(
@@ -382,7 +359,7 @@ class _Home5WidgetState extends State<Home5Widget>
                           driverTaxiIconUrl:
                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                           enableRouteSnake: true,
-                          brandSafePaddingBottom: 24.0,
+                          brandSafePaddingBottom: 60.0,
                           liteModeOnAndroid: false,
                           ultraLowSpecMode: false,
                         ),
