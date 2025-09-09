@@ -1,20 +1,11 @@
+// android/app/src/main/kotlin/com/quicky/ridebahamas/PickerMapNativeView.kt
 package com.quicky.ridebahamas
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.View
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -22,8 +13,11 @@ import io.flutter.plugin.platform.PlatformView
 import java.net.URL
 import kotlin.concurrent.thread
 
-class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int) :
-    PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
+class PickerMapNativeView(
+  context: Context,
+  messenger: BinaryMessenger,
+  id: Int
+) : PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
 
   private val mapView: MapView = MapView(context)
   private var map: GoogleMap? = null
@@ -37,6 +31,8 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
 
   init {
     mapView.onCreate(null)
+    // Lifecycle mínimo
+    mapView.onStart()
     mapView.onResume()
     mapView.getMapAsync(this)
     channel.setMethodCallHandler(this)
@@ -45,7 +41,12 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
   override fun getView(): View = mapView
 
   override fun dispose() {
-    mapView.onDestroy()
+    channel.setMethodCallHandler(null)
+    try {
+      mapView.onPause()
+      mapView.onStop()
+      mapView.onDestroy()
+    } catch (_: Throwable) { }
   }
 
   override fun onMapReady(googleMap: GoogleMap) {
@@ -53,52 +54,60 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
     googleMap.uiSettings.isMapToolbarEnabled = false
     googleMap.uiSettings.isZoomControlsEnabled = false
     googleMap.uiSettings.isMyLocationButtonEnabled = false
+
     googleMap.setOnMapClickListener {
       channel.invokeMethod(
-          "onTap", mapOf("latitude" to it.latitude, "longitude" to it.longitude))
+        "onTap", mapOf("latitude" to it.latitude, "longitude" to it.longitude)
+      )
     }
     googleMap.setOnMapLongClickListener {
       channel.invokeMethod(
-          "onLongPress", mapOf("latitude" to it.latitude, "longitude" to it.longitude))
+        "onLongPress", mapOf("latitude" to it.latitude, "longitude" to it.longitude)
+      )
     }
   }
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
+
+      // === Config principal chamada pelo Dart ===
       "updateConfig" -> {
         val args = call.arguments as Map<*, *>
+
+        // userLocation (Number -> double)
         val user = args["userLocation"] as Map<*, *>
-        val lat = user["latitude"] as Double
-        val lng = user["longitude"] as Double
+        val lat = (user["latitude"] as Number).toDouble()
+        val lng = (user["longitude"] as Number).toDouble()
         val pos = LatLng(lat, lng)
         map?.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f))
 
-        val pad = (args["brandSafePaddingBottom"] as? Double)?.toInt() ?: 0
+        // padding (Number -> int)
+        val pad = ((args["brandSafePaddingBottom"] as? Number)?.toInt()) ?: 0
         map?.setPadding(0, 0, 0, pad)
 
         // user marker
-        val userPhoto = args["userPhotoUrl"] as String?
+        val userPhoto = args["userPhotoUrl"] as? String
         if (userMarker == null) {
-          val opt = MarkerOptions().position(pos).anchor(0.5f,0.5f)
+          userMarker = map?.addMarker(
+            MarkerOptions().position(pos).anchor(0.5f, 0.5f)
               .icon(BitmapDescriptorFactory.defaultMarker())
-          userMarker = map?.addMarker(opt)
+          )
         }
         userMarker?.position = pos
         userPhoto?.let { url ->
           loadIcon(url) { icon ->
-            if (icon != null) userMarker?.setIcon(icon)
+            userMarker?.setIcon(icon ?: BitmapDescriptorFactory.defaultMarker())
           }
         }
 
-        // destination marker
+        // destination marker (opcional)
         if (args.containsKey("destination")) {
           val dest = args["destination"] as Map<*, *>
-          val dlat = dest["latitude"] as Double
-          val dlng = dest["longitude"] as Double
+          val dlat = (dest["latitude"] as Number).toDouble()
+          val dlng = (dest["longitude"] as Number).toDouble()
           val dpos = LatLng(dlat, dlng)
           if (destMarker == null) {
-            destMarker = map?.addMarker(
-                MarkerOptions().position(dpos).anchor(0.5f,1f))
+            destMarker = map?.addMarker(MarkerOptions().position(dpos).anchor(0.5f, 1f))
           }
           destMarker?.position = dpos
         } else {
@@ -111,31 +120,33 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
         drivers?.forEach { d ->
           val m = d as Map<*, *>
           val id = m["id"].toString()
-          val dlat = m["latitude"] as Double
-          val dlng = m["longitude"] as Double
-          val rotation = (m["rotation"] as? Double)?.toFloat() ?: 0f
+          val dlat = (m["latitude"] as Number).toDouble()
+          val dlng = (m["longitude"] as Number).toDouble()
+          val rotation = ((m["rotation"] as? Number)?.toFloat()) ?: 0f
           val type = m["type"]?.toString() ?: "driver"
-          val marker = driverMarkers[id]
           val posD = LatLng(dlat, dlng)
+
+          val marker = driverMarkers[id]
           if (marker == null) {
-            val opt = MarkerOptions().position(posD).anchor(0.5f,0.5f).rotation(rotation)
-            val mk = map?.addMarker(opt)
+            val mk = map?.addMarker(
+              MarkerOptions().position(posD).anchor(0.5f, 0.5f).rotation(rotation).flat(true)
+            )
             if (mk != null) {
               driverMarkers[id] = mk
-              val iconUrl = if (type == "taxi") {
+              val iconUrl = if (type == "taxi")
                 args["driverTaxiIconUrl"] as? String
-              } else {
+              else
                 args["driverDriverIconUrl"] as? String
-              }
+
               val cacheKey = "${type}_${iconUrl ?: ""}"
               val cached = iconCache[cacheKey]
               if (cached != null) {
                 mk.setIcon(cached)
-              } else if (iconUrl != null) {
+              } else if (!iconUrl.isNullOrEmpty()) {
                 loadIcon(iconUrl) { icon ->
-                  if (icon != null) {
-                    iconCache[cacheKey] = icon
-                    mk.setIcon(icon)
+                  icon?.let { ico ->
+                    iconCache[cacheKey] = ico
+                    mk.setIcon(ico)
                   }
                 }
               }
@@ -150,15 +161,17 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
 
         // route polyline
         val route = args["route"] as? List<*>
-        if (route != null && route.isNotEmpty()) {
+        if (!route.isNullOrEmpty()) {
           val pts = route.map {
             val p = it as Map<*, *>
-            LatLng(p["latitude"] as Double, p["longitude"] as Double)
+            LatLng((p["latitude"] as Number).toDouble(), (p["longitude"] as Number).toDouble())
           }
-          val color = (args["routeColor"] as Int?) ?: 0xFFFFC107.toInt()
-          val width = (args["routeWidth"] as Int?) ?: 4
+          val color = ((args["routeColor"] as? Number)?.toInt()) ?: 0xFFFFC107.toInt()
+          val width = ((args["routeWidth"] as? Number)?.toInt()) ?: 4
           if (routePolyline == null) {
-            routePolyline = map?.addPolyline(PolylineOptions().color(color).width(width.toFloat()).addAll(pts))
+            routePolyline = map?.addPolyline(
+              PolylineOptions().color(color).width(width.toFloat()).addAll(pts)
+            )
           } else {
             routePolyline?.points = pts
             routePolyline?.color = color
@@ -169,32 +182,62 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
         }
         result.success(null)
       }
+
+      // === Implementações mínimas para evitar MissingPluginException ===
+      "cameraTo" -> {
+        val lat = (call.argument<Number>("latitude"))?.toDouble()
+        val lng = (call.argument<Number>("longitude"))?.toDouble()
+        val zoom = (call.argument<Number>("zoom"))?.toFloat()
+        if (lat != null && lng != null) {
+          val update = if (zoom != null)
+            CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom)
+          else
+            CameraUpdateFactory.newLatLng(LatLng(lat, lng))
+          map?.animateCamera(update)
+          result.success(null)
+        } else {
+          result.error("bad_args", "latitude/longitude ausentes", null)
+        }
+      }
+
+      "fitBounds" -> {
+        val points = call.argument<List<Map<String, Number>>>("points").orEmpty()
+        if (points.isNotEmpty()) {
+          val builder = LatLngBounds.builder()
+          points.forEach { p -> builder.include(LatLng(p["latitude"]!!.toDouble(), p["longitude"]!!.toDouble())) }
+          val padding = (call.argument<Number>("padding")?.toInt()) ?: 0
+          val bounds = builder.build()
+          map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+        }
+        result.success(null)
+      }
+
+      "setMarkers", "setPolylines", "setPolygons", "updateCarPosition" -> {
+        // TODO: implemente quando precisar; por enquanto retornamos sucesso pra não quebrar o Dart
+        result.success(null)
+      }
+
       else -> result.notImplemented()
     }
   }
 
-  private fun descriptorFromUrl(url: String?): BitmapDescriptor? {
-    if (url == null || url.isEmpty()) return null
-    return try {
-      val stream = URL(url).openConnection().getInputStream()
-      val bmp = BitmapFactory.decodeStream(stream)
-      BitmapDescriptorFactory.fromBitmap(bmp)
-    } catch (e: Exception) {
-      null
-    }
-  }
-
-  private fun loadIcon(url: String, onLoaded: (BitmapDescriptor?) -> Unit) {
+  private fun loadIcon(url: String, onLoadedMainThread: (BitmapDescriptor?) -> Unit) {
     val cached = iconCache[url]
     if (cached != null) {
-      onLoaded(cached)
+      mapView.post { onLoadedMainThread(cached) } // garante UI thread
       return
     }
     thread {
-      val icon = descriptorFromUrl(url)
+      val icon = try {
+        URL(url).openConnection().getInputStream().use { stream ->
+          val bmp = BitmapFactory.decodeStream(stream)
+          if (bmp != null) BitmapDescriptorFactory.fromBitmap(bmp) else null
+        }
+      } catch (_: Exception) {
+        null
+      }
       iconCache[url] = icon
-      onLoaded(icon)
+      mapView.post { onLoadedMainThread(icon) } // volta pra UI thread
     }
   }
 }
-
