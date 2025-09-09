@@ -20,6 +20,69 @@ import 'package:flutter/gestures.dart';
 
 import '/flutter_flow/lat_lng.dart';
 
+/// Controller that exposes imperative methods to interact with the native map.
+///
+/// The controller simply forwards commands to the underlying platform
+/// implementation via [MethodChannel].  Each method is a thin wrapper around a
+/// channel invocation and therefore returns a [Future] that completes when the
+/// native side acknowledges the request.
+class PickerMapNativeController {
+  MethodChannel? _channel;
+
+  void _attach(MethodChannel channel) {
+    _channel = channel;
+  }
+
+  void _detach() {
+    _channel = null;
+  }
+
+  Future<void> setMarkers(List<Map<String, dynamic>> markers) async {
+    await _channel?.invokeMethod('setMarkers', markers);
+  }
+
+  Future<void> setPolylines(List<Map<String, dynamic>> lines) async {
+    await _channel?.invokeMethod('setPolylines', lines);
+  }
+
+  Future<void> setPolygons(List<Map<String, dynamic>> polys) async {
+    await _channel?.invokeMethod('setPolygons', polys);
+  }
+
+  Future<void> cameraTo(double lat, double lng,
+      {double? zoom, double? bearing, double? tilt}) async {
+    final args = <String, dynamic>{
+      'latitude': lat,
+      'longitude': lng,
+    };
+    if (zoom != null) args['zoom'] = zoom;
+    if (bearing != null) args['bearing'] = bearing;
+    if (tilt != null) args['tilt'] = tilt;
+    await _channel?.invokeMethod('cameraTo', args);
+  }
+
+  Future<void> fitBounds(List<LatLng> points, {double padding = 0}) async {
+    final args = {
+      'points':
+          points.map((p) => {'latitude': p.latitude, 'longitude': p.longitude}).toList(),
+      'padding': padding,
+    };
+    await _channel?.invokeMethod('fitBounds', args);
+  }
+
+  Future<void> updateCarPosition(String id, LatLng pos,
+      {double? rotation, int? durationMs}) async {
+    final args = <String, dynamic>{
+      'id': id,
+      'latitude': pos.latitude,
+      'longitude': pos.longitude,
+    };
+    if (rotation != null) args['rotation'] = rotation;
+    if (durationMs != null) args['durationMs'] = durationMs;
+    await _channel?.invokeMethod('updateCarPosition', args);
+  }
+}
+
 /// Native implementation of [PickerMap] using platform views.
 class PickerMapNative extends StatefulWidget {
   const PickerMapNative({
@@ -44,11 +107,12 @@ class PickerMapNative extends StatefulWidget {
     this.destinationMarkerPngUrl = '',
     this.borderRadius = 16,
     this.enableRouteSnake = true,
-    this.brandSafePaddingBottom = 0,
+    this.brandSafePaddingBottom = 60,
     this.ultraLowSpecMode = false,
     this.liteModeOnAndroid = false,
     this.onTap,
     this.onLongPress,
+    this.controller,
   });
 
   final double? width;
@@ -82,6 +146,11 @@ class PickerMapNative extends StatefulWidget {
 
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongPress;
+
+  /// Optional controller that receives a reference to the underlying native
+  /// view. When supplied, imperative commands like [cameraTo] can be issued
+  /// from the outside.
+  final PickerMapNativeController? controller;
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
@@ -120,6 +189,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     for (final s in _subs.values) {
       s.cancel();
     }
+    widget.controller?._detach();
     super.dispose();
   }
 
@@ -127,6 +197,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     _viewId = id;
     _channel = MethodChannel('picker_map_native_$id');
     _channel!.setMethodCallHandler(_handleCall);
+    widget.controller?._attach(_channel!);
     _subscribeDrivers();
     await _loadRoute();
     await _sendConfig();
