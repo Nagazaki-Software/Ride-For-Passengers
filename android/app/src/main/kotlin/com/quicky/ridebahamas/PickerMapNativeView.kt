@@ -73,6 +73,9 @@ class PickerMapNativeView(context: Context, messenger: BinaryMessenger, id: Int)
         val pos = LatLng(lat, lng)
         map?.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f))
 
+        val pad = (args["brandSafePaddingBottom"] as? Double)?.toInt() ?: 0
+        map?.setPadding(0, 0, 0, pad)
+
         // user marker
         val userPhoto = args["userPhotoUrl"] as String?
         if (userMarker == null) {

@@ -359,7 +359,7 @@ class _Home5WidgetState extends State<Home5Widget>
                           driverTaxiIconUrl:
                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                           enableRouteSnake: true,
-                          brandSafePaddingBottom: 24.0,
+                          brandSafePaddingBottom: 60.0,
                           liteModeOnAndroid: false,
                           ultraLowSpecMode: false,
                         ),
