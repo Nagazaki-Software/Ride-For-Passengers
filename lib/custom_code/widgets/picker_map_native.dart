@@ -18,7 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart' show PlatformViewHitTestBehavior;
+import 'package:flutter/rendering.dart';
 
 import '/flutter_flow/lat_lng.dart';
 
