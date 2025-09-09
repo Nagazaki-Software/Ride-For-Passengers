@@ -328,45 +328,60 @@ class _Home5WidgetState extends State<Home5Widget>
                       List<UsersRecord> pickerMapUsersRecordList =
                           snapshot.data!;
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 60.0),
-                        child: SizedBox(
-                          width: MediaQuery.sizeOf(context).width * 1.0,
-                          height: MediaQuery.sizeOf(context).height * 1.0,
-                          child: custom_widgets.PickerMapNative(
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 60.0),
+                          child: SizedBox(
                             width: MediaQuery.sizeOf(context).width * 1.0,
                             height: MediaQuery.sizeOf(context).height * 1.0,
-                          userLocation: FFAppState().latlngAtual!,
-                          googleApiKey:
-                              'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
-                          driversRefs: pickerMapUsersRecordList
-                              .map((e) => e.reference)
-                              .toList(),
-                          destination: FFAppState().latlangAondeVaiIr,
-                          refreshMs: 6000,
-                          destinationMarkerPngUrl:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
-                          userPhotoUrl: currentUserPhoto,
-                          userMarkerSize: 40,
-                          userName: currentUserDisplayName,
-                          routeColor:
-                              FlutterFlowTheme.of(context).secondaryBackground,
-                          routeWidth: 2,
-                          borderRadius: 0.0,
-                          driverIconWidth: 70,
-                          driverTaxiIconAsset:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                          driverDriverIconUrl:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
-                          driverTaxiIconUrl:
-                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                          enableRouteSnake: true,
-                          brandSafePaddingBottom: 60.0,
-                            liteModeOnAndroid: false,
-                            ultraLowSpecMode: false,
+                            child: (FFAppState().latlngAtual != null)
+                                ? custom_widgets.PickerMapNative(
+                                    width:
+                                        MediaQuery.sizeOf(context).width * 1.0,
+                                    height:
+                                        MediaQuery.sizeOf(context).height * 1.0,
+                                    userLocation: FFAppState().latlngAtual!,
+                                    googleApiKey:
+                                        'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+                                    driversRefs: pickerMapUsersRecordList
+                                        .map((e) => e.reference)
+                                        .toList(),
+                                    destination:
+                                        FFAppState().latlangAondeVaiIr,
+                                    refreshMs: 6000,
+                                    destinationMarkerPngUrl:
+                                        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
+                                    userPhotoUrl: currentUserPhoto,
+                                    userMarkerSize: 40,
+                                    userName: currentUserDisplayName,
+                                    routeColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    routeWidth: 2,
+                                    borderRadius: 0.0,
+                                    driverIconWidth: 70,
+                                    driverTaxiIconAsset:
+                                        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                                    driverDriverIconUrl:
+                                        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+                                    driverTaxiIconUrl:
+                                        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                                    enableRouteSnake: true,
+                                    brandSafePaddingBottom: 60.0,
+                                    liteModeOnAndroid: false,
+                                    ultraLowSpecMode: false,
+                                  )
+                                : Center(
+                                    child: SizedBox(
+                                      width: 50.0,
+                                      height: 50.0,
+                                      child: SpinKitDoubleBounce(
+                                        color:
+                                            FlutterFlowTheme.of(context).accent1,
+                                        size: 50.0,
+                                      ),
+                                    ),
+                                  ),
                           ),
-                        ),
-                      );
+                        );
                     },
                   ),
                 ),
