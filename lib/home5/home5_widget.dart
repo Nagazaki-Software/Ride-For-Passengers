@@ -328,12 +328,14 @@ class _Home5WidgetState extends State<Home5Widget>
                       List<UsersRecord> pickerMapUsersRecordList =
                           snapshot.data!;
 
-                      return Container(
-                        width: MediaQuery.sizeOf(context).width * 1.0,
-                        height: MediaQuery.sizeOf(context).height * 1.0,
-                        child: custom_widgets.PickerMapNative(
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 60.0),
+                        child: SizedBox(
                           width: MediaQuery.sizeOf(context).width * 1.0,
                           height: MediaQuery.sizeOf(context).height * 1.0,
+                          child: custom_widgets.PickerMapNative(
+                            width: MediaQuery.sizeOf(context).width * 1.0,
+                            height: MediaQuery.sizeOf(context).height * 1.0,
                           userLocation: FFAppState().latlngAtual!,
                           googleApiKey:
                               'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
@@ -360,8 +362,9 @@ class _Home5WidgetState extends State<Home5Widget>
                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                           enableRouteSnake: true,
                           brandSafePaddingBottom: 60.0,
-                          liteModeOnAndroid: false,
-                          ultraLowSpecMode: false,
+                            liteModeOnAndroid: false,
+                            ultraLowSpecMode: false,
+                          ),
                         ),
                       );
                     },
