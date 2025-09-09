@@ -1,5 +1,4 @@
 import '/components/navbar_widget.dart';
-import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'home5_widget.dart' show Home5Widget;
@@ -24,9 +23,6 @@ class Home5Model extends FlutterFlowModel<Home5Widget> {
   List<dynamic>? locationPerto;
   // Stores action output result for [Custom Action - localGreetingAction] action in Home5 widget.
   String? fraseInicial;
-  // State field(s) for GoogleMap widget.
-  LatLng? googleMapsCenter;
-  final googleMapsController = Completer<GoogleMapController>();
   // Stores action output result for [Custom Action - geocodeAddress] action in Container widget.
   dynamic geolocatoraddressonchoose;
   DateTime? datePicked;
