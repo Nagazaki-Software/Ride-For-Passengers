@@ -1,4 +1,3 @@
-// android/app/src/main/kotlin/com/quicky/ridebahamas/PickerMapNativeView.kt
 package com.quicky.ridebahamas
 
 import android.content.Context
@@ -19,7 +18,7 @@ class PickerMapNativeView(
   id: Int
 ) : PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
 
-  private val mapView: MapView = MapView(context)
+  private val mapView: MapView
   private var map: GoogleMap? = null
   private val channel = MethodChannel(messenger, "picker_map_native_$id")
 
@@ -30,11 +29,22 @@ class PickerMapNativeView(
   private val iconCache = mutableMapOf<String, BitmapDescriptor?>()
 
   init {
+    // (Opcional) se quiser testar Lite Mode:
+    // val options = GoogleMapOptions().liteMode(true)
+    // mapView = MapView(context, options)
+
+    mapView = MapView(context)
+
     mapView.onCreate(null)
-    // Lifecycle mínimo
+    // Inicializa renderer moderno (ajuda a evitar tela preta em alguns devices/AVDs)
+    try {
+      MapsInitializer.initialize(mapView.context, MapsInitializer.Renderer.LATEST) { }
+    } catch (_: Throwable) { }
+
     mapView.onStart()
     mapView.onResume()
     mapView.getMapAsync(this)
+
     channel.setMethodCallHandler(this)
   }
 
@@ -51,6 +61,8 @@ class PickerMapNativeView(
 
   override fun onMapReady(googleMap: GoogleMap) {
     map = googleMap
+    android.util.Log.d("PickerMap", "onMapReady() chamado")
+
     googleMap.uiSettings.isMapToolbarEnabled = false
     googleMap.uiSettings.isZoomControlsEnabled = false
     googleMap.uiSettings.isMyLocationButtonEnabled = false
@@ -70,18 +82,18 @@ class PickerMapNativeView(
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
 
-      // === Config principal chamada pelo Dart ===
       "updateConfig" -> {
+        android.util.Log.d("PickerMap", "updateConfig recebido")
         val args = call.arguments as Map<*, *>
 
-        // userLocation (Number -> double)
+        // userLocation
         val user = args["userLocation"] as Map<*, *>
         val lat = (user["latitude"] as Number).toDouble()
         val lng = (user["longitude"] as Number).toDouble()
         val pos = LatLng(lat, lng)
         map?.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f))
 
-        // padding (Number -> int)
+        // padding
         val pad = ((args["brandSafePaddingBottom"] as? Number)?.toInt()) ?: 0
         map?.setPadding(0, 0, 0, pad)
 
@@ -183,7 +195,7 @@ class PickerMapNativeView(
         result.success(null)
       }
 
-      // === Implementações mínimas para evitar MissingPluginException ===
+      // Implementações mínimas para evitar MissingPluginException
       "cameraTo" -> {
         val lat = (call.argument<Number>("latitude"))?.toDouble()
         val lng = (call.argument<Number>("longitude"))?.toDouble()
@@ -213,8 +225,7 @@ class PickerMapNativeView(
       }
 
       "setMarkers", "setPolylines", "setPolygons", "updateCarPosition" -> {
-        // TODO: implemente quando precisar; por enquanto retornamos sucesso pra não quebrar o Dart
-        result.success(null)
+        result.success(null) // stubs por enquanto
       }
 
       else -> result.notImplemented()
@@ -224,7 +235,7 @@ class PickerMapNativeView(
   private fun loadIcon(url: String, onLoadedMainThread: (BitmapDescriptor?) -> Unit) {
     val cached = iconCache[url]
     if (cached != null) {
-      mapView.post { onLoadedMainThread(cached) } // garante UI thread
+      mapView.post { onLoadedMainThread(cached) }
       return
     }
     thread {
@@ -237,7 +248,7 @@ class PickerMapNativeView(
         null
       }
       iconCache[url] = icon
-      mapView.post { onLoadedMainThread(icon) } // volta pra UI thread
+      mapView.post { onLoadedMainThread(icon) }
     }
   }
 }
