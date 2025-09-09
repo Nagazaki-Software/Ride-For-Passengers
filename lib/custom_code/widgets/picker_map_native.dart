@@ -13,10 +13,12 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/widgets.dart' show PlatformViewHitTestBehavior;
 
 import '/flutter_flow/lat_lng.dart';
 
@@ -63,8 +65,9 @@ class PickerMapNativeController {
 
   Future<void> fitBounds(List<LatLng> points, {double padding = 0}) async {
     final args = {
-      'points':
-          points.map((p) => {'latitude': p.latitude, 'longitude': p.longitude}).toList(),
+      'points': points
+          .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
+          .toList(),
       'padding': padding,
     };
     await _channel?.invokeMethod('fitBounds', args);
@@ -246,8 +249,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         break;
       case 'onLongPress':
         final args = call.arguments as Map;
-        widget.onLongPress
-            ?.call(LatLng(args['latitude'], args['longitude']));
+        widget.onLongPress?.call(LatLng(args['latitude'], args['longitude']));
         break;
     }
     return null;
@@ -395,8 +397,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     return resolved;
   }
 
-  Future<List<LatLng>> _fetchDrivingRoute(
-      LatLng origin, LatLng dest) async {
+  Future<List<LatLng>> _fetchDrivingRoute(LatLng origin, LatLng dest) async {
     final key = (widget.googleApiKey ?? '').trim();
     if (key.isEmpty) {
       return [origin, dest];
@@ -420,8 +421,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       if (routes.isEmpty) {
         return [origin, dest];
       }
-      final overview =
-          routes.first['overview_polyline']?['points']?.toString();
+      final overview = routes.first['overview_polyline']?['points']?.toString();
       if (overview == null || overview.isEmpty) {
         return [origin, dest];
       }
@@ -454,7 +454,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
           return PlatformViewsService.initSurfaceAndroidView(
             id: params.id,
             viewType: viewType,
-            layoutDirection: TextDirection.ltr,
+            layoutDirection: ui.TextDirection.ltr,
             creationParams: creationParams,
             creationParamsCodec: const StandardMessageCodec(),
           )
@@ -465,11 +465,12 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       platformView = UiKitView(
         viewType: viewType,
-        layoutDirection: TextDirection.ltr,
+        layoutDirection: ui.TextDirection.ltr,
         creationParams: creationParams,
         creationParamsCodec: const StandardMessageCodec(),
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+        hitTestBehavior: PlatformViewHitTestBehavior.opaque,
       );
     } else {
       return Text(
@@ -486,4 +487,3 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     );
   }
 }
-
