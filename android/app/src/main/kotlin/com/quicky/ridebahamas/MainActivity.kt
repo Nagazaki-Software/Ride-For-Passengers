@@ -10,7 +10,7 @@ class MainActivity: FlutterActivity() {
       .platformViewsController
       .registry
       .registerViewFactory(
-        "picker_map_native", // TEM que bater com o viewType no Dart
+        "picker_map_native",
         PickerMapNativeFactory(flutterEngine.dartExecutor.binaryMessenger)
       )
   }
