@@ -1,6 +1,8 @@
 package com.quicky.ridebahamas
 
 import android.content.Context
+import android.graphics.Color
+import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
@@ -21,8 +23,14 @@ class PickerMapNativeView(
   private var gmap: GoogleMap? = null
 
   init {
+    Log.d("PickerMap", "View.init(id=$id) params=$creationParams")
     channel.setMethodCallHandler(this)
-    try { MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST){} } catch (_: Throwable) {}
+    try { MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST){} 
+      Log.d("PickerMap", "MapsInitializer.initialize OK")
+    } catch (t: Throwable) {
+      Log.e("PickerMap", "MapsInitializer.initialize FAIL", t)
+    }
+    mapView.setBackgroundColor(Color.RED) // fica vermelho até o mapa carregar
     mapView.onCreate(null); mapView.onStart(); mapView.onResume()
     mapView.getMapAsync(this)
   }
@@ -30,12 +38,18 @@ class PickerMapNativeView(
   override fun getView(): View = mapView
 
   override fun dispose() {
+    Log.d("PickerMap", "dispose()")
     channel.setMethodCallHandler(null)
     mapView.onPause(); mapView.onStop(); mapView.onDestroy()
   }
 
   override fun onMapReady(map: GoogleMap) {
+    Log.d("PickerMap", "onMapReady()")
     gmap = map
+    gmap?.setOnMapLoadedCallback {
+      Log.d("PickerMap", "onMapLoaded()")
+      mapView.setBackgroundColor(Color.TRANSPARENT)
+    }
     val init = creationParams["initialUserLocation"] as? Map<*, *>
     val lat = (init?.get("latitude") as? Number)?.toDouble()
     val lng = (init?.get("longitude") as? Number)?.toDouble()
@@ -43,28 +57,23 @@ class PickerMapNativeView(
       val ll = LatLng(lat, lng)
       gmap?.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 14f))
       gmap?.addMarker(MarkerOptions().position(ll).title("You"))
+    } else {
+      Log.w("PickerMap", "initialUserLocation ausente")
     }
   }
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+    Log.d("PickerMap", "onMethodCall ${call.method}")
     when (call.method) {
-      "updateConfig" -> {
-        val cfg = call.arguments as Map<*, *>
-        val dest = (cfg["destination"] as? Map<*, *>)?.let {
-          val la = (it["latitude"] as? Number)?.toDouble()
-          val lo = (it["longitude"] as? Number)?.toDouble()
-          if (la != null && lo != null) LatLng(la, lo) else null
-        }
-        dest?.let { gmap?.addMarker(MarkerOptions().position(it).title("Destination")) }
-        result.success(null)
-      }
+      "updateConfig" -> result.success(null)
       "cameraTo" -> {
         val a = call.arguments as Map<*, *>
         val la = (a["latitude"] as Number).toDouble()
         val lo = (a["longitude"] as Number).toDouble()
         val zoom = (a["zoom"] as? Number)?.toFloat()
-        val u = if (zoom != null) CameraUpdateFactory.newLatLngZoom(LatLng(la, lo), zoom)
-                else CameraUpdateFactory.newLatLng(LatLng(la, lo))
+        val u = if (zoom != null)
+          CameraUpdateFactory.newLatLngZoom(LatLng(la, lo), zoom)
+        else CameraUpdateFactory.newLatLng(LatLng(la, lo))
         gmap?.animateCamera(u); result.success(null)
       }
       "fitBounds" -> {
