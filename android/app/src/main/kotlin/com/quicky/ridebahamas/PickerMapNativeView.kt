@@ -2,7 +2,12 @@ package com.quicky.ridebahamas
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.TextView
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import io.flutter.plugin.common.BinaryMessenger
@@ -13,11 +18,22 @@ import java.net.URL
 import kotlin.concurrent.thread
 
 class PickerMapNativeView(
-  context: Context,
+  private val ctx: Context,
   messenger: BinaryMessenger,
   id: Int
 ) : PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
 
+  // Container para poder sobrepor mensagens de diagnóstico
+  private val root: FrameLayout = FrameLayout(ctx)
+  private val diag: TextView = TextView(ctx).apply {
+    textSize = 12f
+    setPadding(16, 16, 16, 16)
+    setTextColor(0xFFFFE082.toInt()) // amarelinho
+    setBackgroundColor(0x66000000)   // preto 40%
+    visibility = View.GONE
+  }
+
+  // Tenta criar MapView no modo normal; se Play Services indisponível, ativa lite mode
   private val mapView: MapView
   private var map: GoogleMap? = null
   private val channel = MethodChannel(messenger, "picker_map_native_$id")
@@ -29,26 +45,42 @@ class PickerMapNativeView(
   private val iconCache = mutableMapOf<String, BitmapDescriptor?>()
 
   init {
-    // (Opcional) se quiser testar Lite Mode:
-    // val options = GoogleMapOptions().liteMode(true)
-    // mapView = MapView(context, options)
+    // Diagnóstico: Play Services
+    val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
+    android.util.Log.d("PickerMap", "PlayServices status=$status (${statusName(status)})")
 
-    mapView = MapView(context)
+    val options = GoogleMapOptions().apply {
+      // se não está SUCCESS, força liteMode para pelo menos renderizar algo
+      if (status != ConnectionResult.SUCCESS) liteMode(true)
+    }
+
+    mapView = MapView(ctx, options)
 
     mapView.onCreate(null)
-    // Inicializa renderer moderno (ajuda a evitar tela preta em alguns devices/AVDs)
-    try {
-      MapsInitializer.initialize(mapView.context, MapsInitializer.Renderer.LATEST) { }
-    } catch (_: Throwable) { }
-
+    try { MapsInitializer.initialize(mapView.context, MapsInitializer.Renderer.LATEST) { } } catch (_: Throwable) { }
     mapView.onStart()
     mapView.onResume()
     mapView.getMapAsync(this)
 
     channel.setMethodCallHandler(this)
+
+    // Monta a view raiz com overlay de diagnóstico
+    root.addView(mapView, FrameLayout.LayoutParams(
+      FrameLayout.LayoutParams.MATCH_PARENT,
+      FrameLayout.LayoutParams.MATCH_PARENT
+    ))
+    val lp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+    lp.gravity = Gravity.TOP or Gravity.START
+    root.addView(diag, lp)
+
+    // Mostra mensagem se Play Services não ok
+    if (status != ConnectionResult.SUCCESS) {
+      diag.visibility = View.VISIBLE
+      diag.text = "Google Play Services: ${statusName(status)} (modo lite)"
+    }
   }
 
-  override fun getView(): View = mapView
+  override fun getView(): View = root
 
   override fun dispose() {
     channel.setMethodCallHandler(null)
@@ -61,72 +93,68 @@ class PickerMapNativeView(
 
   override fun onMapReady(googleMap: GoogleMap) {
     map = googleMap
-    android.util.Log.d("PickerMap", "onMapReady() chamado")
+    android.util.Log.d("PickerMap", "onMapReady()")
+    googleMap.setOnMapLoadedCallback {
+      android.util.Log.d("PickerMap", "onMapLoaded()")
+      diag.visibility = View.GONE // some o diagnóstico quando carregar
+    }
 
+    // Configurações de segurança
     googleMap.uiSettings.isMapToolbarEnabled = false
     googleMap.uiSettings.isZoomControlsEnabled = false
     googleMap.uiSettings.isMyLocationButtonEnabled = false
+    googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+    googleMap.isBuildingsEnabled = true
+    googleMap.isIndoorEnabled = false
+    googleMap.isTrafficEnabled = false
 
     googleMap.setOnMapClickListener {
-      channel.invokeMethod(
-        "onTap", mapOf("latitude" to it.latitude, "longitude" to it.longitude)
-      )
+      channel.invokeMethod("onTap", mapOf("latitude" to it.latitude, "longitude" to it.longitude))
     }
     googleMap.setOnMapLongClickListener {
-      channel.invokeMethod(
-        "onLongPress", mapOf("latitude" to it.latitude, "longitude" to it.longitude)
-      )
+      channel.invokeMethod("onLongPress", mapOf("latitude" to it.latitude, "longitude" to it.longitude))
     }
   }
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
-
       "updateConfig" -> {
-        android.util.Log.d("PickerMap", "updateConfig recebido")
+        android.util.Log.d("PickerMap", "updateConfig")
         val args = call.arguments as Map<*, *>
 
-        // userLocation
         val user = args["userLocation"] as Map<*, *>
         val lat = (user["latitude"] as Number).toDouble()
         val lng = (user["longitude"] as Number).toDouble()
         val pos = LatLng(lat, lng)
         map?.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f))
 
-        // padding
         val pad = ((args["brandSafePaddingBottom"] as? Number)?.toInt()) ?: 0
         map?.setPadding(0, 0, 0, pad)
 
-        // user marker
+        // Marcador do usuário
         val userPhoto = args["userPhotoUrl"] as? String
         if (userMarker == null) {
-          userMarker = map?.addMarker(
-            MarkerOptions().position(pos).anchor(0.5f, 0.5f)
-              .icon(BitmapDescriptorFactory.defaultMarker())
-          )
+          userMarker = map?.addMarker(MarkerOptions().position(pos).anchor(0.5f, 0.5f)
+            .icon(BitmapDescriptorFactory.defaultMarker()))
         }
         userMarker?.position = pos
-        userPhoto?.let { url ->
-          loadIcon(url) { icon ->
-            userMarker?.setIcon(icon ?: BitmapDescriptorFactory.defaultMarker())
-          }
-        }
+        userPhoto?.let { url -> loadIcon(url) { icon ->
+          userMarker?.setIcon(icon ?: BitmapDescriptorFactory.defaultMarker())
+        } }
 
-        // destination marker (opcional)
+        // Destino (opcional)
         if (args.containsKey("destination")) {
           val dest = args["destination"] as Map<*, *>
           val dlat = (dest["latitude"] as Number).toDouble()
           val dlng = (dest["longitude"] as Number).toDouble()
           val dpos = LatLng(dlat, dlng)
-          if (destMarker == null) {
-            destMarker = map?.addMarker(MarkerOptions().position(dpos).anchor(0.5f, 1f))
-          }
+          if (destMarker == null) destMarker = map?.addMarker(MarkerOptions().position(dpos).anchor(0.5f, 1f))
           destMarker?.position = dpos
         } else {
           destMarker?.remove(); destMarker = null
         }
 
-        // drivers
+        // Drivers
         val existing = driverMarkers.keys.toMutableSet()
         val drivers = args["drivers"] as? List<*>
         drivers?.forEach { d ->
@@ -140,27 +168,14 @@ class PickerMapNativeView(
 
           val marker = driverMarkers[id]
           if (marker == null) {
-            val mk = map?.addMarker(
-              MarkerOptions().position(posD).anchor(0.5f, 0.5f).rotation(rotation).flat(true)
-            )
+            val mk = map?.addMarker(MarkerOptions().position(posD).anchor(0.5f, 0.5f).rotation(rotation).flat(true))
             if (mk != null) {
               driverMarkers[id] = mk
-              val iconUrl = if (type == "taxi")
-                args["driverTaxiIconUrl"] as? String
-              else
-                args["driverDriverIconUrl"] as? String
-
+              val iconUrl = if (type == "taxi") args["driverTaxiIconUrl"] as? String else args["driverDriverIconUrl"] as? String
               val cacheKey = "${type}_${iconUrl ?: ""}"
               val cached = iconCache[cacheKey]
-              if (cached != null) {
-                mk.setIcon(cached)
-              } else if (!iconUrl.isNullOrEmpty()) {
-                loadIcon(iconUrl) { icon ->
-                  icon?.let { ico ->
-                    iconCache[cacheKey] = ico
-                    mk.setIcon(ico)
-                  }
-                }
+              if (cached != null) mk.setIcon(cached) else if (!iconUrl.isNullOrEmpty()) {
+                loadIcon(iconUrl) { icon -> icon?.let { ico -> iconCache[cacheKey] = ico; mk.setIcon(ico) } }
               }
             }
           } else {
@@ -171,7 +186,7 @@ class PickerMapNativeView(
         }
         existing.forEach { id -> driverMarkers.remove(id)?.remove() }
 
-        // route polyline
+        // Rota
         val route = args["route"] as? List<*>
         if (!route.isNullOrEmpty()) {
           val pts = route.map {
@@ -181,9 +196,7 @@ class PickerMapNativeView(
           val color = ((args["routeColor"] as? Number)?.toInt()) ?: 0xFFFFC107.toInt()
           val width = ((args["routeWidth"] as? Number)?.toInt()) ?: 4
           if (routePolyline == null) {
-            routePolyline = map?.addPolyline(
-              PolylineOptions().color(color).width(width.toFloat()).addAll(pts)
-            )
+            routePolyline = map?.addPolyline(PolylineOptions().color(color).width(width.toFloat()).addAll(pts))
           } else {
             routePolyline?.points = pts
             routePolyline?.color = color
@@ -192,24 +205,20 @@ class PickerMapNativeView(
         } else {
           routePolyline?.remove(); routePolyline = null
         }
+
         result.success(null)
       }
 
-      // Implementações mínimas para evitar MissingPluginException
       "cameraTo" -> {
         val lat = (call.argument<Number>("latitude"))?.toDouble()
         val lng = (call.argument<Number>("longitude"))?.toDouble()
         val zoom = (call.argument<Number>("zoom"))?.toFloat()
         if (lat != null && lng != null) {
-          val update = if (zoom != null)
-            CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom)
-          else
-            CameraUpdateFactory.newLatLng(LatLng(lat, lng))
+          val update = if (zoom != null) CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom)
+                       else CameraUpdateFactory.newLatLng(LatLng(lat, lng))
           map?.animateCamera(update)
           result.success(null)
-        } else {
-          result.error("bad_args", "latitude/longitude ausentes", null)
-        }
+        } else result.error("bad_args", "latitude/longitude ausentes", null)
       }
 
       "fitBounds" -> {
@@ -218,37 +227,36 @@ class PickerMapNativeView(
           val builder = LatLngBounds.builder()
           points.forEach { p -> builder.include(LatLng(p["latitude"]!!.toDouble(), p["longitude"]!!.toDouble())) }
           val padding = (call.argument<Number>("padding")?.toInt()) ?: 0
-          val bounds = builder.build()
-          map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+          map?.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), padding))
         }
         result.success(null)
       }
 
-      "setMarkers", "setPolylines", "setPolygons", "updateCarPosition" -> {
-        result.success(null) // stubs por enquanto
-      }
-
+      "setMarkers", "setPolylines", "setPolygons", "updateCarPosition" -> result.success(null)
       else -> result.notImplemented()
     }
   }
 
   private fun loadIcon(url: String, onLoadedMainThread: (BitmapDescriptor?) -> Unit) {
     val cached = iconCache[url]
-    if (cached != null) {
-      mapView.post { onLoadedMainThread(cached) }
-      return
-    }
+    if (cached != null) { root.post { onLoadedMainThread(cached) }; return }
     thread {
       val icon = try {
         URL(url).openConnection().getInputStream().use { stream ->
           val bmp = BitmapFactory.decodeStream(stream)
           if (bmp != null) BitmapDescriptorFactory.fromBitmap(bmp) else null
         }
-      } catch (_: Exception) {
-        null
-      }
+      } catch (_: Exception) { null }
       iconCache[url] = icon
-      mapView.post { onLoadedMainThread(icon) }
+      root.post { onLoadedMainThread(icon) }
     }
+  }
+
+  private fun statusName(code: Int) = when(code) {
+    ConnectionResult.SUCCESS -> "SUCCESS"
+    ConnectionResult.SERVICE_MISSING -> "SERVICE_MISSING"
+    ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED -> "UPDATE_REQUIRED"
+    ConnectionResult.SERVICE_DISABLED -> "SERVICE_DISABLED"
+    else -> "CODE_$code"
   }
 }
