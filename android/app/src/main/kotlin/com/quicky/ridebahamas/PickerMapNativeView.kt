@@ -2,6 +2,7 @@ package com.quicky.ridebahamas
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.*
@@ -23,31 +24,36 @@ class PickerMapNativeView(
   private var gmap: GoogleMap? = null
 
   init {
-    Log.d("PickerMap", "View.init(id=$id) params=$creationParams")
+    Log.i("PickerMap", "View.init id=$id params=$creationParams")
     channel.setMethodCallHandler(this)
-    try { MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST){} 
-      Log.d("PickerMap", "MapsInitializer.initialize OK")
+
+    try {
+      MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST) {}
+      Log.i("PickerMap", "MapsInitializer OK")
     } catch (t: Throwable) {
-      Log.e("PickerMap", "MapsInitializer.initialize FAIL", t)
+      Log.e("PickerMap", "MapsInitializer FAIL", t)
     }
-    mapView.setBackgroundColor(Color.RED) // fica vermelho até o mapa carregar
-    mapView.onCreate(null); mapView.onStart(); mapView.onResume()
+
+    mapView.setBackgroundColor(Color.RED) // vermelho até carregar o mapa
+    mapView.onCreate(Bundle())
+    mapView.onStart()
+    mapView.onResume()
     mapView.getMapAsync(this)
   }
 
   override fun getView(): View = mapView
 
   override fun dispose() {
-    Log.d("PickerMap", "dispose()")
+    Log.i("PickerMap", "dispose")
     channel.setMethodCallHandler(null)
     mapView.onPause(); mapView.onStop(); mapView.onDestroy()
   }
 
   override fun onMapReady(map: GoogleMap) {
-    Log.d("PickerMap", "onMapReady()")
+    Log.i("PickerMap", "onMapReady")
     gmap = map
     gmap?.setOnMapLoadedCallback {
-      Log.d("PickerMap", "onMapLoaded()")
+      Log.i("PickerMap", "onMapLoaded -> OK")
       mapView.setBackgroundColor(Color.TRANSPARENT)
     }
     val init = creationParams["initialUserLocation"] as? Map<*, *>
@@ -63,7 +69,7 @@ class PickerMapNativeView(
   }
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-    Log.d("PickerMap", "onMethodCall ${call.method}")
+    Log.i("PickerMap", "onMethodCall ${call.method}")
     when (call.method) {
       "updateConfig" -> result.success(null)
       "cameraTo" -> {
