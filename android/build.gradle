@@ -1,48 +1,32 @@
-// android/build.gradle (raiz do projeto Android)
+// android/build.gradle (RAIZ)
 buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-    implementation 'io.card:android-sdk:5.5.1'
-
-    // Sem BoM, com versões explícitas:
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation 'com.google.android.gms:play-services-location:21.3.0'
-    }
+  repositories {
+    google()
+    mavenCentral()
+  }
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+  repositories {
+    google()
+    mavenCentral()
+  }
 }
 
 rootProject.buildDir = '../build'
 
 subprojects {
-    // Deixa o Kotlin mirar pra 1.8 sem gambiarra
-    afterEvaluate { project ->
-        if (project.hasProperty("kotlin")) {
-            project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-                kotlinOptions {
-                    jvmTarget = "1.8"
-                }
-            }
-        }
+  afterEvaluate { project ->
+    if (project.hasProperty("kotlin")) {
+      project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions { jvmTarget = "1.8" }
+      }
     }
-}
-
-// Cada módulo usa seu próprio compileSdk.
-// Evite forçar compileSdk/namespace aqui pra todos.
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-    project.evaluationDependsOn(':app')
+  }
+  project.buildDir = "${rootProject.buildDir}/${project.name}"
+  project.evaluationDependsOn(':app')
 }
 
 task clean(type: Delete) {
-    delete rootProject.buildDir
+  delete rootProject.buildDir
 }
