@@ -1,279 +1,124 @@
-// android/app/src/main/kotlin/com/quicky/ridebahamas/PickerMapNativeView.kt
 package com.quicky.ridebahamas
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.os.Bundle
-import android.util.Log
+import android.graphics.Color
 import android.view.View
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-import java.net.URL
-import kotlin.concurrent.thread
 
 class PickerMapNativeView(
-  private val context: Context,
+  context: Context,
   messenger: BinaryMessenger,
-  id: Int
-) : PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
+  id: Int,
+  private val creationParams: Map<String, Any?>
+) : PlatformView, OnMapReadyCallback, MethodChannel.MethodCallHandler {
 
-  companion object {
-    private const val TAG = "PickerMapNative"
-  }
-
-  private val mapView: MapView = MapView(context)
-  private var map: GoogleMap? = null
   private val channel = MethodChannel(messenger, "picker_map_native_$id")
+  private val options = GoogleMapOptions().liteMode(
+    (creationParams["liteModeOnAndroid"] as? Boolean) == true
+  )
+  private val mapView = MapView(context, options)
+  private var gmap: GoogleMap? = null
 
-  private var userMarker: Marker? = null
-  private var destMarker: Marker? = null
-  private var routePolyline: Polyline? = null
-  private val driverMarkers = mutableMapOf<String, Marker>()
-  private val iconCache = mutableMapOf<String, BitmapDescriptor?>()
+  private var route: List<LatLng> = emptyList()
+  private var user: LatLng? = null
+  private var dest: LatLng? = null
+  private var routeColor = Color.parseColor("#FFC107")
+  private var routeWidth = 4f
 
   init {
-    // Renderer moderno (corrige telas pretas em vários dispositivos)
-    try {
-      MapsInitializer.initialize(
-        context,
-        MapsInitializer.Renderer.LATEST
-      ) { renderer ->
-        Log.d(TAG, "Google Maps renderer: $renderer")
-      }
-    } catch (t: Throwable) {
-      Log.w(TAG, "MapsInitializer falhou: ${t.message}")
-    }
+    channel.setMethodCallHandler(this)
+    try { MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST) { } } catch (_: Throwable) {}
 
-    // Ciclo mínimo do MapView
-    mapView.onCreate(Bundle())
+    // CHAME o ciclo de vida – sem isso o mapa não aparece.
+    mapView.onCreate(null)
     mapView.onStart()
     mapView.onResume()
 
     mapView.getMapAsync(this)
-    channel.setMethodCallHandler(this)
   }
 
   override fun getView(): View = mapView
 
   override fun dispose() {
     channel.setMethodCallHandler(null)
-    try {
-      mapView.onPause()
-      mapView.onStop()
-      mapView.onDestroy()
-    } catch (_: Throwable) { }
+    mapView.onPause()
+    mapView.onStop()
+    mapView.onDestroy()
   }
 
-  override fun onMapReady(googleMap: GoogleMap) {
-    // Verifica Google Play Services no device/emulador
-    val gp = GoogleApiAvailability.getInstance()
-    val status = gp.isGooglePlayServicesAvailable(context)
-    if (status != ConnectionResult.SUCCESS) {
-      Log.e(TAG, "Google Play Services indisponível ($status). O mapa não renderiza.")
-      return
-    }
-
-    map = googleMap
-    googleMap.uiSettings.isMapToolbarEnabled = false
-    googleMap.uiSettings.isZoomControlsEnabled = false
-    googleMap.uiSettings.isMyLocationButtonEnabled = false
-
-    googleMap.setOnMapClickListener {
-      channel.invokeMethod(
-        "onTap", mapOf("latitude" to it.latitude, "longitude" to it.longitude)
-      )
-    }
-    googleMap.setOnMapLongClickListener {
-      channel.invokeMethod(
-        "onLongPress", mapOf("latitude" to it.latitude, "longitude" to it.longitude)
-      )
-    }
-
-    Log.d(TAG, "onMapReady OK")
+  override fun onMapReady(map: GoogleMap) {
+    gmap = map
+    // posição inicial enviada do Flutter
+    user = creationParams["initialUserLocation"].toLatLng()
+    user?.let { gmap?.moveCamera(CameraUpdateFactory.newLatLngZoom(it, 14f)) }
+    drawAll()
   }
 
+  private fun drawAll() {
+    val m = gmap ?: return
+    m.clear()
+    user?.let { m.addMarker(MarkerOptions().position(it).title("You")) }
+    dest?.let { m.addMarker(MarkerOptions().position(it).title("Destination")) }
+    if (route.isNotEmpty()) {
+      m.addPolyline(
+        PolylineOptions()
+          .addAll(route)
+          .color(routeColor)
+          .width(routeWidth)
+          .geodesic(true)
+      )
+    }
+  }
+
+  // ===== MethodChannel =====
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
-
       "updateConfig" -> {
-        val args = call.arguments as Map<*, *>
-
-        // userLocation
-        val user = args["userLocation"] as Map<*, *>
-        val lat = (user["latitude"] as Number).toDouble()
-        val lng = (user["longitude"] as Number).toDouble()
-        val pos = LatLng(lat, lng)
-        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 14f))
-
-        // padding
-        val pad = (args["brandSafePaddingBottom"] as? Number)?.toInt() ?: 0
-        map?.setPadding(0, 0, 0, pad)
-
-        // user marker
-        val userPhoto = args["userPhotoUrl"] as? String
-        if (userMarker == null) {
-          userMarker = map?.addMarker(
-            MarkerOptions().position(pos).anchor(0.5f, 0.5f)
-              .icon(BitmapDescriptorFactory.defaultMarker())
-          )
-        }
-        userMarker?.position = pos
-        userPhoto?.let { url ->
-          loadIcon(url) { icon ->
-            userMarker?.setIcon(icon ?: BitmapDescriptorFactory.defaultMarker())
-          }
-        }
-
-        // destination marker
-        if (args.containsKey("destination")) {
-          val dest = args["destination"] as Map<*, *>
-          val dlat = (dest["latitude"] as Number).toDouble()
-          val dlng = (dest["longitude"] as Number).toDouble()
-          val dpos = LatLng(dlat, dlng)
-          if (destMarker == null) {
-            destMarker = map?.addMarker(MarkerOptions().position(dpos).anchor(0.5f, 1f))
-          }
-          destMarker?.position = dpos
-        } else {
-          destMarker?.remove(); destMarker = null
-        }
-
-        // drivers
-        val existing = driverMarkers.keys.toMutableSet()
-        val drivers = args["drivers"] as? List<*>
-        drivers?.forEach { d ->
-          val m = d as Map<*, *>
-          val id = m["id"].toString()
-          val dlat = (m["latitude"] as Number).toDouble()
-          val dlng = (m["longitude"] as Number).toDouble()
-          val rotation = (m["rotation"] as? Number)?.toFloat() ?: 0f
-          val type = m["type"]?.toString() ?: "driver"
-          val posD = LatLng(dlat, dlng)
-
-          val marker = driverMarkers[id]
-          if (marker == null) {
-            val mk = map?.addMarker(
-              MarkerOptions()
-                .position(posD)
-                .anchor(0.5f, 0.5f)
-                .rotation(rotation)
-                .flat(true)
-            )
-            if (mk != null) {
-              driverMarkers[id] = mk
-              val iconUrl = if (type == "taxi")
-                args["driverTaxiIconUrl"] as? String
-              else
-                args["driverDriverIconUrl"] as? String
-
-              val cacheKey = "${type}_${iconUrl ?: ""}"
-              val cached = iconCache[cacheKey]
-              if (cached != null) {
-                mk.setIcon(cached)
-              } else if (!iconUrl.isNullOrEmpty()) {
-                loadIcon(iconUrl) { icon ->
-                  icon?.let { ico ->
-                    iconCache[cacheKey] = ico
-                    mk.setIcon(ico)
-                  }
-                }
-              }
-            }
-          } else {
-            marker.position = posD
-            marker.rotation = rotation
-          }
-          existing.remove(id)
-        }
-        existing.forEach { id -> driverMarkers.remove(id)?.remove() }
-
-        // route polyline
-        val route = args["route"] as? List<*>
-        if (!route.isNullOrEmpty()) {
-          val pts = route.map {
-            val p = it as Map<*, *>
-            LatLng((p["latitude"] as Number).toDouble(), (p["longitude"] as Number).toDouble())
-          }
-          val color = (args["routeColor"] as? Number)?.toInt() ?: 0xFFFFC107.toInt()
-          val width = (args["routeWidth"] as? Number)?.toInt() ?: 4
-          if (routePolyline == null) {
-            routePolyline = map?.addPolyline(
-              PolylineOptions().color(color).width(width.toFloat()).addAll(pts)
-            )
-          } else {
-            routePolyline?.points = pts
-            routePolyline?.color = color
-            routePolyline?.width = width.toFloat()
-          }
-        } else {
-          routePolyline?.remove(); routePolyline = null
-        }
-
+        val cfg = call.arguments as Map<*, *>
+        user = cfg["userLocation"].toLatLng()
+        dest = cfg["destination"].toLatLng()
+        route = (cfg["route"] as? List<*>)?.mapNotNull { it.toLatLng() } ?: emptyList()
+        (cfg["routeColor"] as? Number)?.toInt()?.let { routeColor = it }
+        (cfg["routeWidth"] as? Number)?.toFloat()?.let { routeWidth = it }
+        drawAll()
         result.success(null)
       }
-
       "cameraTo" -> {
-        val lat = (call.argument<Number>("latitude"))?.toDouble()
-        val lng = (call.argument<Number>("longitude"))?.toDouble()
-        val zoom = (call.argument<Number>("zoom"))?.toFloat()
-        if (lat != null && lng != null) {
-          val update = if (zoom != null)
-            CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom)
-          else
-            CameraUpdateFactory.newLatLng(LatLng(lat, lng))
-          map?.animateCamera(update)
-          result.success(null)
-        } else {
-          result.error("bad_args", "latitude/longitude ausentes", null)
-        }
+        val a = call.arguments as Map<*, *>
+        val lat = (a["latitude"] as Number).toDouble()
+        val lng = (a["longitude"] as Number).toDouble()
+        val zoom = (a["zoom"] as? Number)?.toFloat()
+        val update = if (zoom != null)
+          CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom)
+        else
+          CameraUpdateFactory.newLatLng(LatLng(lat, lng))
+        gmap?.animateCamera(update)
+        result.success(null)
       }
-
       "fitBounds" -> {
-        val points = call.argument<List<Map<String, Number>>>("points").orEmpty()
-        if (points.isNotEmpty()) {
-          val builder = LatLngBounds.builder()
-          points.forEach { p ->
-            builder.include(LatLng(p["latitude"]!!.toDouble(), p["longitude"]!!.toDouble()))
-          }
-          val padding = (call.argument<Number>("padding")?.toInt()) ?: 0
-          val bounds = builder.build()
-          map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+        val a = call.arguments as Map<*, *>
+        val pts = (a["points"] as? List<*>)?.mapNotNull { it.toLatLng() } ?: emptyList()
+        val pad = ((a["padding"] as? Number)?.toInt()) ?: 0
+        if (pts.isNotEmpty()) {
+          val b = LatLngBounds.builder()
+          pts.forEach { b.include(it) }
+          gmap?.animateCamera(CameraUpdateFactory.newLatLngBounds(b.build(), pad))
         }
         result.success(null)
       }
-
-      // stubs seguros
-      "setMarkers", "setPolylines", "setPolygons", "updateCarPosition" -> {
-        result.success(null)
-      }
-
       else -> result.notImplemented()
     }
   }
+}
 
-  private fun loadIcon(url: String, onLoadedMainThread: (BitmapDescriptor?) -> Unit) {
-    val cached = iconCache[url]
-    if (cached != null) {
-      mapView.post { onLoadedMainThread(cached) }
-      return
-    }
-    thread {
-      val icon = try {
-        URL(url).openConnection().getInputStream().use { stream ->
-          val bmp = BitmapFactory.decodeStream(stream)
-          if (bmp != null) BitmapDescriptorFactory.fromBitmap(bmp) else null
-        }
-      } catch (_: Exception) {
-        null
-      }
-      iconCache[url] = icon
-      mapView.post { onLoadedMainThread(icon) }
-    }
-  }
+private fun Any?.toLatLng(): LatLng? {
+  val m = this as? Map<*, *> ?: return null
+  val la = (m["latitude"] as? Number)?.toDouble()
+  val lo = (m["longitude"] as? Number)?.toDouble()
+  return if (la != null && lo != null) LatLng(la, lo) else null
 }
