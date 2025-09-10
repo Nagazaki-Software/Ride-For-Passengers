@@ -13,7 +13,7 @@ class PickerMapNativeFactory(
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
   override fun create(context: Context?, id: Int, args: Any?): PlatformView {
-    Log.d("PickerMap", "Factory.create(id=$id) args=$args")
+    Log.i("PickerMap", "Factory.create id=$id args=$args")
     @Suppress("UNCHECKED_CAST")
     val creationParams = args as? Map<String, Any?> ?: emptyMap()
     return PickerMapNativeView(appContext, messenger, id, creationParams)
