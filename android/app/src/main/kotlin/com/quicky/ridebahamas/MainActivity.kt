@@ -1,13 +1,13 @@
 package com.quicky.ridebahamas
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import android.util.Log
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
-    Log.d("PickerMap", "MainActivity.configureFlutterEngine()")
+    Log.i("PickerMap", "MainActivity.configureFlutterEngine")
     flutterEngine.platformViewsController.registry.registerViewFactory(
       "picker_map_native",
       PickerMapNativeFactory(
@@ -15,6 +15,6 @@ class MainActivity : FlutterActivity() {
         flutterEngine.dartExecutor.binaryMessenger
       )
     )
-    Log.d("PickerMap", "Factory registrada com viewType=picker_map_native")
+    Log.i("PickerMap", "Factory registrada: picker_map_native")
   }
 }
