@@ -1,32 +1,36 @@
-// android/build.gradle (RAIZ)
-buildscript {
-  repositories {
-    google()
-    mavenCentral()
-  }
-}
-
 allprojects {
-  repositories {
-    google()
-    mavenCentral()
-  }
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
 
 rootProject.buildDir = '../build'
 
-subprojects {
-  afterEvaluate { project ->
-    if (project.hasProperty("kotlin")) {
-      project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-        kotlinOptions { jvmTarget = "1.8" }
-      }
+subprojects { sub ->
+    afterEvaluate {
+        def hasAndroid = sub.extensions.findByName("android")
+        if (hasAndroid != null) {
+            // Funciona tanto para com.android.application quanto com.android.library
+            sub.android.compileSdkVersion 35
+            // (opcional, mas ajuda)
+            sub.android.defaultConfig {
+                if (it.hasProperty('targetSdkVersion')) targetSdkVersion 35
+                if (it.hasProperty('minSdkVersion'))    minSdkVersion 23
+            }
+            // Namespace pra plugins antigos que não definem
+            if (!sub.android.hasProperty('namespace') || sub.android.namespace == null) {
+                sub.android.namespace = "${sub.group}.${sub.name}".replace('-', '_')
+            }
+        }
     }
-  }
-  project.buildDir = "${rootProject.buildDir}/${project.name}"
-  project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
-  delete rootProject.buildDir
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+task clean(type: Delete) { delete rootProject.buildDir }
