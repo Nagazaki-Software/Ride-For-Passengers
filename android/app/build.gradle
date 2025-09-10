@@ -88,14 +88,11 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-
-    // Deixe o plugin do Kotlin gerenciar a stdlib. Remova versão fixa 2.1.0 (pode conflitar):
-    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
-
     implementation 'io.card:android-sdk:5.5.1'
 
-    // Use o BoM do Play Services pra manter versões coerentes
-    implementation platform('com.google.android.gms:play-services-bom:16.1.0')
-    implementation 'com.google.android.gms:play-services-maps'
-    implementation 'com.google.android.gms:play-services-location'
+    // Google Play services (sem BoM)
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    // Se realmente precisar do Location aqui (senão deixe que os plugins tragam):
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
 }
+
