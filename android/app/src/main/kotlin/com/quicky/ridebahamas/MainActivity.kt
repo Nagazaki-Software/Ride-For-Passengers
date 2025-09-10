@@ -7,8 +7,11 @@ class MainActivity : FlutterActivity() {
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     flutterEngine.platformViewsController.registry.registerViewFactory(
-      "picker_map_native",
-      PickerMapNativeFactory(applicationContext, flutterEngine.dartExecutor.binaryMessenger)
+      "picker_map_native", // <-- TEM QUE bater com o Dart
+      PickerMapNativeFactory(
+        applicationContext,
+        flutterEngine.dartExecutor.binaryMessenger
+      )
     )
   }
 }
