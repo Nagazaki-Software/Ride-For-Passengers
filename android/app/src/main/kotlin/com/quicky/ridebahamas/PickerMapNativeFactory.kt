@@ -10,6 +10,7 @@ class PickerMapNativeFactory(private val messenger: BinaryMessenger)
   : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
   override fun create(context: Context, id: Int, obj: Any?): PlatformView {
-    return PickerMapNativeView(context, messenger, id)
+    // repassa os creationParams (obj) para a view
+    return PickerMapNativeView(context, messenger, id, obj)
   }
 }
