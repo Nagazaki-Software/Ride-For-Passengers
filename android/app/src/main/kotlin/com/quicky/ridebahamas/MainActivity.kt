@@ -2,7 +2,7 @@ package com.quicky.ridebahamas
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.Log
+import android.util.Log
 
 class MainActivity : FlutterActivity() {
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
