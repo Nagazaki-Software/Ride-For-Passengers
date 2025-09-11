@@ -25,10 +25,8 @@
         android:label="Ride Bahamas"
         tools:replace="android:label"
         android:icon="@mipmap/ic_launcher"
-
-        <!-- IMPORTANTES para MapView/WebView -->
         android:hardwareAccelerated="true"
-        android:usesCleartextTraffic="true"   <!-- opcional: útil em debug -->
+        android:usesCleartextTraffic="true" 
         android:requestLegacyExternalStorage="true">
 
         <activity
