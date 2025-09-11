@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Splash API nativa do Android 12+ -->
-    <style name="LaunchTheme" parent="@style/Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/splash_color</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        <item name="postSplashScreenTheme">@style/NormalTheme</item>
+
+    <!-- Em v31+, use as attrs do Android 12 (note o prefixo android:) -->
+    <style name="LaunchTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowSplashScreenBackground">@color/splash_color</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/launch_image</item>
+        <item name="android:postSplashScreenTheme">@style/NormalTheme</item>
     </style>
 
-    <style name="NormalTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
 </resources>
