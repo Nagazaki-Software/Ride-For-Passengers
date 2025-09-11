@@ -2,19 +2,24 @@ package com.quicky.ridebahamas
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.widget.FrameLayout
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.*
-import io.flutter.Log
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
-import org.json.JSONObject
 
 class PickerMapNativeView(
   context: Context,
@@ -36,9 +41,19 @@ class PickerMapNativeView(
     Log.d(tag, "PickerMapNativeView init, id=$id")
     channel.setMethodCallHandler(this)
 
+    try {
+      MapsInitializer.initialize(context.applicationContext)
+    } catch (t: Throwable) {
+      Log.e(tag, "MapsInitializer error", t)
+    }
+
     mapView.onCreate(null)
+    mapView.onStart()
+    mapView.onResume()
     mapView.getMapAsync(this)
-    container.addView(mapView,
+
+    container.addView(
+      mapView,
       FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
@@ -52,12 +67,9 @@ class PickerMapNativeView(
     Log.d(tag, "dispose")
     channel.setMethodCallHandler(null)
     mapView.onPause()
+    mapView.onStop()
     mapView.onDestroy()
   }
-
-  // ===== Lifecycle bridging (suficiente p/ MapView) =====
-  fun onResume() { mapView.onResume() }
-  fun onPause() { mapView.onPause() }
 
   // ===== OnMapReady =====
   override fun onMapReady(map: GoogleMap) {
@@ -66,10 +78,10 @@ class PickerMapNativeView(
     googleMap?.uiSettings?.isCompassEnabled = true
     googleMap?.uiSettings?.isMyLocationButtonEnabled = false
     googleMap?.isBuildingsEnabled = true
-    // IMPORTANTE: habilitar/checar mapas
-    // googleMap?.isMyLocationEnabled = false // só ative se já tiver permissão
+    // Se quiser habilitar a localização nativa, lembre de checar permissão:
+    // googleMap?.isMyLocationEnabled = false
 
-    // Sinaliza pro Dart que a view está criada
+    // Avisa o Dart que o mapa está pronto para receber updateConfig
     channel.invokeMethod("platformReady", null)
   }
 
@@ -125,14 +137,16 @@ class PickerMapNativeView(
         try {
           val args = call.arguments as Map<*, *>
           val points = args["points"] as List<*>
-          val padding = ((args["padding"] as Number?)?: 0).toInt()
+          val padding = ((args["padding"] as Number?) ?: 0).toInt()
           val builder = LatLngBounds.Builder()
           points.forEach { p ->
             val m = p as Map<*, *>
-            builder.include(LatLng(
-              (m["latitude"] as Number).toDouble(),
-              (m["longitude"] as Number).toDouble()
-            ))
+            builder.include(
+              LatLng(
+                (m["latitude"] as Number).toDouble(),
+                (m["longitude"] as Number).toDouble()
+              )
+            )
           }
           val bounds = builder.build()
           googleMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
@@ -148,7 +162,11 @@ class PickerMapNativeView(
 
   // ===== Helpers =====
   private fun applyConfig(cfg: Map<*, *>) {
-    val map = googleMap ?: return
+    val map = googleMap ?: run {
+      Log.d(tag, "applyConfig: googleMap ainda nulo, ignorando")
+      return
+    }
+
     // user marker
     (cfg["userLocation"] as? Map<*, *>)?.let { m ->
       val p = LatLng(
