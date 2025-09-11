@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/splash_color"/>
-    <!-- Ícone central opcional (pode remover este <item> se não quiser) -->
-    <item>
-        <bitmap
-            android:src="@mipmap/ic_launcher"
-            android:gravity="center"/>
-    </item>
+    <!-- opcional: colocar um logo centralizado -->
 </layer-list>
