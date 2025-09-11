@@ -22,12 +22,6 @@ import 'package:flutter/rendering.dart';
 
 import '/flutter_flow/lat_lng.dart';
 
-/// Controller that exposes imperative methods to interact with the native map.
-///
-/// The controller simply forwards commands to the underlying platform
-/// implementation via [MethodChannel].  Each method is a thin wrapper around a
-/// channel invocation and therefore returns a [Future] that completes when the
-/// native side acknowledges the request.
 class PickerMapNativeController {
   MethodChannel? _channel;
 
@@ -86,7 +80,6 @@ class PickerMapNativeController {
   }
 }
 
-/// Native implementation of [PickerMap] using platform views.
 class PickerMapNative extends StatefulWidget {
   const PickerMapNative({
     super.key,
@@ -150,9 +143,6 @@ class PickerMapNative extends StatefulWidget {
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongPress;
 
-  /// Optional controller that receives a reference to the underlying native
-  /// view. When supplied, imperative commands like [cameraTo] can be issued
-  /// from the outside.
   final PickerMapNativeController? controller;
 
   @override
@@ -163,13 +153,11 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   MethodChannel? _channel;
   int? _viewId;
 
-  // drivers
   final Map<String, StreamSubscription<DocumentSnapshot>> _subs = {};
   final Map<String, LatLng> _driverPos = {};
   final Map<String, double> _driverRot = {};
   final Map<String, String> _driverType = {};
 
-  // route
   List<LatLng> _route = [];
 
   @override
@@ -243,6 +231,10 @@ class _PickerMapNativeState extends State<PickerMapNative> {
 
   Future<dynamic> _handleCall(MethodCall call) async {
     switch (call.method) {
+      case 'platformReady':
+        // O nativo sinalizou que onMapReady já ocorreu — reenviar configuração.
+        await _sendConfig();
+        break;
       case 'onTap':
         final args = call.arguments as Map;
         widget.onTap?.call(LatLng(args['latitude'], args['longitude']));
@@ -473,8 +465,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         hitTestBehavior: PlatformViewHitTestBehavior.opaque,
       );
     } else {
-      return Text(
-          '$defaultTargetPlatform is not yet supported by PickerMapNative');
+      return Text('$defaultTargetPlatform is not yet supported by PickerMapNative');
     }
 
     return SizedBox(
