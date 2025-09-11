@@ -16,18 +16,19 @@ import io.flutter.plugin.platform.PlatformView
 class PickerMapNativeView(
   private val ctx: Context,
   messenger: BinaryMessenger,
-  id: Int
+  id: Int,
+  private val creationParams: Any? // <--- AGORA ACEITA OS PARAMS DO FLUTTER
 ) : PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
 
   private val tag = "PickerMap"
   private val container = FrameLayout(ctx)
 
-  // Use GoogleMapOptions para garantir inicialização correta
+  // Opções de inicialização do Map
   private val mapOptions = GoogleMapOptions()
     .mapType(GoogleMap.MAP_TYPE_NORMAL)
     .compassEnabled(true)
     .mapToolbarEnabled(false)
-    .liteMode(false) // deixe false para “forçar” o mapa completo
+    .liteMode(false)
 
   private val mapView = MapView(ctx, mapOptions)
   private var googleMap: GoogleMap? = null
@@ -38,19 +39,18 @@ class PickerMapNativeView(
   private var routePolyline: Polyline? = null
 
   init {
-    Log.d(tag, "PickerMapNativeView init, id=$id")
+    Log.d(tag, "PickerMapNativeView init, id=$id, hasParams=${creationParams != null}")
 
-    // 1) Verifica Google Play Services
+    // 1) Play Services
     val ga = GoogleApiAvailability.getInstance()
     val status = ga.isGooglePlayServicesAvailable(ctx)
     if (status != ConnectionResult.SUCCESS) {
       Log.e(tag, "Google Play Services indisponível: code=$status")
-      // Continua — MapView ainda pode inicializar em alguns casos
     } else {
       Log.d(tag, "Google Play Services OK")
     }
 
-    // 2) Inicializa Maps SDK explicitamente
+    // 2) Inicializa Maps
     try {
       val renderer = MapsInitializer.initialize(ctx, MapsInitializer.Renderer.LATEST) {}
       Log.d(tag, "MapsInitializer.initialize -> $renderer")
@@ -58,7 +58,7 @@ class PickerMapNativeView(
       Log.e(tag, "MapsInitializer.initialize falhou", t)
     }
 
-    // 3) Lifecycle completo para MapView
+    // 3) Lifecycle do MapView
     try {
       mapView.onCreate(null)
       mapView.onStart()
@@ -67,7 +67,7 @@ class PickerMapNativeView(
       Log.e(tag, "Lifecycle create/start/resume falhou", t)
     }
 
-    // 4) getMapAsync
+    // 4) Map async
     mapView.getMapAsync(this)
 
     // 5) Adiciona ao container
@@ -107,7 +107,25 @@ class PickerMapNativeView(
     googleMap?.isBuildingsEnabled = true
     googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
 
-    // Sinaliza para o Dart que a view está pronta
+    // Se vieram creationParams do Dart, aplica config inicial aqui
+    try {
+      (creationParams as? Map<*, *>)?.let { params ->
+        // Ex.: params["initialCamera"] = { latitude, longitude, zoom }
+        (params["initialCamera"] as? Map<*, *>)?.let { cam ->
+          val lat = (cam["latitude"] as Number).toDouble()
+          val lng = (cam["longitude"] as Number).toDouble()
+          val zoom = (cam["zoom"] as? Number)?.toFloat() ?: 14f
+          googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), zoom))
+        }
+
+        // Se quiser já aplicar markers/rota iniciais:
+        (params["config"] as? Map<*, *>)?.let { cfg -> applyConfig(cfg) }
+      }
+    } catch (t: Throwable) {
+      Log.e(tag, "Erro ao aplicar creationParams", t)
+    }
+
+    // Sinaliza pro Dart que a view está pronta
     channel.invokeMethod("platformReady", null)
   }
 
