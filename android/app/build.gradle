@@ -92,6 +92,9 @@ dependencies {
 
     // Google Play services (sem BoM)
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation "com.google.android.gms:play-services-maps:18.2.0"
+    implementation "com.google.android.gms:play-services-base:18.5.0"
+
     // Se realmente precisar do Location aqui (senão deixe que os plugins tragam):
     implementation 'com.google.android.gms:play-services-location:21.2.0'
 }
