@@ -89,6 +89,12 @@ flutter {
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation 'io.card:android-sdk:5.5.1'
+    // Splash oficial do Android 12+
+    implementation "androidx.core:core-splashscreen:1.0.1"
+
+    // Material + AppCompat para garantir os temas Material3/AppCompat disponíveis
+    implementation "com.google.android.material:material:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.7.0"
 
     // Google Play services (sem BoM)
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
