@@ -5,6 +5,8 @@
     <style name="LaunchTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowSplashScreenBackground">@color/splash_color</item>
         <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <!-- Use postSplashScreenTheme sem o prefixo android: -->
+        <item name="postSplashScreenTheme">@style/NormalTheme</item>
     </style>
 
 </resources>
