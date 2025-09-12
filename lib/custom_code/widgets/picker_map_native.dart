@@ -25,27 +25,36 @@ class PickerMapNativeController {
   MethodChannel? _channel;
   void _attach(MethodChannel channel) { _channel = channel; }
   void _detach() { _channel = null; }
+
   Future<void> setMarkers(List<Map<String, dynamic>> m)
     => _channel?.invokeMethod('setMarkers', m) ?? Future.value();
   Future<void> setPolylines(List<Map<String, dynamic>> l)
     => _channel?.invokeMethod('setPolylines', l) ?? Future.value();
   Future<void> setPolygons(List<Map<String, dynamic>> p)
     => _channel?.invokeMethod('setPolygons', p) ?? Future.value();
+
   Future<void> cameraTo(double lat, double lng, {double? zoom, double? bearing, double? tilt})
     => _channel?.invokeMethod('cameraTo', {
-      'latitude':lat,'longitude':lng, if(zoom!=null) 'zoom':zoom,
-      if(bearing!=null) 'bearing':bearing, if(tilt!=null) 'tilt':tilt
+      'latitude':lat,'longitude':lng,
+      if(zoom!=null) 'zoom':zoom,
+      if(bearing!=null) 'bearing':bearing,
+      if(tilt!=null) 'tilt':tilt
     }) ?? Future.value();
+
   Future<void> fitBounds(List<LatLng> pts, {double padding = 0})
     => _channel?.invokeMethod('fitBounds', {
       'points': pts.map((p)=>{'latitude':p.latitude,'longitude':p.longitude}).toList(),
       'padding': padding,
     }) ?? Future.value();
+
   Future<void> updateCarPosition(String id, LatLng pos, {double? rotation, int? durationMs})
     => _channel?.invokeMethod('updateCarPosition', {
       'id':id,'latitude':pos.latitude,'longitude':pos.longitude,
       if(rotation!=null) 'rotation':rotation, if(durationMs!=null) 'durationMs':durationMs
     }) ?? Future.value();
+
+  Future<dynamic> debugInfo()
+    => _channel?.invokeMethod('debugInfo') ?? Future.value();
 }
 
 class PickerMapNative extends StatefulWidget {
@@ -77,6 +86,7 @@ class PickerMapNative extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.controller,
+    this.showDebugPanel = true, // <--- NOVO: painel de logs on-screen
   });
 
   final double? width;
@@ -106,6 +116,8 @@ class PickerMapNative extends StatefulWidget {
   final void Function(LatLng)? onLongPress;
   final PickerMapNativeController? controller;
 
+  final bool showDebugPanel; // <---
+
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
 }
@@ -113,6 +125,22 @@ class PickerMapNative extends StatefulWidget {
 class _PickerMapNativeState extends State<PickerMapNative> {
   MethodChannel? _channel;
   int? _viewId;
+
+  // ======= LOG PANEL STATE =======
+  final List<String> _ktLogs = <String>[];
+  bool _logsVisible = true;
+
+  void _pushLog(String msg) {
+    setState(() {
+      final ts = DateTime.now().toIso8601String().substring(11, 19);
+      _ktLogs.insert(0, '[$ts] $msg');
+      if (_ktLogs.length > 200) _ktLogs.removeLast();
+    });
+    // Console do Flutter (VS Code/Android Studio/terminal)
+    // Em build release isso pode não aparecer; por isso temos o painel.
+    // ignore: avoid_print
+    print(msg);
+  }
 
   @override
   void dispose() {
@@ -132,21 +160,38 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   Future<void> _sendConfig() async {
     if (_channel == null) return;
     final cfg = <String, dynamic>{
-      'userLocation': {'latitude': widget.userLocation.latitude, 'longitude': widget.userLocation.longitude},
+      'userLocation': {
+        'latitude': widget.userLocation.latitude,
+        'longitude': widget.userLocation.longitude
+      },
       if (widget.destination != null)
-        'destination': {'latitude': widget.destination!.latitude, 'longitude': widget.destination!.longitude},
-      'route': const <Map<String, double>>[], // rota é opcional; pode ser atualizada depois
+        'destination': {
+          'latitude': widget.destination!.latitude,
+          'longitude': widget.destination!.longitude
+        },
+      'route': const <Map<String, double>>[],
       'routeColor': widget.routeColor.value,
       'routeWidth': widget.routeWidth,
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
     };
-    try { await _channel!.invokeMethod('updateConfig', cfg); } catch (_) {}
+    try {
+      await _channel!.invokeMethod('updateConfig', cfg);
+    } catch (e) {
+      _pushLog('Dart updateConfig erro: $e');
+    }
   }
 
   Future<dynamic> _handleCall(MethodCall call) async {
     if (call.method == 'platformReady') {
+      _pushLog('KT → Dart: platformReady');
       await _sendConfig();
+    } else if (call.method == 'debugLog') {
+      // AQUI APARECE o que o Kotlin enviar via channel.invokeMethod("debugLog", {...})
+      final m = (call.arguments as Map?) ?? const {};
+      final level = (m['level'] ?? 'D').toString();
+      final msg = (m['msg'] ?? '').toString();
+      _pushLog('[KT/$level] $msg');
     }
     return null;
   }
@@ -185,16 +230,70 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         },
       );
     } else {
-      return Text('$defaultTargetPlatform is not yet supported by PickerMapNative');
+      return const Text('PickerMapNative: apenas Android');
     }
 
-    return SizedBox(
+    final mapBox = SizedBox(
       width: widget.width,
-      height: widget.height,
+      height: widget.height ?? 300,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(widget.borderRadius),
         child: platformView,
       ),
     );
+
+    // Painel de logs opcional
+    if (!widget.showDebugPanel) return mapBox;
+
+    return Stack(
+      children: [
+        mapBox,
+        Positioned(
+          left: 8,
+          top: 8,
+          child: Material(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              onTap: () => setState(() => _logsVisible = !_logsVisible),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Text(_logsVisible ? 'Ocultar logs' : 'Mostrar logs',
+                    style: const TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+            ),
+          ),
+        ),
+        if (_logsVisible)
+          Positioned(
+            left: 8,
+            right: 8,
+            bottom: 8,
+            child: SizedBox(
+              height: 160,
+              child: Material(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: _ktLogs.length,
+                    itemBuilder: (_, i) => Text(
+                      _ktLogs[i],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
+
