@@ -78,7 +78,7 @@ class PickerMapNativeView(
     // 0) *** Forçar a MESMA API KEY do google_maps_flutter (teste definitivo) ***
     //    Cole aqui a key que você usa no android/app/src/debug/res/values/google_maps_api.xml
     try {
-      MapsInitializer.setApiKey("SUA_API_KEY_ANDROID_AQUI")
+      MapsInitializer.setApiKey("AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ")
       dbg("MapsInitializer.setApiKey aplicado (forçando mesma key do Flutter).")
     } catch (t: Throwable) {
       dbge("setApiKey falhou", t)
