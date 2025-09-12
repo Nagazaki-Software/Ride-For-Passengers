@@ -10,7 +10,7 @@ import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // HapticFeedback
+import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,6 +36,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   LatLng? currentUserLocationValue;
+
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
   var hasContainerTriggered3 = false;
@@ -43,6 +44,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   var hasContainerTriggered5 = false;
   var hasContainerTriggered6 = false;
   var hasContainerTriggered7 = false;
+
   final animationsMap = <String, AnimationInfo>{};
 
   @override
@@ -50,18 +52,16 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     super.initState();
     _model = createModel(context, () => Home5Model());
 
-    // Usa localização cacheada para o mapa responder mais rápido
-    getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0), cached: true)
+    getCurrentUserLocation(defaultLocation: const LatLng(0.0, 0.0), cached: true)
         .then((loc) => safeSetState(() {
               currentUserLocationValue = loc;
               FFAppState().latlngAtual ??= loc;
               FFAppState().update(() {});
             }));
 
-    // On page load
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       currentUserLocationValue =
-          await getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0));
+          await getCurrentUserLocation(defaultLocation: const LatLng(0.0, 0.0));
 
       _model.locationPerto = await actions.googlePlacesNearbyImportant(
         context,
@@ -165,6 +165,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+
     if (currentUserLocationValue == null) {
       return Container(
         color: FlutterFlowTheme.of(context).primaryBackground,
@@ -192,10 +193,12 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         backgroundColor: FlutterFlowTheme.of(context).primaryText,
         body: Stack(
           children: [
-            PointerInterceptor(
-              intercepting: isWeb,
-              child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 60),
+            // =========================
+            // MAPA NATIVO — ocupa toda a área
+            // =========================
+            Positioned.fill(
+              child: PointerInterceptor(
+                intercepting: isWeb,
                 child: AuthUserStreamWidget(
                   builder: (context) => StreamBuilder<List<UsersRecord>>(
                     stream: queryUsersRecord(
@@ -217,66 +220,62 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         );
                       }
                       final pickerMapUsersRecordList = snapshot.data!;
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 60),
-                        child: SizedBox(
-                          width: MediaQuery.sizeOf(context).width,
-                          height: MediaQuery.sizeOf(context).height,
-                          child: (FFAppState().latlngAtual != null)
-                              ? custom_widgets.PickerMapNative(
-                                  width: MediaQuery.sizeOf(context).width,
-                                  height: MediaQuery.sizeOf(context).height,
-                                  userLocation: FFAppState().latlngAtual!,
-                                  googleApiKey:
-                                      'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
-                                  driversRefs:
-                                      pickerMapUsersRecordList.map((e) => e.reference).toList(),
-                                  destination: FFAppState().latlangAondeVaiIr,
-                                  refreshMs: 2000, // atualização mais rápida
-                                  destinationMarkerPngUrl:
-                                      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
-                                  userPhotoUrl: currentUserPhoto,
-                                  userMarkerSize: 40,
-                                  userName: currentUserDisplayName,
-                                  routeColor:
-                                      FlutterFlowTheme.of(context).secondaryBackground,
-                                  routeWidth: 2,
-                                  borderRadius: 0,
-                                  driverIconWidth: 70,
-                                  driverTaxiIconAsset:
-                                      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                                  driverDriverIconUrl:
-                                      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
-                                  driverTaxiIconUrl:
-                                      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                                  enableRouteSnake: true,
-                                  brandSafePaddingBottom: 60,
-                                  liteModeOnAndroid: false,
-                                  ultraLowSpecMode: true, // rota mais leve
-                                )
-                              : Center(
-                                  child: SizedBox(
-                                    width: 50,
-                                    height: 50,
-                                    child: SpinKitDoubleBounce(
-                                      color: FlutterFlowTheme.of(context).accent1,
-                                      size: 50,
-                                    ),
-                                  ),
-                                ),
-                        ),
+                      if (FFAppState().latlngAtual == null) {
+                        return Center(
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: SpinKitDoubleBounce(
+                              color: FlutterFlowTheme.of(context).accent1,
+                              size: 50,
+                            ),
+                          ),
+                        );
+                      }
+                      return custom_widgets.PickerMapNative(
+                        width: double.infinity,
+                        height: double.infinity,
+                        userLocation: FFAppState().latlngAtual!,
+                        googleApiKey: 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+                        driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
+                        destination: FFAppState().latlangAondeVaiIr,
+                        refreshMs: 2000,
+                        destinationMarkerPngUrl:
+                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
+                        userPhotoUrl: currentUserPhoto,
+                        userMarkerSize: 40,
+                        userName: currentUserDisplayName,
+                        routeColor: FlutterFlowTheme.of(context).secondaryBackground,
+                        routeWidth: 2,
+                        borderRadius: 0,
+                        driverIconWidth: 70,
+                        driverTaxiIconAsset:
+                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                        driverDriverIconUrl:
+                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+                        driverTaxiIconUrl:
+                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                        enableRouteSnake: true,
+                        brandSafePaddingBottom: 60,
+                        liteModeOnAndroid: false,
+                        ultraLowSpecMode: true,
+                        showDebugPanel: true, // painel de logs na tela
                       );
                     },
                   ),
                 ),
               ),
             ),
+
+            // =========================
+            // OVERLAYS (topo + bottom card + navbar)
+            // =========================
             PointerInterceptor(
               intercepting: isWeb,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  // HEADER com gradiente
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
@@ -293,6 +292,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         padding: const EdgeInsetsDirectional.fromSTEB(0, 14, 0, 0),
                         child: Column(
                           children: [
+                            // Avatar + menu
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(18, 35, 18, 0),
                               child: Row(
@@ -444,6 +444,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                 ].divide(const SizedBox(width: 12)),
                               ),
                             ),
+
+                            // Where to?
                             Stack(
                               alignment: const AlignmentDirectional(0, -1),
                               children: [
@@ -533,6 +535,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                 ),
                               ],
                             ),
+
+                            // Chips — layout estável e com espaçamento
                             Align(
                               alignment: const AlignmentDirectional(-1, -1),
                               child: Padding(
@@ -540,12 +544,17 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                 child: Builder(
                                   builder: (context) {
                                     final pertos = FFAppState().locationsPorPerto.toList();
-                                    return SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: List.generate(pertos.length, (i) {
+                                    return SizedBox(
+                                      height: 36, // altura fixa pro carrossel
+                                      child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        padding: const EdgeInsets.only(right: 12),
+                                        itemCount: pertos.length,
+                                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                                        itemBuilder: (context, i) {
                                           final item = pertos[i];
                                           final selected = FFAppState().listPerto == item;
+
                                           return InkWell(
                                             splashColor: Colors.transparent,
                                             onTap: () async {
@@ -586,8 +595,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 duration: const Duration(milliseconds: 160),
                                                 curve: Curves.easeOut,
                                                 height: 28,
-                                                padding:
-                                                    const EdgeInsets.symmetric(horizontal: 8),
+                                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                                 decoration: BoxDecoration(
                                                   color: selected
                                                       ? FlutterFlowTheme.of(context).accent1
@@ -603,28 +611,24 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                         ]
                                                       : const [],
                                                 ),
-                                                alignment: const AlignmentDirectional(0, 0),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      item,
-                                                      style: FlutterFlowTheme.of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts.poppins(
-                                                              fontWeight: FlutterFlowTheme.of(context)
-                                                                  .bodyMedium
-                                                                  .fontWeight,
-                                                              fontStyle: FlutterFlowTheme.of(context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
-                                                            ),
-                                                            color: const Color(0xFF585858),
-                                                            fontSize: 10,
-                                                          ),
-                                                    ),
-                                                  ],
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  item,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        font: GoogleFonts.poppins(
+                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                        ),
+                                                        color: const Color(0xFF585858),
+                                                        fontSize: 10,
+                                                      ),
                                                 ),
                                               ),
                                             ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.08),
@@ -632,7 +636,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             animationsMap['containerOnActionTriggerAnimation1']!,
                                             hasBeenTriggered: hasContainerTriggered1,
                                           );
-                                        }).divide(const SizedBox(width: 8)),
+                                        },
                                       ),
                                     );
                                   },
@@ -644,7 +648,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                       ),
                     ),
                   ),
+
                   const Spacer(flex: 10),
+
+                  // BOTTOM CARD + NAVBAR (inalterados)
                   Align(
                     alignment: const AlignmentDirectional(0, 1),
                     child: Column(
@@ -711,7 +718,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 formatNumber(
                                                   price,
                                                   formatType: FormatType.decimal,
-                                                  decimalType: DecimalType.periodDecimal, // $3.50
+                                                  decimalType: DecimalType.periodDecimal,
                                                   currency: '\$',
                                                 ),
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -1041,7 +1048,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             splashColor: Colors.transparent,
                                             onTap: () async {
                                               currentUserLocationValue = await getCurrentUserLocation(
-                                                defaultLocation: LatLng(0.0, 0.0),
+                                                defaultLocation: const LatLng(0.0, 0.0),
                                               );
                                               if (animationsMap['containerOnActionTriggerAnimation6'] !=
                                                   null) {
@@ -1153,6 +1160,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                               ),
                             ),
                           ).animateOnPageLoad(animationsMap['containerOnPageLoadAnimation']!),
+
                         wrapWithModel(
                           model: _model.navbarModel,
                           updateCallback: () => safeSetState(() {}),
@@ -1170,7 +1178,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     );
   }
 
-  // Helper para os botões Ride/XL/Luxury com microanimação
+  // Helper para os botões Ride/XL/Luxury
   Widget _optionChip({
     required BuildContext context,
     required String labelKey,
