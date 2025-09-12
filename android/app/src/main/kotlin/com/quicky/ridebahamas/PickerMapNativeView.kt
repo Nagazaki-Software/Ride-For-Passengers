@@ -4,13 +4,13 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.PackageManager // <- NOVO
 import android.graphics.Color
+import android.util.Log
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
-import android.util.Log
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -74,6 +74,15 @@ class PickerMapNativeView(
 
   init {
     dbg("init: id=$id, params=${creationParams is Map<*, *>}")
+
+    // 0) *** Forçar a MESMA API KEY do google_maps_flutter (teste definitivo) ***
+    //    Cole aqui a key que você usa no android/app/src/debug/res/values/google_maps_api.xml
+    try {
+      MapsInitializer.setApiKey("SUA_API_KEY_ANDROID_AQUI")
+      dbg("MapsInitializer.setApiKey aplicado (forçando mesma key do Flutter).")
+    } catch (t: Throwable) {
+      dbge("setApiKey falhou", t)
+    }
 
     // 1) Google Play Services
     val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
@@ -165,6 +174,14 @@ class PickerMapNativeView(
       }
     } catch (t: Throwable) {
       dbge("Erro ao aplicar creationParams", t)
+    }
+
+    // (workaround) garante render ativo pós-ready
+    try {
+      mapView.onResume()
+      dbg("onMapReady -> mapView.onResume() reforçado")
+    } catch (t: Throwable) {
+      dbge("onResume extra falhou", t)
     }
 
     // sinaliza pronto
