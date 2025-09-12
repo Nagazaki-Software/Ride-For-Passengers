@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.util.Log
+import android.view.ViewTreeObserver
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import com.google.android.gms.common.ConnectionResult
@@ -40,8 +41,6 @@ class PickerMapNativeView(
   private var destMarker: Marker? = null
   private var routePolyline: Polyline? = null
   private val polygons = mutableListOf<Polygon>()
-
-  // carros animados por id
   private val cars = mutableMapOf<String, Marker>()
   private val carAnimators = mutableMapOf<String, ValueAnimator>()
 
@@ -49,68 +48,56 @@ class PickerMapNativeView(
     Log.d(tag, msg)
     try { channel.invokeMethod("debugLog", mapOf("msg" to msg, "ts" to System.currentTimeMillis())) } catch (_: Throwable) {}
   }
-
   private fun dbge(msg: String, t: Throwable? = null) {
     Log.e(tag, msg, t)
     try { channel.invokeMethod("debugLog", mapOf("level" to "E", "msg" to "$msg: ${t?.message}", "ts" to System.currentTimeMillis())) } catch (_: Throwable) {}
   }
 
-  // Loga a API key efetiva do Manifest
   private fun logApiKeyFromManifest() {
     try {
       val ai = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
       val key = ai.metaData?.getString("com.google.android.geo.API_KEY") ?: "<null>"
       val masked = if (key.length >= 12) key.take(6) + "…" + key.takeLast(4) else key
       dbg("API_KEY(manifest)=$masked len=${key.length}")
-    } catch (t: Throwable) { dbge("Falha ao ler API_KEY do manifest", t) }
+    } catch (t: Throwable) {
+      dbge("Falha ao ler API_KEY do manifest", t)
+    }
   }
 
   init {
-    dbg("init: id=$id, params=${creationParams is Map<*, *>}")
-
-    // 1) Google Play Services
     val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
-    if (status != ConnectionResult.SUCCESS) {
-      dbge("Google Play Services indisponível: code=$status")
-    } else dbg("Google Play Services OK")
+    if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=$status")
+    else dbg("Google Play Services OK")
 
-    // 2) Inicializa Maps – usando LEGACY como fallback de render
     try {
-      val renderer = MapsInitializer.initialize(ctx, MapsInitializer.Renderer.LEGACY) {}
+      val renderer = MapsInitializer.initialize(ctx, MapsInitializer.Renderer.LATEST) {}
       dbg("MapsInitializer.initialize -> $renderer")
-    } catch (t: Throwable) {
-      dbge("MapsInitializer.initialize falhou", t)
-    }
+    } catch (t: Throwable) { dbge("MapsInitializer.initialize falhou", t) }
 
-    // 3) Lifecycle do MapView
     try {
-      container.setBackgroundColor(Color.TRANSPARENT)
-      mapView.setBackgroundColor(Color.TRANSPARENT)
       mapView.onCreate(null)
       mapView.onStart()
       mapView.onResume()
       dbg("MapView lifecycle ok (create/start/resume)")
-    } catch (t: Throwable) {
-      dbge("Lifecycle create/start/resume falhou", t)
-    }
+    } catch (t: Throwable) { dbge("Lifecycle create/start/resume falhou", t) }
 
-    // 4) Async
     mapView.getMapAsync(this)
 
-    // 5) Container
     container.addView(
       mapView,
-      FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.MATCH_PARENT
-      )
+      FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
     )
 
-    // Channel
+    // LOG DE TAMANHOS
+    mapView.viewTreeObserver.addOnGlobalLayoutListener(
+      ViewTreeObserver.OnGlobalLayoutListener {
+        dbg("sizes: container=${container.width}x${container.height} mapView=${mapView.width}x${mapView.height}")
+      }
+    )
+
     channel.setMethodCallHandler(this)
   }
 
-  // ---------- PlatformView ----------
   override fun getView() = container
 
   override fun dispose() {
@@ -124,21 +111,18 @@ class PickerMapNativeView(
     } catch (t: Throwable) { dbge("dispose lifecycle error", t) }
   }
 
-  // ---------- OnMapReady ----------
   override fun onMapReady(map: GoogleMap) {
     dbg("onMapReady")
-    googleMap = map
-
-    // Loga a key e confirma tiles
     logApiKeyFromManifest()
-    map.setOnMapLoadedCallback { dbg("onMapLoaded (tiles renderizados)") }
-
+    googleMap = map
     map.uiSettings.isCompassEnabled = true
     map.uiSettings.isMyLocationButtonEnabled = false
     map.isBuildingsEnabled = true
     map.mapType = GoogleMap.MAP_TYPE_NORMAL
 
-    // creationParams: "initialCamera" / "initialUserLocation"
+    map.setOnMapLoadedCallback { dbg("onMapLoaded (tiles renderizados)") }
+    map.setOnMapClickListener { p -> dbg("onMapClick ${p.latitude},${p.longitude}") }
+
     try {
       (creationParams as? Map<*, *>)?.let { params ->
         (params["initialCamera"] as? Map<*, *>)?.let { cam ->
@@ -157,89 +141,60 @@ class PickerMapNativeView(
       }
     } catch (t: Throwable) { dbge("Erro ao aplicar creationParams", t) }
 
-    // Workaround: reforça resume após onMapReady (timing)
-    try {
-      mapView.onResume()
-      dbg("onMapReady -> mapView.onResume() reforçado")
-    } catch (t: Throwable) { dbge("onResume extra falhou", t) }
-
-    // sinaliza pronto
     try { channel.invokeMethod("platformReady", null) } catch (_: Throwable) {}
   }
 
-  // ---------- MethodChannel ----------
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-    when (call.method) {
-      "updateConfig" -> safe(result) {
-        val args = call.arguments as Map<*, *>
-        applyConfig(args)
+    fun ok() = result.success(null)
+    fun err(t: Throwable) = result.error("error", t.message, null)
+
+    try {
+      when (call.method) {
+        "updateConfig" -> { applyConfig(call.arguments as Map<*, *>); ok() }
+        "setMarkers" -> { setMarkers(call.arguments as List<*>); ok() }
+        "setPolylines" -> { setPolylines(call.arguments as List<*>); ok() }
+        "setPolygons" -> { setPolygons(call.arguments as List<*>); ok() }
+        "cameraTo" -> {
+          val a = call.arguments as Map<*, *>
+          val lat = (a["latitude"] as Number).toDouble()
+          val lng = (a["longitude"] as Number).toDouble()
+          val zoom = (a["zoom"] as? Number)?.toFloat()
+          val bearing = (a["bearing"] as? Number)?.toFloat()
+          val tilt = (a["tilt"] as? Number)?.toFloat()
+          cameraTo(lat, lng, zoom, bearing, tilt); ok()
+        }
+        "fitBounds" -> {
+          val a = call.arguments as Map<*, *>
+          val points = a["points"] as List<*>
+          val padding = ((a["padding"] as? Number) ?: 0).toInt()
+          fitBounds(points, padding); ok()
+        }
+        "updateCarPosition" -> {
+          val a = call.arguments as Map<*, *>
+          val id = a["id"] as String
+          val lat = (a["latitude"] as Number).toDouble()
+          val lng = (a["longitude"] as Number).toDouble()
+          val rotation = (a["rotation"] as? Number)?.toFloat()
+          val duration = (a["durationMs"] as? Number)?.toLong() ?: 0L
+          updateCarPosition(id, LatLng(lat, lng), rotation, duration); ok()
+        }
+        "debugInfo" -> {
+          val info = mapOf(
+            "hasGooglePlay" to (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx) == ConnectionResult.SUCCESS),
+            "mapReady" to (googleMap != null),
+            "paramsKeys" to ((creationParams as? Map<*, *>)?.keys?.map { it.toString() } ?: emptyList<String>())
+          )
+          result.success(info)
+        }
+        else -> result.notImplemented()
       }
-      "setMarkers" -> safe(result) {
-        val list = call.arguments as List<*>
-        setMarkers(list)
-      }
-      "setPolylines" -> safe(result) {
-        val list = call.arguments as List<*>
-        setPolylines(list)
-      }
-      "setPolygons" -> safe(result) {
-        val list = call.arguments as List<*>
-        setPolygons(list)
-      }
-      "cameraTo" -> safe(result) {
-        val a = call.arguments as Map<*, *>
-        val lat = (a["latitude"] as Number).toDouble()
-        val lng = (a["longitude"] as Number).toDouble()
-        val zoom = (a["zoom"] as? Number)?.toFloat()
-        val bearing = (a["bearing"] as? Number)?.toFloat()
-        val tilt = (a["tilt"] as? Number)?.toFloat()
-        cameraTo(lat, lng, zoom, bearing, tilt)
-      }
-      "fitBounds" -> safe(result) {
-        val a = call.arguments as Map<*, *>
-        val points = a["points"] as List<*>
-        val padding = ((a["padding"] as? Number) ?: 0).toInt()
-        fitBounds(points, padding)
-      }
-      "updateCarPosition" -> safe(result) {
-        val a = call.arguments as Map<*, *>
-        val id = a["id"] as String
-        val lat = (a["latitude"] as Number).toDouble()
-        val lng = (a["longitude"] as Number).toDouble()
-        val rotation = (a["rotation"] as? Number)?.toFloat()
-        val durationMs = (a["durationMs"] as? Number)?.toLong() ?: 0L
-        updateCarPosition(id, LatLng(lat, lng), rotation, durationMs)
-      }
-      "debugInfo" -> {
-        val info = mapOf(
-          "hasGooglePlay" to (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx) == ConnectionResult.SUCCESS),
-          "mapReady" to (googleMap != null),
-          "paramsKeys" to ((creationParams as? Map<*, *>)?.keys?.map { it.toString() } ?: emptyList<String>())
-        )
-        result.success(info)
-      }
-      else -> result.notImplemented()
-    }
+    } catch (t: Throwable) { dbge("onMethodCall ${call.method} error", t); err(t) }
   }
 
-  private inline fun safe(result: MethodChannel.Result, crossinline block: () -> Unit) {
-    try { block(); result.success(null) }
-    catch (t: Throwable) {
-      dbge("${Thread.currentThread().stackTrace[3].methodName} error", t)
-      result.error("error", t.message, null)
-    }
-  }
-
-  // ---------- Helpers ----------
   private fun cameraTo(lat: Double, lng: Double, zoom: Float?, bearing: Float?, tilt: Float?) {
     val map = googleMap ?: run { dbg("cameraTo antes do onMapReady"); return }
     val cu = CameraUpdateFactory.newCameraPosition(
-      CameraPosition(
-        LatLng(lat, lng),
-        zoom ?: map.cameraPosition.zoom,
-        tilt ?: map.cameraPosition.tilt,
-        bearing ?: map.cameraPosition.bearing
-      )
+      CameraPosition(LatLng(lat, lng), zoom ?: map.cameraPosition.zoom, tilt ?: map.cameraPosition.tilt, bearing ?: map.cameraPosition.bearing)
     )
     map.animateCamera(cu)
     dbg("cameraTo ($lat,$lng) z=${zoom ?: "-"} b=${bearing ?: "-"} t=${tilt ?: "-"}")
@@ -247,51 +202,39 @@ class PickerMapNativeView(
 
   private fun fitBounds(points: List<*>, padding: Int) {
     val map = googleMap ?: return
-    val builder = LatLngBounds.Builder()
+    val b = LatLngBounds.Builder()
     points.forEach { p ->
       val m = p as Map<*, *>
-      builder.include(LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble()))
+      b.include(LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble()))
     }
-    val bounds = builder.build()
-    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+    map.animateCamera(CameraUpdateFactory.newLatLngBounds(b.build(), padding))
     dbg("fitBounds points=${points.size} padding=$padding")
   }
 
   private fun applyConfig(cfg: Map<*, *>) {
     val map = googleMap ?: run { dbg("applyConfig antes do onMapReady"); return }
 
-    // user marker
     (cfg["userLocation"] as? Map<*, *>)?.let { m ->
       val p = LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble())
       if (userMarker == null) {
         userMarker = map.addMarker(
-          MarkerOptions()
-            .position(p)
-            .title((cfg["userName"] as? String) ?: "You")
+          MarkerOptions().position(p).title((cfg["userName"] as? String) ?: "You")
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
         )
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(p, 15f))
-      } else {
-        userMarker?.position = p
-      }
+      } else userMarker?.position = p
     }
 
-    // destination
     (cfg["destination"] as? Map<*, *>)?.let { m ->
       val p = LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble())
       if (destMarker == null) {
         destMarker = map.addMarker(
-          MarkerOptions()
-            .position(p)
-            .title("Destination")
+          MarkerOptions().position(p).title("Destination")
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
         )
-      } else {
-        destMarker?.position = p
-      }
+      } else destMarker?.position = p
     } ?: run { destMarker?.remove(); destMarker = null }
 
-    // route polyline
     val colorInt = (cfg["routeColor"] as? Number)?.toInt() ?: Color.YELLOW
     val width = (cfg["routeWidth"] as? Number)?.toFloat() ?: 4f
     routePolyline?.remove()
@@ -302,9 +245,7 @@ class PickerMapNativeView(
         }
       }
       if (pts.size >= 2) {
-        routePolyline = map.addPolyline(
-          PolylineOptions().addAll(pts).color(colorInt).width(width)
-        )
+        routePolyline = map.addPolyline(PolylineOptions().addAll(pts).color(colorInt).width(width))
       }
     }
     dbg("applyConfig ok: user=${userMarker != null} dest=${destMarker != null} route=${routePolyline != null}")
@@ -341,7 +282,6 @@ class PickerMapNativeView(
     val map = googleMap ?: return
     polygons.forEach { it.remove() }
     polygons.clear()
-
     list.forEach { any ->
       val m = any as Map<*, *>
       val pts = (m["points"] as List<*>).mapNotNull { p ->
@@ -353,38 +293,28 @@ class PickerMapNativeView(
       val fillColor = (m["fillColor"] as? Number)?.toInt() ?: 0x220000FF
       val width = (m["width"] as? Number)?.toFloat() ?: 2f
       val polygon = map.addPolygon(
-        PolygonOptions()
-          .addAll(pts)
-          .strokeColor(strokeColor)
-          .fillColor(fillColor)
-          .strokeWidth(width)
+        PolygonOptions().addAll(pts).strokeColor(strokeColor).fillColor(fillColor).strokeWidth(width)
       )
       polygons += polygon
     }
     dbg("setPolygons n=${polygons.size}")
   }
 
-  private fun updateCarPosition(id: String, dest: LatLng, rotation: Float?, durationMs: Long) {
+  private fun updateCarPosition(id: String, dest: LatLng, rotation: Float?, duration: Long) {
     val map = googleMap ?: return
     val marker = cars[id] ?: run {
       val m = map.addMarker(
-        MarkerOptions()
-          .position(dest)
-          .flat(true)
-          .anchor(0.5f, 0.5f)
+        MarkerOptions().position(dest).flat(true).anchor(0.5f, 0.5f)
           .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-      )
-      cars[id] = m!!
+      )!!
+      cars[id] = m
       dbg("car[$id] criado em ${dest.latitude},${dest.longitude}")
       m
     }
-
     rotation?.let { marker.rotation = it }
-
-    // cancela anim anterior se houver
     carAnimators[id]?.cancel()
 
-    if (durationMs <= 0L) {
+    if (duration <= 0L) {
       marker.position = dest
       dbg("car[$id] snap -> ${dest.latitude},${dest.longitude} rot=${rotation ?: "-"}")
       return
@@ -393,7 +323,7 @@ class PickerMapNativeView(
     val startPos = marker.position
     val animator = ValueAnimator.ofFloat(0f, 1f).apply {
       interpolator = LinearInterpolator()
-      this.duration = durationMs   // <- AQUI: seta a propriedade do animator
+      duration = duration
       addUpdateListener { va ->
         val f = va.animatedValue as Float
         val lat = startPos.latitude + (dest.latitude - startPos.latitude) * f
@@ -403,6 +333,6 @@ class PickerMapNativeView(
       start()
     }
     carAnimators[id] = animator
-    dbg("car[$id] anim -> ${dest.latitude},${dest.longitude} dur=${durationMs}ms rot=${rotation ?: "-"}")
+    dbg("car[$id] anim -> ${dest.latitude},${dest.longitude} dur=${duration}ms rot=${rotation ?: "-"}")
   }
 }
