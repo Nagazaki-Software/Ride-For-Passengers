@@ -207,8 +207,8 @@ class PickerMapNativeView(
         val lat = (a["latitude"] as Number).toDouble()
         val lng = (a["longitude"] as Number).toDouble()
         val rotation = (a["rotation"] as? Number)?.toFloat()
-        val duration = (a["durationMs"] as? Number)?.toLong() ?: 0L
-        updateCarPosition(id, LatLng(lat, lng), rotation, duration)
+        val durationMs = (a["durationMs"] as? Number)?.toLong() ?: 0L
+        updateCarPosition(id, LatLng(lat, lng), rotation, durationMs)
       }
       "debugInfo" -> {
         val info = mapOf(
@@ -364,7 +364,7 @@ class PickerMapNativeView(
     dbg("setPolygons n=${polygons.size}")
   }
 
-  private fun updateCarPosition(id: String, dest: LatLng, rotation: Float?, duration: Long) {
+  private fun updateCarPosition(id: String, dest: LatLng, rotation: Float?, durationMs: Long) {
     val map = googleMap ?: return
     val marker = cars[id] ?: run {
       val m = map.addMarker(
@@ -380,9 +380,11 @@ class PickerMapNativeView(
     }
 
     rotation?.let { marker.rotation = it }
+
+    // cancela anim anterior se houver
     carAnimators[id]?.cancel()
 
-    if (duration <= 0L) {
+    if (durationMs <= 0L) {
       marker.position = dest
       dbg("car[$id] snap -> ${dest.latitude},${dest.longitude} rot=${rotation ?: "-"}")
       return
@@ -391,7 +393,7 @@ class PickerMapNativeView(
     val startPos = marker.position
     val animator = ValueAnimator.ofFloat(0f, 1f).apply {
       interpolator = LinearInterpolator()
-      duration = duration
+      this.duration = durationMs   // <- AQUI: seta a propriedade do animator
       addUpdateListener { va ->
         val f = va.animatedValue as Float
         val lat = startPos.latitude + (dest.latitude - startPos.latitude) * f
@@ -401,6 +403,6 @@ class PickerMapNativeView(
       start()
     }
     carAnimators[id] = animator
-    dbg("car[$id] anim -> ${dest.latitude},${dest.longitude} dur=${duration}ms rot=${rotation ?: "-"}")
+    dbg("car[$id] anim -> ${dest.latitude},${dest.longitude} dur=${durationMs}ms rot=${rotation ?: "-"}")
   }
 }
