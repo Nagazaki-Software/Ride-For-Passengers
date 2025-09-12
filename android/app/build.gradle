@@ -30,10 +30,15 @@ android {
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        // lê do gradle.properties/local.properties/variável de ambiente
+        // 🔽🔽🔽 AQUI RESOLVEMOS O ERRO DO PLACEHOLDER
         def mapsApiKey = project.findProperty("MAPS_API_KEY")
                 ?: System.getenv("MAPS_API_KEY") ?: ""
-        manifestPlaceholders = [ MAPS_API_KEY: mapsApiKey ]
+
+        manifestPlaceholders = [
+                // O plugin do Flutter costuma preencher isso, mas em alguns ambientes não rola.
+                // Esses valores funcionam bem com a Embedding v2.
+                applicationName: "io.flutter.app.FlutterApplication",
+                MAPS_API_KEY  : mapsApiKey
     }
 
     compileOptions {
