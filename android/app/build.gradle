@@ -2,7 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.gms.google-services"
+    id "com.google.gms.google-services" // (ok se o projeto raiz já tem o classpath do Google Services)
 }
 
 def localProperties = new Properties()
@@ -30,21 +30,23 @@ android {
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        // 🔽🔽🔽 AQUI RESOLVEMOS O ERRO DO PLACEHOLDER
+
+        // 🔽 Resolve placeholders do Manifest
         def mapsApiKey = project.findProperty("MAPS_API_KEY")
                 ?: System.getenv("MAPS_API_KEY") ?: ""
 
         manifestPlaceholders = [
-                // O plugin do Flutter costuma preencher isso, mas em alguns ambientes não rola.
-                // Esses valores funcionam bem com a Embedding v2.
+                // Embedding v2: se o plugin não preencher, use este Application padrão
                 applicationName: "io.flutter.app.FlutterApplication",
-                MAPS_API_KEY  : mapsApiKey
-    }
+                MAPS_API_KEY   : mapsApiKey
+        ] //  <-- este colchete FALTAVA
+    } //  <-- e este fecha o defaultConfig
 
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        // Se quiser alinhar com AGP 8+, pode usar JavaVersion.VERSION_17 e subir o jvmTarget para "17"
     }
 
     kotlinOptions {
@@ -71,22 +73,13 @@ android {
 
     buildTypes {
         debug {
-            // nada especial aqui
+            // nada especial
         }
         release {
-            // **ASSINE com o release**, não com o debug:
             signingConfig signingConfigs.release
-
-            // Para testar o Maps sem o R8 atrapalhar, comece assim:
             minifyEnabled false
             shrinkResources false
-
-            // Depois que tudo funcionar, você pode reativar:
-            // minifyEnabled true
-            // shrinkResources true
-
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                          'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -98,19 +91,18 @@ flutter {
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation 'io.card:android-sdk:5.5.1'
+
     // Splash oficial do Android 12+
     implementation "androidx.core:core-splashscreen:1.0.1"
 
-    // Material + AppCompat para garantir os temas Material3/AppCompat disponíveis
+    // Material + AppCompat (para Theme.Material3.* ficar disponível)
     implementation "com.google.android.material:material:1.12.0"
     implementation "androidx.appcompat:appcompat:1.7.0"
 
-    // Google Play services (sem BoM)
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    // Google Play services (NÃO duplicar!)
     implementation "com.google.android.gms:play-services-maps:18.2.0"
     implementation "com.google.android.gms:play-services-base:18.5.0"
 
-    // Se realmente precisar do Location aqui (senão deixe que os plugins tragam):
-    implementation 'com.google.android.gms:play-services-location:21.2.0'
+    // Se precisar de Location direto (senão os plugins resolvem)
+    implementation "com.google.android.gms:play-services-location:21.2.0"
 }
-
