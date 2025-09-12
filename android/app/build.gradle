@@ -30,6 +30,10 @@ android {
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // lê do gradle.properties/local.properties/variável de ambiente
+        def mapsApiKey = project.findProperty("MAPS_API_KEY")
+                ?: System.getenv("MAPS_API_KEY") ?: ""
+        manifestPlaceholders = [ MAPS_API_KEY: mapsApiKey ]
     }
 
     compileOptions {
