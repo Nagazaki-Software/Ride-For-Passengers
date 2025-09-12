@@ -85,7 +85,7 @@
         <!-- CHAVE DO GOOGLE MAPS (usada no MapView e no fallback WebView) -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ" />
+            android:value="${MAPS_API_KEY}" />
 
         <!-- Play Services (boa prática para Maps) -->
         <meta-data
