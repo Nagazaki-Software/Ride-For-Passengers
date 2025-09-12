@@ -236,7 +236,6 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         width: double.infinity,
                         height: double.infinity,
                         userLocation: FFAppState().latlngAtual!,
-                        googleApiKey: 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
                         driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
                         destination: FFAppState().latlangAondeVaiIr,
                         refreshMs: 2000,

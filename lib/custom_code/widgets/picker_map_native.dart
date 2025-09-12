@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
 
 // Se estiver usando FlutterFlow, adapte imports de LatLng conforme seu projeto.
 // Aqui uso uma struct simples:
@@ -153,21 +154,23 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       return const Center(child: Text('PickerMapNative: apenas Android'));
     }
 
-    final androidView = AndroidViewSurface(
-      controller: PlatformViewsService.initSurfaceAndroidView(
-        id: 0,
-        viewType: 'picker_map_native',
-        layoutDirection: ui.TextDirection.ltr,
-        creationParams: {
-          'initialUserLocation': {
-            'latitude': widget.userLocation.latitude,
-            'longitude': widget.userLocation.longitude,
-          },
+    final controller = PlatformViewsService.initSurfaceAndroidView(
+      id: 0,
+      viewType: 'picker_map_native',
+      layoutDirection: ui.TextDirection.ltr,
+      creationParams: {
+        'initialUserLocation': {
+          'latitude': widget.userLocation.latitude,
+          'longitude': widget.userLocation.longitude,
         },
-        creationParamsCodec: const StandardMessageCodec(),
-      )
-        ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
-        ..create() as AndroidViewController,
+      },
+      creationParamsCodec: const StandardMessageCodec(),
+    )
+      ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
+      ..create();
+
+    final androidView = AndroidViewSurface(
+      controller: controller as AndroidViewController,
       gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
       hitTestBehavior: PlatformViewHitTestBehavior.opaque,
     );
