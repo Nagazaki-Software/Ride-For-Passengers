@@ -2,6 +2,7 @@ package com.quicky.ridebahamas
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.pm.PackageManager // <- NOVO
 import android.graphics.Color
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
@@ -57,6 +58,19 @@ class PickerMapNativeView(
       channel.invokeMethod("debugLog", mapOf("level" to "E", "msg" to "$msg: ${t?.message}", "ts" to System.currentTimeMillis()))
     } catch (_: Throwable) { /* melhor esforço */ }
   }
+
+  // ----------- NOVO: logar a API key que o app está usando -----------
+  private fun logApiKeyFromManifest() {
+    try {
+      val ai = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+      val key = ai.metaData?.getString("com.google.android.geo.API_KEY") ?: "<null>"
+      val masked = if (key.length >= 12) key.take(6) + "…" + key.takeLast(4) else key
+      dbg("API_KEY(manifest)=$masked len=${key.length}")
+    } catch (t: Throwable) {
+      dbge("Falha ao ler API_KEY do manifest", t)
+    }
+  }
+  // -------------------------------------------------------------------
 
   init {
     dbg("init: id=$id, params=${creationParams is Map<*, *>}")
@@ -121,6 +135,12 @@ class PickerMapNativeView(
   override fun onMapReady(map: GoogleMap) {
     dbg("onMapReady")
     googleMap = map
+
+    // >>> NOVO: loga a API key e confirma quando tiles carregarem
+    logApiKeyFromManifest()
+    map.setOnMapLoadedCallback { dbg("onMapLoaded (tiles renderizados)") }
+    // <<<
+
     map.uiSettings.isCompassEnabled = true
     map.uiSettings.isMyLocationButtonEnabled = false
     map.isBuildingsEnabled = true
