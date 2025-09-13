@@ -42,24 +42,22 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes","unchecked"})
 public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
 
   private static final String TAG = "PickerMap";
   private final Context ctx;
   private final FrameLayout container;
   private final GoogleMapOptions mapOptions;
-  private MapView mapView;                 // muda referência -> não final
-  private GoogleMap googleMap;             // idem
+  private MapView mapView;
+  private GoogleMap googleMap;
   private final MethodChannel channel;
   private final Object creationParams;
 
-  // estado do mapa
   private Marker userMarker;
   private Marker destMarker;
   private Polyline routePolyline;
 
-  // coleções mutáveis (conteúdo muda)
   private final List<Polygon> polygons = new ArrayList<>();
   private final Map<String, Marker> cars = new HashMap<>();
   private final Map<String, ValueAnimator> carAnimators = new HashMap<>();
@@ -121,8 +119,12 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=" + status, null);
       else dbg("Google Play Services OK");
 
-      MapsInitializer.Renderer r = MapsInitializer.initialize(ctx, MapsInitializer.Renderer.LATEST, null);
-      dbg("MapsInitializer.initialize -> " + r);
+      // ✅ API nova (18+): escolhe renderer e recebe no callback (sem retorno)
+      MapsInitializer.initialize(
+          ctx,
+          MapsInitializer.Renderer.LATEST,
+          renderer -> dbg("MapsInitializer renderer -> " + renderer)
+      );
     } catch (Throwable t) {
       dbge("MapsInitializer.initialize falhou", t);
     }
@@ -164,7 +166,6 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
     } catch (Throwable t) { dbge("dispose lifecycle error", t); }
   }
 
-  // OnMapReadyCallback
   @Override public void onMapReady(@NonNull GoogleMap map) {
     dbg("onMapReady");
     logApiKeyFromManifest();
@@ -206,7 +207,6 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
     try { channel.invokeMethod("platformReady", null); } catch (Throwable ignore) {}
   }
 
-  // MethodChannel
   @Override public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     try {
       switch (call.method) {
@@ -259,6 +259,10 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
           result.success(info);
           break;
         }
+        case "ping": {
+          result.success("pong from native");
+          break;
+        }
         default:
           result.notImplemented();
       }
@@ -267,8 +271,6 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       result.error("error", t.getMessage(), null);
     }
   }
-
-  // Helpers
 
   private void cameraTo(double lat, double lng, @Nullable Float zoom, @Nullable Float bearing, @Nullable Float tilt) {
     if (googleMap == null) { dbg("cameraTo antes do onMapReady"); return; }
@@ -407,24 +409,20 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
     dbg("setPolygons n=" + polygons.size());
   }
 
-  private void updateCarPosition(final String id, final LatLng dest, @Nullable Float rotation, long duration) {
+  private void updateCarPosition(String id, LatLng dest, @Nullable Float rotation, long duration) {
     if (googleMap == null) return;
-
     Marker marker = cars.get(id);
     if (marker == null) {
       marker = googleMap.addMarker(new MarkerOptions()
-          .position(dest)
-          .flat(true)
-          .anchor(0.5f, 0.5f)
+          .position(dest).flat(true).anchor(0.5f, 0.5f)
           .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
       );
       cars.put(id, marker);
       dbg("car[" + id + "] criado em " + dest.latitude + "," + dest.longitude);
     }
-
     if (rotation != null) marker.setRotation(rotation);
-    ValueAnimator old = carAnimators.get(id);
-    if (old != null) old.cancel();
+    ValueAnimator prev = carAnimators.get(id);
+    if (prev != null) prev.cancel();
 
     if (duration <= 0L) {
       marker.setPosition(dest);
@@ -432,8 +430,7 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       return;
     }
 
-    final Marker mk = marker;
-    final LatLng startPos = mk.getPosition();
+    final LatLng startPos = marker.getPosition();
     ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
     animator.setInterpolator(new LinearInterpolator());
     animator.setDuration(duration);
@@ -441,14 +438,13 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       float f = (float) va.getAnimatedValue();
       double lat = startPos.latitude + (dest.latitude - startPos.latitude) * f;
       double lng = startPos.longitude + (dest.longitude - startPos.longitude) * f;
-      mk.setPosition(new LatLng(lat, lng));
+      marker.setPosition(new LatLng(lat, lng));
     });
     animator.start();
     carAnimators.put(id, animator);
     dbg("car[" + id + "] anim -> " + dest.latitude + "," + dest.longitude + " dur=" + duration + "ms rot=" + (rotation != null ? rotation : "-"));
   }
 
-  // conversões seguras
-  private static double toDouble(Object o) { return ((Number) o).doubleValue(); }
-  private static float toFloat(Object o) { return ((Number) o).floatValue(); }
+  private static double toDouble(Object n) { return ((Number) n).doubleValue(); }
+  private static float toFloat(Object n) { return ((Number) n).floatValue(); }
 }
