@@ -33,16 +33,17 @@ class PickerMapNativeView(
     .mapToolbarEnabled(false)
     .liteMode(false)
 
-  private val mapView = MapView(ctx, mapOptions)
+  // objetos que mudam de referência -> var/lateinit
+  private lateinit var mapView: MapView
   private var googleMap: GoogleMap? = null
-  private val channel = MethodChannel(messenger, "picker_map_native_$id")
+  private lateinit var channel: MethodChannel
 
   private var userMarker: Marker? = null
   private var destMarker: Marker? = null
   private var routePolyline: Polyline? = null
-  private val polygons = mutableListOf<Polygon>()
-  private val cars = mutableMapOf<String, Marker>()
-  private val carAnimators = mutableMapOf<String, ValueAnimator>()
+  private val polygons = mutableListOf<Polygon>()              // mutável no conteúdo
+  private val cars = mutableMapOf<String, Marker>()            // mutável no conteúdo
+  private val carAnimators = mutableMapOf<String, ValueAnimator>() // mutável no conteúdo
 
   private fun dbg(msg: String) {
     Log.d(tag, msg)
@@ -65,15 +66,23 @@ class PickerMapNativeView(
   }
 
   init {
-    val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
-    if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=$status")
-    else dbg("Google Play Services OK")
+    // Channel
+    channel = MethodChannel(messenger, "picker_map_native_$id")
+    channel.setMethodCallHandler(this)
 
+    // MapView lifecycle inicial
     try {
+      val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
+      if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=$status")
+      else dbg("Google Play Services OK")
+
       val renderer = MapsInitializer.initialize(ctx, MapsInitializer.Renderer.LATEST) {}
       dbg("MapsInitializer.initialize -> $renderer")
-    } catch (t: Throwable) { dbge("MapsInitializer.initialize falhou", t) }
+    } catch (t: Throwable) {
+      dbge("MapsInitializer.initialize falhou", t)
+    }
 
+    mapView = MapView(ctx, mapOptions)
     try {
       mapView.onCreate(null)
       mapView.onStart()
@@ -88,14 +97,12 @@ class PickerMapNativeView(
       FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
     )
 
-    // LOG DE TAMANHOS
+    // Log de tamanhos
     mapView.viewTreeObserver.addOnGlobalLayoutListener(
       ViewTreeObserver.OnGlobalLayoutListener {
         dbg("sizes: container=${container.width}x${container.height} mapView=${mapView.width}x${mapView.height}")
       }
     )
-
-    channel.setMethodCallHandler(this)
   }
 
   override fun getView() = container
@@ -246,6 +253,8 @@ class PickerMapNativeView(
       }
       if (pts.size >= 2) {
         routePolyline = map.addPolyline(PolylineOptions().addAll(pts).color(colorInt).width(width))
+      } else {
+        routePolyline = null
       }
     }
     dbg("applyConfig ok: user=${userMarker != null} dest=${destMarker != null} route=${routePolyline != null}")
