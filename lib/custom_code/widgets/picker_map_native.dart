@@ -70,6 +70,18 @@ class PickerMapNative extends StatefulWidget {
     this.routeWidth = 4,
     this.showDebugPanel = true,
     this.controller,
+    this.driversRefs = const [],
+    this.refreshMs,
+    this.destinationMarkerPngUrl,
+    this.userMarkerSize,
+    this.driverIconWidth,
+    this.driverTaxiIconAsset,
+    this.driverDriverIconUrl,
+    this.driverTaxiIconUrl,
+    this.enableRouteSnake = false,
+    this.brandSafePaddingBottom,
+    this.liteModeOnAndroid,
+    this.ultraLowSpecMode,
   });
 
   final LatLng userLocation;
@@ -84,6 +96,18 @@ class PickerMapNative extends StatefulWidget {
   final int routeWidth;
   final bool showDebugPanel;
   final PickerMapNativeController? controller;
+  final List<dynamic> driversRefs;
+  final int? refreshMs;
+  final String? destinationMarkerPngUrl;
+  final double? userMarkerSize;
+  final double? driverIconWidth;
+  final String? driverTaxiIconAsset;
+  final String? driverDriverIconUrl;
+  final String? driverTaxiIconUrl;
+  final bool enableRouteSnake;
+  final double? brandSafePaddingBottom;
+  final bool? liteModeOnAndroid;
+  final bool? ultraLowSpecMode;
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
@@ -172,7 +196,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     final androidView = AndroidViewSurface(
       controller: controller as AndroidViewController,
       gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+      hitTestBehavior: ui.PlatformViewHitTestBehavior.opaque,
     );
 
     final mapBox = SizedBox(
