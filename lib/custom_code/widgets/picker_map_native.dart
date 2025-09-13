@@ -1,11 +1,12 @@
 // ignore_for_file: avoid_print
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/rendering.dart'; // <- para PlatformViewHitTestBehavior
-import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // <- usa o LatLng do FlutterFlow
+import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
+import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // LatLng do FlutterFlow
 
 class PickerMapNativeController {
   MethodChannel? _channel;
@@ -82,10 +83,15 @@ class PickerMapNative extends StatefulWidget {
     this.brandSafePaddingBottom,
     this.liteModeOnAndroid,
     this.ultraLowSpecMode,
+
+    // NOVOS (opcionais)
+    this.logPanelInitialHeight = 120,
+    this.logPanelMaxHeightFraction = 0.45,
+    this.logPanelBottomExtraPadding = 0,
   });
 
-  final ff.LatLng userLocation;          // <- usa FF LatLng
-  final ff.LatLng? destination;          // <- idem
+  final ff.LatLng userLocation;
+  final ff.LatLng? destination;
   final String? userName;
   final String? userPhotoUrl;
 
@@ -105,9 +111,14 @@ class PickerMapNative extends StatefulWidget {
   final String? driverDriverIconUrl;
   final String? driverTaxiIconUrl;
   final bool enableRouteSnake;
-  final double? brandSafePaddingBottom;
+  final double? brandSafePaddingBottom; // já existia – ajuda a não sobrepor navbar própria do app
   final bool? liteModeOnAndroid;
   final bool? ultraLowSpecMode;
+
+  // NOVOS parâmetros p/ painel de logs
+  final double logPanelInitialHeight;         // altura inicial (px)
+  final double logPanelMaxHeightFraction;     // fração da tela (0–1)
+  final double logPanelBottomExtraPadding;    // padding extra no bottom (px) além do SafeArea/brandSafe
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
@@ -119,14 +130,23 @@ class _PickerMapNativeState extends State<PickerMapNative> {
 
   final _ktLogs = <String>[];
   bool _logsVisible = true;
+  bool _logsMinimized = false;
+  double _logPanelHeight = 0;
 
   void _pushLog(String msg) {
+    if (!mounted) return;
     setState(() {
       final ts = DateTime.now().toIso8601String().substring(11, 19);
       _ktLogs.insert(0, '[$ts] $msg');
-      if (_ktLogs.length > 200) _ktLogs.removeLast();
+      if (_ktLogs.length > 300) _ktLogs.removeLast();
     });
     print(msg);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _logPanelHeight = widget.logPanelInitialHeight.clamp(80, 260);
   }
 
   @override
@@ -178,8 +198,11 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       return const Center(child: Text('PickerMapNative: apenas Android'));
     }
 
+    // ID único p/ evitar colisão de PlatformView em rebuilds
+    final uniqueId = (hashCode ^ DateTime.now().microsecondsSinceEpoch) & 0x7fffffff;
+
     final controller = PlatformViewsService.initSurfaceAndroidView(
-      id: 0, // se tiver múltiplas instâncias, gere IDs únicos
+      id: uniqueId,
       viewType: 'picker_map_native',
       layoutDirection: ui.TextDirection.ltr,
       creationParams: {
@@ -196,7 +219,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     final androidView = AndroidViewSurface(
       controller: controller as AndroidViewController,
       gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-      hitTestBehavior: PlatformViewHitTestBehavior.opaque, // <- sem ui.
+      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
     );
 
     final mapBox = SizedBox(
@@ -212,59 +235,217 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       );
     }
 
+    // Cálculo de paddings para não sobrepor navbar/chat
+    final mq = MediaQuery.of(context);
+    final safeBottom = mq.padding.bottom; // system nav/gesture area
+    final brandPad = widget.brandSafePaddingBottom ?? 0;
+    final extra = widget.logPanelBottomExtraPadding;
+    final bottomPad = (safeBottom + brandPad + extra).clamp(0, 200).toDouble();
+
+    // Altura máxima da folha de logs – fração da tela
+    final maxLogH = (mq.size.height * widget.logPanelMaxHeightFraction)
+        .clamp(120, 420)
+        .toDouble();
+
+    final panelHeight = _logsMinimized ? 38.0 : _logPanelHeight.clamp(80.0, maxLogH);
+
     return Stack(
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(widget.borderRadius),
           child: mapBox,
         ),
+
+        // Toggle: mostrar/ocultar painel inteiro (não confundir com minimizar)
         Positioned(
           left: 8,
-          top: 8,
+          top: 8 + mq.padding.top, // respeita status bar
           child: Material(
             color: Colors.black54,
             borderRadius: BorderRadius.circular(8),
             child: InkWell(
               onTap: () => setState(() => _logsVisible = !_logsVisible),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 child: Text(
-                  'Ocultar logs',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                  _logsVisible ? 'Ocultar debug' : 'Mostrar debug',
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
             ),
           ),
         ),
+
         if (_logsVisible)
+          // Painel de logs estilo mini bottom-sheet
           Positioned(
             left: 8,
             right: 8,
-            bottom: 8,
-            child: SizedBox(
-              height: 160,
-              child: Material(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.builder(
-                    reverse: true,
-                    itemCount: _ktLogs.length,
-                    itemBuilder: (_, i) => Text(
-                      _ktLogs[i],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                      ),
-                    ),
+            bottom: 8 + bottomPad,
+            child: _LogPanel(
+              height: panelHeight,
+              minimized: _logsMinimized,
+              onDragDelta: (dy) {
+                // arrasta por cima/baixo pra redimensionar
+                setState(() {
+                  _logPanelHeight = (_logPanelHeight - dy).clamp(80.0, maxLogH);
+                });
+              },
+              onToggleMinimize: () => setState(() => _logsMinimized = !_logsMinimized),
+              onClear: () => setState(_ktLogs.clear),
+              onCopyAll: () {
+                Clipboard.setData(ClipboardData(text: _ktLogs.reversed.join('\n')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Logs copiados')),
+                );
+              },
+              child: ListView.builder(
+                key: const PageStorageKey('picker_map_logs'),
+                reverse: true,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                itemCount: _ktLogs.length,
+                itemBuilder: (_, i) => Text(
+                  _ktLogs[i],
+                  maxLines: 2, // lista mais "curta" por item
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'monospace',
+                    fontSize: 11, // diminui tipografia
+                    height: 1.2,
                   ),
                 ),
               ),
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Widget do painel de logs (cabeçalho com ações + área rolável)
+class _LogPanel extends StatelessWidget {
+  const _LogPanel({
+    required this.height,
+    required this.child,
+    required this.minimized,
+    required this.onDragDelta,
+    required this.onToggleMinimize,
+    required this.onClear,
+    required this.onCopyAll,
+  });
+
+  final double height;
+  final Widget child;
+  final bool minimized;
+  final void Function(double dy) onDragDelta;
+  final VoidCallback onToggleMinimize;
+  final VoidCallback onClear;
+  final VoidCallback onCopyAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final border = BorderRadius.circular(10);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOut,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(minimized ? 0.45 : 0.72),
+        borderRadius: border,
+        border: Border.all(color: Colors.white10),
+        boxShadow: const [
+          BoxShadow(blurRadius: 10, color: Colors.black54, offset: Offset(0, 4)),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: border,
+        child: Column(
+          children: [
+            // Header com "drag handle" + ações
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onVerticalDragUpdate: (d) => onDragDelta(d.delta.dy),
+              child: Container(
+                height: 34,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF222222), Color(0xFF1A1A1A)],
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // drag handle
+                    Container(
+                      width: 36,
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 24, height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Expanded(
+                      child: Text(
+                        'Logs',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                    // ações
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: minimized ? 'Expandir' : 'Minimizar',
+                      iconSize: 18,
+                      color: Colors.white70,
+                      onPressed: onToggleMinimize,
+                      icon: Icon(minimized ? Icons.unfold_more : Icons.unfold_less),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Copiar tudo',
+                      iconSize: 18,
+                      color: Colors.white70,
+                      onPressed: onCopyAll,
+                      icon: const Icon(Icons.copy_all),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Limpar',
+                      iconSize: 18,
+                      color: Colors.white70,
+                      onPressed: onClear,
+                      icon: const Icon(Icons.delete_outline),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Lista – some quando minimizado
+            if (!minimized)
+              Expanded(
+                child: Container(
+                  color: Colors.black.withOpacity(0.15),
+                  child: child,
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
