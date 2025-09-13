@@ -4,14 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
-
-// Se estiver usando FlutterFlow, adapte imports de LatLng conforme seu projeto.
-// Aqui uso uma struct simples:
-class LatLng {
-  final double latitude;
-  final double longitude;
-  const LatLng(this.latitude, this.longitude);
-}
+import 'package:flutter/rendering.dart'; // <- para PlatformViewHitTestBehavior
+import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // <- usa o LatLng do FlutterFlow
 
 class PickerMapNativeController {
   MethodChannel? _channel;
@@ -20,10 +14,13 @@ class PickerMapNativeController {
 
   Future<void> updateConfig(Map<String, dynamic> cfg) async =>
       _channel?.invokeMethod('updateConfig', cfg) ?? Future.value();
+
   Future<void> setMarkers(List<Map<String, dynamic>> m) async =>
       _channel?.invokeMethod('setMarkers', m) ?? Future.value();
+
   Future<void> setPolylines(List<Map<String, dynamic>> l) async =>
       _channel?.invokeMethod('setPolylines', l) ?? Future.value();
+
   Future<void> setPolygons(List<Map<String, dynamic>> p) async =>
       _channel?.invokeMethod('setPolygons', p) ?? Future.value();
 
@@ -37,13 +34,16 @@ class PickerMapNativeController {
         if (tilt != null) 'tilt': tilt
       }) ?? Future.value();
 
-  Future<void> fitBounds(List<LatLng> pts, {double padding = 0}) async =>
+  Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 0}) async =>
       _channel?.invokeMethod('fitBounds', {
-        'points': pts.map((p) => {'latitude': p.latitude, 'longitude': p.longitude}).toList(),
+        'points': pts
+            .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
+            .toList(),
         'padding': padding,
       }) ?? Future.value();
 
-  Future<void> updateCarPosition(String id, LatLng pos, {double? rotation, int? durationMs}) async =>
+  Future<void> updateCarPosition(String id, ff.LatLng pos,
+          {double? rotation, int? durationMs}) async =>
       _channel?.invokeMethod('updateCarPosition', {
         'id': id,
         'latitude': pos.latitude,
@@ -84,8 +84,8 @@ class PickerMapNative extends StatefulWidget {
     this.ultraLowSpecMode,
   });
 
-  final LatLng userLocation;
-  final LatLng? destination;
+  final ff.LatLng userLocation;          // <- usa FF LatLng
+  final ff.LatLng? destination;          // <- idem
   final String? userName;
   final String? userPhotoUrl;
 
@@ -179,7 +179,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     }
 
     final controller = PlatformViewsService.initSurfaceAndroidView(
-      id: 0,
+      id: 0, // se tiver múltiplas instâncias, gere IDs únicos
       viewType: 'picker_map_native',
       layoutDirection: ui.TextDirection.ltr,
       creationParams: {
@@ -196,7 +196,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     final androidView = AndroidViewSurface(
       controller: controller as AndroidViewController,
       gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-      hitTestBehavior: ui.PlatformViewHitTestBehavior.opaque,
+      hitTestBehavior: PlatformViewHitTestBehavior.opaque, // <- sem ui.
     );
 
     final mapBox = SizedBox(
@@ -205,34 +205,47 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       child: androidView,
     );
 
-    if (!widget.showDebugPanel) return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.borderRadius),
-      child: mapBox,
-    );
+    if (!widget.showDebugPanel) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(widget.borderRadius),
+        child: mapBox,
+      );
+    }
 
     return Stack(
       children: [
-        ClipRRect(borderRadius: BorderRadius.circular(widget.borderRadius), child: mapBox),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          child: mapBox,
+        ),
         Positioned(
-          left: 8, top: 8,
+          left: 8,
+          top: 8,
           child: Material(
-            color: Colors.black54, borderRadius: BorderRadius.circular(8),
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8),
             child: InkWell(
               onTap: () => setState(() => _logsVisible = !_logsVisible),
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Text('Ocultar logs', style: TextStyle(color: Colors.white, fontSize: 12)),
+                child: Text(
+                  'Ocultar logs',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ),
             ),
           ),
         ),
         if (_logsVisible)
           Positioned(
-            left: 8, right: 8, bottom: 8,
+            left: 8,
+            right: 8,
+            bottom: 8,
             child: SizedBox(
               height: 160,
               child: Material(
-                color: Colors.black54, borderRadius: BorderRadius.circular(8),
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListView.builder(
@@ -240,7 +253,11 @@ class _PickerMapNativeState extends State<PickerMapNative> {
                     itemCount: _ktLogs.length,
                     itemBuilder: (_, i) => Text(
                       _ktLogs[i],
-                      style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),
