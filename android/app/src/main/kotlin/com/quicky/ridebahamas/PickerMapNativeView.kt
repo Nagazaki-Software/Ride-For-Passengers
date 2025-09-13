@@ -33,7 +33,7 @@ class PickerMapNativeView(
     .mapToolbarEnabled(false)
     .liteMode(false)
 
-  // objetos que mudam de referência -> var/lateinit
+  // IMPORTANTE: referências que mudam => var/lateinit
   private lateinit var mapView: MapView
   private var googleMap: GoogleMap? = null
   private lateinit var channel: MethodChannel
@@ -41,9 +41,11 @@ class PickerMapNativeView(
   private var userMarker: Marker? = null
   private var destMarker: Marker? = null
   private var routePolyline: Polyline? = null
-  private val polygons = mutableListOf<Polygon>()              // mutável no conteúdo
-  private val cars = mutableMapOf<String, Marker>()            // mutável no conteúdo
-  private val carAnimators = mutableMapOf<String, ValueAnimator>() // mutável no conteúdo
+
+  // Coleções mutáveis cujo CONTEÚDO muda (podem ser val)
+  private val polygons = mutableListOf<Polygon>()
+  private val cars = mutableMapOf<String, Marker>()
+  private val carAnimators = mutableMapOf<String, ValueAnimator>()
 
   private fun dbg(msg: String) {
     Log.d(tag, msg)
@@ -66,11 +68,9 @@ class PickerMapNativeView(
   }
 
   init {
-    // Channel
     channel = MethodChannel(messenger, "picker_map_native_$id")
     channel.setMethodCallHandler(this)
 
-    // MapView lifecycle inicial
     try {
       val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
       if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=$status")
@@ -97,7 +97,6 @@ class PickerMapNativeView(
       FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
     )
 
-    // Log de tamanhos
     mapView.viewTreeObserver.addOnGlobalLayoutListener(
       ViewTreeObserver.OnGlobalLayoutListener {
         dbg("sizes: container=${container.width}x${container.height} mapView=${mapView.width}x${mapView.height}")
@@ -245,6 +244,8 @@ class PickerMapNativeView(
     val colorInt = (cfg["routeColor"] as? Number)?.toInt() ?: Color.YELLOW
     val width = (cfg["routeWidth"] as? Number)?.toFloat() ?: 4f
     routePolyline?.remove()
+    routePolyline = null
+
     (cfg["route"] as? List<*>)?.let { list ->
       val pts = list.mapNotNull { p ->
         (p as? Map<*, *>)?.let {
@@ -253,8 +254,6 @@ class PickerMapNativeView(
       }
       if (pts.size >= 2) {
         routePolyline = map.addPolyline(PolylineOptions().addAll(pts).color(colorInt).width(width))
-      } else {
-        routePolyline = null
       }
     }
     dbg("applyConfig ok: user=${userMarker != null} dest=${destMarker != null} route=${routePolyline != null}")
