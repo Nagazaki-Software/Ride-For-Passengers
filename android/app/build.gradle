@@ -100,7 +100,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.7.0"
 
     // Google Play services (NÃO duplicar!)
-    implementation "com.google.android.gms:play-services-maps:18.2.0"
+    implementation "com.google.android.gms:play-services-maps:19.2.0"
     implementation "com.google.android.gms:play-services-base:18.5.0"
 
     // Se precisar de Location direto (senão os plugins resolvem)
