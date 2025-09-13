@@ -119,7 +119,7 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=" + status, null);
       else dbg("Google Play Services OK");
 
-      // ✅ API nova (18+): escolhe renderer e recebe no callback (sem retorno)
+      // API nova (18+): sem retorno; renderer vem no callback
       MapsInitializer.initialize(
           ctx,
           MapsInitializer.Renderer.LATEST,
@@ -411,6 +411,7 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
 
   private void updateCarPosition(String id, LatLng dest, @Nullable Float rotation, long duration) {
     if (googleMap == null) return;
+
     Marker marker = cars.get(id);
     if (marker == null) {
       marker = googleMap.addMarker(new MarkerOptions()
@@ -421,6 +422,7 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       dbg("car[" + id + "] criado em " + dest.latitude + "," + dest.longitude);
     }
     if (rotation != null) marker.setRotation(rotation);
+
     ValueAnimator prev = carAnimators.get(id);
     if (prev != null) prev.cancel();
 
@@ -431,6 +433,8 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
     }
 
     final LatLng startPos = marker.getPosition();
+    final Marker markerRef = marker; // ✅ final ref para usar na lambda
+
     ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
     animator.setInterpolator(new LinearInterpolator());
     animator.setDuration(duration);
@@ -438,9 +442,10 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
       float f = (float) va.getAnimatedValue();
       double lat = startPos.latitude + (dest.latitude - startPos.latitude) * f;
       double lng = startPos.longitude + (dest.longitude - startPos.longitude) * f;
-      marker.setPosition(new LatLng(lat, lng));
+      markerRef.setPosition(new LatLng(lat, lng)); // ✅ usa markerRef (final)
     });
     animator.start();
+
     carAnimators.put(id, animator);
     dbg("car[" + id + "] anim -> " + dest.latitude + "," + dest.longitude + " dur=" + duration + "ms rot=" + (rotation != null ? rotation : "-"));
   }
