@@ -89,6 +89,9 @@ class PickerMapNative extends StatefulWidget {
     @Deprecated('Compat apenas. Não é usado pelo nativo.')
     this.driversRefs = const [],
 
+    /// Também chamado pelo home5. Mantido apenas para compat.
+    this.refreshMs,
+
     this.brandSafePaddingBottom,
     this.mapStyleJson,
     this.panelMaxLines = 120,
@@ -123,6 +126,9 @@ class PickerMapNative extends StatefulWidget {
   /// Compat (não utilizado pelo nativo, apenas pra não quebrar chamada antiga)
   @Deprecated('Compat apenas. Não é usado pelo nativo.')
   final List<dynamic> driversRefs;
+
+  /// Compat (não utilizado, mas presente em chamadas antigas)
+  final int? refreshMs;
 
   /// Ajuste de segurança visual na borda inferior (quando tem navbar)
   final double? brandSafePaddingBottom;
@@ -186,6 +192,9 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
       if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
+
+      // compat: envia, mesmo que o nativo ignore
+      if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
     });
   }
 
@@ -217,6 +226,9 @@ class _PickerMapNativeState extends State<PickerMapNative> {
           'longitude': widget.userLocation.longitude,
         },
         if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
+
+        // compat
+        if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
       },
       creationParamsCodec: const StandardMessageCodec(),
     )
