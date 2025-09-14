@@ -418,6 +418,9 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
 
         marker.setRotation(rotation);
 
+        // >>> FIX: usar referência final dentro do listener <<<
+        final Marker movingMarker = marker;
+
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         animator.setDuration(Math.max(100L, durationMs));
         animator.setInterpolator(new LinearInterpolator());
@@ -426,7 +429,7 @@ public class PickerMapNativeView implements PlatformView, MethodChannel.MethodCa
                 float t = (float) valueAnimator.getAnimatedValue();
                 double lat = startPos.latitude + (endPos.latitude - startPos.latitude) * t;
                 double lng = startPos.longitude + (endPos.longitude - startPos.longitude) * t;
-                marker.setPosition(new LatLng(lat, lng));
+                movingMarker.setPosition(new LatLng(lat, lng));
             }
         });
         animator.start();
