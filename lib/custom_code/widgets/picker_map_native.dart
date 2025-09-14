@@ -1,12 +1,10 @@
 // ignore_for_file: avoid_print
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
-import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // LatLng do FlutterFlow
+import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff;
 
 class PickerMapNativeController {
   MethodChannel? _channel;
@@ -26,14 +24,15 @@ class PickerMapNativeController {
       _channel?.invokeMethod('setPolygons', p) ?? Future.value();
 
   Future<void> cameraTo(double lat, double lng,
-      {double? zoom, double? bearing, double? tilt}) async =>
+          {double? zoom, double? bearing, double? tilt}) async =>
       _channel?.invokeMethod('cameraTo', {
         'latitude': lat,
         'longitude': lng,
         if (zoom != null) 'zoom': zoom,
         if (bearing != null) 'bearing': bearing,
         if (tilt != null) 'tilt': tilt
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 0}) async =>
       _channel?.invokeMethod('fitBounds', {
@@ -41,7 +40,8 @@ class PickerMapNativeController {
             .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
             .toList(),
         'padding': padding,
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<void> updateCarPosition(String id, ff.LatLng pos,
           {double? rotation, int? durationMs}) async =>
@@ -51,7 +51,8 @@ class PickerMapNativeController {
         'longitude': pos.longitude,
         if (rotation != null) 'rotation': rotation,
         if (durationMs != null) 'durationMs': durationMs
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<dynamic> debugInfo() async =>
       _channel?.invokeMethod('debugInfo') ?? Future.value();
@@ -83,11 +84,6 @@ class PickerMapNative extends StatefulWidget {
     this.brandSafePaddingBottom,
     this.liteModeOnAndroid,
     this.ultraLowSpecMode,
-
-    // NOVOS (opcionais)
-    this.logPanelInitialHeight = 120,
-    this.logPanelMaxHeightFraction = 0.45,
-    this.logPanelBottomExtraPadding = 0,
   });
 
   final ff.LatLng userLocation;
@@ -111,42 +107,113 @@ class PickerMapNative extends StatefulWidget {
   final String? driverDriverIconUrl;
   final String? driverTaxiIconUrl;
   final bool enableRouteSnake;
-  final double? brandSafePaddingBottom; // já existia – ajuda a não sobrepor navbar própria do app
+  final double? brandSafePaddingBottom;
   final bool? liteModeOnAndroid;
   final bool? ultraLowSpecMode;
-
-  // NOVOS parâmetros p/ painel de logs
-  final double logPanelInitialHeight;         // altura inicial (px)
-  final double logPanelMaxHeightFraction;     // fração da tela (0–1)
-  final double logPanelBottomExtraPadding;    // padding extra no bottom (px) além do SafeArea/brandSafe
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
 }
 
-class _PickerMapNativeState extends State<PickerMapNative> {
+class _PickerMapNativeState extends State<PickerMapNative>
+    with AutomaticKeepAliveClientMixin {
   MethodChannel? _channel;
-  int? _viewId;
-
+  late final Widget _platformView; // criado 1x
   final _ktLogs = <String>[];
   bool _logsVisible = true;
-  bool _logsMinimized = false;
-  double _logPanelHeight = 0;
+
+  @override
+  bool get wantKeepAlive => true;
 
   void _pushLog(String msg) {
-    if (!mounted) return;
     setState(() {
       final ts = DateTime.now().toIso8601String().substring(11, 19);
       _ktLogs.insert(0, '[$ts] $msg');
-      if (_ktLogs.length > 300) _ktLogs.removeLast();
+      if (_ktLogs.length > 120) _ktLogs.removeLast(); // cap mais baixo
     });
+    // ignore: avoid_print
     print(msg);
+  }
+
+  Future<dynamic> _handleCall(MethodCall call) async {
+    if (call.method == 'platformReady') {
+      _pushLog('KT → Dart: platformReady');
+      // Envia config inicial aqui (após o "platformReady" o nativo está 100%)
+      await _channel?.invokeMethod('updateConfig', {
+        'userLocation': {
+          'latitude': widget.userLocation.latitude,
+          'longitude': widget.userLocation.longitude,
+        },
+        if (widget.destination != null)
+          'destination': {
+            'latitude': widget.destination!.latitude,
+            'longitude': widget.destination!.longitude,
+          },
+        'route': const <Map<String, double>>[],
+        'routeColor': widget.routeColor.value,
+        'routeWidth': widget.routeWidth,
+        'userName': widget.userName,
+        'userPhotoUrl': widget.userPhotoUrl,
+      });
+    } else if (call.method == 'debugLog') {
+      final m = (call.arguments as Map?) ?? const {};
+      final level = (m['level'] ?? 'D').toString();
+      final msg = (m['msg'] ?? '').toString();
+      // Evita flood: ignora logs de sizes repetidos
+      if (msg.startsWith('sizes:')) return null;
+      _pushLog('[KT/$level] $msg');
+    }
+    return null;
+  }
+
+  Future<void> _onPlatformViewCreated(int id) async {
+    _channel = MethodChannel('picker_map_native_$id');
+    _channel!.setMethodCallHandler(_handleCall);
+    widget.controller?._attach(_channel!);
   }
 
   @override
   void initState() {
     super.initState();
-    _logPanelHeight = widget.logPanelInitialHeight.clamp(80, 260);
+    // Cria o AndroidView uma única vez
+    _platformView = AndroidView(
+      viewType: 'picker_map_native',
+      layoutDirection: TextDirection.ltr,
+      creationParams: {
+        'initialUserLocation': {
+          'latitude': widget.userLocation.latitude,
+          'longitude': widget.userLocation.longitude,
+        },
+      },
+      creationParamsCodec: const StandardMessageCodec(),
+      onPlatformViewCreated: _onPlatformViewCreated,
+      gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant PickerMapNative oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Se localização/destino mudarem, reenvia config sem recriar a view
+    if (_channel != null &&
+        (oldWidget.userLocation.latitude != widget.userLocation.latitude ||
+            oldWidget.userLocation.longitude !=
+                widget.userLocation.longitude ||
+            oldWidget.destination?.latitude != widget.destination?.latitude ||
+            oldWidget.destination?.longitude !=
+                widget.destination?.longitude)) {
+      _channel!.invokeMethod('updateConfig', {
+        'userLocation': {
+          'latitude': widget.userLocation.latitude,
+          'longitude': widget.userLocation.longitude,
+        },
+        if (widget.destination != null)
+          'destination': {
+            'latitude': widget.destination!.latitude,
+            'longitude': widget.destination!.longitude,
+          },
+      });
+    }
   }
 
   @override
@@ -156,76 +223,18 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     super.dispose();
   }
 
-  Future<void> _onPlatformViewCreated(int id) async {
-    _viewId = id;
-    _channel = MethodChannel('picker_map_native_$id');
-    _channel!.setMethodCallHandler(_handleCall);
-    widget.controller?._attach(_channel!);
-
-    await _channel!.invokeMethod('updateConfig', {
-      'userLocation': {
-        'latitude': widget.userLocation.latitude,
-        'longitude': widget.userLocation.longitude,
-      },
-      if (widget.destination != null)
-        'destination': {
-          'latitude': widget.destination!.latitude,
-          'longitude': widget.destination!.longitude,
-        },
-      'route': const <Map<String, double>>[],
-      'routeColor': widget.routeColor.value,
-      'routeWidth': widget.routeWidth,
-      'userName': widget.userName,
-      'userPhotoUrl': widget.userPhotoUrl,
-    });
-  }
-
-  Future<dynamic> _handleCall(MethodCall call) async {
-    if (call.method == 'platformReady') {
-      _pushLog('KT → Dart: platformReady');
-    } else if (call.method == 'debugLog') {
-      final m = (call.arguments as Map?) ?? const {};
-      final level = (m['level'] ?? 'D').toString();
-      final msg = (m['msg'] ?? '').toString();
-      _pushLog('[KT/$level] $msg');
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     if (defaultTargetPlatform != TargetPlatform.android) {
       return const Center(child: Text('PickerMapNative: apenas Android'));
     }
 
-    // ID único p/ evitar colisão de PlatformView em rebuilds
-    final uniqueId = (hashCode ^ DateTime.now().microsecondsSinceEpoch) & 0x7fffffff;
-
-    final controller = PlatformViewsService.initSurfaceAndroidView(
-      id: uniqueId,
-      viewType: 'picker_map_native',
-      layoutDirection: ui.TextDirection.ltr,
-      creationParams: {
-        'initialUserLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
-        },
-      },
-      creationParamsCodec: const StandardMessageCodec(),
-    )
-      ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
-      ..create();
-
-    final androidView = AndroidViewSurface(
-      controller: controller as AndroidViewController,
-      gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-    );
-
     final mapBox = SizedBox(
       width: widget.width,
       height: widget.height,
-      child: androidView,
+      child: _platformView,
     );
 
     if (!widget.showDebugPanel) {
@@ -235,216 +244,74 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       );
     }
 
-    // Cálculo de paddings para não sobrepor navbar/chat
-    final mq = MediaQuery.of(context);
-    final safeBottom = mq.padding.bottom; // system nav/gesture area
-    final brandPad = widget.brandSafePaddingBottom ?? 0;
-    final extra = widget.logPanelBottomExtraPadding;
-    final bottomPad = (safeBottom + brandPad + extra).clamp(0, 200).toDouble();
+    // Ajustes de overlay/log: respeita SafeArea e altura adaptativa
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final safePad =
+        (widget.brandSafePaddingBottom ?? 0) + (bottomInset > 0 ? bottomInset : 8);
+    final logsMaxH = math.min(180.0, math.max(120.0, widget.height * 0.35));
 
-    // Altura máxima da folha de logs – fração da tela
-    final maxLogH = (mq.size.height * widget.logPanelMaxHeightFraction)
-        .clamp(120, 420)
-        .toDouble();
-
-    final panelHeight = _logsMinimized ? 38.0 : _logPanelHeight.clamp(80.0, maxLogH);
-
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          child: mapBox,
-        ),
-
-        // Toggle: mostrar/ocultar painel inteiro (não confundir com minimizar)
-        Positioned(
-          left: 8,
-          top: 8 + mq.padding.top, // respeita status bar
-          child: Material(
-            color: Colors.black54,
-            borderRadius: BorderRadius.circular(8),
-            child: InkWell(
-              onTap: () => setState(() => _logsVisible = !_logsVisible),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Text(
-                  _logsVisible ? 'Ocultar debug' : 'Mostrar debug',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        if (_logsVisible)
-          // Painel de logs estilo mini bottom-sheet
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: Stack(
+        children: [
+          mapBox,
+          // Botão compacto
           Positioned(
             left: 8,
-            right: 8,
-            bottom: 8 + bottomPad,
-            child: _LogPanel(
-              height: panelHeight,
-              minimized: _logsMinimized,
-              onDragDelta: (dy) {
-                // arrasta por cima/baixo pra redimensionar
-                setState(() {
-                  _logPanelHeight = (_logPanelHeight - dy).clamp(80.0, maxLogH);
-                });
-              },
-              onToggleMinimize: () => setState(() => _logsMinimized = !_logsMinimized),
-              onClear: () => setState(_ktLogs.clear),
-              onCopyAll: () {
-                Clipboard.setData(ClipboardData(text: _ktLogs.reversed.join('\n')));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Logs copiados')),
-                );
-              },
-              child: ListView.builder(
-                key: const PageStorageKey('picker_map_logs'),
-                reverse: true,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                itemCount: _ktLogs.length,
-                itemBuilder: (_, i) => Text(
-                  _ktLogs[i],
-                  maxLines: 2, // lista mais "curta" por item
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'monospace',
-                    fontSize: 11, // diminui tipografia
-                    height: 1.2,
+            top: 8,
+            child: Material(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(8),
+              child: InkWell(
+                onTap: () => setState(() => _logsVisible = !_logsVisible),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Text(
+                    _logsVisible ? 'Ocultar logs' : 'Mostrar logs',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
               ),
             ),
           ),
-      ],
-    );
-  }
-}
-
-/// Widget do painel de logs (cabeçalho com ações + área rolável)
-class _LogPanel extends StatelessWidget {
-  const _LogPanel({
-    required this.height,
-    required this.child,
-    required this.minimized,
-    required this.onDragDelta,
-    required this.onToggleMinimize,
-    required this.onClear,
-    required this.onCopyAll,
-  });
-
-  final double height;
-  final Widget child;
-  final bool minimized;
-  final void Function(double dy) onDragDelta;
-  final VoidCallback onToggleMinimize;
-  final VoidCallback onClear;
-  final VoidCallback onCopyAll;
-
-  @override
-  Widget build(BuildContext context) {
-    final border = BorderRadius.circular(10);
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      curve: Curves.easeOut,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(minimized ? 0.45 : 0.72),
-        borderRadius: border,
-        border: Border.all(color: Colors.white10),
-        boxShadow: const [
-          BoxShadow(blurRadius: 10, color: Colors.black54, offset: Offset(0, 4)),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: border,
-        child: Column(
-          children: [
-            // Header com "drag handle" + ações
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onVerticalDragUpdate: (d) => onDragDelta(d.delta.dy),
-              child: Container(
-                height: 34,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF222222), Color(0xFF1A1A1A)],
-                  ),
+          // Painel de logs no rodapé, com SafeArea
+          if (_logsVisible)
+            Positioned(
+              left: 8,
+              right: 8,
+              bottom: 8 + safePad,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: logsMaxH,
+                  minHeight: math.min(120.0, logsMaxH),
                 ),
-                child: Row(
-                  children: [
-                    // drag handle
-                    Container(
-                      width: 36,
-                      alignment: Alignment.center,
-                      child: Container(
-                        width: 24, height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Expanded(
-                      child: Text(
-                        'Logs',
-                        maxLines: 1,
+                child: Material(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                    child: ListView.builder(
+                      reverse: true,
+                      padding: EdgeInsets.zero,
+                      itemCount: _ktLogs.length,
+                      itemBuilder: (_, i) => Text(
+                        _ktLogs[i],
+                        softWrap: false,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white70,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'monospace',
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
+                          height: 1.2,
                         ),
                       ),
                     ),
-                    // ações
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      tooltip: minimized ? 'Expandir' : 'Minimizar',
-                      iconSize: 18,
-                      color: Colors.white70,
-                      onPressed: onToggleMinimize,
-                      icon: Icon(minimized ? Icons.unfold_more : Icons.unfold_less),
-                    ),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      tooltip: 'Copiar tudo',
-                      iconSize: 18,
-                      color: Colors.white70,
-                      onPressed: onCopyAll,
-                      icon: const Icon(Icons.copy_all),
-                    ),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      tooltip: 'Limpar',
-                      iconSize: 18,
-                      color: Colors.white70,
-                      onPressed: onClear,
-                      icon: const Icon(Icons.delete_outline),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-
-            // Lista – some quando minimizado
-            if (!minimized)
-              Expanded(
-                child: Container(
-                  color: Colors.black.withOpacity(0.15),
-                  child: child,
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }
