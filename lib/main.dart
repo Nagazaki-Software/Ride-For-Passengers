@@ -10,6 +10,9 @@ import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 
+// ✅ IMPORTA o ticker global
+import 'custom_code/live_location_ticker.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -29,7 +32,6 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  // This widget is the root of your application.
   @override
   State<MyApp> createState() => _MyAppState();
 
@@ -44,6 +46,7 @@ class _MyAppState extends State<MyApp> {
 
   late AppStateNotifier _appStateNotifier;
   late GoRouter _router;
+
   String getRoute([RouteMatch? routeMatch]) {
     final RouteMatch lastMatch =
         routeMatch ?? _router.routerDelegate.currentConfiguration.last;
@@ -73,7 +76,7 @@ class _MyAppState extends State<MyApp> {
       });
     jwtTokenStream.listen((_) {});
     Future.delayed(
-      Duration(milliseconds: 3500),
+      const Duration(milliseconds: 3500),
       () => _appStateNotifier.stopShowingSplashImage(),
     );
   }
@@ -81,7 +84,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     authUserSub.cancel();
-
     super.dispose();
   }
 
@@ -99,7 +101,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Ride Bahamas',
-      localizationsDelegates: [
+      localizationsDelegates: const [
         FFLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -121,18 +123,21 @@ class _MyAppState extends State<MyApp> {
           thumbVisibility: WidgetStateProperty.all(false),
           thumbColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.dragged)) {
-              return Color(4280558628);
+              return const Color(0xFF1976D2);
             }
             if (states.contains(WidgetState.hovered)) {
-              return Color(4280558628);
+              return const Color(0xFF1976D2);
             }
-            return Color(4280558628);
+            return const Color(0xFF1976D2);
           }),
         ),
         useMaterial3: false,
       ),
       themeMode: _themeMode,
       routerConfig: _router,
+
+      // ✅ Instala o stream de localização por cima da árvore inteira.
+      builder: (context, child) => LiveLocationTicker(child: child!),
     );
   }
 }
