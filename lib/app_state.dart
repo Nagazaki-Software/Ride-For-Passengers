@@ -205,10 +205,12 @@ class FFAppState extends ChangeNotifier {
   LatLng? _latlngAtual = LatLng(25.0443312, -77.3503609);
   LatLng? get latlngAtual => _latlngAtual;
   set latlngAtual(LatLng? value) {
+    if (value == null) {
+      // Ignora atualizações nulas para evitar estado inconsistente.
+      return;
+    }
     _latlngAtual = value;
-    value != null
-        ? prefs.setString('ff_latlngAtual', value.serialize())
-        : prefs.remove('ff_latlngAtual');
+    prefs.setString('ff_latlngAtual', value.serialize());
   }
 
   LatLng? _latlangAondeVaiIr;
