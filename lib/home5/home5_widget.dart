@@ -37,6 +37,11 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   final scaffoldKey = GlobalKey<ScaffoldState>();
   LatLng? currentUserLocationValue;
 
+  // === NOVO: controller do mapa + memo do último destino
+  final custom_widgets.PickerMapNativeController _mapCtrl =
+      custom_widgets.PickerMapNativeController();
+  LatLng? _lastDest;
+
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
   var hasContainerTriggered3 = false;
@@ -166,6 +171,27 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
+    // === NOVO: enquadra automaticamente quando o destino muda
+    final userNow = FFAppState().latlngAtual;
+    final destNow = FFAppState().latlangAondeVaiIr;
+    if (userNow != null &&
+        destNow != null &&
+        (_lastDest == null ||
+            _lastDest!.latitude != destNow.latitude ||
+            _lastDest!.longitude != destNow.longitude)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // tenta agora e repete com um pequeno delay (garante se o nativo terminou de montar)
+        try {
+          await _mapCtrl.fitBounds([userNow, destNow], padding: 80);
+        } catch (_) {}
+        await Future.delayed(const Duration(milliseconds: 350));
+        try {
+          await _mapCtrl.fitBounds([userNow, destNow], padding: 80);
+        } catch (_) {}
+      });
+      _lastDest = destNow;
+    }
+
     if (currentUserLocationValue == null) {
       return Container(
         color: FlutterFlowTheme.of(context).primaryBackground,
@@ -232,20 +258,30 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                           ),
                         );
                       }
+
+                      // === AQUI: controller + tema DARK/AMARELO + flags estáveis
                       return custom_widgets.PickerMapNative(
                         width: double.infinity,
                         height: double.infinity,
+                        controller: _mapCtrl,
                         userLocation: FFAppState().latlngAtual!,
-                        driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
                         destination: FFAppState().latlangAondeVaiIr,
+
+                        // Tema dark + amarelo (sem azul)
+                        mapStyleJson: kGoogleMapsDarkAmberStyle,
+
+                        // Rota em âmbar mais grossa
+                        routeColor: const Color(0xFFFFC107),
+                        routeWidth: 6,
+
+                        // Seus parâmetros existentes
+                        driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
                         refreshMs: 2000,
                         destinationMarkerPngUrl:
                             'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
                         userPhotoUrl: currentUserPhoto,
                         userMarkerSize: 40,
                         userName: currentUserDisplayName,
-                        routeColor: FlutterFlowTheme.of(context).secondaryBackground,
-                        routeWidth: 2,
                         borderRadius: 0,
                         driverIconWidth: 70,
                         driverTaxiIconAsset:
@@ -256,8 +292,11 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                             'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                         enableRouteSnake: true,
                         brandSafePaddingBottom: 60,
+
+                        // Anti-“sumiço”: nada de lite/ultra low enquanto depura
                         liteModeOnAndroid: false,
-                        ultraLowSpecMode: true,
+                        ultraLowSpecMode: false,
+
                         showDebugPanel: true, // painel de logs na tela
                       );
                     },
@@ -1246,3 +1285,28 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     );
   }
 }
+
+// === NOVO: Tema DARK com acentos âmbar (amarelo), sem azul.
+const String kGoogleMapsDarkAmberStyle = '''
+[
+  {"elementType":"geometry","stylers":[{"color":"#1a1a1a"}]},
+  {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+  {"elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},
+  {"elementType":"labels.text.stroke","stylers":[{"color":"#1a1a1a"}]},
+
+  {"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#5f5f5f"}]},
+  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#252525"}]},
+  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
+  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#232323"}]},
+  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0d0d0d"}]},
+
+  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2a2a2a"}]},
+  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#3a3a3a"}]},
+  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#444444"}]},
+  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#e6c200"}]},
+  {"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#151515"}]},
+
+  {"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#ffc107"}]},
+  {"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#ffc107"}]}
+]
+''';
