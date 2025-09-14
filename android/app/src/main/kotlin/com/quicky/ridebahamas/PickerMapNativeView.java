@@ -1,6 +1,4 @@
 // ignore_for_file: avoid_print
-import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -8,18 +6,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
 import 'package:flutter/services.dart';
+import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // LatLng do FlutterFlow
 
-import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // FlutterFlow LatLng
-
-// ============================================================================
-// Controller
-// ============================================================================
+/// Controller para chamar métodos nativos (Android).
 class PickerMapNativeController {
   MethodChannel? _channel;
   void _attach(MethodChannel ch) => _channel = ch;
   void _detach() => _channel = null;
 
-  // --- Métodos diretos do nativo ---
   Future<void> updateConfig(Map<String, dynamic> cfg) async =>
       _channel?.invokeMethod('updateConfig', cfg) ?? Future.value();
 
@@ -54,8 +48,7 @@ class PickerMapNativeController {
             .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
             .toList(),
         'padding': padding,
-      }) ??
-      Future.value();
+      }) ?? Future.value();
 
   Future<void> updateCarPosition(
     String id,
@@ -74,85 +67,8 @@ class PickerMapNativeController {
 
   Future<dynamic> debugInfo() async =>
       _channel?.invokeMethod('debugInfo') ?? Future.value();
-
-  // --- Extras de conforto (se o nativo não tiver, apenas ignorará) ---
-  Future<void> setMapStyle(String json) async {
-    try {
-      await _channel?.invokeMethod('setMapStyle', {'json': json});
-    } catch (_) {
-      // se o método não existir no nativo, ignora
-    }
-  }
-
-  /// Anima um polyline "crescendo" ponto a ponto (route snake).
-  /// Se o nativo tiver animação própria, prefira lá; isso aqui é compat no Dart.
-  Future<void> animatePolyline({
-    required List<ff.LatLng> points,
-    int steps = 24,
-    int totalMs = 900,
-    int color = 0xFFFFC107,
-    double width = 4.0,
-  }) async {
-    if (points.length < 2) return;
-    final stepMs = (totalMs / steps).round();
-    for (var i = 1; i <= steps; i++) {
-      final t = i / steps;
-      final idx = (t * (points.length - 1)).clamp(1.0, (points.length - 1).toDouble());
-      final hi = idx.floor();
-      final lo = hi - 1;
-      final frac = idx - hi;
-
-      final out = <Map<String, dynamic>>[];
-      for (var k = 0; k <= hi; k++) {
-        out.add({
-          'latitude': points[k].latitude,
-          'longitude': points[k].longitude,
-        });
-      }
-      if (frac > 0 && hi + 1 < points.length) {
-        final a = points[hi];
-        final b = points[hi + 1];
-        final lat = a.latitude + (b.latitude - a.latitude) * frac;
-        final lng = a.longitude + (b.longitude - a.longitude) * frac;
-        out.add({'latitude': lat, 'longitude': lng});
-      }
-
-      await setPolylines([
-        {
-          'points': out,
-          'color': color,
-          'width': width,
-        }
-      ]);
-
-      await Future.delayed(Duration(milliseconds: stepMs));
-    }
-  }
-
-  /// Desenha um polígono simples (borda + preenchimento).
-  Future<void> drawPolygon({
-    required List<ff.LatLng> points,
-    int strokeColor = 0xFF000000,
-    double strokeWidth = 2.0,
-    int fillColor = 0x220000FF,
-  }) async {
-    if (points.length < 3) return;
-    await setPolygons([
-      {
-        'points': points
-            .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
-            .toList(),
-        'strokeColor': strokeColor,
-        'width': strokeWidth,
-        'fillColor': fillColor,
-      }
-    ]);
-  }
 }
 
-// ============================================================================
-// Widget
-// ============================================================================
 class PickerMapNative extends StatefulWidget {
   const PickerMapNative({
     super.key,
@@ -167,43 +83,51 @@ class PickerMapNative extends StatefulWidget {
     this.routeWidth = 4,
     this.showDebugPanel = true,
     this.controller,
-    @Deprecated('Compat apenas. Não é usado pelo native.')
-    this.driversRefs = const [], // <- mantém compat com seu call site
+
+    /// Compatibilidade com chamadas antigas (não é usado no nativo).
+    /// Mantido só para não quebrar o `home5_widget.dart`.
+    @Deprecated('Compat apenas. Não é usado pelo nativo.')
+    this.driversRefs = const [],
+
     this.brandSafePaddingBottom,
     this.mapStyleJson,
+    this.panelMaxLines = 120,
   });
 
-  // Requeridos / principais
+  /// Localização do usuário (FF LatLng)
   final ff.LatLng userLocation;
+
+  /// Destino (opcional)
   final ff.LatLng? destination;
 
-  // Info do usuário (opcional)
+  /// Dados opcionais
   final String? userName;
   final String? userPhotoUrl;
 
-  // Layout / estilo
+  /// Layout
   final double? width;
   final double height;
   final double borderRadius;
 
-  // Rota
+  /// Rota
   final Color routeColor;
   final int routeWidth;
 
-  // Painel de debug
+  /// Painel de debug/logs
   final bool showDebugPanel;
+  final int panelMaxLines;
 
-  // Controller
+  /// Controller
   final PickerMapNativeController? controller;
 
-  // Compat
-  @Deprecated('Compat apenas. Não é usado pelo native.')
+  /// Compat (não utilizado)
+  @Deprecated('Compat apenas. Não é usado pelo nativo.')
   final List<dynamic> driversRefs;
 
-  // UI
+  /// Ajuste de segurança visual na borda inferior (quando tem navbar)
   final double? brandSafePaddingBottom;
 
-  // Estilo do mapa (passe o JSON do Styled Maps aqui para dark mode)
+  /// Estilo de mapa JSON (para modo dark, etc). O nativo precisa aplicar.
   final String? mapStyleJson;
 
   @override
@@ -211,31 +135,28 @@ class PickerMapNative extends StatefulWidget {
 }
 
 class _PickerMapNativeState extends State<PickerMapNative> {
-  MethodChannel? _channel;
-  int? _viewId;
+  static int _nextViewId = 1;
 
-  static int _nextViewId = 1; // multi-instância sem conflito
+  MethodChannel? _channel;
+  late final int _viewId;
 
   final _ktLogs = <String>[];
   bool _logsVisible = true;
-
-  String? _pendingMapStyleJson; // aplica assim que platformReady chegar
 
   void _pushLog(String msg) {
     setState(() {
       final ts = DateTime.now().toIso8601String().substring(11, 19);
       _ktLogs.insert(0, '[$ts] $msg');
-      if (_ktLogs.length > 300) _ktLogs.removeLast();
+      if (_ktLogs.length > widget.panelMaxLines) _ktLogs.removeLast();
     });
-    // Só para ver no logcat também
-    // ignore: avoid_print
+    // também joga no log do Dart
     print(msg);
   }
 
   @override
   void initState() {
     super.initState();
-    _pendingMapStyleJson = widget.mapStyleJson;
+    _viewId = _nextViewId++;
   }
 
   @override
@@ -246,12 +167,10 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   }
 
   Future<void> _onPlatformViewCreated(int id) async {
-    _viewId = id;
     _channel = MethodChannel('picker_map_native_$id');
     _channel!.setMethodCallHandler(_handleCall);
     widget.controller?._attach(_channel!);
 
-    // Config inicial
     await _channel!.invokeMethod('updateConfig', {
       'userLocation': {
         'latitude': widget.userLocation.latitude,
@@ -267,21 +186,13 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'routeWidth': widget.routeWidth,
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
+      if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
     });
   }
 
   Future<dynamic> _handleCall(MethodCall call) async {
     if (call.method == 'platformReady') {
       _pushLog('KT → Dart: platformReady');
-      // aplica estilo do mapa assim que o nativo estiver pronto
-      if (_pendingMapStyleJson != null && _pendingMapStyleJson!.trim().isNotEmpty) {
-        try {
-          await _channel?.invokeMethod('setMapStyle', {'json': _pendingMapStyleJson});
-          _pushLog('[Dart] mapStyle aplicado');
-        } catch (_) {
-          _pushLog('[Dart] setMapStyle não suportado no nativo (ignorado)');
-        }
-      }
     } else if (call.method == 'debugLog') {
       final m = (call.arguments as Map?) ?? const {};
       final level = (m['level'] ?? 'D').toString();
@@ -297,11 +208,8 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       return const Center(child: Text('PickerMapNative: apenas Android'));
     }
 
-    // ID único para este PlatformView
-    final viewId = _nextViewId++;
-
     final controller = PlatformViewsService.initSurfaceAndroidView(
-      id: viewId,
+      id: _viewId,
       viewType: 'picker_map_native',
       layoutDirection: ui.TextDirection.ltr,
       creationParams: {
@@ -309,6 +217,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
           'latitude': widget.userLocation.latitude,
           'longitude': widget.userLocation.longitude,
         },
+        if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
       },
       creationParamsCodec: const StandardMessageCodec(),
     )
@@ -321,10 +230,18 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       hitTestBehavior: PlatformViewHitTestBehavior.opaque,
     );
 
-    final mapBox = SizedBox(
-      width: widget.width,
-      height: widget.height,
-      child: androidView,
+    // Evita corte de bordas e ajuda a não sobrepor a navbar (safe area + padding)
+    final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
+    final brandBottom = widget.brandSafePaddingBottom ?? 16;
+    final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
+
+    final mapBox = Padding(
+      padding: outerPadding,
+      child: SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: androidView,
+      ),
     );
 
     if (!widget.showDebugPanel) {
@@ -334,93 +251,67 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       );
     }
 
-    // Evitar sobrepor status/nav bar: usa SafeArea e paddings
-    final mq = MediaQuery.of(context);
-    final bottomInset = mq.padding.bottom;
-    final topInset = mq.padding.top;
-    final brandPad = widget.brandSafePaddingBottom ?? 0;
-    final logsHeight = math.min<double>(180, widget.height * 0.3);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.borderRadius),
-      child: Stack(
-        children: [
-          mapBox,
-          // Botão de toggle dos logs no topo, respeitando status bar
+    // Painel de logs compacto e que não gruda na navbar nem corta o conteúdo
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          child: mapBox,
+        ),
+        SafeArea(
+          child: Positioned(
+            left: 8,
+            top: 8,
+            child: Material(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(8),
+              child: InkWell(
+                onTap: () => setState(() => _logsVisible = !_logsVisible),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Text(
+                    'LOGS',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (_logsVisible)
           Positioned(
             left: 8,
             right: 8,
-            top: 8 + topInset,
-            child: Row(
-              children: [
-                Material(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(8),
-                  child: InkWell(
-                    onTap: () => setState(() => _logsVisible = !_logsVisible),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      child: Text(
-                        'Logs',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // slot pra mais ações se quiser
-              ],
-            ),
-          ),
-          if (_logsVisible)
-            Positioned(
-              left: 8,
-              right: 8,
-              // respeita nav bar / bottom inset e ainda um brandPad opcional
-              bottom: 8 + bottomInset + brandPad,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  // evita cortar quando o container é baixo
-                  maxHeight: logsHeight,
-                ),
-                child: Material(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ScrollConfiguration(
-                      behavior: const _NoGlowBehavior(),
-                      child: ListView.builder(
-                        reverse: true,
-                        shrinkWrap: true,
-                        itemCount: _ktLogs.length,
-                        itemBuilder: (_, i) => Text(
-                          _ktLogs[i],
-                          softWrap: true,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                            height: 1.2,
-                          ),
-                        ),
+            bottom: 12 + (widget.brandSafePaddingBottom ?? 16),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                // Altura menor pra não “comer” a tela e não colar na navbar
+                maxHeight: 140,
+              ),
+              child: Material(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: _ktLogs.length,
+                    itemBuilder: (_, i) => Text(
+                      _ktLogs[i],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 11,
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
-  }
-}
-
-// Remove overscroll glow do painel de logs (puramente estético)
-class _NoGlowBehavior extends ScrollBehavior {
-  const _NoGlowBehavior();
-  @override
-  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
-    return child;
   }
 }
