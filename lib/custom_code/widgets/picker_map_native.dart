@@ -11,18 +11,82 @@ class PickerMapNativeController {
   void _attach(MethodChannel ch) => _channel = ch;
   void _detach() => _channel = null;
 
-  Future<void> updateConfig(Map<String, dynamic> cfg) async =>
-      _channel?.invokeMethod('updateConfig', cfg) ?? Future.value();
+  // ====== CONFIG BÁSICA ======
+  Future<void> updateConfig({
+    required ff.LatLng user,
+    ff.LatLng? destination,
+    Color? routeColor,
+    int? routeWidth,
+    String? userName,
+    String? userPhotoUrl,
+    String? mapStyleJson,         // <- dark mode via JSON
+  }) async {
+    final cfg = <String, dynamic>{
+      'userLocation': {'latitude': user.latitude, 'longitude': user.longitude},
+      if (destination != null)
+        'destination': {
+          'latitude': destination.latitude,
+          'longitude': destination.longitude
+        },
+      if (routeColor != null) 'routeColor': routeColor.value,
+      if (routeWidth != null) 'routeWidth': routeWidth,
+      if (userName != null) 'userName': userName,
+      if (userPhotoUrl != null) 'userPhotoUrl': userPhotoUrl,
+      if (mapStyleJson != null) 'mapStyleJson': mapStyleJson,
+    };
+    await (_channel?.invokeMethod('updateConfig', cfg) ?? Future.value());
+  }
 
+  // ====== ESTILO DO MAPA (você pode trocar em runtime) ======
+  Future<void> setMapStyleJson(String json) async =>
+      _channel?.invokeMethod('setMapStyleJson', {'json': json}) ?? Future.value();
+
+  // ====== LINHAS (rotas) ======
+  /// Desenha UMA polyline. Se [animated]=true, faz o “snake” no nativo.
+  Future<void> drawRoute(List<ff.LatLng> points,
+      {Color color = const Color(0xFFFFC107),
+      double width = 4,
+      bool geodesic = true,
+      bool animated = false,
+      int durationMs = 1800,
+      double zIndex = 6}) async {
+    final payload = {
+      'points': points
+          .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
+          .toList(),
+      'color': color.value,
+      'width': width,
+      'geodesic': geodesic,
+      'animated': animated,
+      'durationMs': durationMs,
+      'zIndex': zIndex,
+    };
+    await (_channel?.invokeMethod('setPolylines', [payload]) ?? Future.value());
+  }
+
+  // ====== POLÍGONOS ======
+  Future<void> drawPolygon(List<ff.LatLng> points,
+      {Color strokeColor = const Color(0xFF00BCD4),
+      Color fillColor = const Color(0x3300BCD4),
+      double strokeWidth = 2,
+      double zIndex = 10}) async {
+    final payload = {
+      'points': points
+          .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
+          .toList(),
+      'strokeColor': strokeColor.value,
+      'fillColor': fillColor.value,
+      'width': strokeWidth,
+      'zIndex': zIndex,
+    };
+    await (_channel?.invokeMethod('setPolygons', [payload]) ?? Future.value());
+  }
+
+  // ====== MARCADORES AUX ======
   Future<void> setMarkers(List<Map<String, dynamic>> m) async =>
       _channel?.invokeMethod('setMarkers', m) ?? Future.value();
 
-  Future<void> setPolylines(List<Map<String, dynamic>> l) async =>
-      _channel?.invokeMethod('setPolylines', l) ?? Future.value();
-
-  Future<void> setPolygons(List<Map<String, dynamic>> p) async =>
-      _channel?.invokeMethod('setPolygons', p) ?? Future.value();
-
+  // ====== CÂMERA ======
   Future<void> cameraTo(double lat, double lng,
           {double? zoom, double? bearing, double? tilt}) async =>
       _channel?.invokeMethod('cameraTo', {
@@ -34,7 +98,7 @@ class PickerMapNativeController {
       }) ??
       Future.value();
 
-  Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 0}) async =>
+  Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 48}) async =>
       _channel?.invokeMethod('fitBounds', {
         'points': pts
             .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
@@ -43,6 +107,7 @@ class PickerMapNativeController {
       }) ??
       Future.value();
 
+  // ====== CARRO ANIMADO ======
   Future<void> updateCarPosition(String id, ff.LatLng pos,
           {double? rotation, int? durationMs}) async =>
       _channel?.invokeMethod('updateCarPosition', {
@@ -72,18 +137,8 @@ class PickerMapNative extends StatefulWidget {
     this.routeWidth = 4,
     this.showDebugPanel = true,
     this.controller,
-    this.driversRefs = const [],
-    this.refreshMs,
-    this.destinationMarkerPngUrl,
-    this.userMarkerSize,
-    this.driverIconWidth,
-    this.driverTaxiIconAsset,
-    this.driverDriverIconUrl,
-    this.driverTaxiIconUrl,
-    this.enableRouteSnake = false,
+    this.mapStyleJson, // <- passa o estilo dark aqui
     this.brandSafePaddingBottom,
-    this.liteModeOnAndroid,
-    this.ultraLowSpecMode,
   });
 
   final ff.LatLng userLocation;
@@ -98,18 +153,8 @@ class PickerMapNative extends StatefulWidget {
   final int routeWidth;
   final bool showDebugPanel;
   final PickerMapNativeController? controller;
-  final List<dynamic> driversRefs;
-  final int? refreshMs;
-  final String? destinationMarkerPngUrl;
-  final double? userMarkerSize;
-  final double? driverIconWidth;
-  final String? driverTaxiIconAsset;
-  final String? driverDriverIconUrl;
-  final String? driverTaxiIconUrl;
-  final bool enableRouteSnake;
+  final String? mapStyleJson;
   final double? brandSafePaddingBottom;
-  final bool? liteModeOnAndroid;
-  final bool? ultraLowSpecMode;
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
@@ -118,7 +163,7 @@ class PickerMapNative extends StatefulWidget {
 class _PickerMapNativeState extends State<PickerMapNative>
     with AutomaticKeepAliveClientMixin {
   MethodChannel? _channel;
-  late final Widget _platformView; // criado 1x
+  late final Widget _platformView;
   final _ktLogs = <String>[];
   bool _logsVisible = true;
 
@@ -129,38 +174,28 @@ class _PickerMapNativeState extends State<PickerMapNative>
     setState(() {
       final ts = DateTime.now().toIso8601String().substring(11, 19);
       _ktLogs.insert(0, '[$ts] $msg');
-      if (_ktLogs.length > 120) _ktLogs.removeLast(); // cap mais baixo
+      if (_ktLogs.length > 120) _ktLogs.removeLast();
     });
-    // ignore: avoid_print
     print(msg);
   }
 
   Future<dynamic> _handleCall(MethodCall call) async {
     if (call.method == 'platformReady') {
       _pushLog('KT → Dart: platformReady');
-      // Envia config inicial aqui (após o "platformReady" o nativo está 100%)
-      await _channel?.invokeMethod('updateConfig', {
-        'userLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
-        },
-        if (widget.destination != null)
-          'destination': {
-            'latitude': widget.destination!.latitude,
-            'longitude': widget.destination!.longitude,
-          },
-        'route': const <Map<String, double>>[],
-        'routeColor': widget.routeColor.value,
-        'routeWidth': widget.routeWidth,
-        'userName': widget.userName,
-        'userPhotoUrl': widget.userPhotoUrl,
-      });
+      await widget.controller?.updateConfig(
+        user: widget.userLocation,
+        destination: widget.destination,
+        routeColor: widget.routeColor,
+        routeWidth: widget.routeWidth,
+        userName: widget.userName,
+        userPhotoUrl: widget.userPhotoUrl,
+        mapStyleJson: widget.mapStyleJson, // <- seta dark aqui
+      );
     } else if (call.method == 'debugLog') {
       final m = (call.arguments as Map?) ?? const {};
       final level = (m['level'] ?? 'D').toString();
       final msg = (m['msg'] ?? '').toString();
-      // Evita flood: ignora logs de sizes repetidos
-      if (msg.startsWith('sizes:')) return null;
+      if (msg.startsWith('sizes:')) return null; // menos flood
       _pushLog('[KT/$level] $msg');
     }
     return null;
@@ -175,7 +210,6 @@ class _PickerMapNativeState extends State<PickerMapNative>
   @override
   void initState() {
     super.initState();
-    // Cria o AndroidView uma única vez
     _platformView = AndroidView(
       viewType: 'picker_map_native',
       layoutDirection: TextDirection.ltr,
@@ -194,25 +228,19 @@ class _PickerMapNativeState extends State<PickerMapNative>
   @override
   void didUpdateWidget(covariant PickerMapNative oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Se localização/destino mudarem, reenvia config sem recriar a view
     if (_channel != null &&
         (oldWidget.userLocation.latitude != widget.userLocation.latitude ||
             oldWidget.userLocation.longitude !=
                 widget.userLocation.longitude ||
             oldWidget.destination?.latitude != widget.destination?.latitude ||
             oldWidget.destination?.longitude !=
-                widget.destination?.longitude)) {
-      _channel!.invokeMethod('updateConfig', {
-        'userLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
-        },
-        if (widget.destination != null)
-          'destination': {
-            'latitude': widget.destination!.latitude,
-            'longitude': widget.destination!.longitude,
-          },
-      });
+                widget.destination?.longitude ||
+            oldWidget.mapStyleJson != widget.mapStyleJson)) {
+      widget.controller?.updateConfig(
+        user: widget.userLocation,
+        destination: widget.destination,
+        mapStyleJson: widget.mapStyleJson,
+      );
     }
   }
 
@@ -244,7 +272,6 @@ class _PickerMapNativeState extends State<PickerMapNative>
       );
     }
 
-    // Ajustes de overlay/log: respeita SafeArea e altura adaptativa
     final bottomInset = MediaQuery.of(context).padding.bottom;
     final safePad =
         (widget.brandSafePaddingBottom ?? 0) + (bottomInset > 0 ? bottomInset : 8);
@@ -255,7 +282,6 @@ class _PickerMapNativeState extends State<PickerMapNative>
       child: Stack(
         children: [
           mapBox,
-          // Botão compacto
           Positioned(
             left: 8,
             top: 8,
@@ -275,7 +301,6 @@ class _PickerMapNativeState extends State<PickerMapNative>
               ),
             ),
           ),
-          // Painel de logs no rodapé, com SafeArea
           if (_logsVisible)
             Positioned(
               left: 8,
