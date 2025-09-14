@@ -1,7 +1,6 @@
-// lib/custom_code/widgets/picker_map_native.dart
 // ignore_for_file: avoid_print
-
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -9,15 +8,18 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
 import 'package:flutter/services.dart';
-import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff;
 
-/// ------------------------ CONTROLLER ------------------------
+import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // FlutterFlow LatLng
 
+// ============================================================================
+// Controller
+// ============================================================================
 class PickerMapNativeController {
   MethodChannel? _channel;
   void _attach(MethodChannel ch) => _channel = ch;
   void _detach() => _channel = null;
 
+  // --- Métodos diretos do nativo ---
   Future<void> updateConfig(Map<String, dynamic> cfg) async =>
       _channel?.invokeMethod('updateConfig', cfg) ?? Future.value();
 
@@ -30,15 +32,21 @@ class PickerMapNativeController {
   Future<void> setPolygons(List<Map<String, dynamic>> p) async =>
       _channel?.invokeMethod('setPolygons', p) ?? Future.value();
 
-  Future<void> cameraTo(double lat, double lng,
-          {double? zoom, double? bearing, double? tilt}) async =>
+  Future<void> cameraTo(
+    double lat,
+    double lng, {
+    double? zoom,
+    double? bearing,
+    double? tilt,
+  }) async =>
       _channel?.invokeMethod('cameraTo', {
         'latitude': lat,
         'longitude': lng,
         if (zoom != null) 'zoom': zoom,
         if (bearing != null) 'bearing': bearing,
         if (tilt != null) 'tilt': tilt,
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 0}) async =>
       _channel?.invokeMethod('fitBounds', {
@@ -46,7 +54,8 @@ class PickerMapNativeController {
             .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
             .toList(),
         'padding': padding,
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<void> updateCarPosition(
     String id,
@@ -60,60 +69,90 @@ class PickerMapNativeController {
         'longitude': pos.longitude,
         if (rotation != null) 'rotation': rotation,
         if (durationMs != null) 'durationMs': durationMs,
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<dynamic> debugInfo() async =>
       _channel?.invokeMethod('debugInfo') ?? Future.value();
 
-  /// Helpers
+  // --- Extras de conforto (se o nativo não tiver, apenas ignorará) ---
+  Future<void> setMapStyle(String json) async {
+    try {
+      await _channel?.invokeMethod('setMapStyle', {'json': json});
+    } catch (_) {
+      // se o método não existir no nativo, ignora
+    }
+  }
 
-  Future<void> setRoute(List<ff.LatLng> pts,
-          {Color? color, double? width}) async =>
-      setPolylines([
+  /// Anima um polyline "crescendo" ponto a ponto (route snake).
+  /// Se o nativo tiver animação própria, prefira lá; isso aqui é compat no Dart.
+  Future<void> animatePolyline({
+    required List<ff.LatLng> points,
+    int steps = 24,
+    int totalMs = 900,
+    int color = 0xFFFFC107,
+    double width = 4.0,
+  }) async {
+    if (points.length < 2) return;
+    final stepMs = (totalMs / steps).round();
+    for (var i = 1; i <= steps; i++) {
+      final t = i / steps;
+      final idx = (t * (points.length - 1)).clamp(1.0, (points.length - 1).toDouble());
+      final hi = idx.floor();
+      final lo = hi - 1;
+      final frac = idx - hi;
+
+      final out = <Map<String, dynamic>>[];
+      for (var k = 0; k <= hi; k++) {
+        out.add({
+          'latitude': points[k].latitude,
+          'longitude': points[k].longitude,
+        });
+      }
+      if (frac > 0 && hi + 1 < points.length) {
+        final a = points[hi];
+        final b = points[hi + 1];
+        final lat = a.latitude + (b.latitude - a.latitude) * frac;
+        final lng = a.longitude + (b.longitude - a.longitude) * frac;
+        out.add({'latitude': lat, 'longitude': lng});
+      }
+
+      await setPolylines([
         {
-          'points':
-              pts.map((e) => {'latitude': e.latitude, 'longitude': e.longitude}).toList(),
-          if (color != null) 'color': color.value,
-          if (width != null) 'width': width,
+          'points': out,
+          'color': color,
+          'width': width,
         }
       ]);
 
-  Future<void> animateRouteSnake(
-    List<ff.LatLng> pts, {
-    Duration total = const Duration(seconds: 2),
-    Color? color,
-    double width = 5,
-  }) async {
-    if (pts.length < 2) return;
-    final steps = pts.length;
-    final perStep = total ~/ steps;
-    for (var i = 2; i <= steps; i++) {
-      await setRoute(pts.take(i).toList(), color: color, width: width);
-      await Future.delayed(perStep);
+      await Future.delayed(Duration(milliseconds: stepMs));
     }
   }
 
-  Future<void> moveCarSmooth(
-    String id,
-    List<ff.LatLng> path, {
-    int durationMsPerLeg = 800,
-    double? fixedRotation,
+  /// Desenha um polígono simples (borda + preenchimento).
+  Future<void> drawPolygon({
+    required List<ff.LatLng> points,
+    int strokeColor = 0xFF000000,
+    double strokeWidth = 2.0,
+    int fillColor = 0x220000FF,
   }) async {
-    if (path.length < 2) return;
-    for (var i = 1; i < path.length; i++) {
-      await updateCarPosition(
-        id,
-        path[i],
-        rotation: fixedRotation,
-        durationMs: durationMsPerLeg,
-      );
-      await Future.delayed(Duration(milliseconds: durationMsPerLeg));
-    }
+    if (points.length < 3) return;
+    await setPolygons([
+      {
+        'points': points
+            .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
+            .toList(),
+        'strokeColor': strokeColor,
+        'width': strokeWidth,
+        'fillColor': fillColor,
+      }
+    ]);
   }
 }
 
-/// ------------------------ WIDGET ------------------------
-
+// ============================================================================
+// Widget
+// ============================================================================
 class PickerMapNative extends StatefulWidget {
   const PickerMapNative({
     super.key,
@@ -129,26 +168,42 @@ class PickerMapNative extends StatefulWidget {
     this.showDebugPanel = true,
     this.controller,
     @Deprecated('Compat apenas. Não é usado pelo native.')
-    this.driversRefs = const [], // <- aqui
+    this.driversRefs = const [], // <- mantém compat com seu call site
     this.brandSafePaddingBottom,
     this.mapStyleJson,
   });
 
+  // Requeridos / principais
   final ff.LatLng userLocation;
   final ff.LatLng? destination;
+
+  // Info do usuário (opcional)
   final String? userName;
   final String? userPhotoUrl;
 
+  // Layout / estilo
   final double? width;
   final double height;
   final double borderRadius;
+
+  // Rota
   final Color routeColor;
   final int routeWidth;
+
+  // Painel de debug
   final bool showDebugPanel;
+
+  // Controller
   final PickerMapNativeController? controller;
+
+  // Compat
   @Deprecated('Compat apenas. Não é usado pelo native.')
-  final List<dynamic> driversRefs; // <- aqui
+  final List<dynamic> driversRefs;
+
+  // UI
   final double? brandSafePaddingBottom;
+
+  // Estilo do mapa (passe o JSON do Styled Maps aqui para dark mode)
   final String? mapStyleJson;
 
   @override
@@ -159,18 +214,28 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   MethodChannel? _channel;
   int? _viewId;
 
-  final _ktLogs = <String>[];
-  bool _logsVisible = false;
+  static int _nextViewId = 1; // multi-instância sem conflito
 
-  static int _nextViewId = 9000;
+  final _ktLogs = <String>[];
+  bool _logsVisible = true;
+
+  String? _pendingMapStyleJson; // aplica assim que platformReady chegar
 
   void _pushLog(String msg) {
     setState(() {
       final ts = DateTime.now().toIso8601String().substring(11, 19);
       _ktLogs.insert(0, '[$ts] $msg');
-      if (_ktLogs.length > 200) _ktLogs.removeLast();
+      if (_ktLogs.length > 300) _ktLogs.removeLast();
     });
+    // Só para ver no logcat também
+    // ignore: avoid_print
     print(msg);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pendingMapStyleJson = widget.mapStyleJson;
   }
 
   @override
@@ -186,6 +251,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     _channel!.setMethodCallHandler(_handleCall);
     widget.controller?._attach(_channel!);
 
+    // Config inicial
     await _channel!.invokeMethod('updateConfig', {
       'userLocation': {
         'latitude': widget.userLocation.latitude,
@@ -201,14 +267,21 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'routeWidth': widget.routeWidth,
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
-      if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-      // driversRefs é ignorado no native.
     });
   }
 
   Future<dynamic> _handleCall(MethodCall call) async {
     if (call.method == 'platformReady') {
       _pushLog('KT → Dart: platformReady');
+      // aplica estilo do mapa assim que o nativo estiver pronto
+      if (_pendingMapStyleJson != null && _pendingMapStyleJson!.trim().isNotEmpty) {
+        try {
+          await _channel?.invokeMethod('setMapStyle', {'json': _pendingMapStyleJson});
+          _pushLog('[Dart] mapStyle aplicado');
+        } catch (_) {
+          _pushLog('[Dart] setMapStyle não suportado no nativo (ignorado)');
+        }
+      }
     } else if (call.method == 'debugLog') {
       final m = (call.arguments as Map?) ?? const {};
       final level = (m['level'] ?? 'D').toString();
@@ -224,7 +297,9 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       return const Center(child: Text('PickerMapNative: apenas Android'));
     }
 
+    // ID único para este PlatformView
     final viewId = _nextViewId++;
+
     final controller = PlatformViewsService.initSurfaceAndroidView(
       id: viewId,
       viewType: 'picker_map_native',
@@ -259,107 +334,93 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       );
     }
 
+    // Evitar sobrepor status/nav bar: usa SafeArea e paddings
     final mq = MediaQuery.of(context);
-    final safeBottom = mq.padding.bottom;
-    final extraBottom = widget.brandSafePaddingBottom ?? 56;
-    final panelHeight = (mq.size.height * 0.22).clamp(120.0, 180.0);
+    final bottomInset = mq.padding.bottom;
+    final topInset = mq.padding.top;
+    final brandPad = widget.brandSafePaddingBottom ?? 0;
+    final logsHeight = math.min<double>(180, widget.height * 0.3);
 
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          child: mapBox,
-        ),
-        Positioned(
-          left: 10,
-          top: 10,
-          child: Material(
-            color: Colors.black54,
-            borderRadius: BorderRadius.circular(10),
-            child: InkWell(
-              onTap: () => setState(() => _logsVisible = !_logsVisible),
-              borderRadius: BorderRadius.circular(10),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Text(
-                  _logsVisible ? 'Ocultar logs' : 'Mostrar logs',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: Stack(
+        children: [
+          mapBox,
+          // Botão de toggle dos logs no topo, respeitando status bar
+          Positioned(
+            left: 8,
+            right: 8,
+            top: 8 + topInset,
+            child: Row(
+              children: [
+                Material(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    onTap: () => setState(() => _logsVisible = !_logsVisible),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      child: Text(
+                        'Logs',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                // slot pra mais ações se quiser
+              ],
             ),
           ),
-        ),
-        if (_logsVisible)
-          Positioned(
-            left: 10,
-            right: 10,
-            bottom: 10 + safeBottom + extraBottom,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: 110,
-                maxHeight: panelHeight,
-              ),
-              child: Material(
-                color: Colors.black.withOpacity(0.65),
-                borderRadius: BorderRadius.circular(12),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Logs do mapa',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Expanded(
-                        child: ListView.builder(
-                          reverse: true,
-                          padding: EdgeInsets.zero,
-                          itemCount: _ktLogs.length,
-                          itemBuilder: (_, i) => Text(
-                            _ktLogs[i],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'monospace',
-                              fontSize: 11,
-                              height: 1.2,
-                            ),
+          if (_logsVisible)
+            Positioned(
+              left: 8,
+              right: 8,
+              // respeita nav bar / bottom inset e ainda um brandPad opcional
+              bottom: 8 + bottomInset + brandPad,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  // evita cortar quando o container é baixo
+                  maxHeight: logsHeight,
+                ),
+                child: Material(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ScrollConfiguration(
+                      behavior: const _NoGlowBehavior(),
+                      child: ListView.builder(
+                        reverse: true,
+                        shrinkWrap: true,
+                        itemCount: _ktLogs.length,
+                        itemBuilder: (_, i) => Text(
+                          _ktLogs[i],
+                          softWrap: true,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'monospace',
+                            fontSize: 12,
+                            height: 1.2,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-/// ------------------------ Estilo DARK opcional ------------------------
-const String kDarkMapStyle = '''
-[
-  {"elementType": "geometry", "stylers": [{"color": "#1d1f25"}]},
-  {"elementType": "labels.icon", "stylers": [{"visibility": "off"}]},
-  {"elementType": "labels.text.fill", "stylers": [{"color": "#e0e0e0"}]},
-  {"elementType": "labels.text.stroke", "stylers": [{"color": "#1d1f25"}]},
-  {"featureType": "administrative", "elementType": "geometry", "stylers": [{"color":"#3a3d44"}]},
-  {"featureType": "poi", "elementType": "geometry", "stylers": [{"color":"#2a2d34"}]},
-  {"featureType": "poi.park", "elementType": "geometry", "stylers": [{"color":"#27302b"}]},
-  {"featureType": "road", "elementType": "geometry", "stylers": [{"color":"#2b2f36"}]},
-  {"featureType": "road", "elementType": "geometry.stroke", "stylers": [{"color":"#1f2228"}]},
-  {"featureType": "road.highway", "elementType": "geometry", "stylers": [{"color":"#383c45"}]},
-  {"featureType": "transit", "elementType": "geometry", "stylers": [{"color":"#2b2f36"}]},
-  {"featureType": "water", "elementType": "geometry", "stylers": [{"color":"#0f141a"}]}
-]
-''';
+// Remove overscroll glow do painel de logs (puramente estético)
+class _NoGlowBehavior extends ScrollBehavior {
+  const _NoGlowBehavior();
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+}
