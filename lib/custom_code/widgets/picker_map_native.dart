@@ -247,11 +247,15 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (defaultTargetPlatform != TargetPlatform.android) {
-      return const Center(child: Text('PickerMapNative: apenas Android'));
-    }
+  @override
+Widget build(BuildContext context) {
+  final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
+  final brandBottom = widget.brandSafePaddingBottom ?? 16;
+  final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
 
+  Widget platformView;
+
+  if (defaultTargetPlatform == TargetPlatform.android) {
     final controller = PlatformViewsService.initSurfaceAndroidView(
       id: _viewId,
       viewType: 'picker_map_native',
@@ -262,46 +266,52 @@ class _PickerMapNativeState extends State<PickerMapNative> {
           'longitude': widget.userLocation.longitude,
         },
         if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-
-        // ====== Compat (legado) — o nativo pode ignorar ======
         if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
-        if (widget.liteModeOnAndroid != null)
-          'liteModeOnAndroid': widget.liteModeOnAndroid,
-        if (widget.ultraLowSpecMode != null)
-          'ultraLowSpecMode': widget.ultraLowSpecMode,
-        // =====================================================
+        if (widget.liteModeOnAndroid != null) 'liteModeOnAndroid': widget.liteModeOnAndroid,
+        if (widget.ultraLowSpecMode != null) 'ultraLowSpecMode': widget.ultraLowSpecMode,
       },
       creationParamsCodec: const StandardMessageCodec(),
     )
       ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
       ..create();
 
-    final androidView = AndroidViewSurface(
+    platformView = AndroidViewSurface(
       controller: controller as AndroidViewController,
       gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
       hitTestBehavior: PlatformViewHitTestBehavior.opaque,
     );
-
-    // Evita corte de bordas e ajuda a não sobrepor a navbar (safe area + padding)
-    final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
-    final brandBottom = widget.brandSafePaddingBottom ?? 16;
-    final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
-
-    final mapBox = Padding(
-      padding: outerPadding,
-      child: SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: androidView,
-      ),
+  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    platformView = UiKitView(
+      viewType: 'picker_map_native',
+      creationParams: {
+        'initialUserLocation': {
+          'latitude': widget.userLocation.latitude,
+          'longitude': widget.userLocation.longitude,
+        },
+        if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
+      },
+      creationParamsCodec: const StandardMessageCodec(),
+      onPlatformViewCreated: _onPlatformViewCreated,
     );
+  } else {
+    return const Center(child: Text('PickerMapNative: plataforma não suportada'));
+  }
 
-    if (!widget.showDebugPanel) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        child: mapBox,
-      );
-    }
+  final mapBox = Padding(
+    padding: outerPadding,
+    child: SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: platformView,
+    ),
+  );
+
+  if (!widget.showDebugPanel) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: mapBox,
+    );
+  }
 
     // Painel de logs compacto
     return Stack(
