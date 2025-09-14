@@ -37,10 +37,11 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   final scaffoldKey = GlobalKey<ScaffoldState>();
   LatLng? currentUserLocationValue;
 
-  // === NOVO: controller do mapa + memo do último destino
+  // Controller do mapa + memo do último destino + flag do 3D inicial
   final custom_widgets.PickerMapNativeController _mapCtrl =
       custom_widgets.PickerMapNativeController();
   LatLng? _lastDest;
+  bool _didInitial3D = false;
 
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
@@ -52,19 +53,20 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
   final animationsMap = <String, AnimationInfo>{};
 
-  bool _isZero(LatLng? p) => p == null || (p.latitude == 0.0 && p.longitude == 0.0);
-
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => Home5Model());
 
-    getCurrentUserLocation(defaultLocation: const LatLng(0.0, 0.0), cached: true)
-        .then((loc) => safeSetState(() {
-              currentUserLocationValue = loc;
-              FFAppState().latlngAtual ??= loc;
-              FFAppState().update(() {});
-            }));
+    // carrega localização e injeta no FFAppState
+    getCurrentUserLocation(
+      defaultLocation: const LatLng(0.0, 0.0),
+      cached: true,
+    ).then((loc) => safeSetState(() {
+          currentUserLocationValue = loc;
+          FFAppState().latlngAtual ??= loc;
+          FFAppState().update(() {});
+        }));
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       currentUserLocationValue =
@@ -96,13 +98,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         trigger: AnimationTrigger.onActionTrigger,
         applyInitialState: false,
         effectsBuilder: () => [
-          SaturateEffect(
-            curve: Curves.linear,
-            delay: 0.ms,
-            duration: 280.ms,
-            begin: 0.77,
-            end: 2.0,
-          ),
+          SaturateEffect(curve: Curves.linear, delay: 0.ms, duration: 280.ms, begin: 0.77, end: 2.0),
           TintEffect(
             curve: Curves.easeInOut,
             delay: 90.ms,
@@ -116,20 +112,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
       'containerOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
         effectsBuilder: () => [
-          MoveEffect(
-            curve: Curves.easeInOut,
-            delay: 0.ms,
-            duration: 980.ms,
-            begin: const Offset(0, -30),
-            end: const Offset(0, 0),
-          ),
-          FadeEffect(
-            curve: Curves.easeInOut,
-            delay: 0.ms,
-            duration: 450.ms,
-            begin: 0.0,
-            end: 1.0,
-          ),
+          MoveEffect(curve: Curves.easeInOut, delay: 0.ms, duration: 980.ms, begin: const Offset(0, -30), end: const Offset(0, 0)),
+          FadeEffect(curve: Curves.easeInOut, delay: 0.ms, duration: 450.ms, begin: 0.0, end: 1.0),
         ],
       ),
       for (final k in [2, 3, 4, 5, 6, 7])
@@ -137,13 +121,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
           trigger: AnimationTrigger.onActionTrigger,
           applyInitialState: false,
           effectsBuilder: () => [
-            SaturateEffect(
-              curve: Curves.linear,
-              delay: 0.ms,
-              duration: 280.ms,
-              begin: 0.77,
-              end: 2.0,
-            ),
+            SaturateEffect(curve: Curves.linear, delay: 0.ms, duration: 280.ms, begin: 0.77, end: 2.0),
             TintEffect(
               curve: Curves.easeInOut,
               delay: 90.ms,
@@ -156,9 +134,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         ),
     });
     setupAnimations(
-      animationsMap.values.where(
-        (anim) => anim.trigger == AnimationTrigger.onActionTrigger || !anim.applyInitialState,
-      ),
+      animationsMap.values.where((anim) => anim.trigger == AnimationTrigger.onActionTrigger || !anim.applyInitialState),
       this,
     );
   }
@@ -173,27 +149,45 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
-    // === NOVO: enquadra automaticamente quando o destino muda
+    // Auto-enquadrar quando o destino muda
     final userNow = FFAppState().latlngAtual;
     final destNow = FFAppState().latlangAondeVaiIr;
-    if (!_isZero(userNow) &&
+
+    if (userNow != null &&
         destNow != null &&
         (_lastDest == null ||
             _lastDest!.latitude != destNow.latitude ||
             _lastDest!.longitude != destNow.longitude)) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         try {
-          await _mapCtrl.fitBounds([userNow!, destNow], padding: 80);
+          await _mapCtrl.fitBounds([userNow!, destNow!], padding: 80);
         } catch (_) {}
         await Future.delayed(const Duration(milliseconds: 350));
         try {
-          await _mapCtrl.fitBounds([userNow, destNow], padding: 80);
+          await _mapCtrl.fitBounds([userNow!, destNow!], padding: 80);
         } catch (_) {}
       });
       _lastDest = destNow;
     }
 
-    if (currentUserLocationValue == null) {
+    // 3D inicial quando só há origem (uma vez)
+    if (!_didInitial3D && destNow == null && userNow != null) {
+      _didInitial3D = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await _mapCtrl.cameraTo(
+            userNow.latitude,
+            userNow.longitude,
+            zoom: 17,
+            tilt: 45,
+            bearing: 30,
+          );
+        } catch (_) {}
+      });
+    }
+
+    // loading até ter uma origem válida
+    if (currentUserLocationValue == null || FFAppState().latlngAtual == null) {
       return Container(
         color: FlutterFlowTheme.of(context).primaryBackground,
         child: Center(
@@ -220,21 +214,18 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         backgroundColor: FlutterFlowTheme.of(context).primaryText,
         body: Stack(
           children: [
-            // =========================
-            // MAPA NATIVO — ocupa toda a área
-            // =========================
+            // MAPA NATIVO (full)
             Positioned.fill(
               child: PointerInterceptor(
                 intercepting: isWeb,
                 child: AuthUserStreamWidget(
                   builder: (context) => StreamBuilder<List<UsersRecord>>(
                     stream: queryUsersRecord(
-                      queryBuilder: (usersRecord) => usersRecord
-                          .where('driver', isEqualTo: true)
-                          .where('driverOnline', isEqualTo: true),
+                      queryBuilder: (usersRecord) =>
+                          usersRecord.where('driver', isEqualTo: true).where('driverOnline', isEqualTo: true),
                     ),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
+                      if (!snapshot.hasData || FFAppState().latlngAtual == null) {
                         return Center(
                           child: SizedBox(
                             width: 50,
@@ -246,23 +237,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                           ),
                         );
                       }
-                      final pickerMapUsersRecordList = snapshot.data!;
-                      if (_isZero(FFAppState().latlngAtual)) {
-                        return Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: SpinKitDoubleBounce(
-                              color: FlutterFlowTheme.of(context).accent1,
-                              size: 50,
-                            ),
-                          ),
-                        );
-                      }
-
-                      // === AQUI: controller + tema DARK/AMARELO + flags estáveis
+                      final drivers = snapshot.data!;
                       return custom_widgets.PickerMapNative(
-                        key: const ValueKey('picker-map-native'),
                         width: double.infinity,
                         height: double.infinity,
                         controller: _mapCtrl,
@@ -272,17 +248,12 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         // Tema dark + amarelo (sem azul)
                         mapStyleJson: kGoogleMapsDarkAmberStyle,
 
-                        // Rota em âmbar mais grossa
+                        // Rota âmbar e mais grossa
                         routeColor: const Color(0xFFFFC107),
                         routeWidth: 6,
 
-                        // 3D bonitão
-                        initialZoom: 16.5,
-                        initialTilt: 45.0,
-                        initialBearing: 24.0,
-
-                        // Seus parâmetros existentes
-                        driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
+                        // Parâmetros existentes
+                        driversRefs: drivers.map((e) => e.reference).toList(),
                         refreshMs: 2000,
                         destinationMarkerPngUrl:
                             'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
@@ -298,11 +269,16 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         driverTaxiIconUrl:
                             'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
                         enableRouteSnake: true,
+
+                        // padding para não colar na navbar gestual
                         brandSafePaddingBottom: 60,
 
-                        // Anti “sumiço”/lite lavado
+                        // Evita "véu cinza"/lite
                         liteModeOnAndroid: false,
                         ultraLowSpecMode: false,
+
+                        // sem painel de debug
+                        showDebugPanel: false,
                       );
                     },
                   ),
@@ -310,15 +286,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
               ),
             ),
 
-            // =========================
-            // OVERLAYS (topo + bottom card + navbar)
-            // =========================
+            // OVERLAYS (header + bottom + navbar) — igual ao seu
             PointerInterceptor(
               intercepting: isWeb,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  // HEADER com gradiente
+                  // HEADER…
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
@@ -366,13 +340,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                   width: 200,
                                                   height: 200,
                                                   clipBehavior: Clip.antiAlias,
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Image.network(
-                                                    currentUserPhoto,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                                                  child: Image.network(currentUserPhoto, fit: BoxFit.cover),
                                                 ),
                                               ),
                                             ),
@@ -382,9 +351,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 child: AuthUserStreamWidget(
                                                   builder: (context) => Text(
                                                     functions.partesDoName(currentUserDisplayName),
-                                                    style: FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .override(
+                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                           font: GoogleFonts.poppins(
                                                             fontWeight: FlutterFlowTheme.of(context)
                                                                 .bodyMedium
@@ -450,11 +417,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             decoration: BoxDecoration(
                                               color: FlutterFlowTheme.of(context).primaryText,
                                               boxShadow: const [
-                                                BoxShadow(
-                                                  blurRadius: 10,
-                                                  color: Colors.black,
-                                                  offset: Offset(5, 0),
-                                                )
+                                                BoxShadow(blurRadius: 10, color: Colors.black, offset: Offset(5, 0))
                                               ],
                                               borderRadius: BorderRadius.circular(20),
                                             ),
@@ -465,20 +428,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             decoration: BoxDecoration(
                                               color: const Color(0xFF252525),
                                               boxShadow: const [
-                                                BoxShadow(
-                                                  blurRadius: 6,
-                                                  color: Color(0x48FFFFFF),
-                                                  offset: Offset(-2, -1),
-                                                )
+                                                BoxShadow(blurRadius: 6, color: Color(0x48FFFFFF), offset: Offset(-2, -1))
                                               ],
                                               borderRadius: BorderRadius.circular(20),
                                             ),
                                             alignment: const AlignmentDirectional(0, 0),
-                                            child: Icon(
-                                              Icons.menu,
-                                              color: FlutterFlowTheme.of(context).secondaryBackground,
-                                              size: 18,
-                                            ),
+                                            child: Icon(Icons.menu,
+                                                color: FlutterFlowTheme.of(context).secondaryBackground, size: 18),
                                           ),
                                         ],
                                       ),
@@ -526,7 +482,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                         children: [
                                           Flexible(
                                             child: Padding(
-                                              padding: const EdgeInsetsDirectional.fromSTEB(10, 8, 0, 8),
+                                              padding:
+                                                  const EdgeInsetsDirectional.fromSTEB(10, 8, 0, 8),
                                               child: Text(
                                                 FFAppState().locationWhereTo,
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -579,7 +536,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                               ],
                             ),
 
-                            // Chips — layout estável e com espaçamento
+                            // Chips de lugares por perto (inalterado)
                             Align(
                               alignment: const AlignmentDirectional(-1, -1),
                               child: Padding(
@@ -588,7 +545,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                   builder: (context) {
                                     final pertos = FFAppState().locationsPorPerto.toList();
                                     return SizedBox(
-                                      height: 36, // altura fixa pro carrossel
+                                      height: 36,
                                       child: ListView.separated(
                                         scrollDirection: Axis.horizontal,
                                         padding: const EdgeInsets.only(right: 12),
@@ -615,14 +572,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 );
                                                 FFAppState().latlangAondeVaiIr =
                                                     functions.formatStringToLantLng(
-                                                  getJsonField(
-                                                    _model.geolocatoraddressonchoose,
-                                                    r'''$.lat''',
-                                                  ).toString(),
-                                                  getJsonField(
-                                                    _model.geolocatoraddressonchoose,
-                                                    r'''$.lng''',
-                                                  ).toString(),
+                                                  getJsonField(_model.geolocatoraddressonchoose, r'''$.lat''')
+                                                      .toString(),
+                                                  getJsonField(_model.geolocatoraddressonchoose, r'''$.lng''')
+                                                      .toString(),
                                                 );
                                                 FFAppState().listPerto = item;
                                                 FFAppState().locationWhereTo = item;
@@ -658,9 +611,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 child: Text(
                                                   item,
                                                   overflow: TextOverflow.ellipsis,
-                                                  style: FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .override(
+                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                         font: GoogleFonts.poppins(
                                                           fontWeight: FlutterFlowTheme.of(context)
                                                               .bodyMedium
@@ -694,7 +645,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
                   const Spacer(flex: 10),
 
-                  // BOTTOM CARD + NAVBAR (inalterados)
+                  // Bottom card + navbar (como no seu)
                   Align(
                     alignment: const AlignmentDirectional(0, 1),
                     child: Column(
@@ -818,11 +769,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                           ),
                                         ],
                                       ),
-                                      Container(
-                                        width: 336,
-                                        height: 1,
-                                        color: FlutterFlowTheme.of(context).alternate,
-                                      ),
+                                      Container(width: 336, height: 1, color: FlutterFlowTheme.of(context).alternate),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -867,10 +814,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                       return wrapInMaterialDatePickerTheme(
                                                         context,
                                                         child!,
-                                                        headerBackgroundColor:
-                                                            FlutterFlowTheme.of(context).primary,
-                                                        headerForegroundColor:
-                                                            FlutterFlowTheme.of(context).info,
+                                                        headerBackgroundColor: FlutterFlowTheme.of(context).primary,
+                                                        headerForegroundColor: FlutterFlowTheme.of(context).info,
                                                         headerTextStyle: FlutterFlowTheme.of(context)
                                                             .headlineLarge
                                                             .override(
@@ -882,8 +827,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                               ),
                                                               fontSize: 32,
                                                             ),
-                                                        pickerBackgroundColor: FlutterFlowTheme.of(context)
-                                                            .secondaryBackground,
+                                                        pickerBackgroundColor:
+                                                            FlutterFlowTheme.of(context).secondaryBackground,
                                                         pickerForegroundColor:
                                                             FlutterFlowTheme.of(context).primaryText,
                                                         selectedDateTimeBackgroundColor:
@@ -912,8 +857,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                     color: FlutterFlowTheme.of(context).alternate,
                                                     borderRadius: BorderRadius.circular(2),
                                                   ),
-                                                  padding:
-                                                      const EdgeInsetsDirectional.fromSTEB(4, 0, 4, 0),
+                                                  padding: const EdgeInsetsDirectional.fromSTEB(4, 0, 4, 0),
                                                   child: Row(
                                                     mainAxisSize: MainAxisSize.min,
                                                     children: [
@@ -953,8 +897,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               InkWell(
                                                 splashColor: Colors.transparent,
                                                 onTap: () async {
-                                                  if (animationsMap['containerOnActionTriggerAnimation2'] !=
-                                                      null) {
+                                                  if (animationsMap['containerOnActionTriggerAnimation2'] != null) {
                                                     safeSetState(() => hasContainerTriggered2 = true);
                                                     SchedulerBinding.instance.addPostFrameCallback(
                                                       (_) async => await animationsMap[
@@ -964,9 +907,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                     );
                                                   }
                                                   FFAppState().passangers =
-                                                      FFAppState().passangers == 8
-                                                          ? 1
-                                                          : FFAppState().passangers + 1;
+                                                      FFAppState().passangers == 8 ? 1 : FFAppState().passangers + 1;
                                                   safeSetState(() {});
                                                 },
                                                 child: Container(
@@ -983,9 +924,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                           color: Color(0xC2414141), size: 14),
                                                       Text(
                                                         '${valueOrDefault<String>(FFAppState().passangers.toString(), '1')} passengers',
-                                                        style: FlutterFlowTheme.of(context)
-                                                            .bodyMedium
-                                                            .override(
+                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                               font: GoogleFonts.poppins(
                                                                 fontWeight: FontWeight.w500,
                                                                 fontStyle: FlutterFlowTheme.of(context)
@@ -1018,8 +957,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               minutesKey: 'hp82na6c',
                                               selected: _model.rideChoose == 'ride',
                                               onTap: () async {
-                                                if (animationsMap['containerOnActionTriggerAnimation3'] !=
-                                                    null) {
+                                                if (animationsMap['containerOnActionTriggerAnimation3'] != null) {
                                                   safeSetState(() => hasContainerTriggered3 = true);
                                                   SchedulerBinding.instance.addPostFrameCallback(
                                                     (_) async => await animationsMap[
@@ -1041,8 +979,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               minutesKey: 'tr0g6iky',
                                               selected: _model.rideChoose == 'xl',
                                               onTap: () async {
-                                                if (animationsMap['containerOnActionTriggerAnimation4'] !=
-                                                    null) {
+                                                if (animationsMap['containerOnActionTriggerAnimation4'] != null) {
                                                   safeSetState(() => hasContainerTriggered4 = true);
                                                   SchedulerBinding.instance.addPostFrameCallback(
                                                     (_) async => await animationsMap[
@@ -1064,8 +1001,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               minutesKey: 'zkgb4g4y',
                                               selected: _model.rideChoose == 'luxury',
                                               onTap: () async {
-                                                if (animationsMap['containerOnActionTriggerAnimation5'] !=
-                                                    null) {
+                                                if (animationsMap['containerOnActionTriggerAnimation5'] != null) {
                                                   safeSetState(() => hasContainerTriggered5 = true);
                                                   SchedulerBinding.instance.addPostFrameCallback(
                                                     (_) async => await animationsMap[
@@ -1093,8 +1029,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               currentUserLocationValue = await getCurrentUserLocation(
                                                 defaultLocation: const LatLng(0.0, 0.0),
                                               );
-                                              if (animationsMap['containerOnActionTriggerAnimation6'] !=
-                                                  null) {
+                                              if (animationsMap['containerOnActionTriggerAnimation6'] != null) {
                                                 safeSetState(() => hasContainerTriggered6 = true);
                                                 SchedulerBinding.instance.addPostFrameCallback(
                                                   (_) async => await animationsMap[
@@ -1151,8 +1086,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                           InkWell(
                                             splashColor: Colors.transparent,
                                             onTap: () async {
-                                              if (animationsMap['containerOnActionTriggerAnimation7'] !=
-                                                  null) {
+                                              if (animationsMap['containerOnActionTriggerAnimation7'] != null) {
                                                 safeSetState(() => hasContainerTriggered7 = true);
                                                 SchedulerBinding.instance.addPostFrameCallback(
                                                   (_) async => await animationsMap[
@@ -1239,9 +1173,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         width: 70,
         height: 35,
         decoration: BoxDecoration(
-          boxShadow: const [
-            BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, 2)),
-          ],
+          boxShadow: const [BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, 2))],
           gradient: LinearGradient(
             colors: [
               selected ? const Color(0xFFF4B000) : FlutterFlowTheme.of(context).primaryText,
@@ -1291,7 +1223,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   }
 }
 
-// === NOVO: Tema DARK com acentos âmbar (amarelo), sem azul.
+// Tema DARK com acentos âmbar (amarelo), sem azul.
 const String kGoogleMapsDarkAmberStyle = '''
 [
   {"elementType":"geometry","stylers":[{"color":"#1a1a1a"}]},
