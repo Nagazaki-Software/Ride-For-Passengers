@@ -52,6 +52,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
   final animationsMap = <String, AnimationInfo>{};
 
+  bool _isZero(LatLng? p) => p == null || (p.latitude == 0.0 && p.longitude == 0.0);
+
   @override
   void initState() {
     super.initState();
@@ -174,15 +176,14 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     // === NOVO: enquadra automaticamente quando o destino muda
     final userNow = FFAppState().latlngAtual;
     final destNow = FFAppState().latlangAondeVaiIr;
-    if (userNow != null &&
+    if (!_isZero(userNow) &&
         destNow != null &&
         (_lastDest == null ||
             _lastDest!.latitude != destNow.latitude ||
             _lastDest!.longitude != destNow.longitude)) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // tenta agora e repete com um pequeno delay (garante se o nativo terminou de montar)
         try {
-          await _mapCtrl.fitBounds([userNow, destNow], padding: 80);
+          await _mapCtrl.fitBounds([userNow!, destNow], padding: 80);
         } catch (_) {}
         await Future.delayed(const Duration(milliseconds: 350));
         try {
@@ -246,7 +247,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         );
                       }
                       final pickerMapUsersRecordList = snapshot.data!;
-                      if (FFAppState().latlngAtual == null) {
+                      if (_isZero(FFAppState().latlngAtual)) {
                         return Center(
                           child: SizedBox(
                             width: 50,
@@ -261,6 +262,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
                       // === AQUI: controller + tema DARK/AMARELO + flags estáveis
                       return custom_widgets.PickerMapNative(
+                        key: const ValueKey('picker-map-native'),
                         width: double.infinity,
                         height: double.infinity,
                         controller: _mapCtrl,
@@ -273,6 +275,11 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         // Rota em âmbar mais grossa
                         routeColor: const Color(0xFFFFC107),
                         routeWidth: 6,
+
+                        // 3D bonitão
+                        initialZoom: 16.5,
+                        initialTilt: 45.0,
+                        initialBearing: 24.0,
 
                         // Seus parâmetros existentes
                         driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
@@ -293,11 +300,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         enableRouteSnake: true,
                         brandSafePaddingBottom: 60,
 
-                        // Anti-“sumiço”: nada de lite/ultra low enquanto depura
+                        // Anti “sumiço”/lite lavado
                         liteModeOnAndroid: false,
                         ultraLowSpecMode: false,
-
-                        showDebugPanel: true, // painel de logs na tela
                       );
                     },
                   ),
