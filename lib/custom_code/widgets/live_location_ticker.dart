@@ -1,5 +1,5 @@
-// live_location_ticker.dart
-// Ouve a posição do usuário em tempo real e atualiza FFAppState().latlngAtual
+// lib/custom_code/live_location_ticker.dart
+// Stream global de localização: atualiza FFAppState().latlngAtual em tempo real.
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,11 +16,13 @@ class LiveLocationTicker extends StatefulWidget {
 
 class _LiveLocationTickerState extends State<LiveLocationTicker> {
   StreamSubscription<Position>? _sub;
-  Position? _lastEmitted;
 
-  // ajuste fino aqui
-  static const _distanceFilterMeters = 7.0;      // ignora “tremedeira” menor que 7m
-  static const _intervalSeconds = 2;             // não mais que 1 update/2s
+  // Filtros pra evitar “tremedeira” e spam.
+  static const _distanceFilterMeters = 7.0; // ignora variações pequenas
+  static const _intervalSeconds = 2;        // no máx. 1 update a cada 2s
+
+  Position? _lastPos;
+  DateTime? _lastEmitAt;
 
   Future<bool> _ensurePermission() async {
     final enabled = await Geolocator.isLocationServiceEnabled();
@@ -30,66 +32,58 @@ class _LiveLocationTickerState extends State<LiveLocationTicker> {
     if (perm == LocationPermission.denied) {
       perm = await Geolocator.requestPermission();
     }
-    if (perm == LocationPermission.deniedForever ||
-        perm == LocationPermission.denied) {
+    if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
       return false;
     }
     return true;
   }
 
-  void _emit(Position p) {
-    // filtra ruído por distância
-    if (_lastEmitted != null) {
+  void _publish(Position p) {
+    // Filtro de distância
+    if (_lastPos != null) {
       final d = Geolocator.distanceBetween(
-        _lastEmitted!.latitude, _lastEmitted!.longitude,
-        p.latitude, p.longitude,
+        _lastPos!.latitude, _lastPos!.longitude, p.latitude, p.longitude,
       );
       if (d < _distanceFilterMeters) return;
     }
-    _lastEmitted = p;
+    // Filtro de tempo
+    final now = DateTime.now();
+    if (_lastEmitAt != null && now.difference(_lastEmitAt!).inSeconds < _intervalSeconds) {
+      return;
+    }
 
-    // Atualiza o FFAppState (sem prints)
+    _lastPos = p;
+    _lastEmitAt = now;
+
+    // Atualiza o FFAppState globalmente (sem prints).
     FFAppState().latlngAtual = LatLng(p.latitude, p.longitude);
     FFAppState().update(() {});
   }
 
   Future<void> _start() async {
     if (!await _ensurePermission()) {
-      // não atrapalha o app se o user negar; deixa latlngAtual como está
+      // Sem permissão, não faz nada e deixa o app seguir a vida.
       return;
     }
 
-    // pega um fix inicial, mas só publica se fizer sentido
+    // Fix inicial (se disponível)
     try {
       final first = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
       );
-      _emit(first);
-    } catch (_) {/* ignore */}
+      _publish(first);
+    } catch (_) {
+      // ignora erro do fix inicial
+    }
 
-    // stream contínuo
-    final settings = const LocationSettings(
+    // Stream contínua
+    const settings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 5, // Android/iOS já fazem parte do filtro
+      distanceFilter: 5, // Android/iOS já aplicam parte do filtro
     );
 
-    _sub?.cancel();
-    _sub = Geolocator.getPositionStream(locationSettings: settings)
-        // throttling simples: espaça a emissão
-        .where((_) {
-          // usa um relógio “manual” com base no lastEmitted
-          return true;
-        })
-        .listen((pos) {
-          // espaça por tempo
-          final lastTs = _lastEmitted?.timestamp;
-          final now = DateTime.now();
-          if (lastTs != null &&
-              now.difference(lastTs).inSeconds < _intervalSeconds) {
-            return;
-          }
-          _emit(pos);
-        });
+    await _sub?.cancel();
+    _sub = Geolocator.getPositionStream(locationSettings: settings).listen(_publish);
   }
 
   @override
