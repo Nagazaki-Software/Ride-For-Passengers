@@ -8,7 +8,7 @@ import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
 import 'package:flutter/services.dart';
 import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // LatLng do FlutterFlow
 
-/// Controller para chamar métodos nativos (Android).
+/// Controller para chamar métodos nativos (Android/iOS).
 class PickerMapNativeController {
   MethodChannel? _channel;
   void _attach(MethodChannel ch) => _channel = ch;
@@ -48,7 +48,8 @@ class PickerMapNativeController {
             .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
             .toList(),
         'padding': padding,
-      }) ?? Future.value();
+      }) ??
+      Future.value();
 
   Future<void> updateCarPosition(
     String id,
@@ -85,7 +86,7 @@ class PickerMapNative extends StatefulWidget {
     this.controller,
 
     // ==== Parâmetros de compatibilidade (legados) ====
-    // Mantidos para não quebrar telas existentes. O nativo pode ignorar.
+    // Mantidos para não quebrar telas existentes.
     @Deprecated('Compat apenas. Não é usado pelo nativo.')
     this.driversRefs = const [],
     this.refreshMs,
@@ -209,7 +210,6 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
 
-      // estilo do mapa
       if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
 
       // ====== Compat (legado) — o nativo pode ignorar ======
@@ -247,104 +247,105 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   }
 
   @override
-  @override
-Widget build(BuildContext context) {
-  final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
-  final brandBottom = widget.brandSafePaddingBottom ?? 16;
-  final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
+  Widget build(BuildContext context) {
+    final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
+    final brandBottom = widget.brandSafePaddingBottom ?? 16;
+    final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
 
-  Widget platformView;
+    Widget platformView;
 
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    final controller = PlatformViewsService.initSurfaceAndroidView(
-      id: _viewId,
-      viewType: 'picker_map_native',
-      layoutDirection: ui.TextDirection.ltr,
-      creationParams: {
-        'initialUserLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final controller = PlatformViewsService.initSurfaceAndroidView(
+        id: _viewId,
+        viewType: 'picker_map_native',
+        layoutDirection: ui.TextDirection.ltr,
+        creationParams: {
+          'initialUserLocation': {
+            'latitude': widget.userLocation.latitude,
+            'longitude': widget.userLocation.longitude,
+          },
+          if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
+          if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
+          if (widget.liteModeOnAndroid != null)
+            'liteModeOnAndroid': widget.liteModeOnAndroid,
+          if (widget.ultraLowSpecMode != null)
+            'ultraLowSpecMode': widget.ultraLowSpecMode,
         },
-        if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-        if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
-        if (widget.liteModeOnAndroid != null) 'liteModeOnAndroid': widget.liteModeOnAndroid,
-        if (widget.ultraLowSpecMode != null) 'ultraLowSpecMode': widget.ultraLowSpecMode,
-      },
-      creationParamsCodec: const StandardMessageCodec(),
-    )
-      ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
-      ..create();
+        creationParamsCodec: const StandardMessageCodec(),
+      )
+        ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
+        ..create();
 
-    platformView = AndroidViewSurface(
-      controller: controller as AndroidViewController,
-      gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-    );
-  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-    platformView = UiKitView(
-      viewType: 'picker_map_native',
-      creationParams: {
-        'initialUserLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
+      platformView = AndroidViewSurface(
+        controller: controller as AndroidViewController,
+        gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+        hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      platformView = UiKitView(
+        viewType: 'picker_map_native',
+        creationParams: {
+          'initialUserLocation': {
+            'latitude': widget.userLocation.latitude,
+            'longitude': widget.userLocation.longitude,
+          },
+          if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
         },
-        if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-      },
-      creationParamsCodec: const StandardMessageCodec(),
-      onPlatformViewCreated: _onPlatformViewCreated,
-    );
-  } else {
-    return const Center(child: Text('PickerMapNative: plataforma não suportada'));
-  }
+        creationParamsCodec: const StandardMessageCodec(),
+        onPlatformViewCreated: _onPlatformViewCreated,
+      );
+    } else {
+      return const Center(child: Text('PickerMapNative: plataforma não suportada'));
+    }
 
-  final mapBox = Padding(
-    padding: outerPadding,
-    child: SizedBox(
+    // NÃO clipa PlatformView no Android (evita “véu cinza”).
+    final Widget baseBox = SizedBox(
       width: widget.width,
       height: widget.height,
       child: platformView,
-    ),
-  );
-
-  if (!widget.showDebugPanel) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.borderRadius),
-      child: mapBox,
     );
-  }
+
+    final Widget mapBoxPadded = Padding(padding: outerPadding, child: baseBox);
+
+    final Widget mapBox = (defaultTargetPlatform == TargetPlatform.android)
+        ? mapBoxPadded // sem ClipRRect no Android
+        : ClipRRect(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            child: mapBoxPadded,
+          );
+
+    if (!widget.showDebugPanel) return mapBox;
 
     // Painel de logs compacto
+    final double topSafe = (MediaQuery.maybeOf(context)?.padding.top ?? 0) + 8;
+
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          child: mapBox,
-        ),
-        SafeArea(
-          child: Positioned(
-            left: 8,
-            top: 8,
-            child: Material(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(8),
-              child: InkWell(
-                onTap: () => setState(() => _logsVisible = !_logsVisible),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Text(
-                    'LOGS',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
+        mapBox,
+
+        // Botão de toggle
+        Positioned(
+          left: 8,
+          top: topSafe,
+          child: Material(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              onTap: () => setState(() => _logsVisible = !_logsVisible),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Text('LOGS', style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
             ),
           ),
         ),
+
+        // Lista de logs
         if (_logsVisible)
           Positioned(
             left: 8,
             right: 8,
-            bottom: 12 + (widget.brandSafePaddingBottom ?? 16),
+            bottom: 12 + brandBottom,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 140),
               child: Material(
