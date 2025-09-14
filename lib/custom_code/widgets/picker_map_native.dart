@@ -44,9 +44,8 @@ class PickerMapNativeController {
 
   Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 0}) async =>
       _channel?.invokeMethod('fitBounds', {
-        'points': pts
-            .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
-            .toList(),
+        'points':
+            pts.map((p) => {'latitude': p.latitude, 'longitude': p.longitude}).toList(),
         'padding': padding,
       }) ??
       Future.value();
@@ -82,9 +81,10 @@ class PickerMapNative extends StatefulWidget {
     this.borderRadius = 16,
     this.routeColor = const Color(0xFFFFC107),
     this.routeWidth = 4,
+    this.showDebugPanel = false, // padrão sem debug
     this.controller,
 
-    // Compat (legado) — o nativo pode ignorar
+    // ==== Compat (legado) — o nativo pode ignorar ====
     @Deprecated('Compat apenas. Não é usado pelo nativo.')
     this.driversRefs = const [],
     this.refreshMs,
@@ -97,35 +97,44 @@ class PickerMapNative extends StatefulWidget {
     this.enableRouteSnake = false,
     this.liteModeOnAndroid,
     this.ultraLowSpecMode,
+    // =================================================
 
-    // Estilo
+    this.brandSafePaddingBottom,
     this.mapStyleJson,
-
-    // 3D / câmera inicial
-    this.initialZoom = 16.5,
-    this.initialBearing = 24.0,
-    this.initialTilt = 45.0,
+    this.panelMaxLines = 120,
   });
 
+  /// Localização do usuário (FF LatLng)
   final ff.LatLng userLocation;
+
+  /// Destino (opcional)
   final ff.LatLng? destination;
 
+  /// Dados opcionais
   final String? userName;
   final String? userPhotoUrl;
 
+  /// Layout
   final double? width;
   final double height;
   final double borderRadius;
 
+  /// Rota
   final Color routeColor;
   final int routeWidth;
 
+  /// Painel de debug/logs
+  final bool showDebugPanel;
+  final int panelMaxLines;
+
+  /// Controller
   final PickerMapNativeController? controller;
 
-  // ===== compat (legado) =====
+  // ====== Compat (legado) ======
   @Deprecated('Compat apenas. Não é usado pelo nativo.')
   final List<dynamic> driversRefs;
   final int? refreshMs;
+
   final String? destinationMarkerPngUrl;
   final double? userMarkerSize;
   final double? driverIconWidth;
@@ -135,93 +144,115 @@ class PickerMapNative extends StatefulWidget {
   final bool enableRouteSnake;
   final bool? liteModeOnAndroid;
   final bool? ultraLowSpecMode;
-  // ===========================
+  // =============================
 
+  /// Ajuste para não sobrepor a navbar/gestural bar
+  final double? brandSafePaddingBottom;
+
+  /// Estilo JSON do Google Maps (ex.: dark). Use `kGoogleMapsDarkStyle`.
   final String? mapStyleJson;
-
-  // 3D
-  final double initialZoom;
-  final double initialBearing;
-  final double initialTilt;
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
 }
 
-class _PickerMapNativeState extends State<PickerMapNative>
-    with AutomaticKeepAliveClientMixin {
+class _PickerMapNativeState extends State<PickerMapNative> {
   static int _nextViewId = 1;
 
   MethodChannel? _channel;
   late final int _viewId;
 
-  // Mantém o AndroidView vivo entre rebuilds.
-  AndroidViewController? _androidController;
+  final _ktLogs = <String>[];
+  bool _logsVisible = false;
 
-  bool _platformReady = false;
-  bool _movedInitialCamera = false;
-
-  bool _isZero(ff.LatLng? p) =>
-      p == null || (p.latitude == 0.0 && p.longitude == 0.0);
-
-  Map<String, dynamic> _buildCfg() => {
-        'userLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
-        },
-        if (widget.destination != null)
-          'destination': {
-            'latitude': widget.destination!.latitude,
-            'longitude': widget.destination!.longitude,
-          },
-        'route': const <Map<String, double>>[],
-        'routeColor': widget.routeColor.value,
-        'routeWidth': widget.routeWidth,
-        'userName': widget.userName,
-        'userPhotoUrl': widget.userPhotoUrl,
-        if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-        // compat — o nativo pode ignorar
-        if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
-        if (widget.destinationMarkerPngUrl != null)
-          'destinationMarkerPngUrl': widget.destinationMarkerPngUrl,
-        if (widget.userMarkerSize != null) 'userMarkerSize': widget.userMarkerSize,
-        if (widget.driverIconWidth != null) 'driverIconWidth': widget.driverIconWidth,
-        if (widget.driverTaxiIconAsset != null)
-          'driverTaxiIconAsset': widget.driverTaxiIconAsset,
-        if (widget.driverDriverIconUrl != null)
-          'driverDriverIconUrl': widget.driverDriverIconUrl,
-        if (widget.driverTaxiIconUrl != null)
-          'driverTaxiIconUrl': widget.driverTaxiIconUrl,
-        'enableRouteSnake': widget.enableRouteSnake,
-        if (widget.liteModeOnAndroid != null)
-          'liteModeOnAndroid': widget.liteModeOnAndroid,
-        if (widget.ultraLowSpecMode != null)
-          'ultraLowSpecMode': widget.ultraLowSpecMode,
-      };
-
-  Future<void> _moveInitialCameraIfNeeded() async {
-    if (!_platformReady || _movedInitialCamera) return;
-    if (_isZero(widget.userLocation)) return;
-    try {
-      await _channel?.invokeMethod('cameraTo', {
-        'latitude': widget.userLocation.latitude,
-        'longitude': widget.userLocation.longitude,
-        'zoom': widget.initialZoom,
-        'bearing': widget.initialBearing,
-        'tilt': widget.initialTilt,
-      });
-      _movedInitialCamera = true;
-    } catch (_) {}
+  void _pushLog(String msg) {
+    if (!widget.showDebugPanel) return;
+    setState(() {
+      final ts = DateTime.now().toIso8601String().substring(11, 19);
+      _ktLogs.insert(0, '[$ts] $msg');
+      if (_ktLogs.length > widget.panelMaxLines) _ktLogs.removeLast();
+    });
+    // print(msg); // silenciado
   }
 
   @override
   void initState() {
     super.initState();
     _viewId = _nextViewId++;
+  }
+
+  @override
+  void dispose() {
+    _channel?.setMethodCallHandler(null);
+    widget.controller?._detach();
+    super.dispose();
+  }
+
+  Future<void> _onPlatformViewCreated(int id) async {
+    _channel = MethodChannel('picker_map_native_$id');
+    _channel!.setMethodCallHandler(_handleCall);
+    widget.controller?._attach(_channel!);
+
+    await _channel!.invokeMethod('updateConfig', {
+      'userLocation': {
+        'latitude': widget.userLocation.latitude,
+        'longitude': widget.userLocation.longitude,
+      },
+      if (widget.destination != null)
+        'destination': {
+          'latitude': widget.destination!.latitude,
+          'longitude': widget.destination!.longitude,
+        },
+      'route': const <Map<String, double>>[],
+      'routeColor': widget.routeColor.value,
+      'routeWidth': widget.routeWidth,
+      'userName': widget.userName,
+      'userPhotoUrl': widget.userPhotoUrl,
+      if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
+
+      // ====== Compat (legado) — o nativo pode ignorar ======
+      if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
+      if (widget.destinationMarkerPngUrl != null)
+        'destinationMarkerPngUrl': widget.destinationMarkerPngUrl,
+      if (widget.userMarkerSize != null) 'userMarkerSize': widget.userMarkerSize,
+      if (widget.driverIconWidth != null) 'driverIconWidth': widget.driverIconWidth,
+      if (widget.driverTaxiIconAsset != null)
+        'driverTaxiIconAsset': widget.driverTaxiIconAsset,
+      if (widget.driverDriverIconUrl != null)
+        'driverDriverIconUrl': widget.driverDriverIconUrl,
+      if (widget.driverTaxiIconUrl != null)
+        'driverTaxiIconUrl': widget.driverTaxiIconUrl,
+      'enableRouteSnake': widget.enableRouteSnake,
+      if (widget.liteModeOnAndroid != null)
+        'liteModeOnAndroid': widget.liteModeOnAndroid,
+      if (widget.ultraLowSpecMode != null)
+        'ultraLowSpecMode': widget.ultraLowSpecMode,
+      // =====================================================
+    });
+  }
+
+  Future<dynamic> _handleCall(MethodCall call) async {
+    if (call.method == 'platformReady') {
+      _pushLog('KT → Dart: platformReady');
+    } else if (call.method == 'debugLog') {
+      final m = (call.arguments as Map?) ?? const {};
+      final level = (m['level'] ?? 'D').toString();
+      final msg = (m['msg'] ?? '').toString();
+      _pushLog('[KT/$level] $msg');
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
+    final brandBottom = widget.brandSafePaddingBottom ?? 16;
+    final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
+
+    Widget platformView;
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      // Cria o controller UMA vez
-      final ctrl = PlatformViewsService.initSurfaceAndroidView(
+      final controller = PlatformViewsService.initSurfaceAndroidView(
         id: _viewId,
         viewType: 'picker_map_native',
         layoutDirection: ui.TextDirection.ltr,
@@ -242,65 +273,8 @@ class _PickerMapNativeState extends State<PickerMapNative>
         ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
         ..create();
 
-      _androidController = ctrl as AndroidViewController;
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant PickerMapNative oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Sempre que props mudarem, reenvia configuração
-    if (_channel != null) {
-      _channel!.invokeMethod('updateConfig', _buildCfg());
-    }
-
-    // Se antes era 0,0 e agora temos posição, move a câmera 3D
-    if (_isZero(oldWidget.userLocation) && !_isZero(widget.userLocation)) {
-      _movedInitialCamera = false; // garante movimento agora
-      _moveInitialCameraIfNeeded();
-    }
-  }
-
-  @override
-  void dispose() {
-    _channel?.setMethodCallHandler(null);
-    widget.controller?._detach();
-    _androidController?.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onPlatformViewCreated(int id) async {
-    _channel = MethodChannel('picker_map_native_$id');
-    _channel!.setMethodCallHandler(_handleCall);
-    widget.controller?._attach(_channel!);
-
-    // Config inicial
-    await _channel!.invokeMethod('updateConfig', _buildCfg());
-    // Se já temos user válido, tenta mover 3D
-    await _moveInitialCameraIfNeeded();
-  }
-
-  Future<dynamic> _handleCall(MethodCall call) async {
-    if (call.method == 'platformReady') {
-      _platformReady = true;
-      // Reaplica config e Move 3D
-      if (_channel != null) {
-        await _channel!.invokeMethod('updateConfig', _buildCfg());
-      }
-      await _moveInitialCameraIfNeeded();
-    }
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context); // keep-alive
-
-    Widget platformView;
-    if (defaultTargetPlatform == TargetPlatform.android) {
       platformView = AndroidViewSurface(
-        controller: _androidController!,
+        controller: controller as AndroidViewController,
         gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
         hitTestBehavior: PlatformViewHitTestBehavior.opaque,
       );
@@ -321,47 +295,82 @@ class _PickerMapNativeState extends State<PickerMapNative>
       return const Center(child: Text('PickerMapNative: plataforma não suportada'));
     }
 
-    final box = SizedBox(width: widget.width, height: widget.height, child: platformView);
+    // NÃO clipa PlatformView no Android (evita “véu cinza”).
+    final Widget baseBox = SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: platformView,
+    );
 
-    // Android não clipa (evita véu cinza)
-    if (defaultTargetPlatform == TargetPlatform.android) return box;
+    final Widget mapBoxPadded = Padding(padding: outerPadding, child: baseBox);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.borderRadius),
-      child: box,
+    final Widget mapBox = (defaultTargetPlatform == TargetPlatform.android)
+        ? mapBoxPadded // sem ClipRRect no Android
+        : ClipRRect(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            child: mapBoxPadded,
+          );
+
+    if (!widget.showDebugPanel) return mapBox;
+
+    // Painel de logs compacto
+    final double topSafe = (MediaQuery.maybeOf(context)?.padding.top ?? 0) + 8;
+
+    return Stack(
+      children: [
+        mapBox,
+        // Toggle do painel
+        Positioned(
+          left: 8,
+          top: topSafe,
+          child: Material(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              onTap: () => setState(() => _logsVisible = !_logsVisible),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Text('LOGS', style: TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+            ),
+          ),
+        ),
+        if (_logsVisible)
+          Positioned(
+            left: 8,
+            right: 8,
+            bottom: 12 + brandBottom,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 140),
+              child: Material(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: _ktLogs.length,
+                    itemBuilder: (_, i) => Text(
+                      _ktLogs[i],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
-/// Tema DARK com acentos ÂMBAR (amarelo), sem azul.
-const String kGoogleMapsDarkAmberStyle = '''
-[
-  {"elementType":"geometry","stylers":[{"color":"#1a1a1a"}]},
-  {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
-  {"elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},
-  {"elementType":"labels.text.stroke","stylers":[{"color":"#1a1a1a"}]},
-
-  {"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#5f5f5f"}]},
-  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#252525"}]},
-  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
-  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#232323"}]},
-  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0d0d0d"}]},
-
-  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2a2a2a"}]},
-  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#3a3a3a"}]},
-  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#444444"}]},
-  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#e6c200"}]},
-  {"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#151515"}]},
-
-  {"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#ffc107"}]},
-  {"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#ffc107"}]}
-]
-''';
-
-// (Opcional) dark básico
+/// Estilo dark simples (alternativo).
 const String kGoogleMapsDarkStyle = '''
 [
   {"elementType":"geometry","stylers":[{"color":"#212121"}]},
