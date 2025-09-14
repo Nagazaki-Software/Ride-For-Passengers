@@ -301,9 +301,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                               padding: const EdgeInsetsDirectional.fromSTEB(18, 35, 18, 0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                                children: <Widget>[
                                   Row(
-                                    children: [
+                                    children: <Widget>[
                                       Container(
                                         width: 70,
                                         height: 70,
@@ -391,7 +391,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                     ].divide(const SizedBox(width: 10)),
                                   ),
                                   Row(
-                                    children: [
+                                    children: <Widget>[
                                       Stack(
                                         children: [
                                           Container(
@@ -457,7 +457,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Row(
-                                        children: [
+                                        children: <Widget>[
                                           Flexible(
                                             child: Padding(
                                               padding: const EdgeInsetsDirectional.fromSTEB(10, 8, 0, 8),
@@ -606,7 +606,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                   Align(
                     alignment: const AlignmentDirectional(0, 1),
                     child: Column(
-                      children: [
+                      children: <Widget>[
                         if (FFAppState().latlangAondeVaiIr != null)
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 28),
@@ -626,10 +626,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                 padding: const EdgeInsets.all(10),
                                 child: SingleChildScrollView(
                                   child: Column(
-                                    children: [
+                                    children: <Widget>[
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
+                                        children: <Widget>[
                                           Text(
                                             FFLocalizations.of(context).getText('ybwe42qc' /* Ride Estimative */),
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -694,7 +694,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                       ),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
+                                        children: <Widget>[
                                           Text(
                                             FFLocalizations.of(context).getText('76w8fz75' /* Time */),
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -723,7 +723,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                       Container(width: 336, height: 1, color: FlutterFlowTheme.of(context).alternate),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
+                                        children: <Widget>[
                                           Padding(
                                             padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
                                             child: (_model.location != null || _model.locationAtual != null)
@@ -752,7 +752,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 : const SizedBox.shrink(),
                                           ),
                                           Row(
-                                            children: [
+                                            children: <Widget>[
                                               // ... (resto igual ao seu)
                                             ].divide(const SizedBox(width: 10)),
                                           ),
