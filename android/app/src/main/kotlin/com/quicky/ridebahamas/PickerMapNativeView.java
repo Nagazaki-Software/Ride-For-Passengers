@@ -84,7 +84,7 @@ class PickerMapNative extends StatefulWidget {
     this.showDebugPanel = true,
     this.controller,
 
-    /// Compatibilidade com chamadas antigas (não é usado no nativo).
+    /// Compat com chamadas antigas (não é usado no nativo).
     /// Mantido só para não quebrar o `home5_widget.dart`.
     @Deprecated('Compat apenas. Não é usado pelo nativo.')
     this.driversRefs = const [],
@@ -120,14 +120,14 @@ class PickerMapNative extends StatefulWidget {
   /// Controller
   final PickerMapNativeController? controller;
 
-  /// Compat (não utilizado)
+  /// Compat (não utilizado pelo nativo, apenas pra não quebrar chamada antiga)
   @Deprecated('Compat apenas. Não é usado pelo nativo.')
   final List<dynamic> driversRefs;
 
   /// Ajuste de segurança visual na borda inferior (quando tem navbar)
   final double? brandSafePaddingBottom;
 
-  /// Estilo de mapa JSON (para modo dark, etc). O nativo precisa aplicar.
+  /// Estilo de mapa JSON (para modo dark, etc). O nativo aplica via setMapStyle.
   final String? mapStyleJson;
 
   @override
@@ -149,7 +149,6 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       _ktLogs.insert(0, '[$ts] $msg');
       if (_ktLogs.length > widget.panelMaxLines) _ktLogs.removeLast();
     });
-    // também joga no log do Dart
     print(msg);
   }
 
@@ -285,7 +284,6 @@ class _PickerMapNativeState extends State<PickerMapNative> {
             bottom: 12 + (widget.brandSafePaddingBottom ?? 16),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                // Altura menor pra não “comer” a tela e não colar na navbar
                 maxHeight: 140,
               ),
               child: Material(
@@ -315,3 +313,23 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     );
   }
 }
+
+/// Estilo dark simples (use se quiser) — passe como `mapStyleJson: kGoogleMapsDarkStyle`.
+const String kGoogleMapsDarkStyle = '''
+[
+  {"elementType":"geometry","stylers":[{"color":"#212121"}]},
+  {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+  {"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},
+  {"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},
+  {"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},
+  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#303030"}]},
+  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#263238"}]},
+  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2c2c2c"}]},
+  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},
+  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},
+  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},
+  {"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},
+  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#2f3948"}]},
+  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]}
+]
+''';
