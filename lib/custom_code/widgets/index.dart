@@ -6,7 +6,11 @@ export 'radiobuttompayment.dart' show Radiobuttompayment;
 export 'schedule_caledar_ride.dart' show ScheduleCaledarRide;
 export 'card_form_f_f.dart' show CardFormFF;
 export 'picker_map.dart' show PickerMap;
-export 'picker_map_native.dart' show PickerMapNative;
+
+// ⬇️ ALTERADO: agora exporta também o controller e os estilos
+export 'picker_map_native.dart'
+  show PickerMapNative, PickerMapNativeController, kGoogleMapsDarkAmberStyle, kGoogleMapsDarkStyle;
+
 export 'poly_map.dart' show PolyMap;
 export 'route_list_item.dart' show RouteListItem;
 export 'picker_view_more.dart' show PickerViewMore;
