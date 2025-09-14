@@ -65,9 +65,8 @@ class PickerMapNativeController {
   Future<dynamic> debugInfo() async =>
       _channel?.invokeMethod('debugInfo') ?? Future.value();
 
-  /// --------- Helpers “conveniência” (opcional usar) ---------
+  /// Helpers
 
-  /// Define UMA polyline como rota.
   Future<void> setRoute(List<ff.LatLng> pts,
           {Color? color, double? width}) async =>
       setPolylines([
@@ -79,7 +78,6 @@ class PickerMapNativeController {
         }
       ]);
 
-  /// “Snake” (desenha a rota aos poucos). Simples e eficiente.
   Future<void> animateRouteSnake(
     List<ff.LatLng> pts, {
     Duration total = const Duration(seconds: 2),
@@ -95,7 +93,6 @@ class PickerMapNativeController {
     }
   }
 
-  /// Move um carro passando por uma sequência de pontos.
   Future<void> moveCarSmooth(
     String id,
     List<ff.LatLng> path, {
@@ -131,8 +128,8 @@ class PickerMapNative extends StatefulWidget {
     this.routeWidth = 4,
     this.showDebugPanel = true,
     this.controller,
-    @Deprecated('Compatibilidade apenas. Não é usado pelo native.')
-    this.driversRefs = const [],
+    @Deprecated('Compat apenas. Não é usado pelo native.')
+    this.driversRefs = const [], // <- aqui
     this.brandSafePaddingBottom,
     this.mapStyleJson,
   });
@@ -149,16 +146,9 @@ class PickerMapNative extends StatefulWidget {
   final int routeWidth;
   final bool showDebugPanel;
   final PickerMapNativeController? controller;
-
-  /// Mantido só para o seu call site não quebrar.
-  @Deprecated('Compatibilidade apenas. Não é usado pelo native.')
-  final List<dynamic> driversRefs;
-
-  /// Caso sua bottom bar seja alta, ajuste aqui para os logs não sobreporem.
+  @Deprecated('Compat apenas. Não é usado pelo native.')
+  final List<dynamic> driversRefs; // <- aqui
   final double? brandSafePaddingBottom;
-
-  /// JSON de estilo do Google Maps (use p/ tema dark).
-  /// Ex.: const kDarkMapStyle abaixo.
   final String? mapStyleJson;
 
   @override
@@ -172,7 +162,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   final _ktLogs = <String>[];
   bool _logsVisible = false;
 
-  static int _nextViewId = 9000; // id único p/ múltiplas instâncias
+  static int _nextViewId = 9000;
 
   void _pushLog(String msg) {
     setState(() {
@@ -180,8 +170,6 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       _ktLogs.insert(0, '[$ts] $msg');
       if (_ktLogs.length > 200) _ktLogs.removeLast();
     });
-    // também no console do Flutter
-    // ignore: avoid_print
     print(msg);
   }
 
@@ -198,7 +186,6 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     _channel!.setMethodCallHandler(_handleCall);
     widget.controller?._attach(_channel!);
 
-    // configuração inicial
     await _channel!.invokeMethod('updateConfig', {
       'userLocation': {
         'latitude': widget.userLocation.latitude,
@@ -215,6 +202,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
       if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
+      // driversRefs é ignorado no native.
     });
   }
 
@@ -271,10 +259,9 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       );
     }
 
-    // -------- LOG PANEL (reposicionado e menor) ----------
     final mq = MediaQuery.of(context);
     final safeBottom = mq.padding.bottom;
-    final extraBottom = widget.brandSafePaddingBottom ?? 56; // altura típica de navbar
+    final extraBottom = widget.brandSafePaddingBottom ?? 56;
     final panelHeight = (mq.size.height * 0.22).clamp(120.0, 180.0);
 
     return Stack(
@@ -283,7 +270,6 @@ class _PickerMapNativeState extends State<PickerMapNative> {
           borderRadius: BorderRadius.circular(widget.borderRadius),
           child: mapBox,
         ),
-        // botão de toggle (canto superior)
         Positioned(
           left: 10,
           top: 10,
@@ -360,9 +346,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   }
 }
 
-/// ------------------------ Exemplo de estilo DARK ------------------------
-/// Jogue este const em algum arquivo seu (ou aqui mesmo) e passe
-/// `mapStyleJson: kDarkMapStyle` no PickerMapNative.
+/// ------------------------ Estilo DARK opcional ------------------------
 const String kDarkMapStyle = '''
 [
   {"elementType": "geometry", "stylers": [{"color": "#1d1f25"}]},
