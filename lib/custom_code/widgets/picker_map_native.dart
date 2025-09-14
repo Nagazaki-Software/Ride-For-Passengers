@@ -186,6 +186,42 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant PickerMapNative oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final newUser = _safe(widget.userLocation);
+    final oldUser = _safe(oldWidget.userLocation);
+    final destChanged = widget.destination != oldWidget.destination;
+    final userChanged = newUser != oldUser;
+    final photoChanged = widget.userPhotoUrl != oldWidget.userPhotoUrl;
+    final nameChanged = widget.userName != oldWidget.userName;
+
+    if (_channel != null && (userChanged || destChanged || photoChanged || nameChanged)) {
+      _channel!.invokeMethod('updateConfig', {
+        'userLocation': {
+          'latitude': newUser.latitude,
+          'longitude': newUser.longitude,
+        },
+        if (widget.destination != null)
+          'destination': {
+            'latitude': widget.destination!.latitude,
+            'longitude': widget.destination!.longitude,
+          },
+        'userName': widget.userName,
+        'userPhotoUrl': widget.userPhotoUrl,
+      });
+
+      if (userChanged) {
+        _channel!.invokeMethod('cameraTo', {
+          'latitude': newUser.latitude,
+          'longitude': newUser.longitude,
+          'zoom': 15.0,
+        });
+      }
+    }
+  }
+
   Future<void> _onPlatformViewCreated(int id) async {
     _channel = MethodChannel('picker_map_native_$id');
     _channel!.setMethodCallHandler(_handleCall);

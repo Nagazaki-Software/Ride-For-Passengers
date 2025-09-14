@@ -48,6 +48,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
       (p.latitude.abs() < 0.000001 && p.longitude.abs() < 0.000001);
   LatLng _safe(LatLng? p) => (p == null || _isZero(p)) ? _kNassau : p;
 
+  String _initials(String? name) {
+    if (name == null || name.trim().isEmpty) return '';
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    return (parts.first[0] + parts.last[0]).toUpperCase();
+  }
+
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
   var hasContainerTriggered3 = false;
@@ -233,6 +240,33 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                       );
                     },
                   ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: IgnorePointer(
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    image: (currentUserPhoto != '')
+                        ? DecorationImage(
+                            image: NetworkImage(currentUserPhoto),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: (currentUserPhoto != '')
+                      ? null
+                      : Center(
+                          child: Text(
+                            _initials(currentUserDisplayName),
+                            style: FlutterFlowTheme.of(context).titleSmall,
+                          ),
+                        ),
                 ),
               ),
             ),
