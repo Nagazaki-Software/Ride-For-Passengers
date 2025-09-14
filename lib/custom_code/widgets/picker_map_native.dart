@@ -84,13 +84,21 @@ class PickerMapNative extends StatefulWidget {
     this.showDebugPanel = true,
     this.controller,
 
-    /// Compat com chamadas antigas (não é usado no nativo).
-    /// Mantido só para não quebrar o `home5_widget.dart`.
+    // ==== Parâmetros de compatibilidade (legados) ====
+    // Mantidos para não quebrar telas existentes. O nativo pode ignorar.
     @Deprecated('Compat apenas. Não é usado pelo nativo.')
     this.driversRefs = const [],
-
-    /// Também chamado pelo home5. Mantido apenas para compat.
     this.refreshMs,
+    this.destinationMarkerPngUrl,
+    this.userMarkerSize,
+    this.driverIconWidth,
+    this.driverTaxiIconAsset,
+    this.driverDriverIconUrl,
+    this.driverTaxiIconUrl,
+    this.enableRouteSnake = false,
+    this.liteModeOnAndroid,
+    this.ultraLowSpecMode,
+    // =================================================
 
     this.brandSafePaddingBottom,
     this.mapStyleJson,
@@ -123,17 +131,26 @@ class PickerMapNative extends StatefulWidget {
   /// Controller
   final PickerMapNativeController? controller;
 
-  /// Compat (não utilizado pelo nativo, apenas pra não quebrar chamada antiga)
+  // ====== Compat (legado) ======
   @Deprecated('Compat apenas. Não é usado pelo nativo.')
   final List<dynamic> driversRefs;
-
-  /// Compat (não utilizado, mas presente em chamadas antigas)
   final int? refreshMs;
 
-  /// Ajuste de segurança visual na borda inferior (quando tem navbar)
+  final String? destinationMarkerPngUrl;
+  final double? userMarkerSize;
+  final double? driverIconWidth;
+  final String? driverTaxiIconAsset;
+  final String? driverDriverIconUrl;
+  final String? driverTaxiIconUrl;
+  final bool enableRouteSnake;
+  final bool? liteModeOnAndroid;
+  final bool? ultraLowSpecMode;
+  // =============================
+
+  /// Ajuste para não sobrepor a navbar/gestural bar
   final double? brandSafePaddingBottom;
 
-  /// Estilo de mapa JSON (para modo dark, etc). O nativo aplica via setMapStyle.
+  /// Estilo JSON do Google Maps (ex.: dark). Use `kGoogleMapsDarkStyle`.
   final String? mapStyleJson;
 
   @override
@@ -191,10 +208,29 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'routeWidth': widget.routeWidth,
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
+
+      // estilo do mapa
       if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
 
-      // compat: envia, mesmo que o nativo ignore
+      // ====== Compat (legado) — o nativo pode ignorar ======
       if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
+      if (widget.destinationMarkerPngUrl != null)
+        'destinationMarkerPngUrl': widget.destinationMarkerPngUrl,
+      if (widget.userMarkerSize != null) 'userMarkerSize': widget.userMarkerSize,
+      if (widget.driverIconWidth != null)
+        'driverIconWidth': widget.driverIconWidth,
+      if (widget.driverTaxiIconAsset != null)
+        'driverTaxiIconAsset': widget.driverTaxiIconAsset,
+      if (widget.driverDriverIconUrl != null)
+        'driverDriverIconUrl': widget.driverDriverIconUrl,
+      if (widget.driverTaxiIconUrl != null)
+        'driverTaxiIconUrl': widget.driverTaxiIconUrl,
+      'enableRouteSnake': widget.enableRouteSnake,
+      if (widget.liteModeOnAndroid != null)
+        'liteModeOnAndroid': widget.liteModeOnAndroid,
+      if (widget.ultraLowSpecMode != null)
+        'ultraLowSpecMode': widget.ultraLowSpecMode,
+      // =====================================================
     });
   }
 
@@ -227,8 +263,13 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         },
         if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
 
-        // compat
+        // ====== Compat (legado) — o nativo pode ignorar ======
         if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
+        if (widget.liteModeOnAndroid != null)
+          'liteModeOnAndroid': widget.liteModeOnAndroid,
+        if (widget.ultraLowSpecMode != null)
+          'ultraLowSpecMode': widget.ultraLowSpecMode,
+        // =====================================================
       },
       creationParamsCodec: const StandardMessageCodec(),
     )
@@ -262,7 +303,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       );
     }
 
-    // Painel de logs compacto e que não gruda na navbar nem corta o conteúdo
+    // Painel de logs compacto
     return Stack(
       children: [
         ClipRRect(
@@ -295,9 +336,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
             right: 8,
             bottom: 12 + (widget.brandSafePaddingBottom ?? 16),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 140,
-              ),
+              constraints: const BoxConstraints(maxHeight: 140),
               child: Material(
                 color: Colors.black54,
                 borderRadius: BorderRadius.circular(10),
