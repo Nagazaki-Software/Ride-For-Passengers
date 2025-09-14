@@ -1,25 +1,22 @@
+import Foundation
 import Flutter
-import UIKit
 
-class PickerMapNativeFactory: NSObject, FlutterPlatformViewFactory {
-  private var messenger: FlutterBinaryMessenger
+final class PickerMapNativeFactory: NSObject, FlutterPlatformViewFactory {
 
-  init(messenger: FlutterBinaryMessenger) {
-    self.messenger = messenger
-    super.init()
-  }
+    private let messenger: FlutterBinaryMessenger
 
-  func create(
-    withFrame frame: CGRect,
-    viewIdentifier viewId: Int64,
-    arguments args: Any?
-  ) -> FlutterPlatformView {
-    return PickerMapNativeView(
-      frame: frame,
-      viewId: viewId,
-      messenger: messenger,
-      args: args
-    )
-  }
+    init(messenger: FlutterBinaryMessenger) {
+        self.messenger = messenger
+        super.init()
+    }
+
+    func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+        return FlutterStandardMessageCodec.sharedInstance()
+    }
+
+    func create(withFrame frame: CGRect,
+                viewIdentifier viewId: Int64,
+                arguments args: Any?) -> FlutterPlatformView {
+        return PickerMapNativeView(frame: frame, viewIdentifier: viewId, arguments: args, binaryMessenger: messenger)
+    }
 }
-
