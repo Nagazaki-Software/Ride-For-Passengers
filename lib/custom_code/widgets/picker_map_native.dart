@@ -8,14 +8,13 @@ import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
 import 'package:flutter/services.dart';
 import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff;
 
-/// Nassau, Bahamas (fallback quando userLocation vier nulo/0,0)
-const _kNassau = ff.LatLng(25.03428, -77.39628);
+// Nassau fallback (se vier nulo/0,0)
+const _kNassau = ff.LatLng(25.0343, -77.3963);
 
-bool _isZero(ff.LatLng p) =>
-    (p.latitude == 0.0 && p.longitude == 0.0) ||
-    (p.latitude.abs() < 0.000001 && p.longitude.abs() < 0.000001);
-
-ff.LatLng _safe(ff.LatLng p) => _isZero(p) ? _kNassau : p;
+ff.LatLng _safe(ff.LatLng v) {
+  if (v.latitude == 0.0 && v.longitude == 0.0) return _kNassau;
+  return v;
+}
 
 /// Controller para chamar métodos nativos (Android/iOS).
 class PickerMapNativeController {
@@ -89,11 +88,12 @@ class PickerMapNative extends StatefulWidget {
     this.width,
     this.height = 320,
     this.borderRadius = 16,
-    this.routeColor = const Color(0xFFBDBDBD), // rota cinza
+    this.routeColor = const Color(0xFFBDBDBD), // cinza na rota
     this.routeWidth = 5,
+    this.showDebugPanel = false, // desligado por padrão
     this.controller,
 
-    // ==== Compat (legado) — o nativo pode ignorar ====
+    // ==== Compat legado (podem ser ignorados pelo nativo) ====
     @Deprecated('Compat apenas. Não é usado pelo nativo.')
     this.driversRefs = const [],
     this.refreshMs,
@@ -106,39 +106,32 @@ class PickerMapNative extends StatefulWidget {
     this.enableRouteSnake = false,
     this.liteModeOnAndroid,
     this.ultraLowSpecMode,
-    this.brandSafePaddingBottom,
-    // =================================================
+    // =========================================================
 
+    this.brandSafePaddingBottom,
     this.mapStyleJson,
-    this.showDebugPanel = false, // desligado por padrão
+    this.panelMaxLines = 120,
   });
 
-  /// Localização do usuário (FF LatLng)
   final ff.LatLng userLocation;
-
-  /// Destino (opcional)
   final ff.LatLng? destination;
 
-  /// Dados opcionais
   final String? userName;
   final String? userPhotoUrl;
 
-  /// Layout
   final double? width;
   final double height;
   final double borderRadius;
 
-  /// Rota
   final Color routeColor;
   final int routeWidth;
 
-  /// Painel de debug (opcional)
   final bool showDebugPanel;
+  final int panelMaxLines;
 
-  /// Controller
   final PickerMapNativeController? controller;
 
-  // ====== Compat (legado) ======
+  // Legado
   @Deprecated('Compat apenas. Não é usado pelo nativo.')
   final List<dynamic> driversRefs;
   final int? refreshMs;
@@ -152,10 +145,10 @@ class PickerMapNative extends StatefulWidget {
   final bool enableRouteSnake;
   final bool? liteModeOnAndroid;
   final bool? ultraLowSpecMode;
-  final double? brandSafePaddingBottom;
-  // =============================
 
-  /// Estilo JSON do Google Maps (ex.: preto/cinza).
+  final double? brandSafePaddingBottom;
+
+  /// Estilo JSON do Google Maps.
   final String? mapStyleJson;
 
   @override
@@ -167,17 +160,18 @@ class _PickerMapNativeState extends State<PickerMapNative> {
 
   MethodChannel? _channel;
   late final int _viewId;
-  bool _platformReady = false;
-
-  // memo pra evitar updates redundantes (que causam “flash”)
-  ff.LatLng? _lastUser;
-  ff.LatLng? _lastDest;
-  String? _lastStyle;
-  int? _lastRouteColor;
-  int? _lastRouteWidth;
 
   final _ktLogs = <String>[];
   bool _logsVisible = false;
+
+  void _pushLog(String msg) {
+    if (!widget.showDebugPanel) return;
+    setState(() {
+      final ts = DateTime.now().toIso8601String().substring(11, 19);
+      _ktLogs.insert(0, '[$ts] $msg');
+      if (_ktLogs.length > widget.panelMaxLines) _ktLogs.removeLast();
+    });
+  }
 
   @override
   void initState() {
@@ -192,20 +186,27 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     super.dispose();
   }
 
-  Map<String, dynamic> _buildConfig({required bool initial}) {
-    final u = _safe(widget.userLocation);
-    final d = (widget.destination != null) ? _safe(widget.destination!) : null;
+  Future<void> _onPlatformViewCreated(int id) async {
+    _channel = MethodChannel('picker_map_native_$id');
+    _channel!.setMethodCallHandler(_handleCall);
+    widget.controller?._attach(_channel!);
 
-    return {
-      'userLocation': {'latitude': u.latitude, 'longitude': u.longitude},
-      if (d != null) 'destination': {'latitude': d.latitude, 'longitude': d.longitude},
+    final user = _safe(widget.userLocation);
+    await _channel!.invokeMethod('updateConfig', {
+      'userLocation': {'latitude': user.latitude, 'longitude': user.longitude},
+      if (widget.destination != null)
+        'destination': {
+          'latitude': widget.destination!.latitude,
+          'longitude': widget.destination!.longitude,
+        },
       'route': const <Map<String, double>>[],
       'routeColor': widget.routeColor.value,
       'routeWidth': widget.routeWidth,
       'userName': widget.userName,
       'userPhotoUrl': widget.userPhotoUrl,
       if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-      // compat (podem ser ignorados no nativo, mas não quebram)
+
+      // Legado
       if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
       if (widget.destinationMarkerPngUrl != null)
         'destinationMarkerPngUrl': widget.destinationMarkerPngUrl,
@@ -217,98 +218,31 @@ class _PickerMapNativeState extends State<PickerMapNative> {
       'enableRouteSnake': widget.enableRouteSnake,
       if (widget.liteModeOnAndroid != null) 'liteModeOnAndroid': widget.liteModeOnAndroid,
       if (widget.ultraLowSpecMode != null) 'ultraLowSpecMode': widget.ultraLowSpecMode,
-      // dica ao nativo: setar câmera logo após o primeiro update
-      if (initial)
-        'initialCamera': {
-          'zoom': 15.5,
-          'bearing': -18.0,
-          'tilt': 48.0,
-        },
-    };
+    });
   }
 
-  Future<void> _sendFullConfig({required bool initial}) async {
-    if (_channel == null) return;
-    final cfg = _buildConfig(initial: initial);
-    await _channel!.invokeMethod('updateConfig', cfg);
-
-    // memo
-    _lastUser = _safe(widget.userLocation);
-    _lastDest = widget.destination != null ? _safe(widget.destination!) : null;
-    _lastStyle = widget.mapStyleJson;
-    _lastRouteColor = widget.routeColor.value;
-    _lastRouteWidth = widget.routeWidth;
-  }
-
-  @override
-  void didUpdateWidget(covariant PickerMapNative oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!_platformReady || _channel == null) return;
-
-    final u = _safe(widget.userLocation);
-    final d = widget.destination != null ? _safe(widget.destination!) : null;
-
-    final styleChanged = widget.mapStyleJson != _lastStyle;
-    final routeChanged =
-        widget.routeColor.value != _lastRouteColor || widget.routeWidth != _lastRouteWidth;
-    final userChanged = _lastUser == null || u.latitude != _lastUser!.latitude || u.longitude != _lastUser!.longitude;
-    final destChanged = (_lastDest?.latitude != d?.latitude) || (_lastDest?.longitude != d?.longitude);
-
-    if (styleChanged || routeChanged || destChanged) {
-      _sendFullConfig(initial: false);
-      return;
-    }
-
-    if (userChanged) {
-      // move a câmera suavemente pro novo user (sem piscar)
-      _channel!.invokeMethod('cameraTo', {
+  Future<dynamic> _handleCall(MethodCall call) async {
+    if (call.method == 'platformReady') {
+      _pushLog('KT → Dart: platformReady');
+      // Dá uma “garantida” reposicionando a câmera ao carregar
+      final u = _safe(widget.userLocation);
+      await _channel?.invokeMethod('cameraTo', {
         'latitude': u.latitude,
         'longitude': u.longitude,
-        'zoom': 15.5,
-        'bearing': -18.0,
-        'tilt': 48.0,
+        'zoom': 15.0,
       });
-      _lastUser = u;
+    } else if (call.method == 'debugLog') {
+      final m = (call.arguments as Map?) ?? const {};
+      _pushLog('[KT/${(m['level'] ?? 'D')}] ${(m['msg'] ?? '').toString()}');
     }
-  }
-
-  Future<void> _onPlatformViewCreated(int id) async {
-    _channel = MethodChannel('picker_map_native_$id');
-    widget.controller?._attach(_channel!);
-
-    _channel!.setMethodCallHandler((call) async {
-      switch (call.method) {
-        case 'platformReady':
-          _platformReady = true;
-          await _sendFullConfig(initial: true);
-          break;
-        case 'debugLog':
-          if (!widget.showDebugPanel) break;
-          final m = (call.arguments as Map?) ?? const {};
-          final level = (m['level'] ?? 'D').toString();
-          final msg = (m['msg'] ?? '').toString();
-          setState(() {
-            _ktLogs.insert(0, '[$level] $msg');
-            if (_ktLogs.length > 120) _ktLogs.removeLast();
-          });
-          break;
-      }
-      return null;
-    });
-
-    // Envia ao menos uma vez (se o nativo ainda não disparou platformReady)
-    if (!_platformReady) {
-      await _sendFullConfig(initial: true);
-    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
-    final brandBottom = widget.brandSafePaddingBottom ?? 0;
+    final brandBottom = widget.brandSafePaddingBottom ?? 16;
     final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
-
-    final ff.LatLng initial = _safe(widget.userLocation);
 
     Widget platformView;
 
@@ -319,8 +253,8 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         layoutDirection: ui.TextDirection.ltr,
         creationParams: {
           'initialUserLocation': {
-            'latitude': initial.latitude,
-            'longitude': initial.longitude,
+            'latitude': _safe(widget.userLocation).latitude,
+            'longitude': _safe(widget.userLocation).longitude,
           },
           if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
           if (widget.refreshMs != null) 'refreshMs': widget.refreshMs,
@@ -332,8 +266,8 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
         ..create();
 
-      platformView = ColoredBox( // evita “flash” branco por baixo
-        color: Colors.black,
+      platformView = ColoredBox( // evita “flash branco”
+        color: const Color(0xFF0E0E0E),
         child: AndroidViewSurface(
           controller: controller as AndroidViewController,
           gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
@@ -341,17 +275,20 @@ class _PickerMapNativeState extends State<PickerMapNative> {
         ),
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      platformView = UiKitView(
-        viewType: 'picker_map_native',
-        creationParams: {
-          'initialUserLocation': {
-            'latitude': initial.latitude,
-            'longitude': initial.longitude,
+      platformView = ColoredBox(
+        color: const Color(0xFF0E0E0E),
+        child: UiKitView(
+          viewType: 'picker_map_native',
+          creationParams: {
+            'initialUserLocation': {
+              'latitude': _safe(widget.userLocation).latitude,
+              'longitude': _safe(widget.userLocation).longitude,
+            },
+            if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
           },
-          if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-        },
-        creationParamsCodec: const StandardMessageCodec(),
-        onPlatformViewCreated: _onPlatformViewCreated,
+          creationParamsCodec: const StandardMessageCodec(),
+          onPlatformViewCreated: _onPlatformViewCreated,
+        ),
       );
     } else {
       return const Center(child: Text('PickerMapNative: plataforma não suportada'));
@@ -366,7 +303,7 @@ class _PickerMapNativeState extends State<PickerMapNative> {
     final Widget mapBoxPadded = Padding(padding: outerPadding, child: baseBox);
 
     final Widget mapBox = (defaultTargetPlatform == TargetPlatform.android)
-        ? mapBoxPadded // sem ClipRRect no Android (evita “véu cinza”)
+        ? mapBoxPadded // sem ClipRRect no Android
         : ClipRRect(
             borderRadius: BorderRadius.circular(widget.borderRadius),
             child: mapBoxPadded,
@@ -429,23 +366,24 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   }
 }
 
-/// Estilo preto/cinza sem azul
+/// Estilo MONOCROMÁTICO: preto com variações de cinza (sem azuis)
 const String kGoogleMapsMonoBlackStyle = '''
 [
-  {"elementType":"geometry","stylers":[{"color":"#111111"}]},
+  {"elementType":"geometry","stylers":[{"color":"#121212"}]},
   {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
   {"elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},
-  {"elementType":"labels.text.stroke","stylers":[{"color":"#111111"}]},
+  {"elementType":"labels.text.stroke","stylers":[{"color":"#121212"}]},
 
-  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#1a1a1a"}]},
-  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#141414"}]},
-  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#161616"}]},
-  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0d0d0d"}]},
+  {"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#444444"}]},
+  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#1c1c1c"}]},
+  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#181818"}]},
+  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#1a1a1a"}]},
+  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0e0e0e"}]},
 
-  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#202020"}]},
-  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#2a2a2a"}]},
-  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#2f2f2f"}]},
-  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},
+  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
+  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#272727"}]},
+  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#2e2e2e"}]},
+  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8d8d8d"}]},
   {"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#0f0f0f"}]}
 ]
 ''';
