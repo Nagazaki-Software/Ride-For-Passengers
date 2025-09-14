@@ -1,26 +1,18 @@
-package com.quicky.ridebahamas;
+package com.quicky.ridebahamas
 
-import android.content.Context;
+import android.content.Context
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.StandardMessageCodec
+import io.flutter.plugin.platform.PlatformView
+import io.flutter.plugin.platform.PlatformViewFactory
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+class PickerMapNativeFactory(
+    private val messenger: BinaryMessenger
+) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
-import io.flutter.plugin.common.BinaryMessenger;
-import io.flutter.plugin.common.StandardMessageCodec;
-import io.flutter.plugin.platform.PlatformView;
-import io.flutter.plugin.platform.PlatformViewFactory;
-
-public class PickerMapNativeFactory extends PlatformViewFactory {
-
-  private final BinaryMessenger messenger;
-
-  public PickerMapNativeFactory(@NonNull BinaryMessenger messenger) {
-    super(StandardMessageCodec.INSTANCE);
-    this.messenger = messenger;
-  }
-
-  @Override
-  public PlatformView create(@NonNull Context context, int viewId, @Nullable Object args) {
-    return new PickerMapNativeView(context, messenger, viewId, args);
-  }
+    override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
+        @Suppress("UNCHECKED_CAST")
+        val params = args as? Map<*, *> ?: emptyMap<String, Any>()
+        return PickerMapNativeView(context, viewId, messenger, params)
+    }
 }
