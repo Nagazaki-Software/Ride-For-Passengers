@@ -10,7 +10,6 @@ import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:flutter/material.dart';
-import '/flutter_flow/lat_lng.dart' as ff;
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -19,6 +18,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
+import '/flutter_flow/lat_lng.dart' as ff;
 import 'home5_model.dart';
 export 'home5_model.dart';
 
@@ -41,8 +41,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   final custom_widgets.PickerMapNativeController _mapCtrl =
       custom_widgets.PickerMapNativeController();
 
-  // controle de bootstrapping (pra não disparar N vezes)
-  bool _didBootstrapNearby = false;
+  // Última localização boa (não nula, não 0,0)
+  ff.LatLng? _stableUser;
+  ff.LatLng? _lastUserCamera;
   ff.LatLng? _lastDest;
 
   var hasContainerTriggered1 = false;
@@ -55,12 +56,17 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
   final animationsMap = <String, AnimationInfo>{};
 
+  bool get _isReadyUser => _stableUser != null;
+  static bool _isZero(ff.LatLng p) =>
+      (p.latitude.abs() < 1e-6) && (p.longitude.abs() < 1e-6);
+
+  static bool _differs(ff.LatLng a, ff.LatLng b) =>
+      (a.latitude - b.latitude).abs() > 2e-4 || (a.longitude - b.longitude).abs() > 2e-4;
+
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => Home5Model());
-
-    // NÃO setamos latlngAtual aqui. Quem alimenta é o LiveLocationTicker (main.dart).
 
     animationsMap.addAll({
       'containerOnActionTriggerAnimation1': AnimationInfo(
@@ -94,17 +100,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     );
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
-  }
-
   Future<void> _bootstrapNearbyAndGreeting(ff.LatLng user) async {
-    if (_didBootstrapNearby) return;
-    _didBootstrapNearby = true;
-
-    // popula os chips "por perto" e a saudação inicial usando a posição real do usuário
     try {
       final locs = await actions.googlePlacesNearbyImportant(
         context,
@@ -123,18 +119,57 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
           .toList()
           .cast<String>();
       FFAppState().update(() {});
-    } catch (_) {
-      // silencioso
+    } catch (_) {}
+  }
+
+  void _maybeUpdateStableUser(ff.LatLng? candidate) {
+    if (candidate == null || _isZero(candidate)) return;
+    if (_stableUser == null || _differs(_stableUser!, candidate)) {
+      _stableUser = candidate;
+      // Move câmera com leve tilt (3D) quando a posição realmente muda.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_lastUserCamera == null || _differs(_lastUserCamera!, candidate)) {
+          _mapCtrl.cameraTo(candidate.latitude, candidate.longitude, zoom: 16.8, tilt: 50, bearing: 15);
+          _lastUserCamera = candidate;
+        }
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
-    final userNow = FFAppState().latlngAtual; // **fonte da verdade**
 
-    // Se ainda não temos localização real, mostra um loading bonito
-    if (userNow == null) {
+    // Atualiza o "estável" se chegou uma boa
+    _maybeUpdateStableUser(FFAppState().latlngAtual);
+
+    // Bootstrap de chips e frase assim que tiver user bom
+    if (_isReadyUser && (FFAppState().locationsPorPerto.isEmpty)) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _bootstrapNearbyAndGreeting(_stableUser!);
+      });
+    }
+
+    // FitBounds quando destino mudar
+    final destNow = FFAppState().latlangAondeVaiIr;
+    if (_isReadyUser &&
+        destNow != null &&
+        (_lastDest == null ||
+            _lastDest!.latitude != destNow.latitude ||
+            _lastDest!.longitude != destNow.longitude)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await _mapCtrl.fitBounds([_stableUser!, destNow], padding: 80);
+        } catch (_) {}
+        await Future.delayed(const Duration(milliseconds: 250));
+        try {
+          await _mapCtrl.fitBounds([_stableUser!, destNow], padding: 80);
+        } catch (_) {}
+      });
+      _lastDest = destNow;
+    }
+
+    if (!_isReadyUser) {
       return Container(
         color: FlutterFlowTheme.of(context).primaryBackground,
         child: Center(
@@ -150,31 +185,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
       );
     }
 
-    // Inicia “por perto” e saudação na primeira vez que a posição chega
-    if (!_didBootstrapNearby) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        _bootstrapNearbyAndGreeting(userNow);
-      });
-    }
-
-    // Quando muda destino, ajusta câmera (fitBounds)
-    final destNow = FFAppState().latlangAondeVaiIr;
-    if (destNow != null &&
-        (_lastDest == null ||
-            _lastDest!.latitude != destNow.latitude ||
-            _lastDest!.longitude != destNow.longitude)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        try {
-          await _mapCtrl.fitBounds([userNow, destNow], padding: 80);
-        } catch (_) {}
-        await Future.delayed(const Duration(milliseconds: 250));
-        try {
-          await _mapCtrl.fitBounds([userNow, destNow], padding: 80);
-        } catch (_) {}
-      });
-      _lastDest = destNow;
-    }
-
+    final userNow = _stableUser!;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -186,9 +197,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         backgroundColor: FlutterFlowTheme.of(context).primaryText,
         body: Stack(
           children: [
-            // =========================
-            // MAPA NATIVO — ocupa toda a área
-            // =========================
+            // MAPA
             Positioned.fill(
               child: PointerInterceptor(
                 intercepting: isWeb,
@@ -213,23 +222,15 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         );
                       }
                       final pickerMapUsersRecordList = snapshot.data!;
-
-                      // **AQUI**: passamos EXCLUSIVAMENTE o FFAppState().latlngAtual (não tem 0,0)
                       return custom_widgets.PickerMapNative(
                         width: double.infinity,
                         height: double.infinity,
                         controller: _mapCtrl,
                         userLocation: userNow,
                         destination: destNow,
-
-                        // Tema dark + amarelo (sem azul)
-                        mapStyleJson: custom_widgets.kGoogleMapsDarkAmberStyle,
-
-                        // Rota âmbar mais grossa
+                        mapStyleJson: kGoogleMapsDarkAmberStyle,
                         routeColor: const Color(0xFFFFC107),
                         routeWidth: 6,
-
-                        // seus parâmetros existentes
                         driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
                         refreshMs: 2000,
                         destinationMarkerPngUrl:
@@ -249,7 +250,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                         brandSafePaddingBottom: 60,
                         liteModeOnAndroid: false,
                         ultraLowSpecMode: false,
-                        showDebugPanel: false, // sem debug
+                        showDebugPanel: false, // sem logs na tela
                       );
                     },
                   ),
@@ -257,9 +258,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
               ),
             ),
 
-            // =========================
-            // OVERLAYS (topo + bottom card + navbar)
-            // =========================
+            // OVERLAYS (header, chips, bottom card, navbar) — idênticos ao seu
             PointerInterceptor(
               intercepting: isWeb,
               child: Column(
@@ -296,7 +295,11 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                         decoration: BoxDecoration(
                                           color: FlutterFlowTheme.of(context).primaryText,
                                           boxShadow: const [
-                                            BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, 2)),
+                                            BoxShadow(
+                                              blurRadius: 4,
+                                              color: Color(0x33000000),
+                                              offset: Offset(0, 2),
+                                            )
                                           ],
                                           shape: BoxShape.circle,
                                         ),
@@ -309,8 +312,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                   width: 200,
                                                   height: 200,
                                                   clipBehavior: Clip.antiAlias,
-                                                  decoration: const BoxDecoration(shape: BoxShape.circle),
-                                                  child: Image.network(currentUserPhoto, fit: BoxFit.cover),
+                                                  decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Image.network(
+                                                    currentUserPhoto,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -320,10 +328,16 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 child: AuthUserStreamWidget(
                                                   builder: (context) => Text(
                                                     functions.partesDoName(currentUserDisplayName),
-                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                    style: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
                                                           font: GoogleFonts.poppins(
-                                                            fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                            fontWeight: FlutterFlowTheme.of(context)
+                                                                .bodyMedium
+                                                                .fontWeight,
+                                                            fontStyle: FlutterFlowTheme.of(context)
+                                                                .bodyMedium
+                                                                .fontStyle,
                                                           ),
                                                           color: FlutterFlowTheme.of(context).alternate,
                                                           fontSize: 18,
@@ -343,7 +357,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                   font: GoogleFonts.poppins(
                                                     fontWeight: FontWeight.w600,
-                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                    fontStyle: FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
                                                   ),
                                                   color: const Color(0xFF696C6F),
                                                   fontSize: 12,
@@ -354,8 +370,12 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               currentUserDisplayName,
                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                     font: GoogleFonts.poppins(
-                                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                      fontWeight: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                      fontStyle: FlutterFlowTheme.of(context)
+                                                          .bodyMedium
+                                                          .fontStyle,
                                                     ),
                                                     color: FlutterFlowTheme.of(context).alternate,
                                                     fontSize: 16,
@@ -375,7 +395,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             height: 38,
                                             decoration: BoxDecoration(
                                               color: FlutterFlowTheme.of(context).primaryText,
-                                              boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black, offset: Offset(5, 0))],
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  blurRadius: 10,
+                                                  color: Colors.black,
+                                                  offset: Offset(5, 0),
+                                                )
+                                              ],
                                               borderRadius: BorderRadius.circular(20),
                                             ),
                                           ),
@@ -384,11 +410,21 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             height: 38,
                                             decoration: BoxDecoration(
                                               color: const Color(0xFF252525),
-                                              boxShadow: const [BoxShadow(blurRadius: 6, color: Color(0x48FFFFFF), offset: Offset(-2, -1))],
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  blurRadius: 6,
+                                                  color: Color(0x48FFFFFF),
+                                                  offset: Offset(-2, -1),
+                                                )
+                                              ],
                                               borderRadius: BorderRadius.circular(20),
                                             ),
                                             alignment: const AlignmentDirectional(0, 0),
-                                            child: Icon(Icons.menu, color: FlutterFlowTheme.of(context).secondaryBackground, size: 18),
+                                            child: Icon(
+                                              Icons.menu,
+                                              color: FlutterFlowTheme.of(context).secondaryBackground,
+                                              size: 18,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -441,8 +477,12 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 FFAppState().locationWhereTo,
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                       font: GoogleFonts.poppins(
-                                                        fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .fontWeight,
+                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .fontStyle,
                                                       ),
                                                       color: FlutterFlowTheme.of(context).secondaryText,
                                                     ),
@@ -471,7 +511,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                                               font: GoogleFonts.poppins(
                                                 fontWeight: FontWeight.w500,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                fontStyle: FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
                                               ),
                                               color: FlutterFlowTheme.of(context).tertiary,
                                               fontSize: 10,
@@ -483,7 +525,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                               ],
                             ),
 
-                            // Chips — layout estável e com espaçamento
+                            // Chips
                             Align(
                               alignment: const AlignmentDirectional(-1, -1),
                               child: Padding(
@@ -543,17 +585,29 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                       : FlutterFlowTheme.of(context).primary,
                                                   borderRadius: BorderRadius.circular(16),
                                                   boxShadow: selected
-                                                      ? [BoxShadow(blurRadius: 10, offset: const Offset(0, 4), color: Colors.black.withOpacity(0.25))]
+                                                      ? [
+                                                          BoxShadow(
+                                                            blurRadius: 10,
+                                                            offset: const Offset(0, 4),
+                                                            color: Colors.black.withOpacity(0.25),
+                                                          )
+                                                        ]
                                                       : const [],
                                                 ),
                                                 alignment: Alignment.center,
                                                 child: Text(
                                                   item,
                                                   overflow: TextOverflow.ellipsis,
-                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                  style: FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
                                                         font: GoogleFonts.poppins(
-                                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                              .bodyMedium
+                                                              .fontStyle,
                                                         ),
                                                         color: const Color(0xFF585858),
                                                         fontSize: 10,
@@ -611,7 +665,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                           Text(
                                             FFLocalizations.of(context).getText('ybwe42qc' /* Ride Estimative */),
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w300,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
                                                   color: FlutterFlowTheme.of(context).alternate,
                                                   fontSize: 16,
                                                 ),
@@ -699,7 +756,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 '2.4 Km',
                                               ),
                                               style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                    font: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                    font: GoogleFonts.poppins(
+                                                      fontWeight: FontWeight.w500,
+                                                      fontStyle: FontStyle.italic,
+                                                    ),
                                                     color: FlutterFlowTheme.of(context).secondary,
                                                   ),
                                               colors: [FlutterFlowTheme.of(context).accent1, FlutterFlowTheme.of(context).secondary],
@@ -920,7 +980,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               child: Text(
                                                 FFLocalizations.of(context).getText('iv1ii278' /* Confirm Ride   */),
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                      font: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontStyle: FontStyle.italic,
+                                                      ),
                                                       color: FlutterFlowTheme.of(context).primary,
                                                       fontSize: 10,
                                                     ),
@@ -954,7 +1017,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               child: Text(
                                                 FFLocalizations.of(context).getText('nzvn5ujp' /* Ride Share */),
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                      font: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontStyle: FontStyle.italic,
+                                                      ),
                                                       color: FlutterFlowTheme.of(context).primary,
                                                       fontSize: 10,
                                                     ),
@@ -1008,7 +1074,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         width: 70,
         height: 35,
         decoration: BoxDecoration(
-          boxShadow: const [BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, 2))],
+          boxShadow: const [
+            BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, 2)),
+          ],
           gradient: LinearGradient(
             colors: [
               selected ? const Color(0xFFF4B000) : FlutterFlowTheme.of(context).primaryText,
@@ -1057,3 +1125,28 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     );
   }
 }
+
+// Tema DARK com acentos âmbar (sem azul)
+const String kGoogleMapsDarkAmberStyle = '''
+[
+  {"elementType":"geometry","stylers":[{"color":"#1a1a1a"}]},
+  {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+  {"elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},
+  {"elementType":"labels.text.stroke","stylers":[{"color":"#1a1a1a"}]},
+
+  {"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#5f5f5f"}]},
+  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#252525"}]},
+  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#1f1f1f"}]},
+  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#232323"}]},
+  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#0d0d0d"}]},
+
+  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2a2a2a"}]},
+  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#3a3a3a"}]},
+  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#444444"}]},
+  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#e6c200"}]},
+  {"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#151515"}]},
+
+  {"featureType":"poi.business","elementType":"labels.text.fill","stylers":[{"color":"#ffc107"}]},
+  {"featureType":"poi.attraction","elementType":"labels.text.fill","stylers":[{"color":"#ffc107"}]}
+]
+''';
