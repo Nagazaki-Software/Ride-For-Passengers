@@ -1,335 +1,364 @@
-// ignore_for_file: avoid_print
-import 'dart:ui' as ui;
+package com.quicky.ridebahamas
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart'; // PlatformViewHitTestBehavior
-import 'package:flutter/services.dart';
-import 'package:ride_bahamas/flutter_flow/lat_lng.dart' as ff; // LatLng do FlutterFlow
+import android.animation.ValueAnimator
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.util.Log
+import android.view.ViewTreeObserver
+import android.view.animation.LinearInterpolator
+import android.widget.FrameLayout
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.platform.PlatformView
 
-/// Controller para chamar métodos nativos (Android).
-class PickerMapNativeController {
-  MethodChannel? _channel;
-  void _attach(MethodChannel ch) => _channel = ch;
-  void _detach() => _channel = null;
+class PickerMapNativeView(
+  private val ctx: Context,
+  messenger: BinaryMessenger,
+  id: Int,
+  private val creationParams: Any?
+) : PlatformView, MethodChannel.MethodCallHandler, OnMapReadyCallback {
 
-  Future<void> updateConfig(Map<String, dynamic> cfg) async =>
-      _channel?.invokeMethod('updateConfig', cfg) ?? Future.value();
+  private val tag = "PickerMap"
+  private val container = FrameLayout(ctx)
 
-  Future<void> setMarkers(List<Map<String, dynamic>> m) async =>
-      _channel?.invokeMethod('setMarkers', m) ?? Future.value();
+  private val mapOptions = GoogleMapOptions()
+    .mapType(GoogleMap.MAP_TYPE_NORMAL)
+    .compassEnabled(true)
+    .mapToolbarEnabled(false)
+    .liteMode(false)
 
-  Future<void> setPolylines(List<Map<String, dynamic>> l) async =>
-      _channel?.invokeMethod('setPolylines', l) ?? Future.value();
+  private val mapView = MapView(ctx, mapOptions)
+  private var googleMap: GoogleMap? = null
+  private val channel = MethodChannel(messenger, "picker_map_native_$id")
 
-  Future<void> setPolygons(List<Map<String, dynamic>> p) async =>
-      _channel?.invokeMethod('setPolygons', p) ?? Future.value();
+  private var userMarker: Marker? = null
+  private var destMarker: Marker? = null
+  private var routePolyline: Polyline? = null
+  private val polygons = mutableListOf<Polygon>()
+  private val cars = mutableMapOf<String, Marker>()
+  private val carAnimators = mutableMapOf<String, ValueAnimator>()
+  private var pendingMapStyleJson: String? = null
 
-  Future<void> cameraTo(
-    double lat,
-    double lng, {
-    double? zoom,
-    double? bearing,
-    double? tilt,
-  }) async =>
-      _channel?.invokeMethod('cameraTo', {
-        'latitude': lat,
-        'longitude': lng,
-        if (zoom != null) 'zoom': zoom,
-        if (bearing != null) 'bearing': bearing,
-        if (tilt != null) 'tilt': tilt,
-      }) ??
-      Future.value();
-
-  Future<void> fitBounds(List<ff.LatLng> pts, {double padding = 0}) async =>
-      _channel?.invokeMethod('fitBounds', {
-        'points': pts
-            .map((p) => {'latitude': p.latitude, 'longitude': p.longitude})
-            .toList(),
-        'padding': padding,
-      }) ?? Future.value();
-
-  Future<void> updateCarPosition(
-    String id,
-    ff.LatLng pos, {
-    double? rotation,
-    int? durationMs,
-  }) async =>
-      _channel?.invokeMethod('updateCarPosition', {
-        'id': id,
-        'latitude': pos.latitude,
-        'longitude': pos.longitude,
-        if (rotation != null) 'rotation': rotation,
-        if (durationMs != null) 'durationMs': durationMs,
-      }) ??
-      Future.value();
-
-  Future<dynamic> debugInfo() async =>
-      _channel?.invokeMethod('debugInfo') ?? Future.value();
-}
-
-class PickerMapNative extends StatefulWidget {
-  const PickerMapNative({
-    super.key,
-    required this.userLocation,
-    this.destination,
-    this.userName,
-    this.userPhotoUrl,
-    this.width,
-    this.height = 320,
-    this.borderRadius = 16,
-    this.routeColor = const Color(0xFFFFC107),
-    this.routeWidth = 4,
-    this.showDebugPanel = true,
-    this.controller,
-
-    /// Compat com chamadas antigas (não é usado no nativo).
-    /// Mantido só para não quebrar o `home5_widget.dart`.
-    @Deprecated('Compat apenas. Não é usado pelo nativo.')
-    this.driversRefs = const [],
-
-    this.brandSafePaddingBottom,
-    this.mapStyleJson,
-    this.panelMaxLines = 120,
-  });
-
-  /// Localização do usuário (FF LatLng)
-  final ff.LatLng userLocation;
-
-  /// Destino (opcional)
-  final ff.LatLng? destination;
-
-  /// Dados opcionais
-  final String? userName;
-  final String? userPhotoUrl;
-
-  /// Layout
-  final double? width;
-  final double height;
-  final double borderRadius;
-
-  /// Rota
-  final Color routeColor;
-  final int routeWidth;
-
-  /// Painel de debug/logs
-  final bool showDebugPanel;
-  final int panelMaxLines;
-
-  /// Controller
-  final PickerMapNativeController? controller;
-
-  /// Compat (não utilizado pelo nativo, apenas pra não quebrar chamada antiga)
-  @Deprecated('Compat apenas. Não é usado pelo nativo.')
-  final List<dynamic> driversRefs;
-
-  /// Ajuste de segurança visual na borda inferior (quando tem navbar)
-  final double? brandSafePaddingBottom;
-
-  /// Estilo de mapa JSON (para modo dark, etc). O nativo aplica via setMapStyle.
-  final String? mapStyleJson;
-
-  @override
-  State<PickerMapNative> createState() => _PickerMapNativeState();
-}
-
-class _PickerMapNativeState extends State<PickerMapNative> {
-  static int _nextViewId = 1;
-
-  MethodChannel? _channel;
-  late final int _viewId;
-
-  final _ktLogs = <String>[];
-  bool _logsVisible = true;
-
-  void _pushLog(String msg) {
-    setState(() {
-      final ts = DateTime.now().toIso8601String().substring(11, 19);
-      _ktLogs.insert(0, '[$ts] $msg');
-      if (_ktLogs.length > widget.panelMaxLines) _ktLogs.removeLast();
-    });
-    print(msg);
+  private fun dbg(msg: String) {
+    Log.d(tag, msg)
+    try { channel.invokeMethod("debugLog", mapOf("msg" to msg, "ts" to System.currentTimeMillis())) } catch (_: Throwable) {}
+  }
+  private fun dbge(msg: String, t: Throwable? = null) {
+    Log.e(tag, msg, t)
+    try { channel.invokeMethod("debugLog", mapOf("level" to "E", "msg" to "$msg: ${t?.message}", "ts" to System.currentTimeMillis())) } catch (_: Throwable) {}
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _viewId = _nextViewId++;
-  }
-
-  @override
-  void dispose() {
-    _channel?.setMethodCallHandler(null);
-    widget.controller?._detach();
-    super.dispose();
-  }
-
-  Future<void> _onPlatformViewCreated(int id) async {
-    _channel = MethodChannel('picker_map_native_$id');
-    _channel!.setMethodCallHandler(_handleCall);
-    widget.controller?._attach(_channel!);
-
-    await _channel!.invokeMethod('updateConfig', {
-      'userLocation': {
-        'latitude': widget.userLocation.latitude,
-        'longitude': widget.userLocation.longitude,
-      },
-      if (widget.destination != null)
-        'destination': {
-          'latitude': widget.destination!.latitude,
-          'longitude': widget.destination!.longitude,
-        },
-      'route': const <Map<String, double>>[],
-      'routeColor': widget.routeColor.value,
-      'routeWidth': widget.routeWidth,
-      'userName': widget.userName,
-      'userPhotoUrl': widget.userPhotoUrl,
-      if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-    });
-  }
-
-  Future<dynamic> _handleCall(MethodCall call) async {
-    if (call.method == 'platformReady') {
-      _pushLog('KT → Dart: platformReady');
-    } else if (call.method == 'debugLog') {
-      final m = (call.arguments as Map?) ?? const {};
-      final level = (m['level'] ?? 'D').toString();
-      final msg = (m['msg'] ?? '').toString();
-      _pushLog('[KT/$level] $msg');
+  private fun logApiKeyFromManifest() {
+    try {
+      val ai = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+      val key = ai.metaData?.getString("com.google.android.geo.API_KEY") ?: "<null>"
+      val masked = if (key.length >= 12) key.take(6) + "…" + key.takeLast(4) else key
+      dbg("API_KEY(manifest)=$masked len=${key.length}")
+    } catch (t: Throwable) {
+      dbge("Falha ao ler API_KEY do manifest", t)
     }
-    return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (defaultTargetPlatform != TargetPlatform.android) {
-      return const Center(child: Text('PickerMapNative: apenas Android'));
-    }
+  init {
+    val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx)
+    if (status != ConnectionResult.SUCCESS) dbge("Google Play Services indisponível: code=$status")
+    else dbg("Google Play Services OK")
 
-    final controller = PlatformViewsService.initSurfaceAndroidView(
-      id: _viewId,
-      viewType: 'picker_map_native',
-      layoutDirection: ui.TextDirection.ltr,
-      creationParams: {
-        'initialUserLocation': {
-          'latitude': widget.userLocation.latitude,
-          'longitude': widget.userLocation.longitude,
-        },
-        if (widget.mapStyleJson != null) 'mapStyleJson': widget.mapStyleJson,
-      },
-      creationParamsCodec: const StandardMessageCodec(),
+    try {
+      MapsInitializer.initialize(ctx, MapsInitializer.Renderer.LATEST) { r ->
+        dbg("MapsInitializer.initialize -> $r")
+      }
+    } catch (t: Throwable) { dbge("MapsInitializer.initialize falhou", t) }
+
+    try {
+      mapView.onCreate(null)
+      mapView.onStart()
+      mapView.onResume()
+      dbg("MapView lifecycle ok (create/start/resume)")
+    } catch (t: Throwable) { dbge("Lifecycle create/start/resume falhou", t) }
+
+    mapView.getMapAsync(this)
+
+    container.addView(
+      mapView,
+      FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
     )
-      ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
-      ..create();
 
-    final androidView = AndroidViewSurface(
-      controller: controller as AndroidViewController,
-      gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-      hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-    );
+    mapView.viewTreeObserver.addOnGlobalLayoutListener(
+      ViewTreeObserver.OnGlobalLayoutListener {
+        dbg("sizes: container=${container.width}x${container.height} mapView=${mapView.width}x${mapView.height}")
+      }
+    )
 
-    // Evita corte de bordas e ajuda a não sobrepor a navbar (safe area + padding)
-    final bottomSafe = MediaQuery.maybeOf(context)?.padding.bottom ?? 0;
-    final brandBottom = widget.brandSafePaddingBottom ?? 16;
-    final outerPadding = EdgeInsets.fromLTRB(0, 0, 0, bottomSafe + brandBottom);
+    channel.setMethodCallHandler(this)
+  }
 
-    final mapBox = Padding(
-      padding: outerPadding,
-      child: SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: androidView,
-      ),
-    );
+  override fun getView() = container
 
-    if (!widget.showDebugPanel) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        child: mapBox,
-      );
+  override fun dispose() {
+    dbg("dispose")
+    channel.setMethodCallHandler(null)
+    try {
+      carAnimators.values.forEach { it.cancel() }
+      mapView.onPause()
+      mapView.onStop()
+      mapView.onDestroy()
+    } catch (t: Throwable) { dbge("dispose lifecycle error", t) }
+  }
+
+  override fun onMapReady(map: GoogleMap) {
+    dbg("onMapReady")
+    logApiKeyFromManifest()
+    googleMap = map
+    map.uiSettings.isCompassEnabled = true
+    map.uiSettings.isMyLocationButtonEnabled = false
+    map.uiSettings.isMapToolbarEnabled = false
+    map.isBuildingsEnabled = true
+    map.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+    map.setOnMapLoadedCallback { dbg("onMapLoaded (tiles renderizados)") }
+    map.setOnMapClickListener { p -> dbg("onMapClick ${p.latitude},${p.longitude}") }
+
+    // creationParams: initial camera e estilo
+    try {
+      (creationParams as? Map<*, *>)?.let { params ->
+        (params["initialUserLocation"] as? Map<*, *>)?.let { u ->
+          val lat = (u["latitude"] as Number).toDouble()
+          val lng = (u["longitude"] as Number).toDouble()
+          map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 14f))
+          dbg("initialUserLocation aplicada: ($lat,$lng)")
+        }
+        pendingMapStyleJson = (params["mapStyleJson"] as? String)
+      }
+    } catch (t: Throwable) { dbge("Erro ao aplicar creationParams", t) }
+
+    // Aplica estilo (se veio)
+    applyMapStyleIfNeeded()
+
+    try { channel.invokeMethod("platformReady", null) } catch (_: Throwable) {}
+  }
+
+  override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+    fun ok() = result.success(null)
+    fun err(t: Throwable) = result.error("error", t.message, null)
+
+    try {
+      when (call.method) {
+        "updateConfig" -> { applyConfig(call.arguments as Map<*, *>); ok() }
+        "setMarkers" -> { setMarkers(call.arguments as List<*>); ok() }
+        "setPolylines" -> { setPolylines(call.arguments as List<*>); ok() }
+        "setPolygons" -> { setPolygons(call.arguments as List<*>); ok() }
+        "cameraTo" -> {
+          val a = call.arguments as Map<*, *>
+          val lat = (a["latitude"] as Number).toDouble()
+          val lng = (a["longitude"] as Number).toDouble()
+          val zoom = (a["zoom"] as? Number)?.toFloat()
+          val bearing = (a["bearing"] as? Number)?.toFloat()
+          val tilt = (a["tilt"] as? Number)?.toFloat()
+          cameraTo(lat, lng, zoom, bearing, tilt); ok()
+        }
+        "fitBounds" -> {
+          val a = call.arguments as Map<*, *>
+          val points = a["points"] as List<*>
+          val padding = ((a["padding"] as? Number) ?: 0).toInt()
+          fitBounds(points, padding); ok()
+        }
+        "updateCarPosition" -> {
+          val a = call.arguments as Map<*, *>
+          val id = a["id"] as String
+          val lat = (a["latitude"] as Number).toDouble()
+          val lng = (a["longitude"] as Number).toDouble()
+          val rotation = (a["rotation"] as? Number)?.toFloat()
+          val duration = (a["durationMs"] as? Number)?.toLong() ?: 0L
+          updateCarPosition(id, LatLng(lat, lng), rotation, duration); ok()
+        }
+        "debugInfo" -> {
+          val info = mapOf(
+            "hasGooglePlay" to (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ctx) == ConnectionResult.SUCCESS),
+            "mapReady" to (googleMap != null),
+            "paramsKeys" to ((creationParams as? Map<*, *>)?.keys?.map { it.toString() } ?: emptyList<String>())
+          )
+          result.success(info)
+        }
+        else -> result.notImplemented()
+      }
+    } catch (t: Throwable) { dbge("onMethodCall ${call.method} error", t); err(t) }
+  }
+
+  private fun cameraTo(lat: Double, lng: Double, zoom: Float?, bearing: Float?, tilt: Float?) {
+    val map = googleMap ?: run { dbg("cameraTo antes do onMapReady"); return }
+    val pos = map.cameraPosition
+    val cu = CameraUpdateFactory.newCameraPosition(
+      CameraPosition(
+        LatLng(lat, lng),
+        zoom ?: pos.zoom,
+        tilt ?: pos.tilt,
+        bearing ?: pos.bearing
+      )
+    )
+    map.animateCamera(cu)
+    dbg("cameraTo ($lat,$lng) z=${zoom ?: "-"} b=${bearing ?: "-"} t=${tilt ?: "-"}")
+  }
+
+  private fun fitBounds(points: List<*>, padding: Int) {
+    val map = googleMap ?: return
+    val b = LatLngBounds.Builder()
+    points.forEach { p ->
+      val m = p as Map<*, *>
+      b.include(LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble()))
+    }
+    map.animateCamera(CameraUpdateFactory.newLatLngBounds(b.build(), padding))
+    dbg("fitBounds points=${points.size} padding=$padding")
+  }
+
+  private fun applyMapStyleIfNeeded() {
+    val json = pendingMapStyleJson ?: return
+    val map = googleMap ?: return
+    try {
+      val ok = map.setMapStyle(MapStyleOptions(json))
+      dbg("map.setMapStyle -> $ok")
+    } catch (t: Throwable) {
+      dbge("setMapStyle falhou", t)
+    } finally {
+      pendingMapStyleJson = null // consome uma vez
+    }
+  }
+
+  private fun applyConfig(cfg: Map<*, *>) {
+    val map = googleMap ?: run { dbg("applyConfig antes do onMapReady"); return }
+
+    // Estilo (dark, etc) pode vir via updateConfig também
+    (cfg["mapStyleJson"] as? String)?.let {
+      pendingMapStyleJson = it
+      applyMapStyleIfNeeded()
     }
 
-    // Painel de logs compacto e que não gruda na navbar nem corta o conteúdo
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          child: mapBox,
-        ),
-        SafeArea(
-          child: Positioned(
-            left: 8,
-            top: 8,
-            child: Material(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(8),
-              child: InkWell(
-                onTap: () => setState(() => _logsVisible = !_logsVisible),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Text(
-                    'LOGS',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        if (_logsVisible)
-          Positioned(
-            left: 8,
-            right: 8,
-            bottom: 12 + (widget.brandSafePaddingBottom ?? 16),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 140,
-              ),
-              child: Material(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(10),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                  child: ListView.builder(
-                    reverse: true,
-                    itemCount: _ktLogs.length,
-                    itemBuilder: (_, i) => Text(
-                      _ktLogs[i],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'monospace',
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
+    (cfg["userLocation"] as? Map<*, *>)?.let { m ->
+      val p = LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble())
+      if (userMarker == null) {
+        userMarker = map.addMarker(
+          MarkerOptions().position(p).title((cfg["userName"] as? String) ?: "You")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            .flat(true)
+        )
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(p, 15f))
+      } else userMarker?.position = p
+    }
+
+    (cfg["destination"] as? Map<*, *>)?.let { m ->
+      val p = LatLng((m["latitude"] as Number).toDouble(), (m["longitude"] as Number).toDouble())
+      if (destMarker == null) {
+        destMarker = map.addMarker(
+          MarkerOptions().position(p).title("Destination")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+        )
+      } else destMarker?.position = p
+    } ?: run { destMarker?.remove(); destMarker = null }
+
+    val colorInt = (cfg["routeColor"] as? Number)?.toInt() ?: Color.YELLOW
+    val width = (cfg["routeWidth"] as? Number)?.toFloat() ?: 4f
+    routePolyline?.remove()
+    (cfg["route"] as? List<*>)?.let { list ->
+      val pts = list.mapNotNull { p ->
+        (p as? Map<*, *>)?.let {
+          LatLng((it["latitude"] as Number).toDouble(), (it["longitude"] as Number).toDouble())
+        }
+      }
+      if (pts.size >= 2) {
+        routePolyline = map.addPolyline(PolylineOptions().addAll(pts).color(colorInt).width(width))
+      }
+    }
+    dbg("applyConfig ok: user=${userMarker != null} dest=${destMarker != null} route=${routePolyline != null}")
+  }
+
+  private fun setMarkers(list: List<*>) {
+    val map = googleMap ?: return
+    list.forEach { any ->
+      val m = any as Map<*, *>
+      val lat = (m["latitude"] as Number).toDouble()
+      val lng = (m["longitude"] as Number).toDouble()
+      map.addMarker(MarkerOptions().position(LatLng(lat, lng)))
+    }
+    dbg("setMarkers n=${list.size}")
+  }
+
+  private fun setPolylines(list: List<*>) {
+    val map = googleMap ?: return
+    list.forEach { any ->
+      val m = any as Map<*, *>
+      val pts = (m["points"] as List<*>).mapNotNull { p ->
+        (p as? Map<*, *>)?.let {
+          LatLng((it["latitude"] as Number).toDouble(), (it["longitude"] as Number).toDouble())
+        }
+      }
+      val color = (m["color"] as? Number)?.toInt() ?: Color.YELLOW
+      val width = (m["width"] as? Number)?.toFloat() ?: 4f
+      map.addPolyline(PolylineOptions().addAll(pts).color(color).width(width))
+    }
+    dbg("setPolylines n=${list.size}")
+  }
+
+  private fun setPolygons(list: List<*>) {
+    val map = googleMap ?: return
+    polygons.forEach { it.remove() }
+    polygons.clear()
+    list.forEach { any ->
+      val m = any as Map<*, *>
+      val pts = (m["points"] as List<*>).mapNotNull { p ->
+        (p as? Map<*, *>)?.let {
+          LatLng((it["latitude"] as Number).toDouble(), (it["longitude"] as Number).toDouble())
+        }
+      }
+      val strokeColor = (m["strokeColor"] as? Number)?.toInt() ?: Color.BLACK
+      val fillColor = (m["fillColor"] as? Number)?.toInt() ?: 0x220000FF
+      val width = (m["width"] as? Number)?.toFloat() ?: 2f
+      val polygon = map.addPolygon(
+        PolygonOptions().addAll(pts).strokeColor(strokeColor).fillColor(fillColor).strokeWidth(width)
+      )
+      polygons += polygon
+    }
+    dbg("setPolygons n=${polygons.size}")
+  }
+
+  private fun updateCarPosition(id: String, dest: LatLng, rotation: Float?, duration: Long) {
+    val map = googleMap ?: return
+    val marker = cars[id] ?: run {
+      val m = map.addMarker(
+        MarkerOptions().position(dest).flat(true).anchor(0.5f, 0.5f)
+          .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+      )!!
+      cars[id] = m
+      dbg("car[$id] criado em ${dest.latitude},${dest.longitude}")
+      m
+    }
+    rotation?.let { marker.rotation = it }
+    carAnimators[id]?.cancel()
+
+    if (duration <= 0L) {
+      marker.position = dest
+      dbg("car[$id] snap -> ${dest.latitude},${dest.longitude} rot=${rotation ?: "-"}")
+      return
+    }
+
+    val startPos = marker.position
+    val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+      interpolator = LinearInterpolator()
+      duration = duration
+      addUpdateListener { va ->
+        val f = va.animatedValue as Float
+        val lat = startPos.latitude + (dest.latitude - startPos.latitude) * f
+        val lng = startPos.longitude + (dest.longitude - startPos.longitude) * f
+        marker.position = LatLng(lat, lng)
+      }
+      start()
+    }
+    carAnimators[id] = animator
+    dbg("car[$id] anim -> ${dest.latitude},${dest.longitude} dur=${duration}ms rot=${rotation ?: "-"}")
   }
 }
-
-/// Estilo dark simples (use se quiser) — passe como `mapStyleJson: kGoogleMapsDarkStyle`.
-const String kGoogleMapsDarkStyle = '''
-[
-  {"elementType":"geometry","stylers":[{"color":"#212121"}]},
-  {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
-  {"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},
-  {"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},
-  {"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},
-  {"featureType":"poi","elementType":"geometry","stylers":[{"color":"#303030"}]},
-  {"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#263238"}]},
-  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2c2c2c"}]},
-  {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},
-  {"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},
-  {"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},
-  {"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},
-  {"featureType":"transit","elementType":"geometry","stylers":[{"color":"#2f3948"}]},
-  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]}
-]
-''';
