@@ -5,12 +5,14 @@ import '/components/select_location_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/lat_lng.dart' as ff; // 👈 LatLng do FlutterFlow
 import '/custom_code/actions/index.dart' as actions;
-import '/custom_code/widgets/index.dart' as custom_widgets; // mantém import p/ compat
+import '/custom_code/widgets/index.dart' as custom_widgets; // mantido p/ compat
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 
 import 'dart:async';
+import 'dart:convert' as convert;
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -21,7 +23,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap; // 👈 Google Maps com alias
 import 'package:http/http.dart' as http;
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:provider/provider.dart';
@@ -44,13 +46,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   late Home5Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  LatLng? currentUserLocationValue;
+  ff.LatLng? currentUserLocationValue;
 
-  // Google Map
-  GoogleMapController? _gmap;
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {};
-  List<LatLng> _routePoints = [];
+  // Google Map (tudo namespaced)
+  gmap.GoogleMapController? _gmap;
+  final Set<gmap.Marker> _markers = {};
+  final Set<gmap.Polyline> _polylines = {};
+  List<gmap.LatLng> _routePoints = [];
   Timer? _snakeTimer;
   int _snakeIndex = 0;
 
@@ -69,16 +71,16 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   ]
   ''';
 
-  // Controller legado do seu custom widget (mantido só pra não quebrar imports)
+  // Controller legado do seu custom widget (mantido)
   final custom_widgets.PickerMapNativeController _mapCtrl =
       custom_widgets.PickerMapNativeController();
 
-  // Fallback Nassau (evita 0,0)
-  static const LatLng _kNassau = LatLng(25.03428, -77.39628);
-  bool _isZero(LatLng p) =>
+  // Fallback Nassau (evita 0,0) — usando ff.LatLng
+  static const ff.LatLng _kNassau = ff.LatLng(25.03428, -77.39628);
+  bool _isZero(ff.LatLng p) =>
       (p.latitude == 0.0 && p.longitude == 0.0) ||
       (p.latitude.abs() < 0.000001 && p.longitude.abs() < 0.000001);
-  LatLng _safe(LatLng? p) => (p == null || _isZero(p)) ? _kNassau : p;
+  ff.LatLng _safe(ff.LatLng? p) => (p == null || _isZero(p)) ? _kNassau : p;
 
   String _initials(String? name) {
     if (name == null || name.trim().isEmpty) return '';
@@ -90,7 +92,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   var hasContainerTriggered1 = false;
   final animationsMap = <String, AnimationInfo>{};
 
-  // SUA KEY — usei a mesma do arquivo (p/ Places/Geocode/Directions)
+  // SUA KEY — mesma usada nas ações custom
   static const String _kGoogleKey = 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ';
 
   @override
@@ -154,7 +156,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     super.dispose();
   }
 
-  Future<void> _bootstrapNearbyAndGreeting(LatLng user) async {
+  Future<void> _bootstrapNearbyAndGreeting(ff.LatLng user) async {
     _model.locationPerto = await actions.googlePlacesNearbyImportant(
       context,
       _kGoogleKey,
@@ -176,25 +178,27 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   // =======================
   // MAP HELPERS
   // =======================
+  gmap.LatLng _toG(ff.LatLng v) => gmap.LatLng(v.latitude, v.longitude);
+
   Future<void> _applyMapStyle() async {
     try {
       await _gmap?.setMapStyle(_kMonoBlackStyle);
     } catch (_) {}
   }
 
-  Future<BitmapDescriptor> _bitmapFromUrl(String url, {int size = 110}) async {
+  Future<gmap.BitmapDescriptor> _bitmapFromUrl(String url, {int size = 110}) async {
     try {
       final res = await http.get(Uri.parse(url));
       if (res.statusCode == 200) {
         final codec = await ui.instantiateImageCodec(res.bodyBytes, targetWidth: size, targetHeight: size);
         final frame = await codec.getNextFrame();
         final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
-        return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
+        return gmap.BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
       }
     } catch (_) {}
     // fallback bolinha cinza
     final circle = await _fallbackCircle(size: math.max(64, size));
-    return BitmapDescriptor.fromBytes(circle);
+    return gmap.BitmapDescriptor.fromBytes(circle);
   }
 
   Future<Uint8List> _fallbackCircle({int size = 96}) async {
@@ -215,34 +219,34 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   }
 
   Future<void> _updateMarkers() async {
-    final me = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
-    final dst = FFAppState().latlangAondeVaiIr;
+    final meFF = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final dstFF = FFAppState().latlangAondeVaiIr;
 
-    final Set<Marker> markers = {};
+    final Set<gmap.Marker> markers = {};
 
-    // Marker do usuário com foto
-    final BitmapDescriptor meIcon = (currentUserPhoto != '')
+    // Marker do usuário com foto na posição do ff.LatLng
+    final gmap.BitmapDescriptor meIcon = (currentUserPhoto != '')
         ? await _bitmapFromUrl(currentUserPhoto, size: 140)
-        : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+        : gmap.BitmapDescriptor.defaultMarkerWithHue(gmap.BitmapDescriptor.hueAzure);
 
     markers.add(
-      Marker(
-        markerId: const MarkerId('me'),
-        position: me,
+      gmap.Marker(
+        markerId: const gmap.MarkerId('me'),
+        position: _toG(meFF),
         icon: meIcon,
         anchor: const Offset(0.5, 0.5),
-        infoWindow: InfoWindow(title: currentUserDisplayName.isNotEmpty ? currentUserDisplayName : 'Você'),
+        infoWindow: gmap.InfoWindow(title: currentUserDisplayName.isNotEmpty ? currentUserDisplayName : 'Você'),
       ),
     );
 
     // Marker destino
-    if (dst != null) {
+    if (dstFF != null) {
       markers.add(
-        Marker(
-          markerId: const MarkerId('dst'),
-          position: dst,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-          infoWindow: const InfoWindow(title: 'Destino'),
+        gmap.Marker(
+          markerId: const gmap.MarkerId('dst'),
+          position: _toG(dstFF),
+          icon: gmap.BitmapDescriptor.defaultMarkerWithHue(gmap.BitmapDescriptor.hueOrange),
+          infoWindow: const gmap.InfoWindow(title: 'Destino'),
         ),
       );
     }
@@ -256,11 +260,11 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         final geo = d.location;
         if (geo != null) {
           markers.add(
-            Marker(
-              markerId: MarkerId('drv_${d.reference.id}'),
-              position: LatLng(geo.latitude, geo.longitude),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-              infoWindow: InfoWindow(title: d.displayName.isNotEmpty ? d.displayName : 'Driver'),
+            gmap.Marker(
+              markerId: gmap.MarkerId('drv_${d.reference.id}'),
+              position: gmap.LatLng(geo.latitude, geo.longitude),
+              icon: gmap.BitmapDescriptor.defaultMarkerWithHue(gmap.BitmapDescriptor.hueYellow),
+              infoWindow: gmap.InfoWindow(title: d.displayName.isNotEmpty ? d.displayName : 'Driver'),
             ),
           );
         }
@@ -279,19 +283,20 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     _routePoints.clear();
     _snakeIndex = 0;
 
-    final origin = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
-    final dst = FFAppState().latlangAondeVaiIr;
-    if (dst == null) {
+    final originFF = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final dstFF = FFAppState().latlangAondeVaiIr;
+    if (dstFF == null) {
       setState(() {});
       return; // sem destino, sem rota
     }
 
     try {
       final url =
-          'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dst.latitude},${dst.longitude}&mode=driving&key=$_kGoogleKey';
+          'https://maps.googleapis.com/maps/api/directions/json?origin=${originFF.latitude},${originFF.longitude}&destination=${dstFF.latitude},${dstFF.longitude}&mode=driving&key=$_kGoogleKey';
       final resp = await http.get(Uri.parse(url));
       if (resp.statusCode == 200) {
-        final data = getJsonField(resp.body, r'$.routes[0].overview_polyline.points').toString();
+        final json = convert.jsonDecode(resp.body);
+        final data = getJsonField(json, r'$.routes[0].overview_polyline.points').toString();
         if (data.isNotEmpty) {
           _routePoints = _decodePolyline(data);
           // inicia animação
@@ -304,13 +309,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
             _polylines
               ..clear()
               ..add(
-                Polyline(
-                  polylineId: const PolylineId('route'),
+                gmap.Polyline(
+                  polylineId: const gmap.PolylineId('route'),
                   points: visible,
                   width: 5,
                   color: const Color(0xFFBDBDBD),
-                  endCap: Cap.roundCap,
-                  startCap: Cap.roundCap,
+                  endCap: gmap.Cap.roundCap,
+                  startCap: gmap.Cap.roundCap,
                   geodesic: true,
                 ),
               );
@@ -325,8 +330,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     if (mounted) setState(() {});
   }
 
-  List<LatLng> _decodePolyline(String encoded) {
-    final List<LatLng> points = [];
+  List<gmap.LatLng> _decodePolyline(String encoded) {
+    final List<gmap.LatLng> points = [];
     int index = 0, len = encoded.length;
     int lat = 0, lng = 0;
 
@@ -350,7 +355,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
       final dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
       lng += dlng;
 
-      points.add(LatLng(lat / 1e5, lng / 1e5));
+      points.add(gmap.LatLng(lat / 1e5, lng / 1e5));
     }
     return points;
   }
@@ -359,18 +364,20 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
     // Atualiza markers
     await _updateMarkers();
     // Re-centra câmera
-    final me = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
-    final dst = FFAppState().latlangAondeVaiIr;
+    final meFF = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final dstFF = FFAppState().latlangAondeVaiIr;
 
     if (_gmap != null) {
-      if (dst != null) {
-        final bounds = LatLngBounds(
-          southwest: LatLng(math.min(me.latitude, dst.latitude), math.min(me.longitude, dst.longitude)),
-          northeast: LatLng(math.max(me.latitude, dst.latitude), math.max(me.longitude, dst.longitude)),
+      if (dstFF != null) {
+        final bounds = gmap.LatLngBounds(
+          southwest: gmap.LatLng(math.min(meFF.latitude, dstFF.latitude), math.min(meFF.longitude, dstFF.longitude)),
+          northeast: gmap.LatLng(math.max(meFF.latitude, dstFF.latitude), math.max(meFF.longitude, dstFF.longitude)),
         );
-        await _gmap!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
+        await _gmap!.animateCamera(gmap.CameraUpdate.newLatLngBounds(bounds, 80));
       } else {
-        await _gmap!.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: me, zoom: 15.5)));
+        await _gmap!.animateCamera(
+          gmap.CameraUpdate.newCameraPosition(gmap.CameraPosition(target: _toG(meFF), zoom: 15.5)),
+        );
       }
     }
     // Rota
@@ -385,9 +392,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
-    final LatLng userStart = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final ff.LatLng userStartFF = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
 
-    // Tela de splash curto enquanto local pega
+    // Splash curto enquanto pega localização
     if (currentUserLocationValue == null) {
       return Container(
         color: const Color(0xFF0F1116),
@@ -408,7 +415,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
       child: Scaffold(
         key: scaffoldKey,
         resizeToAvoidBottomInset: false,
-        // Tema preto/cinza de verdade
+        // Tema preto/cinza
         backgroundColor: const Color(0xFF0F1116),
         body: Stack(
           children: [
@@ -418,9 +425,9 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
             Positioned.fill(
               child: PointerInterceptor(
                 intercepting: isWeb,
-                child: GoogleMap(
+                child: gmap.GoogleMap(
                   key: const ValueKey('home5_dark_map'),
-                  initialCameraPosition: CameraPosition(target: userStart, zoom: 15.5),
+                  initialCameraPosition: gmap.CameraPosition(target: _toG(userStartFF), zoom: 15.5),
                   compassEnabled: false,
                   mapToolbarEnabled: false,
                   myLocationEnabled: false, // usamos nosso marcador custom
