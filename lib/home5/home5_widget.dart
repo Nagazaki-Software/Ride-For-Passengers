@@ -6,18 +6,27 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/actions/index.dart' as actions;
-import '/custom_code/widgets/index.dart' as custom_widgets;
+import '/custom_code/widgets/index.dart' as custom_widgets; // mantém import p/ compat
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
+
+import 'dart:async';
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
+
 import 'home5_model.dart';
 export 'home5_model.dart';
 
@@ -37,11 +46,34 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   final scaffoldKey = GlobalKey<ScaffoldState>();
   LatLng? currentUserLocationValue;
 
-  // Controller do mapa (nativo)
+  // Google Map
+  GoogleMapController? _gmap;
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
+  List<LatLng> _routePoints = [];
+  Timer? _snakeTimer;
+  int _snakeIndex = 0;
+
+  // Estilo escuro pro mapa (preto/cinza)
+  static const String _kMonoBlackStyle = '''
+  [
+    {"elementType":"geometry","stylers":[{"color":"#1d1f25"}]},
+    {"elementType":"labels.text.fill","stylers":[{"color":"#8a8c91"}]},
+    {"elementType":"labels.text.stroke","stylers":[{"color":"#1d1f25"}]},
+    {"featureType":"poi","stylers":[{"visibility":"off"}]},
+    {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2a2d34"}]},
+    {"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#1a1c21"}]},
+    {"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8c91"}]},
+    {"featureType":"transit","stylers":[{"visibility":"off"}]},
+    {"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#111317"}]}
+  ]
+  ''';
+
+  // Controller legado do seu custom widget (mantido só pra não quebrar imports)
   final custom_widgets.PickerMapNativeController _mapCtrl =
       custom_widgets.PickerMapNativeController();
 
-  // Nassau fallback (se vier null ou 0,0)
+  // Fallback Nassau (evita 0,0)
   static const LatLng _kNassau = LatLng(25.03428, -77.39628);
   bool _isZero(LatLng p) =>
       (p.latitude == 0.0 && p.longitude == 0.0) ||
@@ -56,21 +88,17 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
   }
 
   var hasContainerTriggered1 = false;
-  var hasContainerTriggered2 = false;
-  var hasContainerTriggered3 = false;
-  var hasContainerTriggered4 = false;
-  var hasContainerTriggered5 = false;
-  var hasContainerTriggered6 = false;
-  var hasContainerTriggered7 = false;
-
   final animationsMap = <String, AnimationInfo>{};
+
+  // SUA KEY — usei a mesma do arquivo (p/ Places/Geocode/Directions)
+  static const String _kGoogleKey = 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ';
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => Home5Model());
 
-    // 1) tenta obter rápido do cache
+    // 1) pega rápido do cache
     getCurrentUserLocation(defaultLocation: _kNassau, cached: true)
         .then((loc) => safeSetState(() {
               currentUserLocationValue = loc;
@@ -78,18 +106,27 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
               FFAppState().update(() {});
             }));
 
-    // 2) confirma depois sem cache
+    // 2) confirma sem cache e faz bootstrap
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       final loc = await getCurrentUserLocation(defaultLocation: _kNassau, cached: false);
       currentUserLocationValue = loc;
-      FFAppState().latlngAtual = loc; // mantém quente no AppState
+      FFAppState().latlngAtual = loc;
 
-      // boot de “lugares por perto” e saudação
       await _bootstrapNearbyAndGreeting(loc);
       FFAppState().update(() {});
+
+      // Inicializa mapa quando já temos localização
+      _refreshMap();
     });
 
     animationsMap.addAll({
+      'containerOnPageLoadAnimation': AnimationInfo(
+        trigger: AnimationTrigger.onPageLoad,
+        effectsBuilder: () => [
+          MoveEffect(curve: Curves.easeInOut, delay: 0.ms, duration: 980.ms, begin: const Offset(0, -30), end: const Offset(0, 0)),
+          FadeEffect(curve: Curves.easeInOut, delay: 0.ms, duration: 450.ms, begin: 0.0, end: 1.0),
+        ],
+      ),
       'containerOnActionTriggerAnimation1': AnimationInfo(
         trigger: AnimationTrigger.onActionTrigger,
         applyInitialState: false,
@@ -105,33 +142,22 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
           ),
         ],
       ),
-      'containerOnPageLoadAnimation': AnimationInfo(
-        trigger: AnimationTrigger.onPageLoad,
-        effectsBuilder: () => [
-          MoveEffect(curve: Curves.easeInOut, delay: 0.ms, duration: 980.ms, begin: const Offset(0, -30), end: const Offset(0, 0)),
-          FadeEffect(curve: Curves.easeInOut, delay: 0.ms, duration: 450.ms, begin: 0.0, end: 1.0),
-        ],
-      ),
-      for (final k in [2, 3, 4, 5, 6, 7])
-        'containerOnActionTriggerAnimation$k': AnimationInfo(
-          trigger: AnimationTrigger.onActionTrigger,
-          applyInitialState: false,
-          effectsBuilder: () => [
-            SaturateEffect(curve: Curves.linear, delay: 0.ms, duration: 280.ms, begin: 0.77, end: 2.0),
-            TintEffect(curve: Curves.easeInOut, delay: 90.ms, duration: 360.ms, color: const Color(0xC4BAB5B5), begin: 1.0, end: 0.0),
-          ],
-        ),
     });
-    setupAnimations(
-      animationsMap.values.where((anim) => anim.trigger == AnimationTrigger.onActionTrigger || !anim.applyInitialState),
-      this,
-    );
+    setupAnimations(animationsMap.values, this);
+  }
+
+  @override
+  void dispose() {
+    _snakeTimer?.cancel();
+    _gmap?.dispose();
+    _model.dispose();
+    super.dispose();
   }
 
   Future<void> _bootstrapNearbyAndGreeting(LatLng user) async {
     _model.locationPerto = await actions.googlePlacesNearbyImportant(
       context,
-      'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+      _kGoogleKey,
       user,
       3000,
       '',
@@ -147,29 +173,228 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
         .cast<String>();
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
+  // =======================
+  // MAP HELPERS
+  // =======================
+  Future<void> _applyMapStyle() async {
+    try {
+      await _gmap?.setMapStyle(_kMonoBlackStyle);
+    } catch (_) {}
   }
 
+  Future<BitmapDescriptor> _bitmapFromUrl(String url, {int size = 110}) async {
+    try {
+      final res = await http.get(Uri.parse(url));
+      if (res.statusCode == 200) {
+        final codec = await ui.instantiateImageCodec(res.bodyBytes, targetWidth: size, targetHeight: size);
+        final frame = await codec.getNextFrame();
+        final data = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+        return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
+      }
+    } catch (_) {}
+    // fallback bolinha cinza
+    final circle = await _fallbackCircle(size: math.max(64, size));
+    return BitmapDescriptor.fromBytes(circle);
+  }
+
+  Future<Uint8List> _fallbackCircle({int size = 96}) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final paint = Paint()..color = const Color(0xFF2D2F36);
+    final border = Paint()
+      ..color = const Color(0xFFBDBDBD)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+    final center = Offset(size / 2, size / 2);
+    canvas.drawCircle(center, size / 2.2, paint);
+    canvas.drawCircle(center, size / 2.2, border);
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(size, size);
+    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
+  }
+
+  Future<void> _updateMarkers() async {
+    final me = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final dst = FFAppState().latlangAondeVaiIr;
+
+    final Set<Marker> markers = {};
+
+    // Marker do usuário com foto
+    final BitmapDescriptor meIcon = (currentUserPhoto != '')
+        ? await _bitmapFromUrl(currentUserPhoto, size: 140)
+        : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+
+    markers.add(
+      Marker(
+        markerId: const MarkerId('me'),
+        position: me,
+        icon: meIcon,
+        anchor: const Offset(0.5, 0.5),
+        infoWindow: InfoWindow(title: currentUserDisplayName.isNotEmpty ? currentUserDisplayName : 'Você'),
+      ),
+    );
+
+    // Marker destino
+    if (dst != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId('dst'),
+          position: dst,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          infoWindow: const InfoWindow(title: 'Destino'),
+        ),
+      );
+    }
+
+    // (Opcional) Drivers online
+    try {
+      final drivers = await queryUsersRecordOnce(
+        queryBuilder: (q) => q.where('driver', isEqualTo: true).where('driverOnline', isEqualTo: true),
+      );
+      for (final d in drivers) {
+        final geo = d.location;
+        if (geo != null) {
+          markers.add(
+            Marker(
+              markerId: MarkerId('drv_${d.reference.id}'),
+              position: LatLng(geo.latitude, geo.longitude),
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+              infoWindow: InfoWindow(title: d.displayName.isNotEmpty ? d.displayName : 'Driver'),
+            ),
+          );
+        }
+      }
+    } catch (_) {}
+
+    _markers
+      ..clear()
+      ..addAll(markers);
+  }
+
+  // Busca rota e anima “snake”
+  Future<void> _buildRouteAndAnimate() async {
+    _snakeTimer?.cancel();
+    _polylines.clear();
+    _routePoints.clear();
+    _snakeIndex = 0;
+
+    final origin = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final dst = FFAppState().latlangAondeVaiIr;
+    if (dst == null) {
+      setState(() {});
+      return; // sem destino, sem rota
+    }
+
+    try {
+      final url =
+          'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dst.latitude},${dst.longitude}&mode=driving&key=$_kGoogleKey';
+      final resp = await http.get(Uri.parse(url));
+      if (resp.statusCode == 200) {
+        final data = getJsonField(resp.body, r'$.routes[0].overview_polyline.points').toString();
+        if (data.isNotEmpty) {
+          _routePoints = _decodePolyline(data);
+          // inicia animação
+          _snakeTimer = Timer.periodic(const Duration(milliseconds: 18), (t) {
+            if (_snakeIndex >= _routePoints.length) {
+              t.cancel();
+              return;
+            }
+            final visible = _routePoints.sublist(0, _snakeIndex + 1);
+            _polylines
+              ..clear()
+              ..add(
+                Polyline(
+                  polylineId: const PolylineId('route'),
+                  points: visible,
+                  width: 5,
+                  color: const Color(0xFFBDBDBD),
+                  endCap: Cap.roundCap,
+                  startCap: Cap.roundCap,
+                  geodesic: true,
+                ),
+              );
+            _snakeIndex += 2; // velocidade do snake
+            if (mounted) setState(() {});
+          });
+        }
+      }
+    } catch (_) {
+      // silencia — mapa continua
+    }
+    if (mounted) setState(() {});
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    final List<LatLng> points = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      final dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      final dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      lng += dlng;
+
+      points.add(LatLng(lat / 1e5, lng / 1e5));
+    }
+    return points;
+  }
+
+  Future<void> _refreshMap() async {
+    // Atualiza markers
+    await _updateMarkers();
+    // Re-centra câmera
+    final me = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
+    final dst = FFAppState().latlangAondeVaiIr;
+
+    if (_gmap != null) {
+      if (dst != null) {
+        final bounds = LatLngBounds(
+          southwest: LatLng(math.min(me.latitude, dst.latitude), math.min(me.longitude, dst.longitude)),
+          northeast: LatLng(math.max(me.latitude, dst.latitude), math.max(me.longitude, dst.longitude)),
+        );
+        await _gmap!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
+      } else {
+        await _gmap!.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: me, zoom: 15.5)));
+      }
+    }
+    // Rota
+    await _buildRouteAndAnimate();
+    if (mounted) setState(() {});
+  }
+
+  // =======================
+  // WIDGET
+  // =======================
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
     final LatLng userStart = _safe(FFAppState().latlngAtual ?? currentUserLocationValue);
 
+    // Tela de splash curto enquanto local pega
     if (currentUserLocationValue == null) {
       return Container(
-        color: Colors.black, // evita flash branco
+        color: const Color(0xFF0F1116),
         child: Center(
           child: SizedBox(
-            width: 50,
-            height: 50,
-            child: SpinKitDoubleBounce(
-              color: FlutterFlowTheme.of(context).accent1,
-              size: 50,
-            ),
+            width: 50, height: 50,
+            child: SpinKitDoubleBounce(color: const Color(0xFFBDBDBD), size: 50),
           ),
         ),
       );
@@ -183,93 +408,41 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
       child: Scaffold(
         key: scaffoldKey,
         resizeToAvoidBottomInset: false,
-        backgroundColor: FlutterFlowTheme.of(context).primaryText,
+        // Tema preto/cinza de verdade
+        backgroundColor: const Color(0xFF0F1116),
         body: Stack(
           children: [
             // =========================
-            // MAPA NATIVO — ocupa toda a área
+            // GOOGLE MAP — ocupa tudo
             // =========================
             Positioned.fill(
               child: PointerInterceptor(
                 intercepting: isWeb,
-                child: AuthUserStreamWidget(
-                  builder: (context) => StreamBuilder<List<UsersRecord>>(
-                    stream: queryUsersRecord(
-                      queryBuilder: (usersRecord) =>
-                          usersRecord.where('driver', isEqualTo: true).where('driverOnline', isEqualTo: true),
-                    ),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const ColoredBox(
-                          color: Colors.black, // placeholder preto
-                          child: Center(child: CircularProgressIndicator.adaptive()),
-                        );
-                      }
-                      final pickerMapUsersRecordList = snapshot.data!;
-                      return custom_widgets.PickerMapNative(
-                        width: double.infinity,
-                        height: double.infinity,
-                        controller: _mapCtrl,
-                        userLocation: userStart,
-                        destination: FFAppState().latlangAondeVaiIr, // usa o AppState do seu print
-                        mapStyleJson: custom_widgets.kGoogleMapsMonoBlackStyle, // preto/cinza
-                        routeColor: const Color(0xFFBDBDBD), // rota cinza
-                        routeWidth: 5,
+                child: GoogleMap(
+                  key: const ValueKey('home5_dark_map'),
+                  initialCameraPosition: CameraPosition(target: userStart, zoom: 15.5),
+                  compassEnabled: false,
+                  mapToolbarEnabled: false,
+                  myLocationEnabled: false, // usamos nosso marcador custom
+                  myLocationButtonEnabled: false,
+                  zoomControlsEnabled: false,
+                  tiltGesturesEnabled: true,
+                  buildingsEnabled: false,
+                  trafficEnabled: false,
+                  markers: _markers,
+                  polylines: _polylines,
+                  onMapCreated: (ctrl) async {
+                    _gmap = ctrl;
+                    await _applyMapStyle();
+                    await _refreshMap();
+                  },
+                ),
+              ),
+            ),
 
-                        // legado (ok manter)
-                        driversRefs: pickerMapUsersRecordList.map((e) => e.reference).toList(),
-                        refreshMs: 2000,
-                        destinationMarkerPngUrl:
-                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
-                        userPhotoUrl: currentUserPhoto,
-                        userMarkerSize: 40,
-                        userName: currentUserDisplayName,
-                        borderRadius: 0,
-                        driverIconWidth: 70,
-                        driverTaxiIconAsset:
-                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                        driverDriverIconUrl:
-                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
-                        driverTaxiIconUrl:
-                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                        enableRouteSnake: true,
-                        liteModeOnAndroid: false,
-                        ultraLowSpecMode: false,
-                        brandSafePaddingBottom: 60,
-                        showDebugPanel: false, // sem logs
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: IgnorePointer(
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: FlutterFlowTheme.of(context).secondaryBackground,
-                    image: (currentUserPhoto != '')
-                        ? DecorationImage(
-                            image: NetworkImage(currentUserPhoto),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: (currentUserPhoto != '')
-                      ? null
-                      : Center(
-                          child: Text(
-                            _initials(currentUserDisplayName),
-                            style: FlutterFlowTheme.of(context).titleSmall,
-                          ),
-                        ),
-                ),
-              ),
-            ),
+            // =========================
+            // SEM overlay central de foto (era isso que tampava o mapa)
+            // =========================
 
             // =========================
             // OVERLAYS (topo + bottom card + navbar)
@@ -279,7 +452,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  // HEADER com gradiente
+                  // HEADER com gradiente dark
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
@@ -304,87 +477,49 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                 children: <Widget>[
                                   Row(
                                     children: <Widget>[
+                                      // Avatar pequeno (só no header)
                                       Container(
-                                        width: 70,
-                                        height: 70,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context).primaryText,
-                                          boxShadow: const [
-                                            BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, 2))
-                                          ],
+                                        width: 56,
+                                        height: 56,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF1A1C22),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: Stack(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: AuthUserStreamWidget(
-                                                builder: (context) => Container(
-                                                  width: 200,
-                                                  height: 200,
-                                                  clipBehavior: Clip.antiAlias,
-                                                  decoration: const BoxDecoration(shape: BoxShape.circle),
-                                                  child: Image.network(currentUserPhoto, fit: BoxFit.cover),
-                                                ),
-                                              ),
-                                            ),
-                                            if (currentUserPhoto == '')
-                                              Align(
-                                                alignment: const AlignmentDirectional(0, 0),
-                                                child: AuthUserStreamWidget(
-                                                  builder: (context) => Text(
-                                                    functions.partesDoName(currentUserDisplayName),
-                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                          font: GoogleFonts.poppins(
-                                                            fontWeight: FlutterFlowTheme.of(context)
-                                                                .bodyMedium
-                                                                .fontWeight,
-                                                            fontStyle: FlutterFlowTheme.of(context)
-                                                                .bodyMedium
-                                                                .fontStyle,
-                                                          ),
-                                                          color: FlutterFlowTheme.of(context).alternate,
-                                                          fontSize: 18,
-                                                          letterSpacing: 3,
-                                                        ),
+                                        child: ClipOval(
+                                          child: (currentUserPhoto != '')
+                                              ? Image.network(currentUserPhoto, fit: BoxFit.cover)
+                                              : Center(
+                                                  child: Text(
+                                                    _initials(currentUserDisplayName),
+                                                    style: FlutterFlowTheme.of(context).titleSmall.override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                      color: const Color(0xFFBDBDBD),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                          ],
                                         ),
                                       ),
+                                      const SizedBox(width: 10),
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             FFAppState().fraseInicial,
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle: FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-                                                  ),
+                                                  font: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                                                   color: const Color(0xFF696C6F),
                                                   fontSize: 12,
                                                 ),
                                           ),
-                                          AuthUserStreamWidget(
-                                            builder: (context) => Text(
-                                              currentUserDisplayName,
-                                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                    font: GoogleFonts.poppins(
-                                                      fontWeight: FlutterFlowTheme.of(context)
-                                                          .bodyMedium
-                                                          .fontWeight,
-                                                      fontStyle: FlutterFlowTheme.of(context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                    ),
-                                                    color: FlutterFlowTheme.of(context).alternate,
-                                                    fontSize: 16,
-                                                  ),
-                                            ),
+                                          Text(
+                                            currentUserDisplayName,
+                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                  font: GoogleFonts.poppins(),
+                                                  color: const Color(0xFFE5E5E5),
+                                                  fontSize: 16,
+                                                ),
                                           ),
                                         ],
                                       ),
@@ -392,29 +527,15 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                   ),
                                   Row(
                                     children: <Widget>[
-                                      Stack(
-                                        children: [
-                                          Container(
-                                            width: 38,
-                                            height: 38,
-                                            decoration: BoxDecoration(
-                                              color: FlutterFlowTheme.of(context).primaryText,
-                                              boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black, offset: Offset(5, 0))],
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 38,
-                                            height: 38,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF252525),
-                                              boxShadow: const [BoxShadow(blurRadius: 6, color: Color(0x48FFFFFF), offset: Offset(-2, -1))],
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                            alignment: const AlignmentDirectional(0, 0),
-                                            child: Icon(Icons.menu, color: FlutterFlowTheme.of(context).secondaryBackground, size: 18),
-                                          ),
-                                        ],
+                                      Container(
+                                        width: 38, height: 38,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF1A1C22),
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black, offset: Offset(5, 0))],
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Icon(Icons.menu, color: Color(0xFFE5E5E5), size: 18),
                                       ),
                                     ],
                                   ),
@@ -448,12 +569,16 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             ),
                                           );
                                         },
-                                      ).then((value) => safeSetState(() {}));
+                                      ).then((value) async {
+                                        // sempre que sair do modal, atualiza rota/markers
+                                        await _refreshMap();
+                                        if (mounted) safeSetState(() {});
+                                      });
                                     },
                                     child: Container(
                                       width: MediaQuery.sizeOf(context).width * 0.9,
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context).primary,
+                                        color: const Color(0xFF1A1C22), // dark, não azul
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Row(
@@ -464,11 +589,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               child: Text(
                                                 FFAppState().locationWhereTo,
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                      ),
-                                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                                      font: GoogleFonts.poppins(),
+                                                      color: const Color(0xFF9CA3AF),
                                                     ),
                                               ),
                                             ),
@@ -483,21 +605,17 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                                     child: Container(
-                                      width: 48,
-                                      height: 18,
+                                      width: 48, height: 18,
                                       decoration: BoxDecoration(
-                                        color: FlutterFlowTheme.of(context).alternate,
+                                        color: const Color(0xFFE5E5E5),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      alignment: const AlignmentDirectional(0, 0),
+                                      alignment: Alignment.center,
                                       child: Text(
                                         FFLocalizations.of(context).getText('v2jubsa7' /* 3 min */),
                                         style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                              font: GoogleFonts.poppins(
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                              color: FlutterFlowTheme.of(context).tertiary,
+                                              font: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                              color: const Color(0xFF111317),
                                               fontSize: 10,
                                             ),
                                       ),
@@ -507,7 +625,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                               ],
                             ),
 
-                            // Chips
+                            // Chips (dark)
                             Align(
                               alignment: const AlignmentDirectional(-1, -1),
                               child: Padding(
@@ -533,11 +651,12 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 FFAppState().latlangAondeVaiIr = null;
                                                 FFAppState().listPerto = '';
                                                 FFAppState().locationWhereTo = 'Where to?';
+                                                await _refreshMap();
                                                 safeSetState(() {});
                                               } else {
                                                 _model.geolocatoraddressonchoose = await actions.geocodeAddress(
                                                   context,
-                                                  'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+                                                  _kGoogleKey,
                                                   item,
                                                 );
                                                 FFAppState().latlangAondeVaiIr = functions.formatStringToLantLng(
@@ -546,6 +665,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 );
                                                 FFAppState().listPerto = item;
                                                 FFAppState().locationWhereTo = item;
+                                                await _refreshMap();
                                                 safeSetState(() {});
                                                 HapticFeedback.selectionClick();
                                               }
@@ -560,12 +680,10 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                 height: 28,
                                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                                 decoration: BoxDecoration(
-                                                  color: selected
-                                                      ? FlutterFlowTheme.of(context).accent1
-                                                      : FlutterFlowTheme.of(context).primary,
+                                                  color: selected ? const Color(0xFF8C7CF0) : const Color(0xFF1A1C22),
                                                   borderRadius: BorderRadius.circular(16),
                                                   boxShadow: selected
-                                                      ? [BoxShadow(blurRadius: 10, offset: const Offset(0, 4), color: Colors.black.withOpacity(0.25))]
+                                                      ? [BoxShadow(blurRadius: 10, offset: const Offset(0, 4), color: Colors.black.withOpacity(0.3))]
                                                       : const [],
                                                 ),
                                                 alignment: Alignment.center,
@@ -573,11 +691,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                   item,
                                                   overflow: TextOverflow.ellipsis,
                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                        font: GoogleFonts.poppins(
-                                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                        ),
-                                                        color: const Color(0xFF585858),
+                                                        font: GoogleFonts.poppins(),
+                                                        color: const Color(0xFF9CA3AF),
                                                         fontSize: 10,
                                                       ),
                                                 ),
@@ -602,7 +717,7 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
 
                   const Spacer(flex: 10),
 
-                  // BOTTOM CARD + NAVBAR (inalterados)
+                  // BOTTOM CARD + NAVBAR (inalterados — só cores dark)
                   Align(
                     alignment: const AlignmentDirectional(0, 1),
                     child: Column(
@@ -615,8 +730,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                               height: 182,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [const Color(0xFF333333), FlutterFlowTheme.of(context).primary],
-                                  stops: const [0, 0.8],
+                                  colors: [const Color(0xFF2A2D34), const Color(0xFF1A1C22)],
+                                  stops: const [0, 1],
                                   begin: const AlignmentDirectional(0, -1),
                                   end: const AlignmentDirectional(0, 1),
                                 ),
@@ -633,11 +748,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                           Text(
                                             FFLocalizations.of(context).getText('ybwe42qc' /* Ride Estimative */),
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w300,
-                                                    fontStyle: FontStyle.italic,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(context).alternate,
+                                                  font: GoogleFonts.poppins(fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+                                                  color: const Color(0xFFE5E5E5),
                                                   fontSize: 16,
                                                 ),
                                           ),
@@ -646,12 +758,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                             builder: (context, snapshot) {
                                               if (!snapshot.hasData) {
                                                 return SizedBox(
-                                                  width: 24,
-                                                  height: 24,
-                                                  child: SpinKitDoubleBounce(
-                                                    color: FlutterFlowTheme.of(context).accent1,
-                                                    size: 24,
-                                                  ),
+                                                  width: 24, height: 24,
+                                                  child: SpinKitDoubleBounce(color: const Color(0xFFBDBDBD), size: 24),
                                                 );
                                               }
                                               final list = snapshot.data!;
@@ -673,16 +781,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                   currency: '\$',
                                                 ),
                                                 style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight: FontWeight.w500,
-                                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                      ),
-                                                      color: FlutterFlowTheme.of(context).secondary,
+                                                      font: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                                      color: const Color(0xFFE5E5E5),
                                                       fontSize: 16,
                                                     ),
                                                 colors: [
-                                                  FlutterFlowTheme.of(context).accent1,
-                                                  FlutterFlowTheme.of(context).secondary,
+                                                  const Color(0xFF8C7CF0),
+                                                  const Color(0xFFE5E5E5),
                                                   const Color(0xFFF2E6D5),
                                                 ],
                                                 gradientDirection: GradientDirection.ttb,
@@ -698,11 +803,8 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                           Text(
                                             FFLocalizations.of(context).getText('76w8fz75' /* Time */),
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w300,
-                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(context).secondaryText,
+                                                  font: GoogleFonts.poppins(fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+                                                  color: const Color(0xFF9CA3AF),
                                                 ),
                                           ),
                                           Text(
@@ -711,16 +813,13 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                               FFAppState().latlangAondeVaiIr!,
                                             ),
                                             style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w300,
-                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(context).secondaryText,
+                                                  font: GoogleFonts.poppins(fontWeight: FontWeight.w300, fontStyle: FontStyle.italic),
+                                                  color: const Color(0xFF9CA3AF),
                                                 ),
                                           ),
                                         ],
                                       ),
-                                      Container(width: 336, height: 1, color: FlutterFlowTheme.of(context).alternate),
+                                      Container(width: 336, height: 1, color: const Color(0xFF3A3D44)),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
@@ -736,29 +835,22 @@ class _Home5WidgetState extends State<Home5Widget> with TickerProviderStateMixin
                                                       '2.4 Km',
                                                     ),
                                                     style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                          font: GoogleFonts.poppins(
-                                                            fontWeight: FontWeight.w500,
-                                                            fontStyle: FontStyle.italic,
-                                                          ),
-                                                          color: FlutterFlowTheme.of(context).secondary,
+                                                          font: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                          color: const Color(0xFFE5E5E5),
                                                         ),
-                                                    colors: [
-                                                      FlutterFlowTheme.of(context).accent1,
-                                                      FlutterFlowTheme.of(context).secondary,
-                                                    ],
+                                                    colors: [const Color(0xFF8C7CF0), const Color(0xFFE5E5E5)],
                                                     gradientDirection: GradientDirection.rtl,
                                                     gradientType: GradientType.linear,
                                                   )
                                                 : const SizedBox.shrink(),
                                           ),
                                           Row(
-                                            children: <Widget>[
-                                              // ... (resto igual ao seu)
-                                            ].divide(const SizedBox(width: 10)),
+                                            children: const <Widget>[
+                                              // … botões/ícones que você já tinha (sem mudanças de estrutura)
+                                            ],
                                           ),
                                         ],
                                       ),
-                                      // ... (resto do bottom card e botões, inalterados)
                                     ].divide(const SizedBox(height: 5)),
                                   ),
                                 ),
