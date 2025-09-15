@@ -183,7 +183,7 @@ class _CardFormFFState extends State<CardFormFF> {
 
     // ---------- MODO SALVAR (VAULT) ----------
     if (!widget.chargeOnConfirm) {
-      // Para salvar no Vault, exigimos os 4 campos (número, validade, CVV, nome)
+      // exige os 4 campos
       if (!(_formKey.currentState?.validate() ?? false)) {
         await _emitState(event: 'submit', mode: 'save');
         showSnackbar(context, 'Complete os dados do cartão.');
@@ -227,7 +227,7 @@ class _CardFormFFState extends State<CardFormFF> {
         }
 
         if (result == null) {
-          showSnackbar(context, 'Operation cancelled.');
+          showSnackbar(context, 'Operação cancelada.');
           return;
         }
 
@@ -245,7 +245,8 @@ class _CardFormFFState extends State<CardFormFF> {
           return;
         }
 
-        // JSON minimalista pedido: { token, name, last4 }
+        // JSON enriquecido para a UI
+        final brand = _detectBrand(data.number);
         final jsonReturn = <String, dynamic>{
           'token': saved.token ?? '',
           'name': saved.name ?? data.holder,
@@ -253,6 +254,10 @@ class _CardFormFFState extends State<CardFormFF> {
               (data.number.length >= 4
                   ? data.number.substring(data.number.length - 4)
                   : ''),
+          'numberMasked': _maskNumber(data.number),
+          'brand': brand,
+          'expMonth': data.month,
+          'expYear': data.year,
         };
 
         try {
@@ -266,14 +271,13 @@ class _CardFormFFState extends State<CardFormFF> {
           }
         } catch (_) {}
 
-        showSnackbar(context, 'Saved.');
-
+        showSnackbar(context, 'Cartão salvo.');
         if (widget.closeOnSave) {
           await _dismiss();
         }
       } catch (e) {
         if (kDebugPayments) debugPrint('Save failure: $e');
-        showSnackbar(context, 'Unexpected error while saving.');
+        showSnackbar(context, 'Erro inesperado ao salvar.');
       } finally {
         if (mounted) setState(() => _isPaying = false);
       }
@@ -334,7 +338,7 @@ class _CardFormFFState extends State<CardFormFF> {
       }
 
       if (result == null) {
-        showSnackbar(context, 'Operation cancelled.');
+        showSnackbar(context, 'Operação cancelada.');
         return;
       }
 
@@ -352,14 +356,13 @@ class _CardFormFFState extends State<CardFormFF> {
         final msg = pay.errorMessage!;
         showSnackbar(context, msg);
         if (!mounted) return;
-        await _emitState(
-            event: 'submit', mode: 'charge'); // emite estado com erro
+        await _emitState(event: 'submit', mode: 'charge');
         await _showErrorBottomSheet(msg);
         return;
       }
 
       _transactionId = pay.transactionId;
-      await _emitState(event: 'submit', mode: 'charge'); // inclui transactionId
+      await _emitState(event: 'submit', mode: 'charge');
       showSnackbar(context, 'Payment approved!');
 
       if (_transactionId != null && _transactionId!.isNotEmpty) {
@@ -395,7 +398,6 @@ class _CardFormFFState extends State<CardFormFF> {
         holder: _holderCtrl.text.trim(),
       );
 
-  // Para UI (mudanças/erros), mantém payload informativo.
   Future<void> _emitState({String event = 'change', String? mode}) async {
     if (widget.onTextField == null) return;
 
@@ -418,19 +420,15 @@ class _CardFormFFState extends State<CardFormFF> {
           : null,
       'holder': data.holder,
       'brand': brand,
-
-      'number': numDigits, // visível para UI
-      'expiry': data.expiry, // "MM/YY"
+      'number': numDigits,
+      'expiry': data.expiry,
       'expMonth': data.month,
       'expYear': data.year,
-
       'cvvLength': data.cvv.length,
-
       'isComplete': isComplete,
       'errors': errors,
       'mode': mode ?? (widget.chargeOnConfirm ? 'charge' : 'save'),
       'event': event,
-
       if (_transactionId != null) 'transactionId': _transactionId,
     };
 
@@ -448,7 +446,6 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   String? _validateExpiry(String text) {
-    // Obrigatório em pagar e salvar (para tokenizar/vault)
     final regex = RegExp(r'^(0[1-9]|1[0-2])\/\d{2}$');
     if (text.isEmpty) return 'Required';
     if (!regex.hasMatch(text)) return 'Use MM/YY';
@@ -457,7 +454,6 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   String? _validateCvv(String text) {
-    // Obrigatório em pagar e salvar (para tokenizar/vault)
     if (text.isEmpty) return 'Required';
     if (text.length < 3 || text.length > 4) return 'Invalid CVV';
     return null;
@@ -610,8 +606,7 @@ class _CardFormFFState extends State<CardFormFF> {
     );
   }
 
-  InputDecoration _inputDecoration(
-      {required String hint, required IconData icon}) {
+  InputDecoration _inputDecoration({required String hint, required IconData icon}) {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.black),
@@ -665,8 +660,7 @@ class _CardFormFFState extends State<CardFormFF> {
               ? const SizedBox(
                   width: 22,
                   height: 22,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2.4, color: Colors.black),
+                  child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.black),
                 )
               : Text(
                   label,
@@ -747,7 +741,7 @@ class _CardFormFFState extends State<CardFormFF> {
                 _pillButton(
                   label: 'Close',
                   onTap: () async {
-                    Navigator.pop(context); // fecha o sheet de sucesso
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -816,7 +810,6 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   Future<void> _dismiss() async {
-    // Fecha o BottomSheet pai (onde o formulário está)
     if (Navigator.canPop(context)) {
       Navigator.of(context).pop();
     }
@@ -829,8 +822,7 @@ class _CardFormFFState extends State<CardFormFF> {
   }) async {
     try {
       final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
-      final name =
-          isProd ? 'processBraintreePayment' : 'processBraintreeTestPayment';
+      final name = isProd ? 'processBraintreePayment' : 'processBraintreeTestPayment';
       final callable = functions.httpsCallable(name);
 
       final resp = await callable.call(<String, dynamic>{
@@ -964,7 +956,7 @@ String _friendlyBraintreeError(Object e) {
       return 'Network error while tokenizing. Check your connection and try again.';
     }
     if (msg.contains('authorization') || msg.contains('invalid token')) {
-      return 'Invalid/incompatible tokenization key. Use a sandbox_ key from the same merchant as your server.';
+      return 'Invalid/incompatible tokenization key. Use a sandbox_* key from the same merchant as your server.';
     }
     return e.message ?? e.code;
   }
