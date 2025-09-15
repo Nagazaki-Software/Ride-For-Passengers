@@ -85,7 +85,7 @@ import '/auth/firebase_auth/auth_util.dart';
       final dest = FFAppState().latlangAondeVaiIr;
       if (origin == null || dest == null) return;
       try {
-        final key = 'YOUR_GOOGLE_API_KEY';
+        final key = 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ';
         final url = Uri.parse(
           'https://maps.googleapis.com/maps/api/directions/json'
           '?origin=${origin.latitude},${origin.longitude}'
@@ -186,7 +186,7 @@ import '/auth/firebase_auth/auth_util.dart';
                       return PickerMapNative(
                         userLocation: FFAppState().latlngAtual!,
                         destination: FFAppState().latlangAondeVaiIr,
-                        googleApiKey: 'YOUR_GOOGLE_API_KEY',
+                        googleApiKey: 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
                         userPhotoUrl: currentUserPhoto,
                         userName: currentUserDisplayName,
                         userMarkerSize: 40,
