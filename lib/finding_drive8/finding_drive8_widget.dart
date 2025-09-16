@@ -1,11 +1,19 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+<<<<<<< HEAD
 import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/instant_timer.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/index.dart';
+=======
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/instant_timer.dart';
+import '/index.dart';
+import '/picker_map_native.dart';
+>>>>>>> 10c9b5c (new frkdfm)
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -48,6 +56,10 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
         callback: (timer) async {
           _model.order =
               await RideOrdersRecord.getDocumentOnce(widget.rideOrder!);
+<<<<<<< HEAD
+=======
+          safeSetState(() {});
+>>>>>>> 10c9b5c (new frkdfm)
           if (_model.order?.driver != null) {
             context.goNamed(PickingYou9Widget.routeName);
 
@@ -98,6 +110,7 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
         backgroundColor: FlutterFlowTheme.of(context).primary,
         body: Stack(
           children: [
+<<<<<<< HEAD
             Opacity(
               opacity: 0.0,
               child: FlutterFlowGoogleMap(
@@ -182,6 +195,83 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                         end: AlignmentDirectional(0, 1.0),
                       ),
                     ),
+=======
+    StreamBuilder<List<UsersRecord>>(
+      stream: queryUsersRecord(
+        queryBuilder: (usersRecord) => usersRecord
+            .where('driverOnline', isEqualTo: true)
+            .where('driver', isEqualTo: true),
+      ),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: SizedBox(
+              width: 50.0,
+              height: 50.0,
+              child: SpinKitDoubleBounce(
+                color: FlutterFlowTheme.of(context).accent1,
+                size: 50.0,
+              ),
+            ),
+          );
+        }
+        final drivers = <Map<String, dynamic>>[];
+        for (final u in snapshot.data!) {
+          try {
+            final data = u.snapshotData;
+            final loc = data['location'] as LatLng?;
+            final lat = loc?.latitude;
+            final lng = loc?.longitude;
+            final bearing = (data['bearing'] is num)
+                ? (data['bearing'] as num).toDouble()
+                : 0.0;
+            if (lat != null && lng != null) {
+              drivers.add({
+                'id': u.reference.id,
+                'lat': lat,
+                'lng': lng,
+                'bearing': bearing,
+              });
+            }
+          } catch (_) {}
+        }
+        return SizedBox.expand(
+          child: PickerMapNative(
+            userLocation: currentUserLocationValue!,
+            destination: _model.order?.latlng,
+            googleApiKey: null,
+            userPhotoUrl: currentUserPhoto,
+            userName: currentUserDisplayName,
+            userMarkerSize: 24,
+            drivers: drivers,
+            encodedPolyline: null,
+            enableRouteSnake: true,
+            brandSafePaddingBottom: 90.0,
+            darkStyle: true,
+            driverTaxiIconUrl:
+                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+            driverDriverIconUrl:
+                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+          ),
+        );
+      },
+    ),PointerInterceptor(
+              intercepting: isWeb,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 141.8,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xB517181D), Color(0x0717181D)],
+                        stops: [0.0, 1.0],
+                        begin: AlignmentDirectional(0.0, -1.0),
+                        end: AlignmentDirectional(0, 1.0),
+                      ),
+                    ),
+>>>>>>> 10c9b5c (new frkdfm)
                     child: Align(
                       alignment: AlignmentDirectional(0.0, 0.0),
                       child: Padding(
@@ -769,3 +859,5 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
     );
   }
 }
+
+

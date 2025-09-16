@@ -2,6 +2,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // CardinalCommerce (3DS dependency)
+        maven { url 'https://cardinalcommerce.jfrog.io/artifactory/android' }
+        maven { url 'https://cardinalcommerceprod.jfrog.io/artifactory/android' }
     }
 }
 
@@ -26,6 +29,22 @@ subprojects { sub ->
     }
 }
 
+<<<<<<< HEAD
+=======
+// Map CardinalCommerce artifact to a mirror if the official repo is unavailable
+subprojects { sub ->
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.jfrog.cardinalcommerce.gradle' &&
+                details.requested.name == 'cardinalmobilesdk') {
+                // Use a compatible mirror available on Maven Central
+                details.useTarget 'io.github.airwallex:cardinalmobilesdk:2.2.3-2'
+            }
+        }
+    }
+}
+
+>>>>>>> 10c9b5c (new frkdfm)
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }

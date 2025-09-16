@@ -6,11 +6,17 @@
   "functions": [
     {
       "source": "custom_cloud_functions",
+<<<<<<< HEAD
       "codebase": "custom_cloud_functions"
+=======
+      "codebase": "custom_cloud_functions",
+      "predeploy": []
+>>>>>>> 10c9b5c (new frkdfm)
     },
     {
       "source": "functions",
-      "codebase": "functions"
+      "codebase": "functions",
+      "predeploy": []
     }
   ],
   "hosting": {

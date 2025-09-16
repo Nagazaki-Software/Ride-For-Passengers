@@ -2,6 +2,7 @@ import Foundation
 import GoogleMaps
 import Flutter
 
+<<<<<<< HEAD
 final class PickerMapNativeView: NSObject, FlutterPlatformView {
 
     private let channel: FlutterMethodChannel
@@ -12,6 +13,27 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
     private var polylines: [String: GMSPolyline] = [:]
     private var polygons: [String: GMSPolygon] = [:]
 
+=======
+final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelegate {
+
+    private let channel: FlutterMethodChannel
+    private let mapView: GMSMapView
+    private let snapshotOverlay: UIImageView
+
+    private var genericMarkers: [GMSMarker] = []
+    private var carMarkers: [String: GMSMarker] = [:]
+    private var pendingDriverPositions: [String: CLLocationCoordinate2D] = [:]
+    private var polylines: [String: GMSPolyline] = [:]
+    private var polygons: [String: GMSPolygon] = [:]
+
+    // Snapshots cache
+    private static var lastSnapshot: UIImage? = nil
+    private var lastSnapshotTs: TimeInterval = 0
+
+    private var driverIconImage: UIImage? = nil
+    private var lastDriverIconSource: String? = nil
+
+>>>>>>> 10c9b5c (new frkdfm)
     init(frame: CGRect,
          viewIdentifier viewId: Int64,
          arguments args: Any?,
@@ -33,9 +55,18 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
             } else {
                 camera = GMSCameraPosition(latitude: -18.8639625, longitude: -41.9752148, zoom: zoom, bearing: bearing, viewingAngle: tilt)
             }
+<<<<<<< HEAD
         }
 
         self.mapView = GMSMapView(frame: frame, camera: camera)
+=======
+            // Apply initial style and driver icon from creation params
+            self.applyStyleAndDriverIcon(dict)
+        }
+
+        self.mapView = GMSMapView(frame: frame, camera: camera)
+        self.snapshotOverlay = UIImageView(frame: .zero)
+>>>>>>> 10c9b5c (new frkdfm)
         super.init()
 
         applyDarkStyle()
@@ -45,6 +76,21 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
         mapView.settings.tiltGestures = true
         mapView.settings.myLocationButton = false
         mapView.isMyLocationEnabled = false
+<<<<<<< HEAD
+=======
+        mapView.delegate = self
+
+        // Overlay setup to reduce white flashes
+        snapshotOverlay.contentMode = .scaleAspectFill
+        snapshotOverlay.clipsToBounds = true
+        snapshotOverlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        snapshotOverlay.frame = mapView.bounds
+        snapshotOverlay.isHidden = (Self.lastSnapshot == nil)
+        snapshotOverlay.image = Self.lastSnapshot
+        mapView.addSubview(snapshotOverlay)
+        mapView.backgroundColor = UIColor(red: 0x1D/255.0, green: 0x1F/255.0, blue: 0x25/255.0, alpha: 1)
+        mapView.alpha = 0.0
+>>>>>>> 10c9b5c (new frkdfm)
 
         channel.setMethodCallHandler { [weak self] call, result in
             guard let self = self else { result(nil); return }
@@ -52,6 +98,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
                 switch call.method {
                 case "updateConfig":
                     let cfg = (call.arguments as? [String: Any]) ?? [:]
+<<<<<<< HEAD
+=======
+                    self.applyStyleAndDriverIcon(cfg)
+>>>>>>> 10c9b5c (new frkdfm)
                     self.updateConfig(cfg)
                     result(nil)
 
@@ -72,8 +122,13 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
 
                 case "cameraTo":
                     let a = (call.arguments as? [String: Any]) ?? [:]
+<<<<<<< HEAD
                     let lat = Self.asDouble(a["lat"])
                     let lng = Self.asDouble(a["lng"])
+=======
+                    let lat = Self.asDouble(a["latitude"]) ?? Self.asDouble(a["lat"])
+                    let lng = Self.asDouble(a["longitude"]) ?? Self.asDouble(a["lng"])
+>>>>>>> 10c9b5c (new frkdfm)
                     let zoom = Self.asFloat(a["zoom"]) ?? 16
                     let bearing = Self.asFloat(a["bearing"]) ?? 0
                     let tilt = Self.asFloat(a["tilt"]) ?? 0
@@ -92,11 +147,36 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
                 case "updateCarPosition":
                     let a = (call.arguments as? [String: Any]) ?? [:]
                     let id = (a["id"] as? String) ?? "car"
+<<<<<<< HEAD
                     if let lat = Self.asDouble(a["lat"]), let lng = Self.asDouble(a["lng"]) {
                         let rotation = Self.asFloat(a["rotation"]) ?? 0
                         let duration = (a["duration"] as? NSNumber)?.doubleValue ?? 0.8
                         self.updateCarPosition(id: id, target: CLLocationCoordinate2D(latitude: lat, longitude: lng), rotation: rotation, duration: duration)
                     }
+=======
+                    var target: CLLocationCoordinate2D? = nil
+                    if let pos = a["position"] as? [String: Any], let la = Self.asDouble(pos["latitude"]), let lo = Self.asDouble(pos["longitude"]) {
+                        target = CLLocationCoordinate2D(latitude: la, longitude: lo)
+                    } else if let la = Self.asDouble(a["lat"]), let lo = Self.asDouble(a["lng"]) {
+                        target = CLLocationCoordinate2D(latitude: la, longitude: lo)
+                    }
+                    let rotation = Self.asFloat(a["rotation"]) ?? 0
+                    let duration = (a["durationMs"] as? NSNumber)?.doubleValue ?? ((a["duration"] as? NSNumber)?.doubleValue ?? 0.8)
+                    if let tgt = target { self.updateCarPosition(id: id, target: tgt, rotation: rotation, duration: duration) }
+                    result(nil)
+
+                case "onResume":
+                    if let img = Self.lastSnapshot {
+                        self.snapshotOverlay.image = img
+                        self.snapshotOverlay.isHidden = false
+                    }
+                    result(nil)
+
+                case "onPause":
+                    result(nil)
+
+                case "onLowMemory":
+>>>>>>> 10c9b5c (new frkdfm)
                     result(nil)
 
                 default:
@@ -235,17 +315,33 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
 
     private func updateCarPosition(id: String, target: CLLocationCoordinate2D, rotation: Float, duration: Double) {
         CATransaction.begin()
+<<<<<<< HEAD
         CATransaction.setAnimationDuration(max(0.1, duration))
+=======
+        CATransaction.setAnimationDuration(max(0.1, duration/1000.0))
+>>>>>>> 10c9b5c (new frkdfm)
         CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .linear))
 
         let marker: GMSMarker
         if let existing = carMarkers[id] {
             marker = existing
         } else {
+<<<<<<< HEAD
             marker = GMSMarker(position: target)
             marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
             marker.isFlat = true
             marker.icon = GMSMarker.markerImage(with: .systemBlue)
+=======
+            if driverIconImage == nil {
+                pendingDriverPositions[id] = target
+                CATransaction.commit()
+                return
+            }
+            marker = GMSMarker(position: target)
+            marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+            marker.isFlat = true
+            marker.icon = driverIconImage
+>>>>>>> 10c9b5c (new frkdfm)
             marker.map = mapView
             carMarkers[id] = marker
         }
@@ -280,6 +376,100 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
     }
 
     // MARK: - Utils
+<<<<<<< HEAD
+=======
+    // Camera + overlay callbacks
+    func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
+        channel.invokeMethod("cameraMoveStart", arguments: nil)
+        if let img = Self.lastSnapshot {
+            snapshotOverlay.image = img
+            snapshotOverlay.isHidden = false
+        }
+    }
+    func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
+        channel.invokeMethod("cameraIdle", arguments: nil)
+        // Update snapshot cache (throttled)
+        let now = Date().timeIntervalSince1970
+        if now - lastSnapshotTs > 1.2 {
+            lastSnapshotTs = now
+            Self.lastSnapshot = captureSnapshot()
+        }
+        snapshotOverlay.image = nil
+        snapshotOverlay.isHidden = true
+        if mapView.alpha < 1.0 { UIView.animate(withDuration: 0.2) { mapView.alpha = 1.0 } }
+        // Also signal mapLoaded on first idle
+        channel.invokeMethod("mapLoaded", arguments: nil)
+    }
+
+    private func applyStyleAndDriverIcon(_ cfg: [String: Any]) {
+        if let styleJson = cfg["mapStyleJson"] as? String, !styleJson.isEmpty {
+            if let style = try? GMSMapStyle(jsonString: styleJson) { mapView.mapStyle = style }
+        }
+        let taxiUrl = cfg["driverTaxiIconUrl"] as? String
+        let driverUrl = cfg["driverDriverIconUrl"] as? String
+        let chosen = (taxiUrl?.isEmpty == false) ? taxiUrl : driverUrl
+        let iconW = (cfg["driverIconWidth"] as? NSNumber)?.intValue ?? 70
+        if let src = chosen, !src!.isEmpty, src != lastDriverIconSource {
+            lastDriverIconSource = src
+            loadImage(from: src!, desiredWidth: iconW) { [weak self] img in
+                guard let self = self, let img = img else { return }
+                self.driverIconImage = img
+                for m in self.carMarkers.values { m.icon = img }
+                if !self.pendingDriverPositions.isEmpty {
+                    for (id, pos) in self.pendingDriverPositions {
+                        let m = GMSMarker(position: pos)
+                        m.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+                        m.isFlat = true
+                        m.icon = img
+                        m.map = self.mapView
+                        self.carMarkers[id] = m
+                    }
+                    self.pendingDriverPositions.removeAll()
+                }
+            }
+        }
+    }
+
+    private func captureSnapshot() -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(mapView.bounds.size, true, 0)
+        defer { UIGraphicsEndImageContext() }
+        if let ctx = UIGraphicsGetCurrentContext() {
+            mapView.layer.render(in: ctx)
+            let img = UIGraphicsGetImageFromCurrentImageContext()
+            return img
+        }
+        return nil
+    }
+
+    private func loadImage(from src: String, desiredWidth: Int, completion: @escaping (UIImage?) -> Void) {
+        if src.hasPrefix("http") {
+            guard let url = URL(string: src) else { completion(nil); return }
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                guard let data = data, let img = UIImage(data: data) else { DispatchQueue.main.async { completion(nil) }; return }
+                let resized = self.resizeImage(img, toWidth: CGFloat(desiredWidth))
+                DispatchQueue.main.async { completion(resized) }
+            }.resume()
+        } else {
+            let path = src.hasPrefix("asset:") ? String(src.dropFirst(6)) : src
+            let key = FlutterDartProject.lookupKey(forAsset: path)
+            if let bundlePath = Bundle.main.path(forResource: key, ofType: nil, inDirectory: "flutter_assets"),
+               let img = UIImage(contentsOfFile: bundlePath) {
+                let resized = self.resizeImage(img, toWidth: CGFloat(desiredWidth))
+                completion(resized)
+            } else { completion(nil) }
+        }
+    }
+
+    private func resizeImage(_ image: UIImage, toWidth width: CGFloat) -> UIImage? {
+        let scale = width / max(1, image.size.width)
+        let newSize = CGSize(width: max(1, image.size.width) * scale, height: max(1, image.size.height) * scale)
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+        image.draw(in: CGRect(origin: .zero, size: newSize))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage
+    }
+>>>>>>> 10c9b5c (new frkdfm)
 
     private static func asDouble(_ any: Any?) -> Double? {
         if let n = any as? NSNumber { return n.doubleValue }

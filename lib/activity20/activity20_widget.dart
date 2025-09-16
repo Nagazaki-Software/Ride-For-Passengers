@@ -7,8 +7,11 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+=======
+>>>>>>> 10c9b5c (new frkdfm)
 import 'activity20_model.dart';
 export 'activity20_model.dart';
 
@@ -24,7 +27,6 @@ class Activity20Widget extends StatefulWidget {
 
 class _Activity20WidgetState extends State<Activity20Widget> {
   late Activity20Model _model;
-
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -36,7 +38,6 @@ class _Activity20WidgetState extends State<Activity20Widget> {
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
@@ -50,6 +51,7 @@ class _Activity20WidgetState extends State<Activity20Widget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primary,
+<<<<<<< HEAD
         body: Container(
           height: double.infinity,
           child: Stack(
@@ -1317,9 +1319,19 @@ class _Activity20WidgetState extends State<Activity20Widget> {
                 ),
               ),
             ],
+=======
+        body: SafeArea(
+          child: Center(
+            child: Text(
+              FFLocalizations.of(context).getText('65mjue8s' /* Activity */),
+              style: FlutterFlowTheme.of(context).headlineMedium,
+            ),
+>>>>>>> 10c9b5c (new frkdfm)
           ),
         ),
+        bottomNavigationBar: const NavbarWidget(),
       ),
     );
   }
 }
+

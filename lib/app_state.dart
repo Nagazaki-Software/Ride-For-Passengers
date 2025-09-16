@@ -42,6 +42,48 @@ class FFAppState extends ChangeNotifier {
           prefs.getStringList('ff_locationsPorPerto') ?? _locationsPorPerto;
     });
     _safeInit(() {
+<<<<<<< HEAD
+=======
+      _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
+    });
+    _safeInit(() {
+      _cardExpiry = prefs.getString('ff_cardExpiry') ?? _cardExpiry;
+    });
+    _safeInit(() {
+      _cardCvv = prefs.getString('ff_cardCvv') ?? _cardCvv;
+    });
+    _safeInit(() {
+      _cardHolder = prefs.getString('ff_cardHolder') ?? _cardHolder;
+    });
+    _safeInit(() {
+      _latlngAtual =
+          latLngFromString(prefs.getString('ff_latlngAtual')) ?? _latlngAtual;
+    });
+    _safeInit(() {
+      _passangers = prefs.getInt('ff_passangers') ?? _passangers;
+    });
+    _safeInit(() {
+      _creditCardSalves = prefs.getStringList('ff_creditCardSalves')?.map((x) {
+            try {
+              return jsonDecode(x);
+            } catch (e) {
+              print("Can't decode persisted json. Error: $e.");
+              return {};
+            }
+          }).toList() ??
+          _creditCardSalves;
+    });
+    _safeInit(() {
+      if (prefs.containsKey('ff_defaultCard')) {
+        try {
+          _defaultCard = jsonDecode(prefs.getString('ff_defaultCard') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
+    });
+    _safeInit(() {
+>>>>>>> 10c9b5c (new frkdfm)
       _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
     });
     _safeInit(() {
@@ -140,6 +182,13 @@ class FFAppState extends ChangeNotifier {
     prefs.setStringList('ff_locationsPorPerto', value);
   }
 
+  // Mapa auxiliar (não persistido) com o LatLng de cada item próximo
+  Map<String, LatLng> _locationsPorPertoMap = {};
+  Map<String, LatLng> get locationsPorPertoMap => _locationsPorPertoMap;
+  set locationsPorPertoMap(Map<String, LatLng> value) {
+    _locationsPorPertoMap = value;
+  }
+
   void addToLocationsPorPerto(String value) {
     locationsPorPerto.add(value);
     prefs.setStringList('ff_locationsPorPerto', _locationsPorPerto);
@@ -201,6 +250,10 @@ class FFAppState extends ChangeNotifier {
     _cardHolder = value;
     prefs.setString('ff_cardHolder', value);
   }
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
 
   LatLng? _latlngAtual = LatLng(25.0443312, -77.3503609);
   LatLng? get latlngAtual => _latlngAtual;
@@ -306,6 +359,10 @@ class FFAppState extends ChangeNotifier {
   void clearRecentTripsCache() => _recentTripsManager.clear();
   void clearRecentTripsCacheKey(String? uniqueKey) =>
       _recentTripsManager.clearRequest(uniqueKey);
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
 }
 
 void _safeInit(Function() initializeField) {

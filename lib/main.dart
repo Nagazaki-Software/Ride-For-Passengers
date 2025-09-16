@@ -1,4 +1,8 @@
 import 'dart:async';
+<<<<<<< HEAD
+=======
+import 'dart:ui' as ui;
+>>>>>>> 10c9b5c (new frkdfm)
 
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +15,23 @@ import 'auth/firebase_auth/auth_util.dart';
 import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
+<<<<<<< HEAD
 import 'flutter_flow/lat_lng.dart'; // LatLng do FlutterFlow
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+=======
+// LatLng do FlutterFlow
+import 'package:geolocator/geolocator.dart';
+>>>>>>> 10c9b5c (new frkdfm)
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  usePathUrlStrategy();
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    GoRouter.optionURLReflectsImperativeAPIs = true;
+    usePathUrlStrategy();
 
+<<<<<<< HEAD
   // Preaquece ícones do mapa para reduzir jank e telas brancas.
   // Executa em background; não bloqueia o app start.
   unawaited(_prewarmMapAssets());
@@ -30,11 +41,36 @@ void main() async {
 
   final appState = FFAppState();
   await appState.initializePersistedState();
+=======
+    // Global error handlers to prevent unexpected app exits
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('FlutterError: ' + details.exceptionAsString());
+      if (details.stack != null) debugPrintStack(stackTrace: details.stack);
+    };
+    try {
+      ui.PlatformDispatcher.instance.onError = (error, stack) {
+        debugPrint('PlatformDispatcher error: ' + error.toString());
+        debugPrintStack(stackTrace: stack);
+        return true; // mark as handled to avoid process termination
+      };
+    } catch (_) {}
 
-  runApp(ChangeNotifierProvider(
-    create: (context) => appState,
-    child: MyApp(),
-  ));
+    await initFirebase();
+    await FFLocalizations.initialize();
+>>>>>>> 10c9b5c (new frkdfm)
+
+    final appState = FFAppState();
+    await appState.initializePersistedState();
+
+    runApp(ChangeNotifierProvider(
+      create: (context) => appState,
+      child: MyApp(),
+    ));
+  }, (error, stack) {
+    debugPrint('Uncaught zone error: ' + error.toString());
+    debugPrintStack(stackTrace: stack);
+  });
 }
 
 // Faz download leve de ícones usados por marcadores do mapa e deixa no cache de disco.
@@ -162,10 +198,14 @@ class _MyAppState extends State<MyApp> {
       routerConfig: _router,
 
       // >>> Envia a localização em tempo real para FFAppState.latlngAtual
+<<<<<<< HEAD
       builder: (context, child) => Container(
         color: const Color(0xFF0F1217),
         child: LiveLocationTicker(child: child!),
       ),
+=======
+      builder: (context, child) => LiveLocationTicker(child: child!),
+>>>>>>> 10c9b5c (new frkdfm)
     );
   }
 }
@@ -240,12 +280,16 @@ class _LiveLocationTickerState extends State<LiveLocationTicker> {
 
     app.latlngAtual = LatLng(p.latitude, p.longitude);
     app.update(() {}); // notifica watchers (ex.: Home5)
+<<<<<<< HEAD
     _cacheCameraForNative(p.latitude, p.longitude);
+=======
+>>>>>>> 10c9b5c (new frkdfm)
   }
 
   @override
   Widget build(BuildContext context) => widget.child;
 }
+<<<<<<< HEAD
 
 // Grava rapidamente a última câmera esperada para o mapa nativo
 Future<void> _cacheCameraForNative(double lat, double lng) async {
@@ -258,3 +302,5 @@ Future<void> _cacheCameraForNative(double lat, double lng) async {
     await sp.setDouble('camera_bearing', 0.0);
   } catch (_) {}
 }
+=======
+>>>>>>> 10c9b5c (new frkdfm)

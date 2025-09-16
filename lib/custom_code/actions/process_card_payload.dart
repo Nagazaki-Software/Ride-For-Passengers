@@ -10,13 +10,21 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 // ===== IMPORTS EXTRAS =====
+<<<<<<< HEAD
+=======
+import 'dart:async';
+>>>>>>> 10c9b5c (new frkdfm)
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
+<<<<<<< HEAD
 import 'package:flutter_braintree/flutter_braintree.dart';
+=======
+import '../native/braintree_native.dart';
+>>>>>>> 10c9b5c (new frkdfm)
 
 /// Action única controlada por `charge`:
 /// - charge == false  -> apenas SALVA o JSON no Firestore (sem cobrar)
@@ -79,9 +87,18 @@ Future<dynamic> processCardPayload(
         // ================= CHARGE (somente cobrar) =================
         String? nonce =
             (payload['nonce'] is String) ? (payload['nonce'] as String) : null;
+<<<<<<< HEAD
 
         // Se não há nonce, tenta tokenizar a partir de cardRaw
         if (nonce == null || nonce.isEmpty) {
+=======
+        // Token salvo em Vault (quando o cartão foi salvo anteriormente)
+        String? token =
+            (payload['token'] is String) ? (payload['token'] as String) : null;
+
+        // Se não há nonce, tenta tokenizar a partir de cardRaw
+        if ((nonce == null || nonce.isEmpty) && (token == null || token.isEmpty)) {
+>>>>>>> 10c9b5c (new frkdfm)
           Map<String, dynamic>? cardRaw = payload['cardRaw'] is Map
               ? Map<String, dynamic>.from(payload['cardRaw'])
               : null;
@@ -105,17 +122,31 @@ Future<dynamic> processCardPayload(
                   'Incomplete cardRaw: number/expiry/cvv are required.';
             } else {
               try {
+<<<<<<< HEAD
                 final req = BraintreeCreditCardRequest(
                   cardNumber: number,
+=======
+                final tokenized = await BraintreeNative.tokenizeCard(
+                  tokenizationKey: tk,
+                  number: number,
+>>>>>>> 10c9b5c (new frkdfm)
                   expirationMonth: mm,
                   expirationYear: yy,
                   cvv: cvv,
                 );
+<<<<<<< HEAD
                 final tokenized = await Braintree.tokenizeCreditCard(tk, req);
                 if (tokenized == null || tokenized.nonce.isEmpty) {
                   result['error'] = 'Tokenization failed.';
                 } else {
                   nonce = tokenized.nonce;
+=======
+                final n = tokenized['nonce'] as String?;
+                if (n == null || n.isEmpty) {
+                  result['error'] = 'Tokenization failed.';
+                } else {
+                  nonce = n;
+>>>>>>> 10c9b5c (new frkdfm)
                 }
               } on PlatformException catch (pe) {
                 result['error'] = pe.message ?? pe.code;
@@ -126,8 +157,30 @@ Future<dynamic> processCardPayload(
           }
         }
 
+<<<<<<< HEAD
         // Se temos nonce e ainda não houve erro, chama a Function (us-central1 fixo)
         if (result['error'] == null && nonce != null && nonce.isNotEmpty) {
+=======
+        // 3D Secure (quando temos nonce de cartao)
+        if (result['error'] == null && (nonce != null && nonce.isNotEmpty)) {
+          try {
+            final threeDS = await BraintreeNative.threeDSecureVerify(
+              tokenizationKey: tk,
+              nonce: nonce,
+              amount: amt.toStringAsFixed(2),
+            );
+            final threeDSNonce = (threeDS['nonce'] as String?) ?? '';
+            if (threeDSNonce.isNotEmpty) {
+              nonce = threeDSNonce;
+            }
+          } on PlatformException catch (_) {
+            // segue sem 3DS
+          }
+        }
+
+        // Se temos nonce/token e ainda nao houve erro, chama a Function (us-central1 fixo)
+        if (result['error'] == null && ((nonce != null && nonce.isNotEmpty) || (token != null && token.isNotEmpty))) {
+>>>>>>> 10c9b5c (new frkdfm)
           final isSandbox = tk.startsWith('sandbox_');
           final fnName = isSandbox
               ? 'processBraintreeTestPayment'
@@ -137,10 +190,20 @@ Future<dynamic> processCardPayload(
           final callable = functions.httpsCallable(fnName);
 
           try {
+<<<<<<< HEAD
             final resp = await callable.call(<String, dynamic>{
               'amount': amt.toStringAsFixed(2),
               'paymentNonce': nonce,
             });
+=======
+            final resp = await callable
+                .call(<String, dynamic>{
+              'amount': amt.toStringAsFixed(2),
+              'paymentNonce': (nonce != null && nonce.isNotEmpty) ? nonce : (token ?? ''),
+              if (token != null && token.isNotEmpty) 'paymentMethodToken': token,
+            })
+                .timeout(const Duration(seconds: 30));
+>>>>>>> 10c9b5c (new frkdfm)
 
             final data = Map<String, dynamic>.from(resp.data as Map);
             final txId = data['transactionId'] as String?;
@@ -150,6 +213,11 @@ Future<dynamic> processCardPayload(
               result['ok'] = true;
               result['transactionId'] = txId;
             }
+<<<<<<< HEAD
+=======
+          } on TimeoutException catch (_) {
+            result['error'] = 'Payment request timed out. Check connection and try again.';
+>>>>>>> 10c9b5c (new frkdfm)
           } on FirebaseFunctionsException catch (e) {
             final parts = <String>[];
             if (e.message != null && e.message!.trim().isNotEmpty) {
@@ -196,3 +264,7 @@ Future<dynamic> processCardPayload(
   // ÚNICO return
   return result;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 10c9b5c (new frkdfm)

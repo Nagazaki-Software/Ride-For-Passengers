@@ -64,6 +64,10 @@
             </intent-filter>
         </activity>
 
+        <!-- Braintree return URL scheme for app/browser switch -->
+        <meta-data
+            android:name="com.braintreepayments.api.ReturnUrlScheme"
+            android:value="${applicationId}.braintree" />
         <!-- Braintree -->
         <activity
             android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"

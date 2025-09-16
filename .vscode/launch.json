@@ -7,7 +7,22 @@
         {
             "type": "jdk",
             "request": "launch",
-            "name": "Launch Java App"
+            "name": "Launch Java App",
+            "name": "Ride-For-Passengers",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Ride-For-Passengers (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Ride-For-Passengers (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
         }
     ]
 }

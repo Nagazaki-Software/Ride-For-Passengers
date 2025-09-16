@@ -1,7 +1,10 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
+<<<<<<< HEAD
 import '/flutter_flow/custom_functions.dart' as functions;
+=======
+>>>>>>> 10c9b5c (new frkdfm)
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'select_location_model.dart';
@@ -93,6 +96,7 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
           quickPicksDefaultToDestination: true,
           onConfirm: (result) async {
             _model.jsonAddresss = result;
+<<<<<<< HEAD
             safeSetState(() {});
             FFAppState().latlngAtual = functions.stringToLatlng('${getJsonField(
               result,
@@ -115,6 +119,34 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
             ).toString();
             safeSetState(() {});
             Navigator.pop(context);
+=======
+            // Extrai coordenadas como double e monta LatLng diretamente
+            final double? pLat =
+                (getJsonField(result, r'$.pickupLat') as num?)?.toDouble();
+            final double? pLng =
+                (getJsonField(result, r'$.pickupLng') as num?)?.toDouble();
+            final double? dLat =
+                (getJsonField(result, r'$.destinationLat') as num?)?.toDouble();
+            final double? dLng =
+                (getJsonField(result, r'$.destinationLng') as num?)?.toDouble();
+
+            final LatLng? origem =
+                (pLat != null && pLng != null) ? LatLng(pLat, pLng) : null;
+            final LatLng? destino =
+                (dLat != null && dLng != null) ? LatLng(dLat, dLng) : null;
+
+            // Atualiza o AppState e notifica listeners
+            FFAppState().latlngAtual = origem ?? FFAppState().latlngAtual;
+            FFAppState().latlangAondeVaiIr =
+                destino ?? FFAppState().latlangAondeVaiIr;
+            FFAppState().locationWhereTo = getJsonField(
+              result,
+              r'$.destinationMainText',
+            ).toString();
+            FFAppState().update(() {});
+
+            if (mounted) Navigator.pop(context);
+>>>>>>> 10c9b5c (new frkdfm)
           },
         ),
       ),

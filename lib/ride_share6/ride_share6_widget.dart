@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/custom_code/widgets/index.dart' as custom_widgets;
+<<<<<<< HEAD
 
 import 'dart:async';                       // NOVO
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,17 @@ import 'package:flutter/services.dart';    // NOVO (Clipboard)
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+=======
+import '/index.dart';
+
+import 'dart:async'; // NOVO
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // NOVO (Clipboard)
+import 'package:flutter/foundation.dart'; // kIsWeb
+import 'package:share_plus/share_plus.dart';
+import '/flutter_flow/custom_functions.dart' as functions;
+import 'package:google_fonts/google_fonts.dart';
+>>>>>>> 10c9b5c (new frkdfm)
 
 import 'ride_share6_model.dart';
 export 'ride_share6_model.dart';
@@ -38,6 +50,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
   double _totalFare = 19.50; // fallback local; será sobrescrito pelo Firestore
   Map<String, double> _shares = {}; // uid -> valor $
   String _splitType = 'equal';
+<<<<<<< HEAD
+=======
+  String _activeShareTab = 'invite'; // invite|qr|link
+>>>>>>> 10c9b5c (new frkdfm)
 
   @override
   void initState() {
@@ -47,6 +63,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
     // Tenta juntar pela URL (ex.: ride://.../rideShare6?join=<rideId>)
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _maybeJoinByLink();
+<<<<<<< HEAD
+=======
+      // Carrega tarifa com base nos pontos da Home5
+      await _preloadFareFromHome();
+>>>>>>> 10c9b5c (new frkdfm)
       if (_model.session != null) {
         _subscribeToSession(_model.session!);
       }
@@ -61,6 +82,22 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
   }
 
   // ===================== FUNÇÕES CORE =====================
+<<<<<<< HEAD
+=======
+  Future<void> _preloadFareFromHome() async {
+    try {
+      final o = FFAppState().latlngAtual;
+      final d = FFAppState().latlangAondeVaiIr;
+      if (o == null || d == null) return;
+      final hist = await queryRideOrdersRecordOnce();
+      final price = functions.mediaCorridaNesseKm(o, d, hist);
+      if (price > 0) {
+        _totalFare = double.parse(price.toStringAsFixed(2));
+        if (mounted) setState(() {});
+      }
+    } catch (_) {}
+  }
+>>>>>>> 10c9b5c (new frkdfm)
 
   /// Cria sessão (doc em rideOrders) se ainda não existir.
   Future<void> _createSessionIfNeeded() async {
@@ -74,7 +111,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       ),
       'hostRef': currentUserReference,
       'participantes': [currentUserReference],
+<<<<<<< HEAD
       'totalFare': _totalFare,   // se você calcula em outro lugar, escreva lá
+=======
+      'totalFare': _totalFare, // se você calcula em outro lugar, escreva lá
+>>>>>>> 10c9b5c (new frkdfm)
       'splitType': 'equal',
       'customShares': <String, num>{},
       'isOpen': true,
@@ -114,17 +155,32 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       if (!doc.exists) return;
       final data = doc.data() as Map<String, dynamic>;
 
+<<<<<<< HEAD
       final List<dynamic> refsDyn = (data['participantes'] ?? []) as List<dynamic>;
       _participants = refsDyn.whereType<DocumentReference>().toList();
 
       _totalFare = (data['totalFare'] is num) ? (data['totalFare'] as num).toDouble() : _totalFare;
+=======
+      final List<dynamic> refsDyn =
+          (data['participantes'] ?? []) as List<dynamic>;
+      _participants = refsDyn.whereType<DocumentReference>().toList();
+
+      _totalFare = (data['totalFare'] is num)
+          ? (data['totalFare'] as num).toDouble()
+          : _totalFare;
+>>>>>>> 10c9b5c (new frkdfm)
       _splitType = (data['splitType'] as String?) ?? 'equal';
       final Map<String, dynamic> customShares =
           (data['customShares'] as Map<String, dynamic>?) ?? {};
 
       _recalculateShares(
         splitType: _splitType,
+<<<<<<< HEAD
         customShares: customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
+=======
+        customShares:
+            customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
+>>>>>>> 10c9b5c (new frkdfm)
       );
 
       if (mounted) setState(() {});
@@ -150,16 +206,52 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       final safeSum = sum == 0 ? 100.0 : sum;
       for (final ref in _participants) {
         final pct = customShares[ref.id] ?? 0.0;
+<<<<<<< HEAD
         _shares[ref.id] = double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
+=======
+        _shares[ref.id] =
+            double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
+>>>>>>> 10c9b5c (new frkdfm)
       }
     }
   }
 
   /// Gera o link de convite com ?join=<rideId>
+<<<<<<< HEAD
   String _inviteLink() {
     final basePath = GoRouterState.of(context).uri.path; // /rideShare6
     final id = _model.session!.id;
     return 'ride://ride.com$basePath?join=$id';
+=======
+  ///
+  /// Em web: usa o host atual. Em mobile: usa um host HTTPS estável
+  /// (ajuste para o domínio do seu app quando tiver).
+  String _inviteLink() {
+    final id = _model.session!.id;
+    final path = RideShare6Widget.routePath; // "/rideShare6"
+    final uri = kIsWeb
+        ? Uri(
+            scheme: Uri.base.scheme,
+            host: Uri.base.host,
+            port: Uri.base.hasPort ? Uri.base.port : null,
+            path: path,
+            queryParameters: {'join': id},
+          )
+        : Uri(
+            scheme: 'https',
+            host: 'ride-bahamas.web.app', // TODO: troque pelo domínio real
+            path: path,
+            queryParameters: {'join': id},
+          );
+    return uri.toString();
+  }
+
+  Future<void> _shareInvite() async {
+    await _createSessionIfNeeded();
+    final link = _inviteLink();
+    await Share.share('Join my ride: $link');
+    setState(() => _activeShareTab = 'invite');
+>>>>>>> 10c9b5c (new frkdfm)
   }
 
   /// Copia link de convite
@@ -227,7 +319,12 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
             style: FlutterFlowTheme.of(context).bodyMedium.override(
                   font: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
+<<<<<<< HEAD
                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                    fontStyle:
+                        FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                   ),
                   color: FlutterFlowTheme.of(context).alternate,
                   fontSize: 12,
@@ -277,6 +374,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         Align(
                           alignment: const AlignmentDirectional(1, 0),
                           child: Padding(
+<<<<<<< HEAD
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                             child: Text(
                               _model.session != null ? 'Session started' : 'Session not started',
@@ -284,13 +382,40 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     font: GoogleFonts.poppins(
                                       fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 0, 12, 0),
+                            child: Text(
+                              _model.session != null
+                                  ? 'Session started'
+                                  : 'Session not started',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                     ),
                                     color: _model.session != null
                                         ? FlutterFlowTheme.of(context).secondary
                                         : FlutterFlowTheme.of(context).error,
                                     letterSpacing: 0.0,
+<<<<<<< HEAD
                                     fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                   ),
                             ),
                           ),
@@ -308,6 +433,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   Align(
                                     alignment: const AlignmentDirectional(0, 0),
                                     child: Text(
+<<<<<<< HEAD
                                       FFLocalizations.of(context).getText('c2ku81ov' /* Ride Share */),
                                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                                             font: GoogleFonts.poppins(
@@ -319,6 +445,29 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             letterSpacing: 0.0,
                                             fontWeight: FontWeight.w500,
                                             fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                                      FFLocalizations.of(context)
+                                          .getText('c2ku81ov' /* Ride Share */),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            font: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                            color: FlutterFlowTheme.of(context)
+                                                .alternate,
+                                            fontSize: 22,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.w500,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                           ),
                                     ),
                                   ),
@@ -328,13 +477,26 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           ],
                         ),
                         Text(
+<<<<<<< HEAD
                           FFLocalizations.of(context).getText('vd485i7w' /* Invite riders to split the far... */),
                           style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                          FFLocalizations.of(context).getText(
+                              'vd485i7w' /* Invite riders to split the far... */),
+                          style: FlutterFlowTheme.of(context)
+                              .bodyMedium
+                              .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                 font: GoogleFonts.poppins(
                                   fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                 ),
+<<<<<<< HEAD
                                 color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                 fontSize: 10,
                                 letterSpacing: 0.0,
                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -359,10 +521,19 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                             offset: Offset(0, 1),
                           )
                         ],
+<<<<<<< HEAD
                         borderRadius: const BorderRadius.all(Radius.circular(8)),
                       ),
                       child: Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
+=======
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                      ),
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
+>>>>>>> 10c9b5c (new frkdfm)
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -370,6 +541,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+<<<<<<< HEAD
                                 Container(
                                   width: 124,
                                   height: 26,
@@ -382,9 +554,41 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     FFLocalizations.of(context).getText('5dxw36ml' /* Invite friends */),
                                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                                           font: GoogleFonts.poppins(
+=======
+                                InkWell(
+                                  onTap: _shareInvite,
+                                  child: Container(
+                                    width: 124,
+                                    height: 26,
+                                    decoration: BoxDecoration(
+                                      color: _activeShareTab == 'invite'
+                                          ? FlutterFlowTheme.of(context)
+                                              .alternate
+                                          : const Color(0xA5414141),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(8)),
+                                    ),
+                                    alignment: const AlignmentDirectional(0, 0),
+                                    child: Text(
+                                      FFLocalizations.of(context).getText(
+                                          '5dxw36ml' /* Invite friends */),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            font: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                            fontSize: 10,
+                                            letterSpacing: 0.0,
+>>>>>>> 10c9b5c (new frkdfm)
                                             fontWeight: FontWeight.bold,
                                             fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                           ),
+<<<<<<< HEAD
                                           fontSize: 10,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.bold,
@@ -394,6 +598,14 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+=======
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 10, 0),
+>>>>>>> 10c9b5c (new frkdfm)
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -403,6 +615,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         focusColor: Colors.transparent,
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
+<<<<<<< HEAD
                                         onTap: _openQR,
                                         child: Container(
                                           width: 64,
@@ -453,6 +666,100 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 ),
                                           ),
                                         ),
+=======
+                                        onTap: () async {
+                                          await _openQR();
+                                          setState(() => _activeShareTab = 'qr');
+                                        },
+                                        child: Container(
+                                          width: 64,
+                                          height: 26,
+                                          decoration: BoxDecoration(
+                                            color: _activeShareTab == 'qr'
+                                                ? FlutterFlowTheme.of(context)
+                                                    .alternate
+                                                : const Color(0x89414141),
+                                            borderRadius: const BorderRadius.all(
+                                                Radius.circular(8)),
+                                          ),
+                                          alignment:
+                                              const AlignmentDirectional(0, 0),
+                                          child: Text(
+                                            FFLocalizations.of(context)
+                                                .getText('9ensgtkt' /* QR */),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                  fontSize: 10,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () async {
+                                          await _copyInviteLink();
+                                          setState(() => _activeShareTab = 'link');
+                                        },
+                                        child: Container(
+                                          width: 64,
+                                          height: 26,
+                                          decoration: BoxDecoration(
+                                            color: _activeShareTab == 'link'
+                                                ? FlutterFlowTheme.of(context)
+                                                    .alternate
+                                                : const Color(0xA8414141),
+                                            borderRadius: const BorderRadius.all(
+                                                Radius.circular(8)),
+                                          ),
+                                          alignment:
+                                              const AlignmentDirectional(0, 0),
+                                          child: Text(
+                                            FFLocalizations.of(context)
+                                                .getText('yglrvlqu' /* Link */),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                  fontSize: 10,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ),
+>>>>>>> 10c9b5c (new frkdfm)
                                       ),
                                     ].divide(const SizedBox(width: 30)),
                                   ),
@@ -465,15 +772,31 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Padding(
+<<<<<<< HEAD
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                                   child: Text(
                                     FFLocalizations.of(context).getText('wme97if5' /* Auto-match nearby riders */),
                                     style: FlutterFlowTheme.of(context).bodyLarge.override(
+=======
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 4, 0, 0),
+                                  child: Text(
+                                    FFLocalizations.of(context).getText(
+                                        'wme97if5' /* Auto-match nearby riders */),
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyLarge
+                                        .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                           font: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w500,
                                             fontStyle: FlutterFlowTheme.of(context).bodyLarge.fontStyle,
                                           ),
+<<<<<<< HEAD
                                           color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                           fontSize: 10,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
@@ -484,7 +807,12 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               ],
                             ),
                             Padding(
+<<<<<<< HEAD
                               padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
+=======
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 12, 0),
+>>>>>>> 10c9b5c (new frkdfm)
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -525,27 +853,50 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           height: 66,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
+<<<<<<< HEAD
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
                           ),
                           child: Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 0),
+=======
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 0, 0),
+>>>>>>> 10c9b5c (new frkdfm)
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+<<<<<<< HEAD
                                   FFLocalizations.of(context).getText('ax3wm89h' /* Participants */),
                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                                  FFLocalizations.of(context)
+                                      .getText('ax3wm89h' /* Participants */),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                         font: GoogleFonts.poppins(
                                           fontWeight: FontWeight.normal,
                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                         ),
+<<<<<<< HEAD
                                         color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                         fontSize: 10,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
                                         fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                       ),
                                 ),
+<<<<<<< HEAD
                                 Row(
                                   children: _participants.isEmpty
                                       ? [
@@ -560,21 +911,75 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             padding: const EdgeInsets.only(right: 8),
                                             child: _participantAvatar(ref),
                                           )).toList(),
+=======
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 250),
+                                  child: Row(
+                                    key: ValueKey(_participants.length),
+                                    children: _participants.isEmpty
+                                        ? [
+                                            // placeholders se vazio
+                                            Container(
+                                                width: 34,
+                                                height: 34,
+                                                decoration: const BoxDecoration(
+                                                    color: Color(0xA5414141),
+                                                    shape: BoxShape.circle)),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                                width: 34,
+                                                height: 34,
+                                                decoration: const BoxDecoration(
+                                                    color: Color(0xA5414141),
+                                                    shape: BoxShape.circle)),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                                width: 34,
+                                                height: 34,
+                                                decoration: const BoxDecoration(
+                                                    color: Color(0xA5414141),
+                                                    shape: BoxShape.circle)),
+                                          ]
+                                        : _participants
+                                            .map((ref) => Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      right: 8),
+                                                  child: _participantAvatar(ref),
+                                                ))
+                                            .toList(),
+                                  ),
+>>>>>>> 10c9b5c (new frkdfm)
                                 ),
                               ],
                             ),
                           ),
                         ),
                         Padding(
+<<<<<<< HEAD
                           padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                           child: Text(
                             FFLocalizations.of(context).getText('niwa8eid' /* Tab to remove • “- -” are open spots */),
                             style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                          child: Text(
+                            FFLocalizations.of(context).getText(
+                                'niwa8eid' /* Tab to remove • “- -” are open spots */),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                   font: GoogleFonts.poppins(
                                     fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                   ),
+<<<<<<< HEAD
                                   color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                   fontSize: 10,
                                   letterSpacing: 0.0,
                                   fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -597,21 +1002,43 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           height: 124,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
+<<<<<<< HEAD
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
                           ),
                           child: Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
+=======
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 8, 8),
+>>>>>>> 10c9b5c (new frkdfm)
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+<<<<<<< HEAD
                                   FFLocalizations.of(context).getText('us6osckg' /* Riders splitting */),
                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                                  FFLocalizations.of(context).getText(
+                                      'us6osckg' /* Riders splitting */),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                         font: GoogleFonts.poppins(
                                           fontWeight: FontWeight.normal,
                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                         ),
+<<<<<<< HEAD
                                         color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                         fontSize: 10,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
@@ -623,14 +1050,24 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     SizedBox(
                                       width: 100,
                                       height: 24,
+<<<<<<< HEAD
                                       child: custom_widgets.Countcontrolerideshare(
+=======
+                                      child:
+                                          custom_widgets.Countcontrolerideshare(
+>>>>>>> 10c9b5c (new frkdfm)
                                         width: 100,
                                         height: 24,
                                       ),
                                     ),
                                     GestureDetector(
                                       onTap: () async {
+<<<<<<< HEAD
                                         if (_model.session == null) await _createSessionIfNeeded();
+=======
+                                        if (_model.session == null)
+                                          await _createSessionIfNeeded();
+>>>>>>> 10c9b5c (new frkdfm)
                                         await _model.session!.update({
                                           'splitType': 'equal',
                                           'updatedAt': DateTime.now(),
@@ -641,6 +1078,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         height: 22,
                                         decoration: BoxDecoration(
                                           color: _splitType == 'equal'
+<<<<<<< HEAD
                                               ? FlutterFlowTheme.of(context).alternate
                                               : const Color(0xA5414141),
                                           borderRadius: BorderRadius.circular(14),
@@ -652,6 +1090,29 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 font: GoogleFonts.poppins(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                                              ? FlutterFlowTheme.of(context)
+                                                  .alternate
+                                              : const Color(0xA5414141),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                        ),
+                                        alignment:
+                                            const AlignmentDirectional(0, 0),
+                                        child: Text(
+                                          FFLocalizations.of(context).getText(
+                                              'wpvhw4cs' /* Equal split */),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                                 ),
                                                 fontSize: 10,
                                                 letterSpacing: 0.0,
@@ -664,19 +1125,33 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     GestureDetector(
                                       onTap: () async {
                                         // Exemplo simples: seta "custom" e deixa você editar depois
+<<<<<<< HEAD
                                         if (_model.session == null) await _createSessionIfNeeded();
+=======
+                                        if (_model.session == null)
+                                          await _createSessionIfNeeded();
+>>>>>>> 10c9b5c (new frkdfm)
                                         await _model.session!.update({
                                           'splitType': 'custom',
                                           'updatedAt': DateTime.now(),
                                         });
+<<<<<<< HEAD
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text('Custom % ativado. Preencha customShares no doc.')),
+=======
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Custom % ativado. Preencha customShares no doc.')),
+>>>>>>> 10c9b5c (new frkdfm)
                                         );
                                       },
                                       child: Container(
                                         width: 96,
                                         height: 22,
                                         decoration: BoxDecoration(
+<<<<<<< HEAD
                                           color: _splitType == 'custom' ? FlutterFlowTheme.of(context).alternate : const Color(0xA5414141),
                                           borderRadius: BorderRadius.circular(14),
                                         ),
@@ -689,6 +1164,34 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                                 ),
                                                 color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                          color: _splitType == 'custom'
+                                              ? FlutterFlowTheme.of(context)
+                                                  .alternate
+                                              : const Color(0xA5414141),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                        ),
+                                        alignment:
+                                            const AlignmentDirectional(0, 0),
+                                        child: Text(
+                                          FFLocalizations.of(context).getText(
+                                              'enexrc8j' /* Custom % */),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                                 fontSize: 10,
                                                 letterSpacing: 0.0,
                                                 fontWeight: FontWeight.w600,
@@ -700,13 +1203,26 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ].divide(const SizedBox(width: 8)),
                                 ),
                                 Text(
+<<<<<<< HEAD
                                   FFLocalizations.of(context).getText('nvqck3af' /* Hold 1 extra seat for your friend */),
                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                                  FFLocalizations.of(context).getText(
+                                      'nvqck3af' /* Hold 1 extra seat for your friend */),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                         font: GoogleFonts.poppins(
                                           fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                           fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                         ),
+<<<<<<< HEAD
                                         color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                         fontSize: 10,
                                         letterSpacing: 0.0,
                                         fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -740,16 +1256,31 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
                             boxShadow: const [
+<<<<<<< HEAD
                               BoxShadow(blurRadius: 1, color: Color(0x33000000), offset: Offset(0, 1))
                             ],
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
                           ),
                           child: Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
+=======
+                              BoxShadow(
+                                  blurRadius: 1,
+                                  color: Color(0x33000000),
+                                  offset: Offset(0, 1))
+                            ],
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 0, 8),
+>>>>>>> 10c9b5c (new frkdfm)
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
+<<<<<<< HEAD
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -767,11 +1298,52 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 letterSpacing: 0.0,
                                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 12, 0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(children: [
+                                        Text(
+                                          FFLocalizations.of(context).getText(
+                                              'qycpjvd7' /* Your share */),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                                fontSize: 10,
+                                                letterSpacing: 0.0,
+                                                fontWeight:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontWeight,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                               ),
                                         ),
                                       ]),
                                       Row(children: [
                                         Text(
+<<<<<<< HEAD
                                           FFLocalizations.of(context).getText('a0l4grqi' /* +3 min detour */),
                                           style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                 font: GoogleFonts.poppins(
@@ -783,6 +1355,38 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 letterSpacing: 0.0,
                                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                                          FFLocalizations.of(context).getText(
+                                              'a0l4grqi' /* +3 min detour */),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                fontSize: 14,
+                                                letterSpacing: 0.0,
+                                                fontWeight:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontWeight,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                               ),
                                         ),
                                       ]),
@@ -790,6 +1394,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ),
                                 ),
                                 Padding(
+<<<<<<< HEAD
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -822,6 +1427,86 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 letterSpacing: 0.0,
                                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+=======
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 12, 0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(children: [
+                                        AnimatedSwitcher(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          child: Text(
+                                            _myShareText(),
+                                            key: ValueKey(_myShareText()),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .alternate,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ),
+                                      ]),
+                                      Row(children: [
+                                        Text(
+                                          'of ${_totalFareText()} total',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                                fontSize: 10,
+                                                letterSpacing: 0.0,
+                                                fontWeight:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontWeight,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+>>>>>>> 10c9b5c (new frkdfm)
                                               ),
                                         ),
                                       ]),
@@ -833,15 +1518,31 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           ),
                         ),
                         Padding(
+<<<<<<< HEAD
                           padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                           child: Text(
                             FFLocalizations.of(context).getText('s3y7hgro' /* Price updates if route or riders change before pickup. */),
                             style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                          child: Text(
+                            FFLocalizations.of(context).getText(
+                                's3y7hgro' /* Price updates if route or riders change before pickup. */),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                   font: GoogleFonts.poppins(
                                     fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                   ),
+<<<<<<< HEAD
                                   color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                   fontSize: 10,
                                   letterSpacing: 0.0,
                                   fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -861,6 +1562,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                     mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+<<<<<<< HEAD
                       Container(
                         width: 320,
                         height: 38,
@@ -881,6 +1583,57 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                 fontWeight: FontWeight.bold,
                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                               ),
+=======
+                      InkWell(
+                        onTap: () async {
+                          // Garante sessão criada
+                          await _createSessionIfNeeded();
+                          // Vai para a página de pagamento
+                          context.pushNamed(
+                            PaymentRide7Widget.routeName,
+                            queryParameters: {
+                              'estilo': 'ride_share',
+                            }.withoutNulls,
+                            extra: {
+                              kTransitionInfoKey: const TransitionInfo(
+                                hasTransition: true,
+                                transitionType: PageTransitionType.rightToLeft,
+                              ),
+                              'latlngAtual': FFAppState().latlngAtual,
+                              'latlngWhereTo': FFAppState().latlangAondeVaiIr,
+                            },
+                          );
+                        },
+                        child: Container(
+                          width: 320,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).alternate,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(18)),
+                          ),
+                          alignment: const AlignmentDirectional(0, 0),
+                          child: Text(
+                            FFLocalizations.of(context)
+                                .getText('ntglhxb6' /* Confirm Ride Share */),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                          ),
+>>>>>>> 10c9b5c (new frkdfm)
                         ),
                       ),
                       Container(
@@ -892,8 +1645,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         ),
                         alignment: const AlignmentDirectional(0, 0),
                         child: Text(
+<<<<<<< HEAD
                           FFLocalizations.of(context).getText('4br05fcj' /* Skip for now */),
                           style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                          FFLocalizations.of(context)
+                              .getText('4br05fcj' /* Skip for now */),
+                          style: FlutterFlowTheme.of(context)
+                              .bodyMedium
+                              .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                 font: GoogleFonts.poppins(
                                   fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
@@ -907,15 +1668,31 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         ),
                       ),
                       Padding(
+<<<<<<< HEAD
                         padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                         child: Text(
                           FFLocalizations.of(context).getText('ltqpaty4' /* Next: Matching - Get picked up... */),
                           style: FlutterFlowTheme.of(context).bodyMedium.override(
+=======
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                        child: Text(
+                          FFLocalizations.of(context).getText(
+                              'ltqpaty4' /* Next: Matching - Get picked up... */),
+                          style: FlutterFlowTheme.of(context)
+                              .bodyMedium
+                              .override(
+>>>>>>> 10c9b5c (new frkdfm)
                                 font: GoogleFonts.poppins(
                                   fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                 ),
+<<<<<<< HEAD
                                 color: FlutterFlowTheme.of(context).secondaryText,
+=======
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+>>>>>>> 10c9b5c (new frkdfm)
                                 fontSize: 10,
                                 letterSpacing: 0.0,
                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,

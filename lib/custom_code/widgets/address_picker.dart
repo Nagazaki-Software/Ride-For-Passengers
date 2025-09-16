@@ -343,6 +343,23 @@ class _AddressPickerState extends State<AddressPicker> {
     } else {
       _destination = details;
       _destCtrl.text = details.mainText;
+<<<<<<< HEAD
+=======
+      // Se ainda não temos pickup e sabemos a posição do usuário, define um pickup imediato
+      if (_pickup == null && _hasUserLL) {
+        _pickup = PickedPlace(
+          placeId: 'user_location',
+          mainText: 'Current location',
+          secondaryText: '',
+          formattedAddress: 'Current location',
+          lat: _uLat,
+          lng: _uLng,
+        );
+        if (_pickupCtrl.text.isEmpty) {
+          _pickupCtrl.text = _pickup!.mainText;
+        }
+      }
+>>>>>>> 10c9b5c (new frkdfm)
       setState(() {});
     }
   }
@@ -461,6 +478,23 @@ class _AddressPickerState extends State<AddressPicker> {
     if (useDest) {
       _destination = details;
       _destCtrl.text = details.mainText;
+<<<<<<< HEAD
+=======
+      // Se ainda não temos pickup e sabemos a posição do usuário, define um pickup imediato
+      if (_pickup == null && _hasUserLL) {
+        _pickup = PickedPlace(
+          placeId: 'user_location',
+          mainText: 'Current location',
+          secondaryText: '',
+          formattedAddress: 'Current location',
+          lat: _uLat,
+          lng: _uLng,
+        );
+        if (_pickupCtrl.text.isEmpty) {
+          _pickupCtrl.text = _pickup!.mainText;
+        }
+      }
+>>>>>>> 10c9b5c (new frkdfm)
       setState(() {});
     } else {
       // Caso o usuário tenha focado explicitamente o Pickup, respeitamos.

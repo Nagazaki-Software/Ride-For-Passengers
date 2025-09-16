@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+const functions = require("firebase-functions");
+
+>>>>>>> 10c9b5c (new frkdfm)
 exports.classificarDocBahamas = functions.https.onRequest(async (req, res) => {
   if (applyCors(req, res)) return;
 

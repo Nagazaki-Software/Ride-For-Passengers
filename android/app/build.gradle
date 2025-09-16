@@ -105,4 +105,14 @@ dependencies {
 
     // Se precisar de Location direto (senão os plugins resolvem)
     implementation "com.google.android.gms:play-services-location:21.2.0"
+<<<<<<< HEAD
+=======
+
+    // Braintree v5 (core + card)
+    implementation "com.braintreepayments.api:braintree-core:5.17.0"
+    implementation "com.braintreepayments.api:card:5.17.0"
+    implementation "com.braintreepayments.api:three-d-secure:5.17.0"
+    // Optional: device data collector (disabled for now)
+    // implementation "com.braintreepayments.api:data-collector:4.45.0"
+>>>>>>> 10c9b5c (new frkdfm)
 }

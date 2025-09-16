@@ -70,6 +70,10 @@ class UsersRecord extends FirestoreRecord {
   String get passe => _passe ?? '';
   bool hasPasse() => _passe != null;
 
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
   // "location" field.
   LatLng? _location;
   LatLng? get location => _location;
@@ -95,6 +99,10 @@ class UsersRecord extends FirestoreRecord {
   String get etnia => _etnia ?? '';
   bool hasEtnia() => _etnia != null;
 
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -107,11 +115,19 @@ class UsersRecord extends FirestoreRecord {
     _driver = snapshotData['driver'] as bool?;
     _driverOnline = snapshotData['driverOnline'] as bool?;
     _passe = snapshotData['passe'] as String?;
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
     _location = snapshotData['location'] as LatLng?;
     _ridePoints = castToType<int>(snapshotData['ridePoints']);
     _codeUser = snapshotData['codeUser'] as String?;
     _verifyaccount = snapshotData['verifyaccount'] as bool?;
     _etnia = snapshotData['etnia'] as String?;
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
   }
 
   static CollectionReference get collection =>
@@ -158,11 +174,19 @@ Map<String, dynamic> createUsersRecordData({
   bool? driver,
   bool? driverOnline,
   String? passe,
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
   LatLng? location,
   int? ridePoints,
   String? codeUser,
   bool? verifyaccount,
   String? etnia,
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -176,11 +200,19 @@ Map<String, dynamic> createUsersRecordData({
       'driver': driver,
       'driverOnline': driverOnline,
       'passe': passe,
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
       'location': location,
       'ridePoints': ridePoints,
       'codeUser': codeUser,
       'verifyaccount': verifyaccount,
       'etnia': etnia,
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 10c9b5c (new frkdfm)
     }.withoutNulls,
   );
 
@@ -228,7 +260,11 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.ridePoints,
         e?.codeUser,
         e?.verifyaccount,
+<<<<<<< HEAD
         e?.etnia
+=======
+        e?.etnia,
+>>>>>>> 10c9b5c (new frkdfm)
       ]);
 
   @override
