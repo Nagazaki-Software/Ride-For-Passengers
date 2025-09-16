@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '/backend/backend.dart';
+import '/backend/schema/structs/index.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
@@ -127,12 +129,32 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: PaymentRide7Widget.routeName,
           path: PaymentRide7Widget.routePath,
-          builder: (context, params) => PaymentRide7Widget(),
+          builder: (context, params) => PaymentRide7Widget(
+            estilo: params.getParam(
+              'estilo',
+              ParamType.String,
+            ),
+            latlngAtual: params.getParam(
+              'latlngAtual',
+              ParamType.LatLng,
+            ),
+            latlngWhereTo: params.getParam(
+              'latlngWhereTo',
+              ParamType.LatLng,
+            ),
+          ),
         ),
         FFRoute(
           name: FindingDrive8Widget.routeName,
           path: FindingDrive8Widget.routePath,
-          builder: (context, params) => FindingDrive8Widget(),
+          builder: (context, params) => FindingDrive8Widget(
+            rideOrder: params.getParam(
+              'rideOrder',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['rideOrders'],
+            ),
+          ),
         ),
         FFRoute(
           name: PickingYou9Widget.routeName,
@@ -198,6 +220,53 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: Activity20Widget.routeName,
           path: Activity20Widget.routePath,
           builder: (context, params) => Activity20Widget(),
+        ),
+        FFRoute(
+          name: SafetyToolkit21Widget.routeName,
+          path: SafetyToolkit21Widget.routePath,
+          builder: (context, params) => SafetyToolkit21Widget(),
+        ),
+        FFRoute(
+          name: Support22Widget.routeName,
+          path: Support22Widget.routePath,
+          builder: (context, params) => Support22Widget(),
+        ),
+        FFRoute(
+          name: Legal23Widget.routeName,
+          path: Legal23Widget.routePath,
+          builder: (context, params) => Legal23Widget(),
+        ),
+        FFRoute(
+          name: MyPass24Widget.routeName,
+          path: MyPass24Widget.routePath,
+          builder: (context, params) => MyPass24Widget(),
+        ),
+        FFRoute(
+          name: CreateProfile2CopyWidget.routeName,
+          path: CreateProfile2CopyWidget.routePath,
+          builder: (context, params) => CreateProfile2CopyWidget(
+            quickyPlataform: params.getParam(
+              'quickyPlataform',
+              ParamType.String,
+            ),
+          ),
+        ),
+        FFRoute(
+          name: ViewDetalhesWidget.routeName,
+          path: ViewDetalhesWidget.routePath,
+          builder: (context, params) => ViewDetalhesWidget(
+            order: params.getParam(
+              'order',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['rideOrders'],
+            ),
+          ),
+        ),
+        FFRoute(
+          name: Support22CopyWidget.routeName,
+          path: Support22CopyWidget.routePath,
+          builder: (context, params) => Support22CopyWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -317,6 +386,7 @@ class FFParameters {
     ParamType type, {
     bool isList = false,
     List<String>? collectionNamePath,
+    StructBuilder<T>? structBuilder,
   }) {
     if (futureParamValues.containsKey(paramName)) {
       return futureParamValues[paramName];
@@ -335,6 +405,7 @@ class FFParameters {
       type,
       isList,
       collectionNamePath: collectionNamePath,
+      structBuilder: structBuilder,
     );
   }
 }
@@ -382,15 +453,11 @@ class FFRoute {
                 )
               : builder(context, ffParams);
           final child = appStateNotifier.loading
-              ? Center(
-                  child: SizedBox(
-                    width: 50.0,
-                    height: 50.0,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        FlutterFlowTheme.of(context).primary,
-                      ),
-                    ),
+              ? Container(
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  child: Image.asset(
+                    'assets/images/ChatGPT_Image_19_de_ago._de_2025,_10_05_00.png',
+                    fit: BoxFit.contain,
                   ),
                 )
               : page;

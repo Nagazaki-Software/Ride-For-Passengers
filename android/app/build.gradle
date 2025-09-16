@@ -1,28 +1,18 @@
 plugins {
-   id "com.android.application"
-   id "kotlin-android"
-   id "dev.flutter.flutter-gradle-plugin"
-   id "com.google.gms.google-services"  // Google Services plugin
-
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services" // (ok se o projeto raiz já tem o classpath do Google Services)
 }
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+    localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
@@ -31,18 +21,36 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.quicky.rideforpassengers"
+    namespace "com.quicky.ridebahamas"
     compileSdkVersion 35
-    
+
+    defaultConfig {
+        applicationId "com.quicky.ridebahamas"
+        minSdkVersion 23
+        targetSdkVersion 35
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        // 🔽 Resolve placeholders do Manifest
+        def mapsApiKey = project.findProperty("MAPS_API_KEY")
+                ?: System.getenv("MAPS_API_KEY") ?: ""
+
+        manifestPlaceholders = [
+                // Embedding v2: se o plugin não preencher, use este Application padrão
+                applicationName: "io.flutter.app.FlutterApplication",
+                MAPS_API_KEY   : mapsApiKey
+        ] //  <-- este colchete FALTAVA
+    } //  <-- e este fecha o defaultConfig
 
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        // Se quiser alinhar com AGP 8+, pode usar JavaVersion.VERSION_17 e subir o jvmTarget para "17"
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "1.8"
     }
 
     sourceSets {
@@ -54,30 +62,24 @@ android {
         checkReleaseBuilds false
     }
 
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.quicky.rideforpassengers"
-        minSdkVersion 23
-        targetSdkVersion 35
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
-   signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-           storePassword keystoreProperties['storePassword']
-       }
-   }
-
     buildTypes {
+        debug {
+            // nada especial
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -88,5 +90,26 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
+    implementation 'io.card:android-sdk:5.5.1'
+
+    // Splash oficial do Android 12+
+    implementation "androidx.core:core-splashscreen:1.0.1"
+
+    // Material + AppCompat (para Theme.Material3.* ficar disponível)
+    implementation "com.google.android.material:material:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.7.0"
+
+    // Google Play services (NÃO duplicar!)
+    implementation "com.google.android.gms:play-services-maps:19.2.0"
+    implementation "com.google.android.gms:play-services-base:18.5.0"
+
+    // Se precisar de Location direto (senão os plugins resolvem)
+    implementation "com.google.android.gms:play-services-location:21.2.0"
+
+    // Braintree v5 (core + card)
+    implementation "com.braintreepayments.api:braintree-core:5.17.0"
+    implementation "com.braintreepayments.api:card:5.17.0"
+    implementation "com.braintreepayments.api:three-d-secure:5.17.0"
+    // Optional: device data collector (disabled for now)
+    // implementation "com.braintreepayments.api:data-collector:4.45.0"
 }

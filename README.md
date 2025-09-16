@@ -1,4 +1,4 @@
-# Ride For Passengers
+# Ride Bahamas
 
 A new Flutter project.
 

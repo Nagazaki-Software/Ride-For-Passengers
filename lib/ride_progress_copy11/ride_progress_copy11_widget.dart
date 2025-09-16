@@ -82,7 +82,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'You Arrived at',
+                              FFLocalizations.of(context).getText(
+                                'eaie6vqv' /* You Arrived at */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -102,7 +104,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                         ),
                       ),
                       GradientText(
-                        'Prince Charles #27',
+                        FFLocalizations.of(context).getText(
+                          'cnfdqzgs' /* Prince Charles #27 */,
+                        ),
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               font: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w600,
@@ -128,159 +132,7 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                 Spacer(),
                 Column(
                   mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Container(
-                        width: 127.5,
-                        height: 141.5,
-                        decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).tertiary,
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 10.0,
-                              color: FlutterFlowTheme.of(context).tertiary,
-                              offset: Offset(
-                                0.0,
-                                -2.0,
-                              ),
-                            )
-                          ],
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(
-                                    'Price:',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                          letterSpacing: 0.0,
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                  ),
-                                  GradientText(
-                                    '\$ 14',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryBackground,
-                                          fontSize: 14.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                    colors: [
-                                      FlutterFlowTheme.of(context).secondary,
-                                      FlutterFlowTheme.of(context)
-                                          .primaryBackground
-                                    ],
-                                    gradientDirection: GradientDirection.ltr,
-                                    gradientType: GradientType.linear,
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                width: 40.0,
-                                height: 40.0,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Image.network(
-                                  'https://picsum.photos/seed/94/600',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Enisson',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                          color: FlutterFlowTheme.of(context)
-                                              .alternate,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                  ),
-                                  GradientText(
-                                    'Godoy',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondary,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                    colors: [
-                                      FlutterFlowTheme.of(context).secondary,
-                                      FlutterFlowTheme.of(context)
-                                          .primaryBackground
-                                    ],
-                                    gradientDirection: GradientDirection.ltr,
-                                    gradientType: GradientType.linear,
-                                  ),
-                                ].divide(SizedBox(width: 8.0)),
-                              ),
-                            ].divide(SizedBox(height: 8.0)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  children: [],
                 ),
                 Align(
                   alignment: AlignmentDirectional(0.0, 1.0),
@@ -304,12 +156,213 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
+                                Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Container(
+                                    width: 127.5,
+                                    height: 141.5,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          FlutterFlowTheme.of(context).tertiary,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          blurRadius: 10.0,
+                                          color: FlutterFlowTheme.of(context)
+                                              .tertiary,
+                                          offset: Offset(
+                                            0.0,
+                                            -2.0,
+                                          ),
+                                        )
+                                      ],
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Text(
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'ckrrb152' /* Price: */,
+                                                ),
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontWeight,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontStyle,
+                                                      ),
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .secondaryText,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                              ),
+                                              GradientText(
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '1lubjluw' /* $ 14 */,
+                                                ),
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontStyle,
+                                                      ),
+                                                      color: FlutterFlowTheme
+                                                              .of(context)
+                                                          .primaryBackground,
+                                                      fontSize: 14.0,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                                colors: [
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondary,
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground
+                                                ],
+                                                gradientDirection:
+                                                    GradientDirection.ltr,
+                                                gradientType:
+                                                    GradientType.linear,
+                                              ),
+                                            ],
+                                          ),
+                                          Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Image.network(
+                                              'https://picsum.photos/seed/94/600',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '5kl2pu5g' /* Enisson */,
+                                                ),
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FontStyle.italic,
+                                                      ),
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .alternate,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    ),
+                                              ),
+                                              GradientText(
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'ezetpl5s' /* Godoy */,
+                                                ),
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FontStyle.italic,
+                                                      ),
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .secondary,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    ),
+                                                colors: [
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondary,
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground
+                                                ],
+                                                gradientDirection:
+                                                    GradientDirection.ltr,
+                                                gradientType:
+                                                    GradientType.linear,
+                                              ),
+                                            ].divide(SizedBox(width: 8.0)),
+                                          ),
+                                        ].divide(SizedBox(height: 8.0)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Approximate time',
+                                      FFLocalizations.of(context).getText(
+                                        'gxcs6ol3' /* Approximate time */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -357,7 +410,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           .primaryBackground,
                                     ),
                                     Text(
-                                      'Approximate ETA',
+                                      FFLocalizations.of(context).getText(
+                                        '5zkt1mw3' /* Approximate ETA */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -386,7 +441,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           ),
                                     ),
                                     GradientText(
-                                      '4:30pm',
+                                      FFLocalizations.of(context).getText(
+                                        'asucpsxw' /* 4:30pm */,
+                                      ),
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -456,7 +513,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           alignment:
                                               AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            'Add  Stop',
+                                            FFLocalizations.of(context).getText(
+                                              '1nghdhg5' /* Add  Stop */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -508,7 +567,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                       ),
                                       alignment: AlignmentDirectional(0.0, 0.0),
                                       child: Text(
-                                        'Add  Stop',
+                                        FFLocalizations.of(context).getText(
+                                          'h5b7qu2x' /* Add  Stop */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(

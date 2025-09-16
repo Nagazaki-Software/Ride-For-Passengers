@@ -1,0 +1,14 @@
+{
+  "functions": [
+    {
+      "source": "firebase/custom_cloud_functions",
+      "codebase": "custom_cloud_functions",
+      "predeploy": []
+    },
+    {
+      "source": "firebase/functions",
+      "codebase": "functions",
+      "predeploy": []
+    }
+  ]
+}

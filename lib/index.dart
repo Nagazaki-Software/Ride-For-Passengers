@@ -23,3 +23,12 @@ export '/rewards17/rewards17_widget.dart' show Rewards17Widget;
 export '/activity18/activity18_widget.dart' show Activity18Widget;
 export '/preferences19/preferences19_widget.dart' show Preferences19Widget;
 export '/activity20/activity20_widget.dart' show Activity20Widget;
+export '/safety_toolkit21/safety_toolkit21_widget.dart'
+    show SafetyToolkit21Widget;
+export '/support22/support22_widget.dart' show Support22Widget;
+export '/legal23/legal23_widget.dart' show Legal23Widget;
+export '/my_pass24/my_pass24_widget.dart' show MyPass24Widget;
+export '/create_profile2_copy/create_profile2_copy_widget.dart'
+    show CreateProfile2CopyWidget;
+export '/view_detalhes/view_detalhes_widget.dart' show ViewDetalhesWidget;
+export '/support22_copy/support22_copy_widget.dart' show Support22CopyWidget;

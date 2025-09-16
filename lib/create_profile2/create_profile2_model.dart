@@ -1,3 +1,4 @@
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/index.dart';
@@ -7,10 +8,10 @@ import 'package:flutter/material.dart';
 class CreateProfile2Model extends FlutterFlowModel<CreateProfile2Widget> {
   ///  State fields for stateful widgets in this page.
 
-  bool isDataUploading_uploadDataF7h = false;
-  FFUploadedFile uploadedLocalFile_uploadDataF7h =
+  bool isDataUploading_uploadData0f7h = false;
+  FFUploadedFile uploadedLocalFile_uploadData0f7h =
       FFUploadedFile(bytes: Uint8List.fromList([]));
-  String uploadedFileUrl_uploadDataF7h = '';
+  String uploadedFileUrl_uploadData0f7h = '';
 
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode1;
@@ -36,6 +37,10 @@ class CreateProfile2Model extends FlutterFlowModel<CreateProfile2Widget> {
   // State field(s) for DropDown widget.
   String? dropDownValue2;
   FormFieldController<String>? dropDownValueController2;
+  // Stores action output result for [Firestore Query - Query a collection] action in Container widget.
+  List<UsersRecord>? users;
+  // Stores action output result for [Custom Action - verifiqueRandomNumber] action in Container widget.
+  String? randomNumber;
 
   @override
   void initState(BuildContext context) {

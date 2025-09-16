@@ -57,7 +57,11 @@ class _VerifyAccount3WidgetState extends State<VerifyAccount3Widget> {
                       Align(
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Verify Your\naccount',
+                          FFLocalizations.of(context).getText(
+                            'ghn677x0' /* Verify Your
+account */
+                            ,
+                          ),
                           textAlign: TextAlign.center,
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
@@ -81,7 +85,9 @@ class _VerifyAccount3WidgetState extends State<VerifyAccount3Widget> {
                           Align(
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'An email was sent to',
+                              FFLocalizations.of(context).getText(
+                                '5g27hqw3' /* An email was sent to */,
+                              ),
                               textAlign: TextAlign.center,
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
@@ -106,7 +112,9 @@ class _VerifyAccount3WidgetState extends State<VerifyAccount3Widget> {
                           Align(
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'email',
+                              FFLocalizations.of(context).getText(
+                                '5z2sblp8' /* email */,
+                              ),
                               textAlign: TextAlign.center,
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
@@ -203,7 +211,9 @@ class _VerifyAccount3WidgetState extends State<VerifyAccount3Widget> {
                     ].divide(SizedBox(width: 20.0)),
                   ),
                   Text(
-                    'Insert the code sent on your email to continue',
+                    FFLocalizations.of(context).getText(
+                      'u0ctzyu7' /* Insert the code sent on your e... */,
+                    ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.poppins(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -223,7 +233,9 @@ class _VerifyAccount3WidgetState extends State<VerifyAccount3Widget> {
                         ),
                   ),
                   Text(
-                    'Hang thight we´re almost there.....',
+                    FFLocalizations.of(context).getText(
+                      'd1wov68j' /* Hang thight we´re almost there... */,
+                    ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.poppins(
                             fontWeight: FlutterFlowTheme.of(context)
@@ -302,7 +314,9 @@ class _VerifyAccount3WidgetState extends State<VerifyAccount3Widget> {
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Next',
+                              FFLocalizations.of(context).getText(
+                                'ni71euqk' /* Next */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

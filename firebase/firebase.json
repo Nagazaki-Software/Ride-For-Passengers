@@ -5,8 +5,14 @@
   },
   "functions": [
     {
+      "source": "custom_cloud_functions",
+      "codebase": "custom_cloud_functions",
+      "predeploy": []
+    },
+    {
       "source": "functions",
-      "codebase": "functions"
+      "codebase": "functions",
+      "predeploy": []
     }
   ],
   "hosting": {

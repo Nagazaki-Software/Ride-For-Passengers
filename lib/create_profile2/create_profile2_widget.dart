@@ -1,11 +1,13 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/firebase_storage/storage.dart';
+import '/components/erro_ao_criar_conta_widget.dart';
 import '/flutter_flow/flutter_flow_drop_down.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/flutter_flow/upload_data.dart';
+import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +84,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                       Align(
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          'Profile',
+                          FFLocalizations.of(context).getText(
+                            '281ap27a' /* Profile */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -110,6 +114,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                           await selectMediaWithSourceBottomSheet(
                         context: context,
                         maxHeight: 600.00,
+                        imageQuality: 68,
                         allowPhoto: true,
                         backgroundColor:
                             FlutterFlowTheme.of(context).primaryText,
@@ -120,7 +125,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                           selectedMedia.every((m) =>
                               validateFileFormat(m.storagePath, context))) {
                         safeSetState(
-                            () => _model.isDataUploading_uploadDataF7h = true);
+                            () => _model.isDataUploading_uploadData0f7h = true);
                         var selectedUploadedFiles = <FFUploadedFile>[];
 
                         var downloadUrls = <String>[];
@@ -145,15 +150,15 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               .map((u) => u!)
                               .toList();
                         } finally {
-                          _model.isDataUploading_uploadDataF7h = false;
+                          _model.isDataUploading_uploadData0f7h = false;
                         }
                         if (selectedUploadedFiles.length ==
                                 selectedMedia.length &&
                             downloadUrls.length == selectedMedia.length) {
                           safeSetState(() {
-                            _model.uploadedLocalFile_uploadDataF7h =
+                            _model.uploadedLocalFile_uploadData0f7h =
                                 selectedUploadedFiles.first;
-                            _model.uploadedFileUrl_uploadDataF7h =
+                            _model.uploadedFileUrl_uploadData0f7h =
                                 downloadUrls.first;
                           });
                         } else {
@@ -169,7 +174,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                         Align(
                           alignment: AlignmentDirectional(0.0, 0.0),
                           child: Text(
-                            ' Insert a Photo of you here',
+                            FFLocalizations.of(context).getText(
+                              'k6fyomae' /*  Insert a Photo of you here */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
@@ -198,18 +205,32 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                           ),
                           child: Stack(
                             children: [
-                              Container(
-                                width: 200.0,
-                                height: 200.0,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
+                              if (_model.uploadedFileUrl_uploadData0f7h == '')
+                                Container(
+                                  width: 200.0,
+                                  height: 200.0,
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Image.network(
+                                    '',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                child: Image.network(
-                                  _model.uploadedFileUrl_uploadDataF7h,
-                                  fit: BoxFit.cover,
+                              if (_model.uploadedFileUrl_uploadData0f7h != '')
+                                Container(
+                                  width: 200.0,
+                                  height: 200.0,
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Image.network(
+                                    _model.uploadedFileUrl_uploadData0f7h,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -245,8 +266,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                   colors: [
                                     FlutterFlowTheme.of(context)
                                         .secondaryBackground,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -290,7 +310,10 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                                         .labelMedium
                                                         .fontStyle,
                                               ),
-                                          hintText: ' Type your name here',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            'xmjtm5y7' /*  Type your name here */,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -401,7 +424,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Give it your best shot at spelling it right',
+                                FFLocalizations.of(context).getText(
+                                  'ouan8yhw' /* Give it your best shot at spel... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -449,8 +474,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -471,7 +495,10 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           isDense: true,
-                                          hintText: ' Type your surname here',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            'e2cj412a' /*  Type your surname here */,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -582,7 +609,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Just a Formality',
+                                FFLocalizations.of(context).getText(
+                                  '5dk4xz52' /* Just a Formality */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -630,8 +659,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -652,7 +680,10 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           isDense: true,
-                                          hintText: ' Type your email here',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            'ohn197g1' /*  Type your email here */,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -763,7 +794,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Your best email so we can verify it is you',
+                                FFLocalizations.of(context).getText(
+                                  '2306q68b' /* Your best email so we can veri... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -811,8 +844,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.03, -1.0),
@@ -836,7 +868,12 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                             !_model.textFieldPasswordVisibility,
                                         decoration: InputDecoration(
                                           isDense: true,
-                                          hintText: ' Insert a password\n',
+                                          hintText: FFLocalizations.of(context)
+                                              .getText(
+                                            't0w80jvo' /*  Insert a password
+ */
+                                            ,
+                                          ),
                                           hintStyle: FlutterFlowTheme.of(
                                                   context)
                                               .labelMedium
@@ -964,7 +1001,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Don´t worry if you forget, we´ll be here to \nremind you  when you do.',
+                                FFLocalizations.of(context).getText(
+                                  'm69itacc' /* Don´t worry if you forget, we´... */,
+                                ),
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -1013,8 +1052,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 gradient: LinearGradient(
                                   colors: [
                                     FlutterFlowTheme.of(context).secondary,
-                                    FlutterFlowTheme.of(context)
-                                        .primaryBackground
+                                    FlutterFlowTheme.of(context).accent1
                                   ],
                                   stops: [0.0, 1.0],
                                   begin: AlignmentDirectional(0.0, -1.0),
@@ -1028,8 +1066,6 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 options: functions.nationalityList(),
                                 onChanged: (val) => safeSetState(
                                     () => _model.dropDownValue1 = val),
-                                width: 200.0,
-                                height: 40.0,
                                 textStyle: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -1048,12 +1084,15 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                           .bodyMedium
                                           .fontStyle,
                                     ),
-                                hintText: 'Choose your nationality',
+                                hintText: FFLocalizations.of(context).getText(
+                                  'fnljor9g' /* Choose your nationality */,
+                                ),
                                 icon: Icon(
                                   Icons.keyboard_arrow_down_rounded,
                                   color: FlutterFlowTheme.of(context).primary,
                                   size: 24.0,
                                 ),
+                                fillColor: Color(0x73FB9000),
                                 elevation: 2.0,
                                 borderColor: Colors.transparent,
                                 borderWidth: 0.0,
@@ -1070,7 +1109,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Let us know where your accent is from!',
+                                FFLocalizations.of(context).getText(
+                                  '7ueonljt' /* Let us know where your accent ... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -1156,7 +1197,10 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                                   .bodyMedium
                                                   .fontStyle,
                                         ),
-                                    hintText: ' Select your U.S State',
+                                    hintText:
+                                        FFLocalizations.of(context).getText(
+                                      'mzsqbo70' /*  Select your U.S State */,
+                                    ),
                                     icon: Icon(
                                       Icons.keyboard_arrow_down_rounded,
                                       color:
@@ -1181,7 +1225,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'Ignore this step if you are not American.',
+                                FFLocalizations.of(context).getText(
+                                  'hlykglhq' /* Ignore this step if you are no... */,
+                                ),
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -1262,22 +1308,54 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               return;
                             }
 
-                            await currentUserReference!.update({
-                              ...createUsersRecordData(
-                                displayName:
-                                    '${_model.textController1.text} ${_model.textController2.text}',
-                                photoUrl: _model.uploadedFileUrl_uploadDataF7h,
-                              ),
-                              ...mapToFirestore(
-                                {
-                                  'plataform': FieldValue.arrayUnion(
-                                      [widget.quickyPlataform]),
+                            _model.users = await queryUsersRecordOnce();
+                            _model.randomNumber =
+                                await actions.verifiqueRandomNumber(
+                              _model.users!.toList(),
+                            );
+                            if (_model.randomNumber ==
+                                'Não foi possível gerar um código único agora. Tente novamente.') {
+                              await showModalBottomSheet(
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                enableDrag: false,
+                                context: context,
+                                builder: (context) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                    },
+                                    child: Padding(
+                                      padding: MediaQuery.viewInsetsOf(context),
+                                      child: ErroAoCriarContaWidget(),
+                                    ),
+                                  );
                                 },
-                              ),
-                            });
+                              ).then((value) => safeSetState(() {}));
+                            } else {
+                              await currentUserReference!.update({
+                                ...createUsersRecordData(
+                                  displayName:
+                                      '${_model.textController1.text} ${_model.textController2.text}',
+                                  photoUrl:
+                                      _model.uploadedFileUrl_uploadData0f7h,
+                                  email: '',
+                                ),
+                                ...mapToFirestore(
+                                  {
+                                    'plataform': FieldValue.arrayUnion(
+                                        [widget.quickyPlataform]),
+                                  },
+                                ),
+                              });
+                            }
 
                             context.pushNamedAuth(
                                 ChoosePass4Widget.routeName, context.mounted);
+
+                            safeSetState(() {});
                           },
                           child: Container(
                             width: 280.0,
@@ -1303,7 +1381,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                             ),
                             alignment: AlignmentDirectional(0.0, 0.0),
                             child: Text(
-                              'Next',
+                              FFLocalizations.of(context).getText(
+                                'p5hihdt4' /* Next */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

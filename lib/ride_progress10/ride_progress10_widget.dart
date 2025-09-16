@@ -81,7 +81,9 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Ride in Progress',
+                              FFLocalizations.of(context).getText(
+                                'p4hpd3m1' /* Ride in Progress */,
+                              ),
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -194,7 +196,11 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                           .spaceAround,
                                                   children: [
                                                     Text(
-                                                      'Price:',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'lgdwcl2z' /* Price: */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -227,7 +233,11 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                               ),
                                                     ),
                                                     GradientText(
-                                                      '\$ 14',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        '118h1wq1' /* $ 14 */,
+                                                      ),
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -291,7 +301,11 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     Text(
-                                                      'Enisson',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'z3i8b715' /* Enisson */,
+                                                      ),
                                                       style: FlutterFlowTheme
                                                               .of(context)
                                                           .bodyMedium
@@ -316,7 +330,11 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                           ),
                                                     ),
                                                     GradientText(
-                                                      'Godoy',
+                                                      FFLocalizations.of(
+                                                              context)
+                                                          .getText(
+                                                        'oqlvom82' /* Godoy */,
+                                                      ),
                                                       style: FlutterFlowTheme
                                                               .of(context)
                                                           .bodyMedium
@@ -393,7 +411,9 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Approximate time',
+                                        FFLocalizations.of(context).getText(
+                                          'u88w243v' /* Approximate time */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -423,7 +443,9 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                             ),
                                       ),
                                       Text(
-                                        '7 min',
+                                        FFLocalizations.of(context).getText(
+                                          'o3oghw8x' /* 7 min */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -441,7 +463,9 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                             ),
                                       ),
                                       Text(
-                                        'Approximate ETA',
+                                        FFLocalizations.of(context).getText(
+                                          'lx5nbmnk' /* Approximate ETA */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -471,7 +495,9 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                             ),
                                       ),
                                       GradientText(
-                                        '4:30pm',
+                                        FFLocalizations.of(context).getText(
+                                          '4p6fz6fh' /* 4:30pm */,
+                                        ),
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
@@ -545,7 +571,10 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                             alignment:
                                                 AlignmentDirectional(0.0, 0.0),
                                             child: Text(
-                                              'Add  Stop',
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '1zcn7whm' /* Add  Stop */,
+                                              ),
                                               style: FlutterFlowTheme.of(
                                                       context)
                                                   .bodyMedium

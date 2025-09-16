@@ -66,7 +66,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
-                                'Activity',
+                                FFLocalizations.of(context).getText(
+                                  '17bq7v90' /* Activity */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -114,7 +116,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Upcoming',
+                                FFLocalizations.of(context).getText(
+                                  'bg48o9jg' /* Upcoming */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -145,7 +149,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Today • 4:30 PM',
+                                FFLocalizations.of(context).getText(
+                                  'xrffj6km' /* Today • 4:30 PM */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -166,7 +172,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                                     ),
                               ),
                               Text(
-                                '\$18',
+                                FFLocalizations.of(context).getText(
+                                  'qea840wh' /* $18 */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -227,7 +235,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Aug 10 • 9:14 PM',
+                                  FFLocalizations.of(context).getText(
+                                    'few63cok' /* Aug 10 • 9:14 PM */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -254,7 +264,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                                       ),
                                 ),
                                 Text(
-                                  '\$12.40',
+                                  FFLocalizations.of(context).getText(
+                                    '48htb83l' /* $12.40 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -305,7 +317,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Aug 9 • 7:02 PM',
+                                  FFLocalizations.of(context).getText(
+                                    '0pgr1i1t' /* Aug 9 • 7:02 PM */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -332,7 +346,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                                       ),
                                 ),
                                 Text(
-                                  '\$22.10',
+                                  FFLocalizations.of(context).getText(
+                                    'sqqusrt2' /* $22.10 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -383,7 +399,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Aug 8 • 1:20 PM',
+                                  FFLocalizations.of(context).getText(
+                                    'jk1da09m' /* Aug 8 • 1:20 PM */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -410,7 +428,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                                       ),
                                 ),
                                 Text(
-                                  '\$9.85',
+                                  FFLocalizations.of(context).getText(
+                                    'lt374c88' /* $9.85 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -461,7 +481,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Aug 6• 8:45 PM',
+                                  FFLocalizations.of(context).getText(
+                                    'g0szdg95' /* Aug 6• 8:45 PM */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -488,7 +510,9 @@ class _Activity18WidgetState extends State<Activity18Widget> {
                                       ),
                                 ),
                                 Text(
-                                  '\$16.00',
+                                  FFLocalizations.of(context).getText(
+                                    '6m14pv9v' /* $16.00 */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(

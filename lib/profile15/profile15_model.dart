@@ -1,5 +1,6 @@
 import '/components/navbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 import 'profile15_widget.dart' show Profile15Widget;
 import 'package:flutter/material.dart';
 

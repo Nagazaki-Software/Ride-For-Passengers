@@ -2,8 +2,6 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/custom_code/actions/index.dart' as actions;
-import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -186,7 +184,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                 ),
                               ),
                               Text(
-                                'Help',
+                                FFLocalizations.of(context).getText(
+                                  'qgowcvqw' /* Help */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -208,67 +208,13 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                               ),
                             ].divide(SizedBox(width: 8.0)),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Container(
-                                    width: 56.0,
-                                    height: 24.0,
-                                    child: custom_widgets.Botaoswitch(
-                                      width: 56.0,
-                                      height: 24.0,
-                                      labelOn: 'ON',
-                                      labelOff: 'OFF',
-                                      initialValue: true,
-                                      onChange: (onSelected) async {
-                                        if (onSelected) {
-                                          await actions
-                                              .startLocationStreamSimple(
-                                            context,
-                                          );
-                                        } else {
-                                          await actions
-                                              .stopLocationStreamSimple(
-                                            context,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Text(
-                                    'Autolocation',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                          color: Color(0xBFF1F4F8),
-                                          fontSize: 10.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.normal,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ),
                     Text(
-                      'Continue as',
+                      FFLocalizations.of(context).getText(
+                        'cl1yn8nt' /* Continue as */,
+                      ),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             font: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
@@ -364,7 +310,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'I´m Visiting',
+                                            FFLocalizations.of(context).getText(
+                                              '0sa3l3hv' /* I´m Visiting */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -413,7 +361,8 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                                   .alternate,
                                         ),
                                         child: Checkbox(
-                                          value: _model.checkboxValue1 ??= true,
+                                          value: _model.checkboxValue1 ??=
+                                              _model.click != 'im visiting',
                                           onChanged: (_model.click ==
                                                   'im bahamian')
                                               ? null
@@ -492,7 +441,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'I do not have A bahamian ID or Passport',
+                                FFLocalizations.of(context).getText(
+                                  '961k70uw' /* I do not have A bahamian ID or... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -601,7 +552,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 0.0, 0.0),
                                           child: Text(
-                                            'I´m Bahamian',
+                                            FFLocalizations.of(context).getText(
+                                              'nfgti4ce' /* I´m Bahamian */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -650,7 +603,8 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                                   .alternate,
                                         ),
                                         child: Checkbox(
-                                          value: _model.checkboxValue2 ??= true,
+                                          value: _model.checkboxValue2 ??=
+                                              _model.click != 'im bahamian',
                                           onChanged: (_model.click ==
                                                   'im visiting')
                                               ? null
@@ -729,7 +683,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
                               child: Text(
-                                'I do have A bahamian ID or Passport',
+                                FFLocalizations.of(context).getText(
+                                  'nes976dz' /* I do have A bahamian ID or Pas... */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -767,7 +723,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                             padding: EdgeInsetsDirectional.fromSTEB(
                                 12.0, 28.0, 12.0, 0.0),
                             child: Text(
-                              'In The Bahamas, the taxi market for tourists is protected by regulation. To comply, that is why we devided riders into two roups: tourists, who can locais, who can ride with any available driver.',
+                              FFLocalizations.of(context).getText(
+                                '6rfpe6ba' /* In The Bahamas, the taxi marke... */,
+                              ),
                               textAlign: TextAlign.center,
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
@@ -877,7 +835,9 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
-                                  'Next',
+                                  FFLocalizations.of(context).getText(
+                                    'cdie3eab' /* Next */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(

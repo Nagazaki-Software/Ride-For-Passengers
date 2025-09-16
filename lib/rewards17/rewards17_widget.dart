@@ -67,7 +67,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Text(
-                                'Rewards',
+                                FFLocalizations.of(context).getText(
+                                  '36a24d9o' /* Rewards */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -115,7 +117,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Points',
+                                FFLocalizations.of(context).getText(
+                                  'ltmftlab' /* Points */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -140,7 +144,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                     ),
                               ),
                               Text(
-                                'Tier',
+                                FFLocalizations.of(context).getText(
+                                  'h8mcjhpe' /* Tier */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -171,7 +177,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '2,450',
+                                FFLocalizations.of(context).getText(
+                                  '8p3s5fdd' /* 2,450 */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -192,7 +200,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                     ),
                               ),
                               Text(
-                                'Gold',
+                                FFLocalizations.of(context).getText(
+                                  'lk5k9pah' /* Gold */,
+                                ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -268,7 +278,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Free ride boost',
+                                            FFLocalizations.of(context).getText(
+                                              '5xvue46j' /* Free ride boost */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -301,7 +313,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            '+5 min priority',
+                                            FFLocalizations.of(context).getText(
+                                              'l486yc32' /* +5 min priority */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -379,7 +393,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Airport pickuo lane',
+                                            FFLocalizations.of(context).getText(
+                                              'qldyld0o' /* Airport pickuo lane */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -412,7 +428,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            '1 voucher',
+                                            FFLocalizations.of(context).getText(
+                                              'gj6ttsve' /* 1 voucher */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -490,7 +508,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '\$5 off next ride',
+                                            FFLocalizations.of(context).getText(
+                                              '704kgt3d' /* $5 off next ride */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -523,7 +543,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                                                 ),
                                           ),
                                           Text(
-                                            'Auto-applies',
+                                            FFLocalizations.of(context).getText(
+                                              'e6h4q86o' /* Auto-applies */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -589,7 +611,9 @@ class _Rewards17WidgetState extends State<Rewards17Widget> {
                         ),
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: GradientText(
-                          'Redeem points',
+                          FFLocalizations.of(context).getText(
+                            'jkj1b21w' /* Redeem points */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
