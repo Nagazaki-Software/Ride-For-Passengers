@@ -34,19 +34,10 @@ target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '11.13.0'
   pod 'GoogleMaps'
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   # Braintree Native SDKs (no Drop-in)
   pod 'BraintreeCore'
   pod 'BraintreeCard'
   pod 'BraintreeThreeDSecure'
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 end
 
 post_install do |installer|

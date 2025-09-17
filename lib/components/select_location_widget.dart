@@ -1,13 +1,6 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
-<<<<<<< HEAD
-<<<<<<< HEAD
-import '/flutter_flow/custom_functions.dart' as functions;
-=======
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'select_location_model.dart';
@@ -99,33 +92,6 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
           quickPicksDefaultToDestination: true,
           onConfirm: (result) async {
             _model.jsonAddresss = result;
-<<<<<<< HEAD
-<<<<<<< HEAD
-            safeSetState(() {});
-            FFAppState().latlngAtual = functions.stringToLatlng('${getJsonField(
-              result,
-              r'''$.pickupLat''',
-            ).toString()}, ${getJsonField(
-              result,
-              r'''$.pickupLng''',
-            ).toString()}');
-            FFAppState().latlangAondeVaiIr =
-                functions.stringToLatlng('${getJsonField(
-              result,
-              r'''$.destinationLat''',
-            ).toString()}, ${getJsonField(
-              result,
-              r'''$.destinationLng''',
-            ).toString()}');
-            FFAppState().locationWhereTo = getJsonField(
-              result,
-              r'''$.destinationMainText''',
-            ).toString();
-            safeSetState(() {});
-            Navigator.pop(context);
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
             // Extrai coordenadas como double e monta LatLng diretamente
             final double? pLat =
                 (getJsonField(result, r'$.pickupLat') as num?)?.toDouble();
@@ -152,10 +118,6 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
             FFAppState().update(() {});
 
             if (mounted) Navigator.pop(context);
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           },
         ),
       ),

@@ -29,11 +29,6 @@ subprojects { sub ->
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 // Map CardinalCommerce artifact to a mirror if the official repo is unavailable
 subprojects { sub ->
     configurations.all {
@@ -47,10 +42,6 @@ subprojects { sub ->
     }
 }
 
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
