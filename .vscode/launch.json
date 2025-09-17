@@ -5,9 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+<<<<<<< HEAD
             "type": "jdk",
             "request": "launch",
             "name": "Launch Java App",
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
             "name": "Ride-For-Passengers",
             "request": "launch",
             "type": "dart"

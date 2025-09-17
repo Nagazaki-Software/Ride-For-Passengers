@@ -71,9 +71,13 @@ class UsersRecord extends FirestoreRecord {
   bool hasPasse() => _passe != null;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   // "location" field.
   LatLng? _location;
   LatLng? get location => _location;
@@ -100,9 +104,13 @@ class UsersRecord extends FirestoreRecord {
   bool hasEtnia() => _etnia != null;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -116,18 +124,26 @@ class UsersRecord extends FirestoreRecord {
     _driverOnline = snapshotData['driverOnline'] as bool?;
     _passe = snapshotData['passe'] as String?;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     _location = snapshotData['location'] as LatLng?;
     _ridePoints = castToType<int>(snapshotData['ridePoints']);
     _codeUser = snapshotData['codeUser'] as String?;
     _verifyaccount = snapshotData['verifyaccount'] as bool?;
     _etnia = snapshotData['etnia'] as String?;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   static CollectionReference get collection =>
@@ -175,18 +191,26 @@ Map<String, dynamic> createUsersRecordData({
   bool? driverOnline,
   String? passe,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   LatLng? location,
   int? ridePoints,
   String? codeUser,
   bool? verifyaccount,
   String? etnia,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -201,18 +225,26 @@ Map<String, dynamic> createUsersRecordData({
       'driverOnline': driverOnline,
       'passe': passe,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       'location': location,
       'ridePoints': ridePoints,
       'codeUser': codeUser,
       'verifyaccount': verifyaccount,
       'etnia': etnia,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     }.withoutNulls,
   );
 
@@ -261,10 +293,14 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.codeUser,
         e?.verifyaccount,
 <<<<<<< HEAD
+<<<<<<< HEAD
         e?.etnia
 =======
         e?.etnia,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+        e?.etnia,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       ]);
 
   @override

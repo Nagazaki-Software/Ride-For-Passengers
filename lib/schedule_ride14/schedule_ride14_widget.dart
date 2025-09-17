@@ -62,7 +62,10 @@ class _ScheduleRide14WidgetState extends State<ScheduleRide14Widget> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
  
                       Padding(
                         padding:
@@ -1034,7 +1037,10 @@ class _ScheduleRide14WidgetState extends State<ScheduleRide14Widget> {
                         ),
                       ),
  
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                       Align(
                         alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(

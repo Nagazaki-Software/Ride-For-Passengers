@@ -11,9 +11,13 @@ import 'package:flutter/material.dart';
 
 // ===== IMPORTS EXTRAS =====
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import 'dart:async';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import 'dart:async';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,10 +25,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'package:flutter_braintree/flutter_braintree.dart';
 =======
 import '../native/braintree_native.dart';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import '../native/braintree_native.dart';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 /// Action única controlada por `charge`:
 /// - charge == false  -> apenas SALVA o JSON no Firestore (sem cobrar)
@@ -88,17 +96,23 @@ Future<dynamic> processCardPayload(
         String? nonce =
             (payload['nonce'] is String) ? (payload['nonce'] as String) : null;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         // Se não há nonce, tenta tokenizar a partir de cardRaw
         if (nonce == null || nonce.isEmpty) {
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         // Token salvo em Vault (quando o cartão foi salvo anteriormente)
         String? token =
             (payload['token'] is String) ? (payload['token'] as String) : null;
 
         // Se não há nonce, tenta tokenizar a partir de cardRaw
         if ((nonce == null || nonce.isEmpty) && (token == null || token.isEmpty)) {
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           Map<String, dynamic>? cardRaw = payload['cardRaw'] is Map
               ? Map<String, dynamic>.from(payload['cardRaw'])
               : null;
@@ -123,6 +137,7 @@ Future<dynamic> processCardPayload(
             } else {
               try {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 final req = BraintreeCreditCardRequest(
                   cardNumber: number,
 =======
@@ -130,10 +145,16 @@ Future<dynamic> processCardPayload(
                   tokenizationKey: tk,
                   number: number,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                final tokenized = await BraintreeNative.tokenizeCard(
+                  tokenizationKey: tk,
+                  number: number,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                   expirationMonth: mm,
                   expirationYear: yy,
                   cvv: cvv,
                 );
+<<<<<<< HEAD
 <<<<<<< HEAD
                 final tokenized = await Braintree.tokenizeCreditCard(tk, req);
                 if (tokenized == null || tokenized.nonce.isEmpty) {
@@ -141,12 +162,17 @@ Future<dynamic> processCardPayload(
                 } else {
                   nonce = tokenized.nonce;
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                 final n = tokenized['nonce'] as String?;
                 if (n == null || n.isEmpty) {
                   result['error'] = 'Tokenization failed.';
                 } else {
                   nonce = n;
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                 }
               } on PlatformException catch (pe) {
                 result['error'] = pe.message ?? pe.code;
@@ -158,9 +184,12 @@ Future<dynamic> processCardPayload(
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         // Se temos nonce e ainda não houve erro, chama a Function (us-central1 fixo)
         if (result['error'] == null && nonce != null && nonce.isNotEmpty) {
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         // 3D Secure (quando temos nonce de cartao)
         if (result['error'] == null && (nonce != null && nonce.isNotEmpty)) {
           try {
@@ -180,7 +209,10 @@ Future<dynamic> processCardPayload(
 
         // Se temos nonce/token e ainda nao houve erro, chama a Function (us-central1 fixo)
         if (result['error'] == null && ((nonce != null && nonce.isNotEmpty) || (token != null && token.isNotEmpty))) {
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           final isSandbox = tk.startsWith('sandbox_');
           final fnName = isSandbox
               ? 'processBraintreeTestPayment'
@@ -191,11 +223,14 @@ Future<dynamic> processCardPayload(
 
           try {
 <<<<<<< HEAD
+<<<<<<< HEAD
             final resp = await callable.call(<String, dynamic>{
               'amount': amt.toStringAsFixed(2),
               'paymentNonce': nonce,
             });
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
             final resp = await callable
                 .call(<String, dynamic>{
               'amount': amt.toStringAsFixed(2),
@@ -203,7 +238,10 @@ Future<dynamic> processCardPayload(
               if (token != null && token.isNotEmpty) 'paymentMethodToken': token,
             })
                 .timeout(const Duration(seconds: 30));
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
             final data = Map<String, dynamic>.from(resp.data as Map);
             final txId = data['transactionId'] as String?;
@@ -214,10 +252,15 @@ Future<dynamic> processCardPayload(
               result['transactionId'] = txId;
             }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
           } on TimeoutException catch (_) {
             result['error'] = 'Payment request timed out. Check connection and try again.';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+          } on TimeoutException catch (_) {
+            result['error'] = 'Payment request timed out. Check connection and try again.';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           } on FirebaseFunctionsException catch (e) {
             final parts = <String>[];
             if (e.message != null && e.message!.trim().isNotEmpty) {
@@ -265,6 +308,10 @@ Future<dynamic> processCardPayload(
   return result;
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be

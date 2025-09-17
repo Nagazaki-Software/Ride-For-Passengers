@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart' show PlatformViewHitTestBehavior;
 import 'package:flutter/services.dart';
@@ -12,11 +13,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import '/flutter_flow/lat_lng.dart'; // LatLng do FlutterFlow
 
 // =================== Estilo dark (preto/cinza) ===================
 const String kGoogleMapsMonoBlackStyle = '''
 [
+<<<<<<< HEAD
 <<<<<<< HEAD
   {"elementType":"geometry","stylers":[{"color":"#1d1f25"}]},
   {"elementType":"labels.text.fill","stylers":[{"color":"#8a8c91"}]},
@@ -28,6 +35,8 @@ const String kGoogleMapsMonoBlackStyle = '''
   {"featureType":"transit","stylers":[{"visibility":"off"}]},
   {"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#111317"}]}
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   {"elementType":"geometry","stylers":[{"color":"#0e1116"}]},
   {"elementType":"labels.text.fill","stylers":[{"color":"#8a8f98"}]},
   {"elementType":"labels.text.stroke","stylers":[{"color":"#0e1116"}]},
@@ -46,7 +55,10 @@ const String kGoogleMapsMonoBlackStyle = '''
 
   {"featureType":"transit","stylers":[{"visibility":"off"}]},
   {"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#0a0c10"}]}
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 ]
 ''';
 
@@ -54,10 +66,13 @@ const String kGoogleMapsMonoBlackStyle = '''
 class PickerMapNativeController {
   MethodChannel? _channel;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
   void _attach(int id) {
     _channel = MethodChannel('picker_map_native/$id');
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   Future<dynamic> Function(MethodCall call)? _handler;
 
   void _attach(int id) {
@@ -65,7 +80,10 @@ class PickerMapNativeController {
     if (_handler != null) {
       _channel!.setMethodCallHandler(_handler);
     }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   Future<void> updateConfig(Map<String, dynamic> cfg) async {
@@ -74,7 +92,10 @@ class PickerMapNativeController {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   void setMethodCallHandler(Future<dynamic> Function(MethodCall call) handler) {
     _handler = handler;
     if (_channel != null) {
@@ -82,7 +103,10 @@ class PickerMapNativeController {
     }
   }
 
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   Future<void> updateCarPosition(
     String id,
     LatLng position, {
@@ -93,13 +117,19 @@ class PickerMapNativeController {
     await _channel!.invokeMethod('updateCarPosition', {
       'id': id,
 <<<<<<< HEAD
+<<<<<<< HEAD
       'position': {'latitude': position.latitude, 'longitude': position.longitude},
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       'position': {
         'latitude': position.latitude,
         'longitude': position.longitude
       },
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       'rotation': rotation,
       'durationMs': durationMs,
     });
@@ -124,7 +154,10 @@ class PickerMapNativeController {
     });
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   Future<void> onResume() async {
     if (_channel == null) return;
@@ -140,7 +173,10 @@ class PickerMapNativeController {
     if (_channel == null) return;
     await _channel!.invokeMethod('onLowMemory');
   }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 }
 
 // =================== Widget (Platform View) ===================
@@ -157,13 +193,18 @@ class PickerMapNative extends StatefulWidget {
     this.routeWidth = 5,
     this.enableRouteSnake = true,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     this.encodedPolyline,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+    this.encodedPolyline,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     this.driversRefs, // ignorado aqui (usamos controller p/ posições)
     this.refreshMs = 2000,
     this.destinationMarkerPngUrl,
     this.userPhotoUrl,
+<<<<<<< HEAD
 <<<<<<< HEAD
     this.userMarkerSize = 40,
     this.userName,
@@ -173,6 +214,8 @@ class PickerMapNative extends StatefulWidget {
     this.driverDriverIconUrl,
     this.liteModeOnAndroid = false,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     this.userMarkerSize = 16,
     this.userName,
     this.driverIconWidth = 70,
@@ -183,15 +226,22 @@ class PickerMapNative extends StatefulWidget {
         'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
     this.liteModeOnAndroid = false,
     this.autoFitCamera = true,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     this.ultraLowSpecMode = false,
     this.brandSafePaddingBottom = 60,
     this.showDebugPanel = false,
     this.borderRadius = 0,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     this.deferCreateMs = 350,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+    this.deferCreateMs = 350,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   });
 
   final double width;
@@ -206,9 +256,13 @@ class PickerMapNative extends StatefulWidget {
   final int routeWidth;
   final bool enableRouteSnake;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   final String? encodedPolyline;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+  final String? encodedPolyline;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   final List<dynamic>? driversRefs; // mantido p/ API compatível
   final int refreshMs;
@@ -224,22 +278,31 @@ class PickerMapNative extends StatefulWidget {
 
   final bool liteModeOnAndroid;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   final bool autoFitCamera;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+  final bool autoFitCamera;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   final bool ultraLowSpecMode;
   final int brandSafePaddingBottom;
   final bool showDebugPanel;
   final double borderRadius;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   final int deferCreateMs;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+  final int deferCreateMs;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   @override
   State<PickerMapNative> createState() => _PickerMapNativeState();
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 class _PickerMapNativeState extends State<PickerMapNative> {
   int? _viewId;
@@ -247,6 +310,8 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   Map<String, dynamic> get _payload => {
         'mapStyleJson': widget.mapStyleJson,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 class _PickerMapNativeState extends State<PickerMapNative>
     with WidgetsBindingObserver {
   int? _viewId;
@@ -258,7 +323,10 @@ class _PickerMapNativeState extends State<PickerMapNative>
   Map<String, dynamic> get _payload => {
         'mapStyleJson': widget.mapStyleJson,
         'useNativeStyle': true,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         'userLocation': {
           'latitude': widget.userLocation.latitude,
           'longitude': widget.userLocation.longitude,
@@ -273,11 +341,17 @@ class _PickerMapNativeState extends State<PickerMapNative>
         'routeWidth': widget.routeWidth,
         'enableRouteSnake': widget.enableRouteSnake,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         'encodedPolyline': widget.encodedPolyline,
         'autoFitCamera': widget.autoFitCamera,
         'ultraLowSpecMode': widget.ultraLowSpecMode,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+        'encodedPolyline': widget.encodedPolyline,
+        'autoFitCamera': widget.autoFitCamera,
+        'ultraLowSpecMode': widget.ultraLowSpecMode,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         'destinationMarkerPngUrl': widget.destinationMarkerPngUrl,
         'userPhotoUrl': widget.userPhotoUrl,
         'userMarkerSize': widget.userMarkerSize,
@@ -293,6 +367,7 @@ class _PickerMapNativeState extends State<PickerMapNative>
   void didUpdateWidget(covariant PickerMapNative oldWidget) {
     super.didUpdateWidget(oldWidget);
 <<<<<<< HEAD
+<<<<<<< HEAD
     // sempre empurra config nova pro nativo
     _pushConfig();
   }
@@ -301,6 +376,8 @@ class _PickerMapNativeState extends State<PickerMapNative>
     if (_viewId == null) return;
     await widget.controller.updateConfig(_payload);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     // só envia se mudou (cache controla)
     _pushConfig();
   }
@@ -331,15 +408,21 @@ class _PickerMapNativeState extends State<PickerMapNative>
     if (key == _lastPayloadCache) return;
     _lastPayloadCache = key;
     await widget.controller.updateConfig(payload);
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   @override
   Widget build(BuildContext context) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (!Platform.isAndroid) {
       return const Center(child: Text('PickerMapNative disponível só no Android.'));
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     // iOS branch: use UiKitView and same channel callbacks
     if (Platform.isIOS) {
       final iosView = UiKitView(
@@ -410,7 +493,10 @@ class _PickerMapNativeState extends State<PickerMapNative>
           borderRadius: BorderRadius.circular(widget.borderRadius),
         ),
       );
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     }
 
     final view = PlatformViewLink(
@@ -436,9 +522,12 @@ class _PickerMapNativeState extends State<PickerMapNative>
           _viewId = id;
           widget.controller._attach(id);
 <<<<<<< HEAD
+<<<<<<< HEAD
           await _pushConfig();
           params.onPlatformViewCreated(id);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           // Listen for native 'mapLoaded' to hide placeholder precisely
           widget.controller.setMethodCallHandler((call) async {
             if (!mounted) return null;
@@ -465,13 +554,17 @@ class _PickerMapNativeState extends State<PickerMapNative>
             if (mounted && !_ready) setState(() => _ready = true);
           });
           // Câmera controlada no nativo (3D tilt/bearing) ao mudar rota/destino
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         });
         controller.create();
         return controller;
       },
     );
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     final map = ClipRRect(
       borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -482,6 +575,8 @@ class _PickerMapNativeState extends State<PickerMapNative>
   }
 }
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     final Widget mapViewBox = SizedBox(
       width: widget.width,
       height: widget.height,
@@ -543,4 +638,7 @@ class _PickerMapNativeState extends State<PickerMapNative>
 }
 
 
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be

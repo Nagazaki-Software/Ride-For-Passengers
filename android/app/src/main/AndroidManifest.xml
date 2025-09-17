@@ -68,6 +68,10 @@
         <meta-data
             android:name="com.braintreepayments.api.ReturnUrlScheme"
             android:value="${applicationId}.braintree" />
+<<<<<<< HEAD
+=======
+
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         <!-- Braintree -->
         <activity
             android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"

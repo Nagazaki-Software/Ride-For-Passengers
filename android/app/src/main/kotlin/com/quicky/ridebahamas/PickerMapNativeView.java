@@ -4,16 +4,23 @@ import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import android.graphics.*;
 =======
 import android.content.SharedPreferences;
 import android.graphics.*;
 import android.graphics.drawable.ColorDrawable;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import android.content.SharedPreferences;
+import android.graphics.*;
+import android.graphics.drawable.ColorDrawable;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
+<<<<<<< HEAD
 <<<<<<< HEAD
 import android.widget.FrameLayout;
 =======
@@ -21,22 +28,33 @@ import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.*;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.google.android.gms.maps.model.*;
 
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -48,18 +66,25 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import io.flutter.FlutterInjector;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import io.flutter.FlutterInjector;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, MethodChannel.MethodCallHandler {
   private final FrameLayout root;
   private final MapView mapView;
 <<<<<<< HEAD
+<<<<<<< HEAD
   private GoogleMap map;
   private final MethodChannel channel;
   private final Context context;
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   private final ImageView snapshotOverlay;
   private GoogleMap map;
   private final MethodChannel channel;
@@ -74,7 +99,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
   private static final String PREF_KEY_CAMERA_TILT = "camera_tilt";
   private static final String PREF_KEY_CAMERA_BEARING = "camera_bearing";
   private static final String SNAPSHOT_CACHE_NAME = "picker_map_last.png";
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   // params recebidos do Flutter
   private Map<String, Object> initialParams;
@@ -86,12 +114,15 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
   private final Map<String, Marker> driverMarkers = new HashMap<>();
   private Polyline routePolyline;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
   // ícones
   private Bitmap userPhotoBitmap;
   private Bitmap destIconBitmap;
   private Bitmap driverIconBitmap;
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   private List<LatLng> lastRoutePoints;
   private String lastEncodedPolyline;
   private String lastStyleJson;
@@ -179,16 +210,23 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
   // Store driver positions received before icon is ready to avoid default pin flicker
   private final Map<String, LatLng> pendingDriverPositions = new HashMap<>();
   private int brandPadBottom = 0;
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   // estilo/rota
   private boolean enableRouteSnake = true;
   private int routeColor = Color.parseColor("#BDBDBD");
   private float routeWidth = 5f;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   private boolean ultraLowSpecMode = false;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+  private boolean ultraLowSpecMode = false;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   private final ExecutorService io = Executors.newSingleThreadExecutor();
   private final Handler main = new Handler(Looper.getMainLooper());
@@ -199,6 +237,7 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
                              @Nullable Map<String, Object> params) {
     context = ctx;
 <<<<<<< HEAD
+<<<<<<< HEAD
     root = new FrameLayout(ctx);
 
     mapView = new MapView(ctx);
@@ -206,6 +245,8 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     mapView.onResume();
     mapView.getMapAsync(this);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     Context appCtx = ctx.getApplicationContext();
     prefs = appCtx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     snapshotFile = new File(appCtx.getCacheDir(), SNAPSHOT_CACHE_NAME);
@@ -248,15 +289,21 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       snapshotOverlay.setImageDrawable(new ColorDrawable(DARK_CANVAS_COLOR));
     }
     snapshotOverlay.setVisibility(View.VISIBLE);
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     root.addView(mapView, new FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
     ));
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     initialParams = params != null ? params : new HashMap<>();
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     root.addView(snapshotOverlay, new FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
@@ -273,7 +320,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       Object af = initialParams.get("autoFitCamera");
       if (af instanceof Boolean) autoFitCamera = (Boolean) af;
     } catch (Exception ignored) {}
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     channel = new MethodChannel(messenger, "picker_map_native/" + viewId);
     channel.setMethodCallHandler(this);
   }
@@ -287,9 +337,13 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     if (mapView != null) {
       mapView.onPause();
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       mapView.onStop();
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+      mapView.onStop();
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       mapView.onDestroy();
     }
   }
@@ -304,9 +358,12 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     ui.setMyLocationButtonEnabled(false);
     ui.setRotateGesturesEnabled(true);
 <<<<<<< HEAD
+<<<<<<< HEAD
     map.setBuildingsEnabled(false);
     map.setTrafficEnabled(false);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     ui.setTiltGesturesEnabled(true);
     map.setBuildingsEnabled(true);
     map.setTrafficEnabled(false);
@@ -317,7 +374,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       java.lang.reflect.Method m = GoogleMap.class.getMethod("setPrefetchEnabled", boolean.class);
       m.invoke(map, true);
     } catch (Throwable ignored) {}
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
     // estilo
     applyStyle(initialParams);
@@ -326,21 +386,30 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     applyConfig(initialParams);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     boolean hasInitialDest = initialParams != null && initialParams.get("destination") != null;
     boolean hasInitialPolyline = initialParams != null && initialParams.get("encodedPolyline") != null;
     if (lastCameraPosition != null && !(hasInitialDest || hasInitialPolyline)) {
       try { map.moveCamera(CameraUpdateFactory.newCameraPosition(lastCameraPosition)); } catch (Exception ignored) {}
     }
 
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     // se algo chegou antes do mapa estar pronto
     if (pendingConfig != null) {
       applyConfig(pendingConfig);
       pendingConfig = null;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     // Fade in after tiles load to avoid white flash
     map.setOnMapLoadedCallback(() -> {
       if (!hasFadedIn) {
@@ -485,7 +554,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       mapView.removeCallbacks(hideOverlayRunnable);
       mapView.postDelayed(hideOverlayRunnable, Math.max(0, delayMs));
     } catch (Exception ignored) {}
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   // ========================= MethodChannel =========================
@@ -493,6 +565,7 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     switch (call.method) {
       case "updateConfig":
+<<<<<<< HEAD
 <<<<<<< HEAD
         if (map == null) {
           pendingConfig = (Map<String, Object>) call.arguments;
@@ -503,6 +576,8 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         break;
 
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         try {
           Map<String, Object> cfg = (Map<String, Object>) call.arguments;
           if (cfg != null && cfg.containsKey("autoFitCamera")) {
@@ -560,7 +635,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         break;
       }
 
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       case "updateCarPosition": {
         Map<String, Object> args = (Map<String, Object>) call.arguments;
         String id = (String) args.get("id");
@@ -613,12 +691,15 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
   // ========================= CONFIG =========================
   private void applyStyle(Map<String, Object> cfg) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (map == null) return;
     try {
       Object styleJson = cfg.get("mapStyleJson");
       if (styleJson instanceof String && !((String) styleJson).isEmpty()) {
         map.setMapStyle(new MapStyleOptions((String) styleJson));
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     if (map == null || cfg == null) return;
     try {
       Object useNative = cfg.get("useNativeStyle");
@@ -648,7 +729,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
           lastStyleJson = null;
           map.setMapStyle(null);
         }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       }
     } catch (Exception ignored) {}
   }
@@ -656,7 +740,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
   private void applyConfig(Map<String, Object> cfg) {
     if (cfg == null) return;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     applyStyle(cfg);
     long now = System.currentTimeMillis();
     boolean shouldThrottle = (now - lastUpdateMs) < 16; // ~60fps throttle for smoother animations
@@ -671,7 +758,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       return; // skip only minor/no-op updates
     }
     lastUpdateMs = now;
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
     // rota
     Object rc = cfg.get("routeColor");
@@ -681,6 +771,7 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     Object snake = cfg.get("enableRouteSnake");
     if (snake instanceof Boolean) enableRouteSnake = (Boolean) snake;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     // ícones (baixar uma vez e cachear)
     String userPhotoUrl = asString(cfg.get("userPhotoUrl"));
@@ -699,6 +790,8 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
 
     // USER
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     // brand safe padding bottom (used to pad camera when tilting)
     Object bpad = cfg.get("brandSafePaddingBottom");
     if (bpad instanceof Number) brandPadBottom = ((Number) bpad).intValue();
@@ -841,7 +934,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     }
 
     // USER marker: small circular icon (photo or initials), never default pin
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     Map<String, Object> userLoc = asMap(cfg.get("userLocation"));
     LatLng userLL = null;
     if (userLoc != null) {
@@ -849,6 +945,7 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       Double lng = asDouble(userLoc.get("longitude"));
       if (lat != null && lng != null) {
         userLL = new LatLng(lat, lng);
+<<<<<<< HEAD
 <<<<<<< HEAD
         if (userMarker == null) {
           MarkerOptions mo = new MarkerOptions().position(userLL).anchor(0.5f, 0.5f);
@@ -859,6 +956,8 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         } else {
           userMarker.setPosition(userLL);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         if (userPhotoBitmap != null) {
           if (userMarker == null) {
             MarkerOptions mo = new MarkerOptions()
@@ -871,7 +970,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
             userMarker.setPosition(userLL);
             userMarker.setIcon(BitmapDescriptorFactory.fromBitmap(userPhotoBitmap));
           }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         }
       }
     }
@@ -886,10 +988,13 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         destLL = new LatLng(lat, lng);
         if (destMarker != null) destMarker.remove();
 <<<<<<< HEAD
+<<<<<<< HEAD
         MarkerOptions mo = new MarkerOptions().position(destLL).anchor(0.5f, 1f).title("Destination");
         if (destIconBitmap != null) mo.icon(BitmapDescriptorFactory.fromBitmap(destIconBitmap));
         destMarker = map.addMarker(mo);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         // Snap destination marker to the end of the current route (street) when available
         LatLng markerLL = destLL;
         try {
@@ -904,11 +1009,15 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         } else {
           destMarker = null; // sem pin nativo
         }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       }
     } else {
       if (destMarker != null) { destMarker.remove(); destMarker = null; }
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     // CAMERA
@@ -926,6 +1035,8 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
       if (routePolyline != null) { routePolyline.remove(); routePolyline = null; }
     }
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     if (destLL != null && destSetAtMs == null) destSetAtMs = now; else if (destLL == null) destSetAtMs = null;
 
     // Rota por polyline (se enviada) ou fallback reta user->dest (estÃƒÂ¡vel)
@@ -1003,7 +1114,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     lastDestLL = destLL;
 
     // (removido) Rota duplicada: jÃƒÂ¡ tratada acima por polyline/fallback
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   // ========================= DRIVERS =========================
@@ -1015,6 +1129,7 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
           .position(target)
           .anchor(0.5f, 0.5f)
 <<<<<<< HEAD
+<<<<<<< HEAD
           .flat(true)
           .rotation(rotation);
       if (driverIconBitmap != null) {
@@ -1023,6 +1138,8 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         mo.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
       }
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           // Evita distorÃ§Ã£o com tilt: nÃ£o deixa deitar no chÃ£o
           .flat(false)
           .rotation(rotation);
@@ -1032,7 +1149,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         return;
       }
       mo.icon(BitmapDescriptorFactory.fromBitmap(driverIconBitmap));
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       m = map.addMarker(mo);
       driverMarkers.put(id, m);
     } else {
@@ -1049,13 +1169,19 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     };
     ValueAnimator anim = ValueAnimator.ofObject(te, from, to);
 <<<<<<< HEAD
+<<<<<<< HEAD
     anim.setDuration(Math.max(300, durationMs));
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     anim.setInterpolator(new LinearInterpolator());
     int dur = Math.max(300, durationMs);
     if (ultraLowSpecMode) dur = Math.min(dur, 900);
     anim.setDuration(dur);
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     anim.addUpdateListener(a -> {
       LatLng v = (LatLng) a.getAnimatedValue();
       marker.setPosition(v);
@@ -1072,8 +1198,11 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
 
     if (routePolyline != null) routePolyline.remove();
 <<<<<<< HEAD
+<<<<<<< HEAD
     PolylineOptions po = new PolylineOptions().addAll(pts).width(routeWidth).color(routeColor).geodesic(true);
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     PolylineOptions po = new PolylineOptions()
         .addAll(pts)
         .width(routeWidth)
@@ -1083,18 +1212,24 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
         .endCap(new RoundCap())
         .jointType(JointType.ROUND)
         .zIndex(1f);
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     routePolyline = map.addPolyline(po);
 
     if (snake) animatePolyline(routePolyline, from, to);
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   private void animatePolyline(Polyline pl, LatLng from, LatLng to) {
     if (pl == null) return;
     final int steps = 120; // suavidade
     final long total = 1800; // ms
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   private void drawPolyline(List<LatLng> pts, boolean snake) {
     if (map == null || pts == null || pts.size() < 2) return;
     if (routePolyline != null) routePolyline.remove();
@@ -1217,7 +1352,10 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
     if (pl == null) return;
     final int steps = 120; // suavidade
     final long total = 2200; // ms
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     final long step = total / steps;
 
     List<LatLng> acc = new ArrayList<>();
@@ -1296,8 +1434,11 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
 
   interface BitmapConsumer { void onBitmap(Bitmap b); }
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   // ========================= Camera helpers =========================
   private static double latRad(double lat) {
@@ -1449,4 +1590,7 @@ public class PickerMapNativeView implements PlatformView, OnMapReadyCallback, Me
 
 
 
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be

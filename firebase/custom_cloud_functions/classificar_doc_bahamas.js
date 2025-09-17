@@ -1,8 +1,13 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 const functions = require("firebase-functions");
 
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+const functions = require("firebase-functions");
+
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 exports.classificarDocBahamas = functions.https.onRequest(async (req, res) => {
   if (applyCors(req, res)) return;
 

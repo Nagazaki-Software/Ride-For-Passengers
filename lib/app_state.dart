@@ -43,7 +43,10 @@ class FFAppState extends ChangeNotifier {
     });
     _safeInit(() {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
     });
     _safeInit(() {
@@ -83,7 +86,10 @@ class FFAppState extends ChangeNotifier {
       }
     });
     _safeInit(() {
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
     });
     _safeInit(() {
@@ -94,6 +100,7 @@ class FFAppState extends ChangeNotifier {
     });
     _safeInit(() {
       _cardHolder = prefs.getString('ff_cardHolder') ?? _cardHolder;
+<<<<<<< HEAD
     });
     _safeInit(() {
       _latlngAtual =
@@ -121,6 +128,8 @@ class FFAppState extends ChangeNotifier {
           print("Can't decode persisted json. Error: $e.");
         }
       }
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     });
   }
 
@@ -251,9 +260,13 @@ class FFAppState extends ChangeNotifier {
     prefs.setString('ff_cardHolder', value);
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   LatLng? _latlngAtual = LatLng(25.0443312, -77.3503609);
   LatLng? get latlngAtual => _latlngAtual;
@@ -360,9 +373,13 @@ class FFAppState extends ChangeNotifier {
   void clearRecentTripsCacheKey(String? uniqueKey) =>
       _recentTripsManager.clearRequest(uniqueKey);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
  
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+ 
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 }
 
 void _safeInit(Function() initializeField) {

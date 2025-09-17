@@ -76,6 +76,7 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                 ),
               ),
 <<<<<<< HEAD
+<<<<<<< HEAD
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -166,6 +167,8 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                         color: Colors.transparent,
                         width: 1.0,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
               const SizedBox(height: 12),
               Text(
                 FFLocalizations.of(context).getText('14yzkw68' /* Payment error */),
@@ -176,7 +179,10 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                             .headlineSmall
                             .fontWeight,
                         fontStyle: FontStyle.italic,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                       ),
                       color: FlutterFlowTheme.of(context).accent1,
                       letterSpacing: 0.0,
@@ -185,6 +191,7 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                           .fontWeight,
                       fontStyle: FontStyle.italic,
                     ),
+<<<<<<< HEAD
 <<<<<<< HEAD
                   ),
                   FFButtonWidget(
@@ -227,6 +234,8 @@ class _ErronopagamentoWidgetState extends State<ErronopagamentoWidget> {
                 ].divide(SizedBox(height: 12.0)),
 =======
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
               ),
               const SizedBox(height: 8),
               Text(

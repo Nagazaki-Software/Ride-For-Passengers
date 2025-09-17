@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/custom_code/widgets/index.dart' as custom_widgets;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 import 'dart:async';                       // NOVO
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,6 +27,17 @@ import 'package:share_plus/share_plus.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:google_fonts/google_fonts.dart';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import '/index.dart';
+
+import 'dart:async'; // NOVO
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // NOVO (Clipboard)
+import 'package:flutter/foundation.dart'; // kIsWeb
+import 'package:share_plus/share_plus.dart';
+import '/flutter_flow/custom_functions.dart' as functions;
+import 'package:google_fonts/google_fonts.dart';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 import 'ride_share6_model.dart';
 export 'ride_share6_model.dart';
@@ -51,9 +63,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
   Map<String, double> _shares = {}; // uid -> valor $
   String _splitType = 'equal';
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   String _activeShareTab = 'invite'; // invite|qr|link
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+  String _activeShareTab = 'invite'; // invite|qr|link
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   @override
   void initState() {
@@ -64,10 +80,15 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _maybeJoinByLink();
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       // Carrega tarifa com base nos pontos da Home5
       await _preloadFareFromHome();
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+      // Carrega tarifa com base nos pontos da Home5
+      await _preloadFareFromHome();
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       if (_model.session != null) {
         _subscribeToSession(_model.session!);
       }
@@ -83,7 +104,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 
   // ===================== FUNÇÕES CORE =====================
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   Future<void> _preloadFareFromHome() async {
     try {
       final o = FFAppState().latlngAtual;
@@ -97,7 +121,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       }
     } catch (_) {}
   }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   /// Cria sessão (doc em rideOrders) se ainda não existir.
   Future<void> _createSessionIfNeeded() async {
@@ -112,10 +139,14 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       'hostRef': currentUserReference,
       'participantes': [currentUserReference],
 <<<<<<< HEAD
+<<<<<<< HEAD
       'totalFare': _totalFare,   // se você calcula em outro lugar, escreva lá
 =======
       'totalFare': _totalFare, // se você calcula em outro lugar, escreva lá
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+      'totalFare': _totalFare, // se você calcula em outro lugar, escreva lá
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       'splitType': 'equal',
       'customShares': <String, num>{},
       'isOpen': true,
@@ -156,11 +187,14 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       final data = doc.data() as Map<String, dynamic>;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
       final List<dynamic> refsDyn = (data['participantes'] ?? []) as List<dynamic>;
       _participants = refsDyn.whereType<DocumentReference>().toList();
 
       _totalFare = (data['totalFare'] is num) ? (data['totalFare'] as num).toDouble() : _totalFare;
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       final List<dynamic> refsDyn =
           (data['participantes'] ?? []) as List<dynamic>;
       _participants = refsDyn.whereType<DocumentReference>().toList();
@@ -168,7 +202,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       _totalFare = (data['totalFare'] is num)
           ? (data['totalFare'] as num).toDouble()
           : _totalFare;
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       _splitType = (data['splitType'] as String?) ?? 'equal';
       final Map<String, dynamic> customShares =
           (data['customShares'] as Map<String, dynamic>?) ?? {};
@@ -176,11 +213,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       _recalculateShares(
         splitType: _splitType,
 <<<<<<< HEAD
+<<<<<<< HEAD
         customShares: customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
 =======
         customShares:
             customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+        customShares:
+            customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       );
 
       if (mounted) setState(() {});
@@ -207,22 +249,30 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
       for (final ref in _participants) {
         final pct = customShares[ref.id] ?? 0.0;
 <<<<<<< HEAD
+<<<<<<< HEAD
         _shares[ref.id] = double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
 =======
         _shares[ref.id] =
             double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+        _shares[ref.id] =
+            double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       }
     }
   }
 
   /// Gera o link de convite com ?join=<rideId>
 <<<<<<< HEAD
+<<<<<<< HEAD
   String _inviteLink() {
     final basePath = GoRouterState.of(context).uri.path; // /rideShare6
     final id = _model.session!.id;
     return 'ride://ride.com$basePath?join=$id';
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   ///
   /// Em web: usa o host atual. Em mobile: usa um host HTTPS estável
   /// (ajuste para o domínio do seu app quando tiver).
@@ -251,7 +301,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
     final link = _inviteLink();
     await Share.share('Join my ride: $link');
     setState(() => _activeShareTab = 'invite');
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   /// Copia link de convite
@@ -320,11 +373,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                   font: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
 <<<<<<< HEAD
+<<<<<<< HEAD
                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
                     fontStyle:
                         FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                    fontStyle:
+                        FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                   ),
                   color: FlutterFlowTheme.of(context).alternate,
                   fontSize: 12,
@@ -375,6 +433,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           alignment: const AlignmentDirectional(1, 0),
                           child: Padding(
 <<<<<<< HEAD
+<<<<<<< HEAD
                             padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                             child: Text(
                               _model.session != null ? 'Session started' : 'Session not started',
@@ -383,6 +442,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0, 0, 12, 0),
                             child: Text(
@@ -399,16 +460,22 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       fontStyle: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .fontStyle,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                     ),
                                     color: _model.session != null
                                         ? FlutterFlowTheme.of(context).secondary
                                         : FlutterFlowTheme.of(context).error,
                                     letterSpacing: 0.0,
 <<<<<<< HEAD
+<<<<<<< HEAD
                                     fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                     fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                     fontWeight: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .fontWeight,
@@ -434,6 +501,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     alignment: const AlignmentDirectional(0, 0),
                                     child: Text(
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       FFLocalizations.of(context).getText('c2ku81ov' /* Ride Share */),
                                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                                             font: GoogleFonts.poppins(
@@ -446,6 +514,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             fontWeight: FontWeight.w500,
                                             fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                       FFLocalizations.of(context)
                                           .getText('c2ku81ov' /* Ride Share */),
                                       style: FlutterFlowTheme.of(context)
@@ -467,7 +537,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                           ),
                                     ),
                                   ),
@@ -478,9 +551,12 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         ),
                         Text(
 <<<<<<< HEAD
+<<<<<<< HEAD
                           FFLocalizations.of(context).getText('vd485i7w' /* Invite riders to split the far... */),
                           style: FlutterFlowTheme.of(context).bodyMedium.override(
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                           FFLocalizations.of(context).getText(
                               'vd485i7w' /* Invite riders to split the far... */),
                           style: FlutterFlowTheme.of(context)
@@ -496,7 +572,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                 color:
                                     FlutterFlowTheme.of(context).secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                 fontSize: 10,
                                 letterSpacing: 0.0,
                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -522,18 +601,24 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           )
                         ],
 <<<<<<< HEAD
+<<<<<<< HEAD
                         borderRadius: const BorderRadius.all(Radius.circular(8)),
                       ),
                       child: Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                         borderRadius:
                             const BorderRadius.all(Radius.circular(8)),
                       ),
                       child: Padding(
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -541,6 +626,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+<<<<<<< HEAD
 <<<<<<< HEAD
                                 Container(
                                   width: 124,
@@ -555,6 +641,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                                           font: GoogleFonts.poppins(
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                 InkWell(
                                   onTap: _shareInvite,
                                   child: Container(
@@ -584,10 +672,14 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             ),
                                             fontSize: 10,
                                             letterSpacing: 0.0,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                             fontWeight: FontWeight.bold,
                                             fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                           ),
+<<<<<<< HEAD
 <<<<<<< HEAD
                                           fontSize: 10,
                                           letterSpacing: 0.0,
@@ -606,6 +698,14 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 0, 10, 0),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 10, 0),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -615,6 +715,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         focusColor: Colors.transparent,
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
+<<<<<<< HEAD
 <<<<<<< HEAD
                                         onTap: _openQR,
                                         child: Container(
@@ -682,6 +783,23 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             borderRadius: const BorderRadius.all(
                                                 Radius.circular(8)),
                                           ),
+=======
+                                        onTap: () async {
+                                          await _openQR();
+                                          setState(() => _activeShareTab = 'qr');
+                                        },
+                                        child: Container(
+                                          width: 64,
+                                          height: 26,
+                                          decoration: BoxDecoration(
+                                            color: _activeShareTab == 'qr'
+                                                ? FlutterFlowTheme.of(context)
+                                                    .alternate
+                                                : const Color(0x89414141),
+                                            borderRadius: const BorderRadius.all(
+                                                Radius.circular(8)),
+                                          ),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                           alignment:
                                               const AlignmentDirectional(0, 0),
                                           child: Text(
@@ -773,6 +891,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               children: [
                                 Padding(
 <<<<<<< HEAD
+<<<<<<< HEAD
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                                   child: Text(
                                     FFLocalizations.of(context).getText('wme97if5' /* Auto-match nearby riders */),
@@ -781,6 +900,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 4, 0, 0),
                                   child: Text(
+=======
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 4, 0, 0),
+                                  child: Text(
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                     FFLocalizations.of(context).getText(
                                         'wme97if5' /* Auto-match nearby riders */),
                                     style: FlutterFlowTheme.of(context)
@@ -796,7 +920,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                           fontSize: 10,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
@@ -808,11 +935,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                             ),
                             Padding(
 <<<<<<< HEAD
+<<<<<<< HEAD
                               padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
 =======
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   0, 0, 12, 0),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 12, 0),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -854,6 +986,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
 <<<<<<< HEAD
+<<<<<<< HEAD
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
                           ),
                           child: Padding(
@@ -866,14 +999,25 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 8, 8, 0, 0),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 0, 0),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
 <<<<<<< HEAD
+<<<<<<< HEAD
                                   FFLocalizations.of(context).getText('ax3wm89h' /* Participants */),
                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   FFLocalizations.of(context)
                                       .getText('ax3wm89h' /* Participants */),
                                   style: FlutterFlowTheme.of(context)
@@ -889,13 +1033,17 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         fontSize: 10,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
                                         fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                                       ),
                                 ),
+<<<<<<< HEAD
 <<<<<<< HEAD
                                 Row(
                                   children: _participants.isEmpty
@@ -912,6 +1060,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             child: _participantAvatar(ref),
                                           )).toList(),
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 250),
                                   child: Row(
@@ -948,13 +1098,17 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 ))
                                             .toList(),
                                   ),
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                 ),
                               ],
                             ),
                           ),
                         ),
                         Padding(
+<<<<<<< HEAD
 <<<<<<< HEAD
                           padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                           child: Text(
@@ -964,6 +1118,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           padding:
                               const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                           child: Text(
+=======
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                          child: Text(
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             FFLocalizations.of(context).getText(
                                 'niwa8eid' /* Tab to remove • “- -” are open spots */),
                             style: FlutterFlowTheme.of(context)
@@ -979,7 +1138,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   fontSize: 10,
                                   letterSpacing: 0.0,
                                   fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -1003,6 +1165,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
 <<<<<<< HEAD
+<<<<<<< HEAD
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
                           ),
                           child: Padding(
@@ -1015,14 +1178,25 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 8, 8, 8, 8),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 8, 8),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
 <<<<<<< HEAD
+<<<<<<< HEAD
                                   FFLocalizations.of(context).getText('us6osckg' /* Riders splitting */),
                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   FFLocalizations.of(context).getText(
                                       'us6osckg' /* Riders splitting */),
                                   style: FlutterFlowTheme.of(context)
@@ -1038,7 +1212,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         fontSize: 10,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
@@ -1051,11 +1228,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       width: 100,
                                       height: 24,
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       child: custom_widgets.Countcontrolerideshare(
 =======
                                       child:
                                           custom_widgets.Countcontrolerideshare(
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                                      child:
+                                          custom_widgets.Countcontrolerideshare(
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         width: 100,
                                         height: 24,
                                       ),
@@ -1063,11 +1245,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                     GestureDetector(
                                       onTap: () async {
 <<<<<<< HEAD
+<<<<<<< HEAD
                                         if (_model.session == null) await _createSessionIfNeeded();
 =======
                                         if (_model.session == null)
                                           await _createSessionIfNeeded();
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                                        if (_model.session == null)
+                                          await _createSessionIfNeeded();
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         await _model.session!.update({
                                           'splitType': 'equal',
                                           'updatedAt': DateTime.now(),
@@ -1078,6 +1265,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         height: 22,
                                         decoration: BoxDecoration(
                                           color: _splitType == 'equal'
+<<<<<<< HEAD
 <<<<<<< HEAD
                                               ? FlutterFlowTheme.of(context).alternate
                                               : const Color(0xA5414141),
@@ -1091,6 +1279,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                               ? FlutterFlowTheme.of(context)
                                                   .alternate
                                               : const Color(0xA5414141),
@@ -1112,7 +1302,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                               context)
                                                           .bodyMedium
                                                           .fontStyle,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                                 ),
                                                 fontSize: 10,
                                                 letterSpacing: 0.0,
@@ -1126,31 +1319,43 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       onTap: () async {
                                         // Exemplo simples: seta "custom" e deixa você editar depois
 <<<<<<< HEAD
+<<<<<<< HEAD
                                         if (_model.session == null) await _createSessionIfNeeded();
 =======
                                         if (_model.session == null)
                                           await _createSessionIfNeeded();
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                                        if (_model.session == null)
+                                          await _createSessionIfNeeded();
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         await _model.session!.update({
                                           'splitType': 'custom',
                                           'updatedAt': DateTime.now(),
                                         });
 <<<<<<< HEAD
+<<<<<<< HEAD
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text('Custom % ativado. Preencha customShares no doc.')),
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
                                               content: Text(
                                                   'Custom % ativado. Preencha customShares no doc.')),
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         );
                                       },
                                       child: Container(
                                         width: 96,
                                         height: 22,
                                         decoration: BoxDecoration(
+<<<<<<< HEAD
 <<<<<<< HEAD
                                           color: _splitType == 'custom' ? FlutterFlowTheme.of(context).alternate : const Color(0xA5414141),
                                           borderRadius: BorderRadius.circular(14),
@@ -1165,6 +1370,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 ),
                                                 color: FlutterFlowTheme.of(context).secondaryText,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                           color: _splitType == 'custom'
                                               ? FlutterFlowTheme.of(context)
                                                   .alternate
@@ -1191,7 +1398,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 color:
                                                     FlutterFlowTheme.of(context)
                                                         .secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                                 fontSize: 10,
                                                 letterSpacing: 0.0,
                                                 fontWeight: FontWeight.w600,
@@ -1204,9 +1414,12 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                 ),
                                 Text(
 <<<<<<< HEAD
+<<<<<<< HEAD
                                   FFLocalizations.of(context).getText('nvqck3af' /* Hold 1 extra seat for your friend */),
                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   FFLocalizations.of(context).getText(
                                       'nvqck3af' /* Hold 1 extra seat for your friend */),
                                   style: FlutterFlowTheme.of(context)
@@ -1222,7 +1435,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         fontSize: 10,
                                         letterSpacing: 0.0,
                                         fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -1257,6 +1473,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                             color: FlutterFlowTheme.of(context).primaryText,
                             boxShadow: const [
 <<<<<<< HEAD
+<<<<<<< HEAD
                               BoxShadow(blurRadius: 1, color: Color(0x33000000), offset: Offset(0, 1))
                             ],
                             borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -1276,10 +1493,24 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 8, 8, 0, 8),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                              BoxShadow(
+                                  blurRadius: 1,
+                                  color: Color(0x33000000),
+                                  offset: Offset(0, 1))
+                            ],
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                8, 8, 0, 8),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                                   child: Row(
@@ -1299,6 +1530,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 0, 12, 0),
                                   child: Row(
@@ -1337,12 +1570,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .fontStyle,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                               ),
                                         ),
                                       ]),
                                       Row(children: [
                                         Text(
+<<<<<<< HEAD
 <<<<<<< HEAD
                                           FFLocalizations.of(context).getText('a0l4grqi' /* +3 min detour */),
                                           style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -1356,6 +1593,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                           FFLocalizations.of(context).getText(
                                               'a0l4grqi' /* +3 min detour */),
                                           style: FlutterFlowTheme.of(context)
@@ -1386,7 +1625,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .fontStyle,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                               ),
                                         ),
                                       ]),
@@ -1394,6 +1636,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ),
                                 ),
                                 Padding(
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
                                   child: Row(
@@ -1428,6 +1671,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
                                                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 0, 12, 0),
                                   child: Row(
@@ -1506,7 +1751,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .fontStyle,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                               ),
                                         ),
                                       ]),
@@ -1518,6 +1766,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           ),
                         ),
                         Padding(
+<<<<<<< HEAD
 <<<<<<< HEAD
                           padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                           child: Text(
@@ -1616,10 +1865,88 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           child: Text(
                             FFLocalizations.of(context)
                                 .getText('ntglhxb6' /* Confirm Ride Share */),
+=======
+                          padding:
+                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                          child: Text(
+                            FFLocalizations.of(context).getText(
+                                's3y7hgro' /* Price updates if route or riders change before pickup. */),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
                                   font: GoogleFonts.poppins(
+<<<<<<< HEAD
+=======
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+                                  fontSize: 10,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ====== Privacy, Confirm, etc. (layout original) ======
+                  // ... (mantive seu bloco, sem mudanças funcionais) ...
+
+                  // Seu bloco final mantido:
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          // Garante sessão criada
+                          await _createSessionIfNeeded();
+                          // Vai para a página de pagamento
+                          context.pushNamed(
+                            PaymentRide7Widget.routeName,
+                            queryParameters: {
+                              'estilo': 'ride_share',
+                            }.withoutNulls,
+                            extra: {
+                              kTransitionInfoKey: const TransitionInfo(
+                                hasTransition: true,
+                                transitionType: PageTransitionType.rightToLeft,
+                              ),
+                              'latlngAtual': FFAppState().latlngAtual,
+                              'latlngWhereTo': FFAppState().latlangAondeVaiIr,
+                            },
+                          );
+                        },
+                        child: Container(
+                          width: 320,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).alternate,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(18)),
+                          ),
+                          alignment: const AlignmentDirectional(0, 0),
+                          child: Text(
+                            FFLocalizations.of(context)
+                                .getText('ntglhxb6' /* Confirm Ride Share */),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                     fontWeight: FontWeight.bold,
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .bodyMedium
@@ -1628,6 +1955,34 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   color: FlutterFlowTheme.of(context).primary,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.bold,
+<<<<<<< HEAD
+=======
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 320,
+                        height: 32,
+                        decoration: const BoxDecoration(
+                          color: Color(0xA5414141),
+                          borderRadius: BorderRadius.all(Radius.circular(18)),
+                        ),
+                        alignment: const AlignmentDirectional(0, 0),
+                        child: Text(
+                          FFLocalizations.of(context)
+                              .getText('4br05fcj' /* Skip for now */),
+                          style: FlutterFlowTheme.of(context)
+                              .bodyMedium
+                              .override(
+                                font: GoogleFonts.poppins(
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   fontStyle: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .fontStyle,
@@ -1669,6 +2024,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                       ),
                       Padding(
 <<<<<<< HEAD
+<<<<<<< HEAD
                         padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                         child: Text(
                           FFLocalizations.of(context).getText('ltqpaty4' /* Next: Matching - Get picked up... */),
@@ -1677,6 +2033,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         padding:
                             const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
                         child: Text(
+=======
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                        child: Text(
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                           FFLocalizations.of(context).getText(
                               'ltqpaty4' /* Next: Matching - Get picked up... */),
                           style: FlutterFlowTheme.of(context)
@@ -1692,7 +2053,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 =======
                                 color:
                                     FlutterFlowTheme.of(context).secondaryText,
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                 fontSize: 10,
                                 letterSpacing: 0.0,
                                 fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,

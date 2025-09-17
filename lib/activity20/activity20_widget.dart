@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/components/list_empty_widget.dart';
@@ -12,6 +13,12 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 =======
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import '/components/navbar_widget.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'package:flutter/material.dart';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import 'activity20_model.dart';
 export 'activity20_model.dart';
 
@@ -51,6 +58,7 @@ class _Activity20WidgetState extends State<Activity20Widget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primary,
+<<<<<<< HEAD
 <<<<<<< HEAD
         body: Container(
           height: double.infinity,
@@ -1320,13 +1328,18 @@ class _Activity20WidgetState extends State<Activity20Widget> {
               ),
             ],
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         body: SafeArea(
           child: Center(
             child: Text(
               FFLocalizations.of(context).getText('65mjue8s' /* Activity */),
               style: FlutterFlowTheme.of(context).headlineMedium,
             ),
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           ),
         ),
         bottomNavigationBar: const NavbarWidget(),

@@ -344,7 +344,10 @@ class _AddressPickerState extends State<AddressPicker> {
       _destination = details;
       _destCtrl.text = details.mainText;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       // Se ainda não temos pickup e sabemos a posição do usuário, define um pickup imediato
       if (_pickup == null && _hasUserLL) {
         _pickup = PickedPlace(
@@ -359,7 +362,10 @@ class _AddressPickerState extends State<AddressPicker> {
           _pickupCtrl.text = _pickup!.mainText;
         }
       }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       setState(() {});
     }
   }
@@ -479,7 +485,10 @@ class _AddressPickerState extends State<AddressPicker> {
       _destination = details;
       _destCtrl.text = details.mainText;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       // Se ainda não temos pickup e sabemos a posição do usuário, define um pickup imediato
       if (_pickup == null && _hasUserLL) {
         _pickup = PickedPlace(
@@ -494,7 +503,10 @@ class _AddressPickerState extends State<AddressPicker> {
           _pickupCtrl.text = _pickup!.mainText;
         }
       }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       setState(() {});
     } else {
       // Caso o usuário tenha focado explicitamente o Pickup, respeitamos.

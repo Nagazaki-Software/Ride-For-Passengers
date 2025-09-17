@@ -15,10 +15,14 @@ class CardPaymentWidget extends StatefulWidget {
     required this.passe,
     bool? pagamento,
 <<<<<<< HEAD
+<<<<<<< HEAD
   }) : this.pagamento = pagamento ?? false;
 =======
   }) : pagamento = pagamento ?? false;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+  }) : pagamento = pagamento ?? false;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   final double? value;
   final String? passe;
@@ -90,6 +94,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                   ),
                 ],
               ),
+<<<<<<< HEAD
 <<<<<<< HEAD
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -249,6 +254,8 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                   ),
                 ].divide(SizedBox(height: 12.0)),
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
               const SizedBox(height: 16),
               Text(
                 FFLocalizations.of(context).getText('p8t6d1h2' /* Payment Method */),
@@ -264,7 +271,10 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           FlutterFlowTheme.of(context).headlineMedium.fontWeight,
                       fontStyle: FontStyle.italic,
                     ),
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
               ),
               const SizedBox(height: 8),
               Text(
@@ -356,6 +366,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                 ),
               ),
 <<<<<<< HEAD
+<<<<<<< HEAD
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,6 +420,9 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
 =======
             ],
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+            ],
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
           ),
         ),
       ),

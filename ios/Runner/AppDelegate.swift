@@ -1,9 +1,13 @@
 import UIKit
 <<<<<<< HEAD
+<<<<<<< HEAD
 import Braintree
 =======
 import BraintreeCore
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import BraintreeCore
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 import Flutter
 import GoogleMaps
@@ -21,11 +25,17 @@ import GoogleMaps
     self.registrar(forPlugin: "PickerMapNative")?.register(factory, withId: "picker_map_native")
     BTAppContextSwitcher.setReturnURLScheme("com.quicky.ridebahamas.braintree")
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     if let registrar = self.registrar(forPlugin: "BraintreeNativeChannel") {
       BraintreeNativeChannel.register(with: registrar)
     }
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+    if let registrar = self.registrar(forPlugin: "BraintreeNativeChannel") {
+      BraintreeNativeChannel.register(with: registrar)
+    }
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

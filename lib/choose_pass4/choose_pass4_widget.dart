@@ -1609,10 +1609,14 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                           }(),
                                           passe: _model.click!,
 <<<<<<< HEAD
+<<<<<<< HEAD
                                           pagamento: true,
 =======
                                             pagamento: true,
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                                            pagamento: true,
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                         ),
                                       ),
                                     );

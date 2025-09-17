@@ -7,11 +7,16 @@
     {
       "source": "custom_cloud_functions",
 <<<<<<< HEAD
+<<<<<<< HEAD
       "codebase": "custom_cloud_functions"
 =======
       "codebase": "custom_cloud_functions",
       "predeploy": []
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+      "codebase": "custom_cloud_functions",
+      "predeploy": []
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     },
     {
       "source": "functions",

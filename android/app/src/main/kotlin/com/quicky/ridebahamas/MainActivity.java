@@ -5,9 +5,12 @@ import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.platform.PlatformViewRegistry;
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Removed unused Braintree native channel imports
 // (Flutter code uses flutter_braintree plugin directly.)
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -16,7 +19,10 @@ import com.braintreepayments.api.card.Card;
 import com.braintreepayments.api.card.CardClient;
 import com.braintreepayments.api.card.CardTokenizeCallback;
 import com.braintreepayments.api.card.CardResult;
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 public class MainActivity extends FlutterActivity {
   @Override
@@ -29,8 +35,11 @@ public class MainActivity extends FlutterActivity {
         new PickerMapNativeFactory(messenger)
     );
 <<<<<<< HEAD
+<<<<<<< HEAD
   }
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
     // Braintree native method channel (no Drop-in)
     new MethodChannel(messenger, "braintree_native").setMethodCallHandler(
@@ -121,5 +130,8 @@ public class MainActivity extends FlutterActivity {
   }
 
   // Note: 3DS verify not implemented for Android v5 here; handled above.
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 }

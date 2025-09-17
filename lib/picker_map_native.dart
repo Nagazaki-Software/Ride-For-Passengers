@@ -59,11 +59,23 @@ class _PickerMapNativeState extends State<PickerMapNative> {
   @override
   void didUpdateWidget(covariant PickerMapNative oldWidget) {
     super.didUpdateWidget(oldWidget);
+<<<<<<< HEAD
+=======
+    // Push driver positions whenever the list changes.
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     if (!identical(oldWidget.drivers, widget.drivers)) {
       _pushDrivers();
     }
   }
 
+<<<<<<< HEAD
+=======
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   Future<void> _pushDrivers() async {
     for (final d in widget.drivers) {
       try {

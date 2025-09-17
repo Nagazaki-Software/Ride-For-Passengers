@@ -5,11 +5,17 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import 'share_q_r_code_model.dart';
 export 'share_q_r_code_model.dart';
 
@@ -153,14 +159,20 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
                 ),
                 FFButtonWidget(
 <<<<<<< HEAD
+<<<<<<< HEAD
                   onPressed: () {
                     print('Button pressed ...');
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                   onPressed: () async {
                     final link = widget.linkCurrentPage ?? '';
                     if (link.isEmpty) return;
                     await Share.share('Join my ride: ' + link);
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                   },
                   text: FFLocalizations.of(context).getText(
                     '55ffv6b0' /* Share QR Code */,
@@ -198,7 +210,10 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
                   ),
                 ),
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                 // Quick actions row: copy and open link (optional helpers)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -234,7 +249,10 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
                     ),
                   ],
                 ),
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
               ].divide(SizedBox(height: 16.0)),
             ),
           ),

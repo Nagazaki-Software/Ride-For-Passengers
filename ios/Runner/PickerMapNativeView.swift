@@ -3,6 +3,7 @@ import GoogleMaps
 import Flutter
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 final class PickerMapNativeView: NSObject, FlutterPlatformView {
 
     private let channel: FlutterMethodChannel
@@ -14,6 +15,8 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView {
     private var polygons: [String: GMSPolygon] = [:]
 
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelegate {
 
     private let channel: FlutterMethodChannel
@@ -33,7 +36,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
     private var driverIconImage: UIImage? = nil
     private var lastDriverIconSource: String? = nil
 
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     init(frame: CGRect,
          viewIdentifier viewId: Int64,
          arguments args: Any?,
@@ -56,17 +62,23 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
                 camera = GMSCameraPosition(latitude: -18.8639625, longitude: -41.9752148, zoom: zoom, bearing: bearing, viewingAngle: tilt)
             }
 <<<<<<< HEAD
+<<<<<<< HEAD
         }
 
         self.mapView = GMSMapView(frame: frame, camera: camera)
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
             // Apply initial style and driver icon from creation params
             self.applyStyleAndDriverIcon(dict)
         }
 
         self.mapView = GMSMapView(frame: frame, camera: camera)
         self.snapshotOverlay = UIImageView(frame: .zero)
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         super.init()
 
         applyDarkStyle()
@@ -77,7 +89,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
         mapView.settings.myLocationButton = false
         mapView.isMyLocationEnabled = false
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         mapView.delegate = self
 
         // Overlay setup to reduce white flashes
@@ -90,7 +105,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
         mapView.addSubview(snapshotOverlay)
         mapView.backgroundColor = UIColor(red: 0x1D/255.0, green: 0x1F/255.0, blue: 0x25/255.0, alpha: 1)
         mapView.alpha = 0.0
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
         channel.setMethodCallHandler { [weak self] call, result in
             guard let self = self else { result(nil); return }
@@ -99,9 +117,13 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
                 case "updateConfig":
                     let cfg = (call.arguments as? [String: Any]) ?? [:]
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                     self.applyStyleAndDriverIcon(cfg)
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                    self.applyStyleAndDriverIcon(cfg)
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                     self.updateConfig(cfg)
                     result(nil)
 
@@ -123,12 +145,17 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
                 case "cameraTo":
                     let a = (call.arguments as? [String: Any]) ?? [:]
 <<<<<<< HEAD
+<<<<<<< HEAD
                     let lat = Self.asDouble(a["lat"])
                     let lng = Self.asDouble(a["lng"])
 =======
                     let lat = Self.asDouble(a["latitude"]) ?? Self.asDouble(a["lat"])
                     let lng = Self.asDouble(a["longitude"]) ?? Self.asDouble(a["lng"])
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+                    let lat = Self.asDouble(a["latitude"]) ?? Self.asDouble(a["lat"])
+                    let lng = Self.asDouble(a["longitude"]) ?? Self.asDouble(a["lng"])
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                     let zoom = Self.asFloat(a["zoom"]) ?? 16
                     let bearing = Self.asFloat(a["bearing"]) ?? 0
                     let tilt = Self.asFloat(a["tilt"]) ?? 0
@@ -148,12 +175,15 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
                     let a = (call.arguments as? [String: Any]) ?? [:]
                     let id = (a["id"] as? String) ?? "car"
 <<<<<<< HEAD
+<<<<<<< HEAD
                     if let lat = Self.asDouble(a["lat"]), let lng = Self.asDouble(a["lng"]) {
                         let rotation = Self.asFloat(a["rotation"]) ?? 0
                         let duration = (a["duration"] as? NSNumber)?.doubleValue ?? 0.8
                         self.updateCarPosition(id: id, target: CLLocationCoordinate2D(latitude: lat, longitude: lng), rotation: rotation, duration: duration)
                     }
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                     var target: CLLocationCoordinate2D? = nil
                     if let pos = a["position"] as? [String: Any], let la = Self.asDouble(pos["latitude"]), let lo = Self.asDouble(pos["longitude"]) {
                         target = CLLocationCoordinate2D(latitude: la, longitude: lo)
@@ -176,7 +206,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
                     result(nil)
 
                 case "onLowMemory":
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                     result(nil)
 
                 default:
@@ -316,10 +349,14 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
     private func updateCarPosition(id: String, target: CLLocationCoordinate2D, rotation: Float, duration: Double) {
         CATransaction.begin()
 <<<<<<< HEAD
+<<<<<<< HEAD
         CATransaction.setAnimationDuration(max(0.1, duration))
 =======
         CATransaction.setAnimationDuration(max(0.1, duration/1000.0))
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+        CATransaction.setAnimationDuration(max(0.1, duration/1000.0))
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .linear))
 
         let marker: GMSMarker
@@ -327,11 +364,14 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
             marker = existing
         } else {
 <<<<<<< HEAD
+<<<<<<< HEAD
             marker = GMSMarker(position: target)
             marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
             marker.isFlat = true
             marker.icon = GMSMarker.markerImage(with: .systemBlue)
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
             if driverIconImage == nil {
                 pendingDriverPositions[id] = target
                 CATransaction.commit()
@@ -341,7 +381,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
             marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
             marker.isFlat = true
             marker.icon = driverIconImage
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
             marker.map = mapView
             carMarkers[id] = marker
         }
@@ -377,7 +420,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
 
     // MARK: - Utils
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     // Camera + overlay callbacks
     func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
         channel.invokeMethod("cameraMoveStart", arguments: nil)
@@ -469,7 +515,10 @@ final class PickerMapNativeView: NSObject, FlutterPlatformView, GMSMapViewDelega
         UIGraphicsEndImageContext()
         return newImage
     }
+<<<<<<< HEAD
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
     private static func asDouble(_ any: Any?) -> Double? {
         if let n = any as? NSNumber { return n.doubleValue }

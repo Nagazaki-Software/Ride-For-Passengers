@@ -1,8 +1,12 @@
 import 'dart:async';
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import 'dart:ui' as ui;
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+import 'dart:ui' as ui;
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +20,7 @@ import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'flutter_flow/lat_lng.dart'; // LatLng do FlutterFlow
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,12 +29,17 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 // LatLng do FlutterFlow
 import 'package:geolocator/geolocator.dart';
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+// LatLng do FlutterFlow
+import 'package:geolocator/geolocator.dart';
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
 void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     GoRouter.optionURLReflectsImperativeAPIs = true;
     usePathUrlStrategy();
+<<<<<<< HEAD
 
 <<<<<<< HEAD
   // Preaquece ícones do mapa para reduzir jank e telas brancas.
@@ -60,6 +70,26 @@ void main() {
     await FFLocalizations.initialize();
 >>>>>>> 10c9b5c (new frkdfm)
 
+=======
+
+    // Global error handlers to prevent unexpected app exits
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('FlutterError: ' + details.exceptionAsString());
+      if (details.stack != null) debugPrintStack(stackTrace: details.stack);
+    };
+    try {
+      ui.PlatformDispatcher.instance.onError = (error, stack) {
+        debugPrint('PlatformDispatcher error: ' + error.toString());
+        debugPrintStack(stackTrace: stack);
+        return true; // mark as handled to avoid process termination
+      };
+    } catch (_) {}
+
+    await initFirebase();
+    await FFLocalizations.initialize();
+
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     final appState = FFAppState();
     await appState.initializePersistedState();
 
@@ -71,6 +101,7 @@ void main() {
     debugPrint('Uncaught zone error: ' + error.toString());
     debugPrintStack(stackTrace: stack);
   });
+<<<<<<< HEAD
 }
 
 // Faz download leve de ícones usados por marcadores do mapa e deixa no cache de disco.
@@ -92,6 +123,8 @@ Future<void> _prewarmMapAssets() async {
       } catch (_) {}
     }
   } catch (_) {}
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 }
 
 class MyApp extends StatefulWidget {
@@ -199,6 +232,7 @@ class _MyAppState extends State<MyApp> {
 
       // >>> Envia a localização em tempo real para FFAppState.latlngAtual
 <<<<<<< HEAD
+<<<<<<< HEAD
       builder: (context, child) => Container(
         color: const Color(0xFF0F1217),
         child: LiveLocationTicker(child: child!),
@@ -206,6 +240,9 @@ class _MyAppState extends State<MyApp> {
 =======
       builder: (context, child) => LiveLocationTicker(child: child!),
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+      builder: (context, child) => LiveLocationTicker(child: child!),
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     );
   }
 }
@@ -281,14 +318,18 @@ class _LiveLocationTickerState extends State<LiveLocationTicker> {
     app.latlngAtual = LatLng(p.latitude, p.longitude);
     app.update(() {}); // notifica watchers (ex.: Home5)
 <<<<<<< HEAD
+<<<<<<< HEAD
     _cacheCameraForNative(p.latitude, p.longitude);
 =======
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   @override
   Widget build(BuildContext context) => widget.child;
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 // Grava rapidamente a última câmera esperada para o mapa nativo
@@ -304,3 +345,5 @@ Future<void> _cacheCameraForNative(double lat, double lng) async {
 }
 =======
 >>>>>>> 10c9b5c (new frkdfm)
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
