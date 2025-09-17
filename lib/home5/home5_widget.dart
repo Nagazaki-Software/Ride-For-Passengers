@@ -162,11 +162,15 @@ import '/auth/firebase_auth/auth_util.dart';
                           double? lat; double? lng;
                           // Try common field names – adjust to your schema
                           final any = u.reference; // keep id
-                          if (u.hasField('driverLat') && u.hasField('driverLng')) {
-                            lat = (u.get('driverLat') as num).toDouble();
-                            lng = (u.get('driverLng') as num).toDouble();
-                          } else if (u.hasField('lastLatLng')) {
-                            final m = u.get('lastLatLng');
+                          if (u.hasLocation() && u.location != null) {
+                            lat = u.location!.latitude;
+                            lng = u.location!.longitude;
+                          } else if (u.snapshotData.containsKey('driverLat') && u.snapshotData['driverLat'] != null &&
+                              u.snapshotData.containsKey('driverLng') && u.snapshotData['driverLng'] != null) {
+                            lat = (u.snapshotData['driverLat'] as num).toDouble();
+                            lng = (u.snapshotData['driverLng'] as num).toDouble();
+                          } else if (u.snapshotData.containsKey('lastLatLng')) {
+                            final m = u.snapshotData['lastLatLng'];
                             if (m is Map && m['lat'] != null && m['lng'] != null) {
                               lat = (m['lat'] as num).toDouble();
                               lng = (m['lng'] as num).toDouble();
@@ -177,7 +181,9 @@ import '/auth/firebase_auth/auth_util.dart';
                               'id': any.id,
                               'lat': lat,
                               'lng': lng,
-                              'bearing': u.hasField('bearing') ? (u.get('bearing') as num).toDouble() : 0.0,
+                              'bearing': (u.snapshotData['bearing'] is num)
+                                  ? (u.snapshotData['bearing'] as num).toDouble()
+                                  : 0.0,
                             });
                           }
                         } catch (_) {}

@@ -13,11 +13,17 @@ import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'flutter_flow/lat_lng.dart'; // LatLng do FlutterFlow
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
+
+  // Preaquece ícones do mapa para reduzir jank e telas brancas.
+  // Executa em background; não bloqueia o app start.
+  unawaited(_prewarmMapAssets());
 
   await initFirebase();
   await FFLocalizations.initialize();
@@ -29,6 +35,27 @@ void main() async {
     create: (context) => appState,
     child: MyApp(),
   ));
+}
+
+// Faz download leve de ícones usados por marcadores do mapa e deixa no cache de disco.
+Future<void> _prewarmMapAssets() async {
+  try {
+    const urls = [
+      // destino e motoristas
+      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
+      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+    ];
+    final cm = DefaultCacheManager();
+    for (final u in urls) {
+      try {
+        final hit = await cm.getFileFromCache(u);
+        if (hit == null) {
+          await cm.downloadFile(u);
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
 }
 
 class MyApp extends StatefulWidget {
@@ -135,7 +162,10 @@ class _MyAppState extends State<MyApp> {
       routerConfig: _router,
 
       // >>> Envia a localização em tempo real para FFAppState.latlngAtual
-      builder: (context, child) => LiveLocationTicker(child: child!),
+      builder: (context, child) => Container(
+        color: const Color(0xFF0F1217),
+        child: LiveLocationTicker(child: child!),
+      ),
     );
   }
 }
@@ -210,8 +240,21 @@ class _LiveLocationTickerState extends State<LiveLocationTicker> {
 
     app.latlngAtual = LatLng(p.latitude, p.longitude);
     app.update(() {}); // notifica watchers (ex.: Home5)
+    _cacheCameraForNative(p.latitude, p.longitude);
   }
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+// Grava rapidamente a última câmera esperada para o mapa nativo
+Future<void> _cacheCameraForNative(double lat, double lng) async {
+  try {
+    final sp = await SharedPreferences.getInstance();
+    await sp.setDouble('camera_lat', lat);
+    await sp.setDouble('camera_lng', lng);
+    await sp.setDouble('camera_zoom', 16.0);
+    await sp.setDouble('camera_tilt', 0.0);
+    await sp.setDouble('camera_bearing', 0.0);
+  } catch (_) {}
 }

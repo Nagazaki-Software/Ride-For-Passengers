@@ -1,0 +1,15 @@
+lib/activity20/activity20_model.dart
+lib/activity20/activity20_widget.dart
+lib/app_state.dart
+lib/backend/schema/users_record.dart
+lib/choose_pass4/choose_pass4_widget.dart
+lib/components/card_payment_widget.dart
+lib/components/erronopagamento_widget.dart
+lib/components/passecomprado_widget.dart
+lib/custom_code/widgets/card_form_f_f.dart
+lib/custom_code/widgets/hybrid_ride_map.dart
+lib/custom_code/widgets/index.dart
+lib/flutter_flow/nav/nav.dart
+lib/index.dart
+lib/main.dart
+lib/schedule_ride14/schedule_ride14_widget.dart
