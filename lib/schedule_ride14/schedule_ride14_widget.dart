@@ -128,13 +128,19 @@ class _ScheduleRide14WidgetState extends State<ScheduleRide14Widget> {
 
                                   return Container(
                                     width: double.infinity,
-                                    height: 900.0,
+                                    // Let content size itself; avoid fixed height overflow
                                     child: custom_widgets.ScheduleCalendarRide(
                                       width: double.infinity,
-                                      height: 900.0,
+                                      // Height is managed internally by the widget
                                       disableBookedSlots: true,
-                                      use24hFormat: false,
-                                      dateLocale: 'en-US',
+                                      // Use 24h format for non-English locales
+                                      use24hFormat:
+                                          !FFLocalizations.of(context)
+                                              .languageCode
+                                              .startsWith('en'),
+                                      // Drive month/week labels from current app locale
+                                      dateLocale: FFLocalizations.of(context)
+                                          .languageCode,
                                       initialDate: getCurrentTimestamp,
                                       orders:
                                           scheduleCalendarRideRideOrdersRecordList,

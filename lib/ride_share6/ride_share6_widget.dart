@@ -98,29 +98,31 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 
                   if (s.status == 'payment' && !_model.movedToPayment) {
                     _model.movedToPayment = true;
-                    // Compute a fair split using app state and default estimator if needed
-                    double total = 18.0;
-                    final latA = FFAppState().latlngAtual;
-                    final latB = FFAppState().latlangAondeVaiIr;
-                    if (latA != null && latB != null) {
-                      total = functions.mediaCorridaNesseKm(
-                          latA, latB, const <RideOrdersRecord>[]);
-                    } else if (s.hasRideValue() && s.rideValue > 0) {
-                      total = s.rideValue;
-                    }
-                    final count = s.participantes.isNotEmpty ? s.participantes.length : 1;
-                    final perHead = (total / count).toDouble();
+                    // Compute the same value as Confirm Ride (not split)
+                    Future.microtask(() async {
+                      double value = 18.0;
+                      LatLng? latA = FFAppState().latlngAtual;
+                      LatLng? latB = FFAppState().latlangAondeVaiIr;
+                      // Fallback: use session-stored coordinates if app state is missing
+                      latA ??= s.latlngAtual;
+                      latB ??= s.latlng;
+                      if (latA != null && latB != null) {
+                        final orders = await queryRideOrdersRecordOnce();
+                        value = functions.mediaCorridaNesseKm(latA, latB, orders);
+                      } else if (s.hasRideValue() && s.rideValue > 0) {
+                        value = s.rideValue;
+                      }
 
-                    // Navigate both users to payment page for their share
-                    context.pushNamed(
-                      PaymentRide7Widget.routeName,
-                      queryParameters: {
-                        'estilo': serializeParam('Ride Share', ParamType.String),
-                        'latlngAtual': serializeParam(latA, ParamType.LatLng),
-                        'latlngWhereTo': serializeParam(latB, ParamType.LatLng),
-                        'value': serializeParam(perHead, ParamType.double),
-                      }.withoutNulls,
-                    );
+                      context.pushNamed(
+                        PaymentRide7Widget.routeName,
+                        queryParameters: {
+                          'estilo': serializeParam('Ride Share', ParamType.String),
+                          'latlngAtual': serializeParam(latA ?? const LatLng(0, 0), ParamType.LatLng),
+                          'latlngWhereTo': serializeParam(latB ?? (latA ?? const LatLng(0, 0)), ParamType.LatLng),
+                          'value': serializeParam(value, ParamType.double),
+                        }.withoutNulls,
+                      );
+                    });
                   }
                   return const SizedBox.shrink();
                 },
@@ -388,12 +390,23 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             var rideOrdersRecordReference =
                                                 RideOrdersRecord.collection
                                                     .doc();
+                                            // Prepare coords and estimate similar to Confirm Ride
+                                            final latA = FFAppState().latlngAtual;
+                                            final latB = FFAppState().latlangAondeVaiIr;
+                                            double? estimate;
+                                            if (latA != null && latB != null) {
+                                              final orders = await queryRideOrdersRecordOnce();
+                                              estimate = functions.mediaCorridaNesseKm(latA, latB, orders);
+                                            }
                                             await rideOrdersRecordReference
                                                 .set({
                                               ...createRideOrdersRecordData(
                                                 user: currentUserReference,
                                                 rideShare: true,
                                                 status: 'waiting',
+                                                latlngAtual: latA,
+                                                latlng: latB,
+                                                rideValue: estimate,
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -410,6 +423,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 user: currentUserReference,
                                                 rideShare: true,
                                                 status: 'waiting',
+                                                latlngAtual: latA,
+                                                latlng: latB,
+                                                rideValue: estimate,
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -458,11 +474,14 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                         MediaQuery.viewInsetsOf(
                                                             context),
                                                     child: ShareQRCodeWidget(
-                                                      rideDoc: _model
-                                                          .rideOrderQR!
-                                                          .reference,
+                                                      rideDoc: (_model
+                                                                  .rideOrderQR
+                                                                  ?.reference ??
+                                                              _model.session!),
                                                       linkCurrentPage:
-                                                          'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=${_model.rideOrderQR!.reference.id}',
+                                                          'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=' +
+                                                              (_model.rideOrderQR?.reference.id ??
+                                                                  _model.session!.id),
                                                     ),
                                                   ),
                                                 );

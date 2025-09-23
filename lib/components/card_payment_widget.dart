@@ -297,7 +297,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           passe: widget.passe!,
                           tokenizationKey: 'sandbox_ck9vkcgg_brg8dhjg5tqpw496',
                           chargeOnConfirm: widget.pagamento,
-                          closeOnSave: true,
+                          closeOnSave: false,
                           onTextField: (creditCardTextfield) async {
                             logFirebaseEvent(
                                 'CARD_PAYMENT_Container_9xbwubcj_CALLBACK');
