@@ -1,0 +1,1790 @@
+import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
+import '/components/card_payment_widget.dart';
+import '/flutter_flow/flutter_flow_animations.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/instant_timer.dart';
+import '/index.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'choose_pass4_model.dart';
+export 'choose_pass4_model.dart';
+
+class ChoosePass4Widget extends StatefulWidget {
+  const ChoosePass4Widget({super.key});
+
+  static String routeName = 'ChoosePass4';
+  static String routePath = '/choosePass4';
+
+  @override
+  State<ChoosePass4Widget> createState() => _ChoosePass4WidgetState();
+}
+
+class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
+    with TickerProviderStateMixin {
+  late ChoosePass4Model _model;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  var hasContainerTriggered1 = false;
+  var hasContainerTriggered2 = false;
+  var hasContainerTriggered3 = false;
+  var hasContainerTriggered4 = false;
+  var hasContainerTriggered5 = false;
+  var hasContainerTriggered6 = false;
+  var hasContainerTriggered7 = false;
+  final animationsMap = <String, AnimationInfo>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _model = createModel(context, () => ChoosePass4Model());
+
+    logFirebaseEvent('screen_view', parameters: {'screen_name': 'ChoosePass4'});
+    _model.switchValue = true;
+    animationsMap.addAll({
+      'containerOnActionTriggerAnimation1': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          ShimmerEffect(
+            curve: Curves.easeInOut,
+            delay: 0.0.ms,
+            duration: 810.0.ms,
+            color: Color(0xD9FB9000),
+            angle: -3.77,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation2': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation3': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          ShimmerEffect(
+            curve: Curves.easeInOut,
+            delay: 0.0.ms,
+            duration: 1040.0.ms,
+            color: Color(0xD9FB9000),
+            angle: -3.77,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation4': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation5': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          ShimmerEffect(
+            curve: Curves.easeInOut,
+            delay: 0.0.ms,
+            duration: 1040.0.ms,
+            color: Color(0xD9FB9000),
+            angle: -3.77,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation6': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation7': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+    });
+    setupAnimations(
+      animationsMap.values.where((anim) =>
+          anim.trigger == AnimationTrigger.onActionTrigger ||
+          !anim.applyInitialState),
+      this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primary,
+        body: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0.0, 50.0, 0.0, 0.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Align(
+                        alignment: AlignmentDirectional(0.0, 0.0),
+                        child: Text(
+                          FFLocalizations.of(context).getText(
+                            '62n8c2s0' /* Choose your pass */,
+                          ),
+                          style: FlutterFlowTheme.of(context)
+                              .bodyMedium
+                              .override(
+                                font: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                color: FlutterFlowTheme.of(context).alternate,
+                                fontSize: 28.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.italic,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 0.0, 16.0, 0.0),
+                        child: Container(
+                          width: MediaQuery.sizeOf(context).width * 1.0,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 1.0,
+                                color: Color(0x33000000),
+                                offset: Offset(
+                                  0.0,
+                                  1.0,
+                                ),
+                              )
+                            ],
+                            gradient: LinearGradient(
+                              colors: [
+                                FlutterFlowTheme.of(context).primaryText,
+                                _model.click == 'day'
+                                    ? Color(0xD5FB9000)
+                                    : FlutterFlowTheme.of(context).primaryText
+                              ],
+                              stops: [0.7, 1.0],
+                              begin: AlignmentDirectional(-0.34, 1.0),
+                              end: AlignmentDirectional(0.34, -1.0),
+                            ),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(8.0),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 10.0, 0.0, 10.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12.0, 0.0, 12.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        FFLocalizations.of(context).getText(
+                                          'aztno95n' /* Day Pass */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyLarge
+                                            .override(
+                                              font: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyLarge
+                                                        .fontStyle,
+                                              ),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .alternate,
+                                              fontSize: 14.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyLarge
+                                                      .fontStyle,
+                                            ),
+                                      ),
+                                      InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          logFirebaseEvent(
+                                              'CHOOSE_PASS4_ContainerSelectDay_ON_TAP');
+                                          if (_model.click == 'day') {
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_widget_animation');
+                                            if (animationsMap[
+                                                    'containerOnActionTriggerAnimation2'] !=
+                                                null) {
+                                              safeSetState(() =>
+                                                  hasContainerTriggered2 =
+                                                      true);
+                                              SchedulerBinding.instance
+                                                  .addPostFrameCallback((_) async =>
+                                                      await animationsMap[
+                                                              'containerOnActionTriggerAnimation2']!
+                                                          .controller
+                                                          .forward(from: 0.0));
+                                            }
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_update_page_state');
+                                            _model.click = null;
+                                            safeSetState(() {});
+                                          } else {
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_widget_animation');
+                                            if (animationsMap[
+                                                    'containerOnActionTriggerAnimation2'] !=
+                                                null) {
+                                              safeSetState(() =>
+                                                  hasContainerTriggered2 =
+                                                      true);
+                                              SchedulerBinding.instance
+                                                  .addPostFrameCallback((_) async =>
+                                                      await animationsMap[
+                                                              'containerOnActionTriggerAnimation2']!
+                                                          .controller
+                                                          .forward(from: 0.0));
+                                            }
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_widget_animation');
+                                            if (animationsMap[
+                                                    'containerOnActionTriggerAnimation1'] !=
+                                                null) {
+                                              safeSetState(() =>
+                                                  hasContainerTriggered1 =
+                                                      true);
+                                              SchedulerBinding.instance
+                                                  .addPostFrameCallback((_) async =>
+                                                      await animationsMap[
+                                                              'containerOnActionTriggerAnimation1']!
+                                                          .controller
+                                                          .forward());
+                                            }
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_start_periodic_action');
+                                            _model.instantTimer =
+                                                InstantTimer.periodic(
+                                              duration:
+                                                  Duration(milliseconds: 500),
+                                              callback: (timer) async {
+                                                logFirebaseEvent(
+                                                    'ContainerSelectDay_update_page_state');
+                                                _model.click = 'day';
+                                                safeSetState(() {});
+                                                logFirebaseEvent(
+                                                    'ContainerSelectDay_stop_periodic_action');
+                                                _model.instantTimer?.cancel();
+                                              },
+                                              startImmediately: false,
+                                            );
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 64.0,
+                                          height: 26.0,
+                                          constraints: BoxConstraints(
+                                            maxHeight: 26.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                blurRadius: 4.0,
+                                                color: Color(0x33000000),
+                                                offset: Offset(
+                                                  0.0,
+                                                  2.0,
+                                                ),
+                                              )
+                                            ],
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                FlutterFlowTheme.of(context)
+                                                    .secondaryBackground,
+                                                FlutterFlowTheme.of(context)
+                                                    .accent1
+                                              ],
+                                              stops: [0.0, 1.0],
+                                              begin: AlignmentDirectional(
+                                                  0.91, -1.0),
+                                              end: AlignmentDirectional(
+                                                  -0.91, 1.0),
+                                            ),
+                                            borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(8.0),
+                                              bottomRight: Radius.circular(8.0),
+                                              topLeft: Radius.circular(8.0),
+                                              topRight: Radius.circular(8.0),
+                                            ),
+                                          ),
+                                          alignment:
+                                              AlignmentDirectional(0.0, 0.0),
+                                          child: Text(
+                                            FFLocalizations.of(context).getText(
+                                              'ap2qguhl' /* Select */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  fontSize: 10.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ),
+                                      ).animateOnActionTrigger(
+                                          animationsMap[
+                                              'containerOnActionTriggerAnimation2']!,
+                                          hasBeenTriggered:
+                                              hasContainerTriggered2),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12.0, 0.0, 12.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        FFLocalizations.of(context).getText(
+                                          '2c7511xj' /* $5 */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyLarge
+                                            .override(
+                                              font: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyLarge
+                                                        .fontStyle,
+                                              ),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
+                                              fontSize: 12.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyLarge
+                                                      .fontStyle,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12.0, 0.0, 12.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                '85t1uv66' /* Unlimited rides today + $3 per... */,
+                                              ),
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .bodyLarge
+                                                  .override(
+                                                    font: GoogleFonts.poppins(
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyLarge
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyLarge
+                                                              .fontStyle,
+                                                    ),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
+                                                    fontSize: 10.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLarge
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLarge
+                                                            .fontStyle,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ).animateOnActionTrigger(
+                            animationsMap[
+                                'containerOnActionTriggerAnimation1']!,
+                            hasBeenTriggered: hasContainerTriggered1),
+                      ),
+                      Stack(
+                        children: [
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 0.0),
+                            child: Container(
+                              width: MediaQuery.sizeOf(context).width * 1.0,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    FlutterFlowTheme.of(context).primaryText,
+                                    _model.click == 'week'
+                                        ? Color(0xD5FB9000)
+                                        : FlutterFlowTheme.of(context)
+                                            .primaryText
+                                  ],
+                                  stops: [0.7, 1.0],
+                                  begin: AlignmentDirectional(-0.34, 1.0),
+                                  end: AlignmentDirectional(0.34, -1.0),
+                                ),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 16.0, 0.0, 16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          12.0, 0.0, 12.0, 0.0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'ybtz024k' /* Week Pass */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLarge
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .alternate,
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyLarge
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          12.0, 0.0, 12.0, 0.0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'xo1ob6ng' /* $8 */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLarge
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryBackground,
+                                                  fontSize: 12.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyLarge
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          12.0, 0.0, 12.0, 0.0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'fzf0vq27' /* Unlimited rides today + $7 per... */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyLarge
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLarge
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyLarge
+                                                            .fontStyle,
+                                                  ),
+                                                  color: Color(0xFFCACACA),
+                                                  fontSize: 10.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyLarge
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyLarge
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ].divide(SizedBox(height: 3.0)),
+                                ),
+                              ),
+                            ).animateOnActionTrigger(
+                                animationsMap[
+                                    'containerOnActionTriggerAnimation3']!,
+                                hasBeenTriggered: hasContainerTriggered3),
+                          ),
+                          Align(
+                            alignment: AlignmentDirectional(-1.0, -1.0),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  10.0, 10.0, 0.0, 0.0),
+                              child: Container(
+                                width: 80.0,
+                                height: 22.0,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      FlutterFlowTheme.of(context)
+                                          .secondaryBackground,
+                                      FlutterFlowTheme.of(context).accent1
+                                    ],
+                                    stops: [0.0, 0.5],
+                                    begin: AlignmentDirectional(0.17, -1.0),
+                                    end: AlignmentDirectional(-0.17, 1.0),
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10.0),
+                                    bottomRight: Radius.circular(10.0),
+                                    topLeft: Radius.circular(10.0),
+                                    topRight: Radius.circular(10.0),
+                                  ),
+                                ),
+                                child: Align(
+                                  alignment: AlignmentDirectional(0.0, 0.0),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Text(
+                                      FFLocalizations.of(context).getText(
+                                        'dsbnwvxg' /* Recommended */,
+                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .override(
+                                            font: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w800,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                            fontSize: 8.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.w800,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: AlignmentDirectional(1.0, -1.0),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 24.0, 23.0, 0.0),
+                              child: InkWell(
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () async {
+                                  logFirebaseEvent(
+                                      'CHOOSE_PASS4_ContainerSelectWeek_ON_TAP');
+                                  if (_model.click == 'week') {
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_widget_animation');
+                                    if (animationsMap[
+                                            'containerOnActionTriggerAnimation4'] !=
+                                        null) {
+                                      safeSetState(
+                                          () => hasContainerTriggered4 = true);
+                                      SchedulerBinding.instance
+                                          .addPostFrameCallback((_) async =>
+                                              await animationsMap[
+                                                      'containerOnActionTriggerAnimation4']!
+                                                  .controller
+                                                  .forward(from: 0.0));
+                                    }
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_update_page_state');
+                                    _model.click = null;
+                                    safeSetState(() {});
+                                  } else {
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_widget_animation');
+                                    if (animationsMap[
+                                            'containerOnActionTriggerAnimation4'] !=
+                                        null) {
+                                      safeSetState(
+                                          () => hasContainerTriggered4 = true);
+                                      SchedulerBinding.instance
+                                          .addPostFrameCallback((_) async =>
+                                              await animationsMap[
+                                                      'containerOnActionTriggerAnimation4']!
+                                                  .controller
+                                                  .forward(from: 0.0));
+                                    }
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_widget_animation');
+                                    if (animationsMap[
+                                            'containerOnActionTriggerAnimation3'] !=
+                                        null) {
+                                      safeSetState(
+                                          () => hasContainerTriggered3 = true);
+                                      SchedulerBinding.instance
+                                          .addPostFrameCallback((_) async =>
+                                              await animationsMap[
+                                                      'containerOnActionTriggerAnimation3']!
+                                                  .controller
+                                                  .forward(from: 0.0));
+                                    }
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_start_periodic_actio');
+                                    _model.instantTimerweek =
+                                        InstantTimer.periodic(
+                                      duration: Duration(milliseconds: 500),
+                                      callback: (timer) async {
+                                        logFirebaseEvent(
+                                            'ContainerSelectWeek_update_page_state');
+                                        _model.click = 'week';
+                                        safeSetState(() {});
+                                        logFirebaseEvent(
+                                            'ContainerSelectWeek_stop_periodic_action');
+                                        _model.instantTimerweek?.cancel();
+                                      },
+                                      startImmediately: false,
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  width: 64.0,
+                                  height: 26.0,
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 4.0,
+                                        color: Color(0x33000000),
+                                        offset: Offset(
+                                          0.0,
+                                          2.0,
+                                        ),
+                                      )
+                                    ],
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        FlutterFlowTheme.of(context)
+                                            .secondaryBackground,
+                                        FlutterFlowTheme.of(context).accent1
+                                      ],
+                                      stops: [0.0, 1.0],
+                                      begin: AlignmentDirectional(0.91, -1.0),
+                                      end: AlignmentDirectional(-0.91, 1.0),
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(8.0),
+                                      bottomRight: Radius.circular(8.0),
+                                      topLeft: Radius.circular(8.0),
+                                      topRight: Radius.circular(8.0),
+                                    ),
+                                  ),
+                                  alignment: AlignmentDirectional(0.0, 0.0),
+                                  child: Text(
+                                    FFLocalizations.of(context).getText(
+                                      'ss88el5s' /* Select */,
+                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          font: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+                                          ),
+                                          fontSize: 10.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                  ),
+                                ),
+                              ).animateOnActionTrigger(
+                                  animationsMap[
+                                      'containerOnActionTriggerAnimation4']!,
+                                  hasBeenTriggered: hasContainerTriggered4),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 16.0, 16.0, 0.0),
+                        child: InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            logFirebaseEvent(
+                                'CHOOSE_PASS4_PAGE_ContainerMonth_ON_TAP');
+                            if (_model.click == 'month') {
+                              logFirebaseEvent(
+                                  'ContainerMonth_widget_animation');
+                              if (animationsMap[
+                                      'containerOnActionTriggerAnimation6'] !=
+                                  null) {
+                                safeSetState(
+                                    () => hasContainerTriggered6 = true);
+                                SchedulerBinding.instance.addPostFrameCallback(
+                                    (_) async => await animationsMap[
+                                            'containerOnActionTriggerAnimation6']!
+                                        .controller
+                                        .forward(from: 0.0));
+                              }
+                              logFirebaseEvent(
+                                  'ContainerMonth_widget_animation');
+                              if (animationsMap[
+                                      'containerOnActionTriggerAnimation5'] !=
+                                  null) {
+                                safeSetState(
+                                    () => hasContainerTriggered5 = true);
+                                SchedulerBinding.instance.addPostFrameCallback(
+                                    (_) async => await animationsMap[
+                                            'containerOnActionTriggerAnimation5']!
+                                        .controller
+                                        .forward(from: 0.0));
+                              }
+                              logFirebaseEvent(
+                                  'ContainerMonth_update_page_state');
+                              _model.click = null;
+                              safeSetState(() {});
+                            } else {
+                              logFirebaseEvent(
+                                  'ContainerMonth_widget_animation');
+                              if (animationsMap[
+                                      'containerOnActionTriggerAnimation6'] !=
+                                  null) {
+                                safeSetState(
+                                    () => hasContainerTriggered6 = true);
+                                SchedulerBinding.instance.addPostFrameCallback(
+                                    (_) async => await animationsMap[
+                                            'containerOnActionTriggerAnimation6']!
+                                        .controller
+                                        .forward(from: 0.0));
+                              }
+                              logFirebaseEvent(
+                                  'ContainerMonth_update_page_state');
+                              _model.click = 'month';
+                              safeSetState(() {});
+                            }
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * 1.0,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 1.0,
+                                  color: Color(0x33000000),
+                                  offset: Offset(
+                                    0.0,
+                                    1.0,
+                                  ),
+                                )
+                              ],
+                              gradient: LinearGradient(
+                                colors: [
+                                  FlutterFlowTheme.of(context).primaryText,
+                                  _model.click == 'month'
+                                      ? Color(0xD5FB9000)
+                                      : FlutterFlowTheme.of(context).primaryText
+                                ],
+                                stops: [0.7, 1.0],
+                                begin: AlignmentDirectional(-0.34, 1.0),
+                                end: AlignmentDirectional(0.34, -1.0),
+                              ),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(8.0),
+                                bottomRight: Radius.circular(8.0),
+                                topLeft: Radius.circular(8.0),
+                                topRight: Radius.circular(8.0),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 10.0, 0.0, 10.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12.0, 0.0, 12.0, 0.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          FFLocalizations.of(context).getText(
+                                            'x4d1o852' /* Month Pass */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyLarge
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyLarge
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                fontSize: 14.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyLarge
+                                                        .fontStyle,
+                                              ),
+                                        ),
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () async {
+                                            logFirebaseEvent(
+                                                'CHOOSE_PASS4_ContainerSelectMonth_ON_TAP');
+                                            if (_model.click == 'month') {
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_widget_animation');
+                                              if (animationsMap[
+                                                      'containerOnActionTriggerAnimation6'] !=
+                                                  null) {
+                                                safeSetState(() =>
+                                                    hasContainerTriggered6 =
+                                                        true);
+                                                SchedulerBinding.instance
+                                                    .addPostFrameCallback(
+                                                        (_) async =>
+                                                            await animationsMap[
+                                                                    'containerOnActionTriggerAnimation6']!
+                                                                .controller
+                                                                .forward(
+                                                                    from: 0.0));
+                                              }
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_update_page_state');
+                                              _model.click = null;
+                                              safeSetState(() {});
+                                            } else {
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_widget_animation');
+                                              if (animationsMap[
+                                                      'containerOnActionTriggerAnimation6'] !=
+                                                  null) {
+                                                safeSetState(() =>
+                                                    hasContainerTriggered6 =
+                                                        true);
+                                                SchedulerBinding.instance
+                                                    .addPostFrameCallback(
+                                                        (_) async =>
+                                                            await animationsMap[
+                                                                    'containerOnActionTriggerAnimation6']!
+                                                                .controller
+                                                                .forward(
+                                                                    from: 0.0));
+                                              }
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_widget_animation');
+                                              if (animationsMap[
+                                                      'containerOnActionTriggerAnimation5'] !=
+                                                  null) {
+                                                safeSetState(() =>
+                                                    hasContainerTriggered5 =
+                                                        true);
+                                                SchedulerBinding.instance
+                                                    .addPostFrameCallback(
+                                                        (_) async =>
+                                                            await animationsMap[
+                                                                    'containerOnActionTriggerAnimation5']!
+                                                                .controller
+                                                                .forward(
+                                                                    from: 0.0));
+                                              }
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_start_periodic_acti');
+                                              _model.instantTimerMonth =
+                                                  InstantTimer.periodic(
+                                                duration: Duration(
+                                                    milliseconds: 1000),
+                                                callback: (timer) async {
+                                                  logFirebaseEvent(
+                                                      'ContainerSelectMonth_update_page_state');
+                                                  _model.click = 'month';
+                                                  safeSetState(() {});
+                                                  logFirebaseEvent(
+                                                      'ContainerSelectMonth_stop_periodic_actio');
+                                                  _model.instantTimerMonth
+                                                      ?.cancel();
+                                                },
+                                                startImmediately: true,
+                                              );
+                                            }
+                                          },
+                                          child: Container(
+                                            width: 64.0,
+                                            height: 26.0,
+                                            decoration: BoxDecoration(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  blurRadius: 4.0,
+                                                  color: Color(0x33000000),
+                                                  offset: Offset(
+                                                    0.0,
+                                                    2.0,
+                                                  ),
+                                                )
+                                              ],
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondaryBackground,
+                                                  FlutterFlowTheme.of(context)
+                                                      .accent1
+                                                ],
+                                                stops: [0.0, 1.0],
+                                                begin: AlignmentDirectional(
+                                                    0.91, -1.0),
+                                                end: AlignmentDirectional(
+                                                    -0.91, 1.0),
+                                              ),
+                                              borderRadius: BorderRadius.only(
+                                                bottomLeft:
+                                                    Radius.circular(8.0),
+                                                bottomRight:
+                                                    Radius.circular(8.0),
+                                                topLeft: Radius.circular(8.0),
+                                                topRight: Radius.circular(8.0),
+                                              ),
+                                            ),
+                                            alignment:
+                                                AlignmentDirectional(0.0, 0.0),
+                                            child: Text(
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'yh52ifb4' /* Select */,
+                                              ),
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .bodyMedium
+                                                  .override(
+                                                    font: GoogleFonts.poppins(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                                    fontSize: 10.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                            ),
+                                          ),
+                                        ).animateOnActionTrigger(
+                                            animationsMap[
+                                                'containerOnActionTriggerAnimation6']!,
+                                            hasBeenTriggered:
+                                                hasContainerTriggered6),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12.0, 0.0, 12.0, 0.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          FFLocalizations.of(context).getText(
+                                            'fzc219qz' /* $10 */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyLarge
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyLarge
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryBackground,
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyLarge
+                                                        .fontStyle,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12.0, 0.0, 12.0, 0.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Flexible(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  'owjc7pvd' /* Unlimited rides for 30 days + ... */,
+                                                ),
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyLarge
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyLarge
+                                                                .fontWeight,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyLarge
+                                                                .fontStyle,
+                                                      ),
+                                                      color: Color(0xFFCACACA),
+                                                      fontSize: 10.0,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyLarge
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyLarge
+                                                              .fontStyle,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ).animateOnActionTrigger(
+                            animationsMap[
+                                'containerOnActionTriggerAnimation5']!,
+                            hasBeenTriggered: hasContainerTriggered5),
+                      ),
+                    ],
+                  ),
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      logFirebaseEvent(
+                          'CHOOSE_PASS4_PAGE_Container1day_ON_TAP');
+                      logFirebaseEvent('Container1day_widget_animation');
+                      if (animationsMap['containerOnActionTriggerAnimation7'] !=
+                          null) {
+                        safeSetState(() => hasContainerTriggered7 = true);
+                        SchedulerBinding.instance.addPostFrameCallback(
+                            (_) async => await animationsMap[
+                                    'containerOnActionTriggerAnimation7']!
+                                .controller
+                                .forward(from: 0.0));
+                      }
+                      logFirebaseEvent('Container1day_backend_call');
+
+                      await currentUserReference!.update(createUsersRecordData(
+                        passe: 'day',
+                      ));
+                      logFirebaseEvent('Container1day_navigate_to');
+
+                      context.pushNamed(Home5Widget.routeName);
+                    },
+                    child: Container(
+                      width: 320.0,
+                      height: 38.0,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).alternate,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 4.0,
+                            color: Color(0x33000000),
+                            offset: Offset(
+                              0.0,
+                              2.0,
+                            ),
+                          )
+                        ],
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(18.0),
+                          bottomRight: Radius.circular(18.0),
+                          topLeft: Radius.circular(18.0),
+                          topRight: Radius.circular(18.0),
+                        ),
+                      ),
+                      alignment: AlignmentDirectional(0.0, 0.0),
+                      child: Text(
+                        FFLocalizations.of(context).getText(
+                          'e56s6ui2' /* Click here to try it for free ... */,
+                        ),
+                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              font: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontStyle,
+                              ),
+                              color: FlutterFlowTheme.of(context).primary,
+                              letterSpacing: 0.0,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontStyle,
+                            ),
+                      ),
+                    ),
+                  ).animateOnActionTrigger(
+                      animationsMap['containerOnActionTriggerAnimation7']!,
+                      hasBeenTriggered: hasContainerTriggered7),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    child: Container(
+                      width: MediaQuery.sizeOf(context).width * 1.0,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 1.0,
+                            color: Color(0x33000000),
+                            offset: Offset(
+                              0.0,
+                              1.0,
+                            ),
+                          )
+                        ],
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(8.0),
+                          bottomRight: Radius.circular(8.0),
+                          topLeft: Radius.circular(8.0),
+                          topRight: Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 12.0, 0.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Align(
+                                    alignment: AlignmentDirectional(-1.0, -1.0),
+                                    child: Text(
+                                      FFLocalizations.of(context).getText(
+                                        'prrhxcs8' /* Auto-renew */,
+                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyLarge
+                                          .override(
+                                            font: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.normal,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyLarge
+                                                      .fontStyle,
+                                            ),
+                                            color: FlutterFlowTheme.of(context)
+                                                .alternate,
+                                            fontSize: 14.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyLarge
+                                                    .fontStyle,
+                                          ),
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: _model.switchValue!,
+                                    onChanged: (newValue) async {
+                                      safeSetState(
+                                          () => _model.switchValue = newValue);
+                                    },
+                                    activeColor:
+                                        FlutterFlowTheme.of(context).primary,
+                                    activeTrackColor:
+                                        FlutterFlowTheme.of(context).alternate,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'm3whqe67' /* Applies to Week/Month passes */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.normal,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: Color(0xFFCACACA),
+                                    fontSize: 10.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    child: Container(
+                      width: MediaQuery.sizeOf(context).width * 1.0,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 1.0,
+                            color: Color(0x33000000),
+                            offset: Offset(
+                              0.0,
+                              1.0,
+                            ),
+                          )
+                        ],
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(8.0),
+                          bottomRight: Radius.circular(8.0),
+                          topLeft: Radius.circular(8.0),
+                          topRight: Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(10.0, 8.0, 0.0, 8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 12.0, 0.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Align(
+                                    alignment: AlignmentDirectional(-1.0, -1.0),
+                                    child: Text(
+                                      FFLocalizations.of(context).getText(
+                                        'o92dxp15' /* What is included? */,
+                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyLarge
+                                          .override(
+                                            font: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.normal,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyLarge
+                                                      .fontStyle,
+                                            ),
+                                            color: FlutterFlowTheme.of(context)
+                                                .alternate,
+                                            fontSize: 14.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyLarge
+                                                    .fontStyle,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'gmh5ry67' /* Unlimited rides with an active... */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.normal,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: Color(0xFFCACACA),
+                                    fontSize: 10.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'jhkq5kpo' /* Each ride has a $3 fuel fee */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.normal,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: Color(0xFFCACACA),
+                                    fontSize: 10.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                '3n3wfprk' /* Cancel anytime (prorate on Mon... */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.normal,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: Color(0xFFCACACA),
+                                    fontSize: 10.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 38.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'qnne6q0t' /* Help */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryText,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                logFirebaseEvent(
+                                    'CHOOSE_PASS4_Container_asv8z0gj_ON_TAP');
+                                logFirebaseEvent('Container_bottom_sheet');
+                                await showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  enableDrag: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        FocusScope.of(context).unfocus();
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
+                                      },
+                                      child: Padding(
+                                        padding:
+                                            MediaQuery.viewInsetsOf(context),
+                                        child: CardPaymentWidget(
+                                          value: () {
+                                            if (_model.click == 'day') {
+                                              return 5.0;
+                                            } else if (_model.click == 'week') {
+                                              return 8.0;
+                                            } else if (_model.click ==
+                                                'month') {
+                                              return 10.0;
+                                            } else {
+                                              return 0.0;
+                                            }
+                                          }(),
+                                          passe: _model.click!,
+                                          pagamento: true,
+                                          autoRenew: _model.switchValue,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ).then((value) => safeSetState(() {}));
+                              },
+                              child: Container(
+                                width: 320.0,
+                                height: 38.0,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 4.0,
+                                      color: Color(0x33000000),
+                                      offset: Offset(
+                                        0.0,
+                                        2.0,
+                                      ),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(18.0),
+                                    bottomRight: Radius.circular(18.0),
+                                    topLeft: Radius.circular(18.0),
+                                    topRight: Radius.circular(18.0),
+                                  ),
+                                ),
+                                alignment: AlignmentDirectional(0.0, 0.0),
+                                child: Text(
+                                  FFLocalizations.of(context).getText(
+                                    'j4x9hd45' /* Continue */,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ].divide(SizedBox(height: 6.0)),
+                    ),
+                  ),
+                ].divide(SizedBox(height: 20.0)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

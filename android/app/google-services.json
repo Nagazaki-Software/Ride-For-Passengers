@@ -1,0 +1,230 @@
+{
+  "project_info": {
+    "project_number": "1075126726259",
+    "project_id": "quick-b108e",
+    "storage_bucket": "quick-b108e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:edf0afe80c2eec3cc68406",
+        "android_client_info": {
+          "package_name": "com.nagazakisoftware.quick"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-d7jf1bbbqmeaec6k64c55gf70bv7j8q6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nagazakisoftware.quick",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-9ntnnueg9ksl8a9geqroflp5qgf32hd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.ridedriver"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:40245e5ab36ea36ec68406",
+        "android_client_info": {
+          "package_name": "com.quicky.ride"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-51l3g8gcgjhqhi549aqk7bauk0ij4dv1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quicky.ride",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-9ntnnueg9ksl8a9geqroflp5qgf32hd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.ridedriver"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:6010abc36419f6a6c68406",
+        "android_client_info": {
+          "package_name": "com.quicky.ridebahamas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-8cnq42nki2oq38mpgdc0qg5p7jasq3hv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quicky.ridebahamas",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-9ntnnueg9ksl8a9geqroflp5qgf32hd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.ridedriver"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:8e0dc96cb5fbcc22c68406",
+        "android_client_info": {
+          "package_name": "com.quicky.ridedriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-sm51j5pp0lqdfvfeuc52rid9e6uv1pla.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quicky.ridedriver",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-9ntnnueg9ksl8a9geqroflp5qgf32hd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.ridedriver"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075126726259:android:6259150b78167e11c68406",
+        "android_client_info": {
+          "package_name": "com.quicky.ridefordrivers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075126726259-tsqjeis29jn375vl6gg7upsdseodmra7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quicky.ridefordrivers",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Kb5ofJ3kxe0Vog2zRCVK94kWkPsTVrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075126726259-h08gellmcpdoutnocjh07eohgs9e9vrq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1075126726259-9ntnnueg9ksl8a9geqroflp5qgf32hd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.quicky.ridedriver"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

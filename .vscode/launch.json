@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+<<<<<<< HEAD
+            "type": "jdk",
+            "request": "launch",
+            "name": "Launch Java App",
+=======
+>>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+            "name": "Ride-For-Passengers",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Ride-For-Passengers (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Ride-For-Passengers (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
