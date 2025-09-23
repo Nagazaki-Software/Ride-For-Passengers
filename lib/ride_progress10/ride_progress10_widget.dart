@@ -276,7 +276,7 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                             .secondary,
                                                         FlutterFlowTheme.of(
                                                                 context)
-                                                            .primaryBackground
+                                                            .accent1
                                                       ],
                                                       gradientDirection:
                                                           GradientDirection.ltr,
@@ -366,7 +366,7 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                             .secondary,
                                                         FlutterFlowTheme.of(
                                                                 context)
-                                                            .primaryBackground
+                                                            .accent1
                                                       ],
                                                       gradientDirection:
                                                           GradientDirection.ltr,
@@ -525,8 +525,7 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                         colors: [
                                           FlutterFlowTheme.of(context)
                                               .secondary,
-                                          FlutterFlowTheme.of(context)
-                                              .primaryBackground,
+                                          FlutterFlowTheme.of(context).accent1,
                                           Color(0xFFF0DBA6)
                                         ],
                                         gradientDirection:

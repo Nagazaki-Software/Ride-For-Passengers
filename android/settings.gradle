@@ -1,33 +1,10 @@
 pluginManagement {
     def flutterSdkPath = {
-        // Resolve Flutter SDK path from multiple sources with validation.
         def properties = new Properties()
-        def localProps = file("local.properties")
-        if (localProps.exists()) {
-            localProps.withInputStream { properties.load(it) }
-        }
-
-        // Priority: -Pflutter.sdk > local.properties > env (FLUTTER_HOME/FLUTTER_ROOT)
-        def resolved = gradle.startParameter.projectProperties.get("flutter.sdk")
-        if (resolved == null) {
-            resolved = properties.getProperty("flutter.sdk")
-        }
-        if (resolved == null) {
-            resolved = System.getenv("FLUTTER_HOME") ?: System.getenv("FLUTTER_ROOT")
-        }
-
-        // Validate the candidate path contains expected Flutter structure
-        def isValidFlutter = { String p ->
-            if (p == null) return false
-            def base = new File(p)
-            return new File(base, "bin/flutter").exists() && new File(base, "packages/flutter_tools/gradle").exists()
-        }
-
-        if (!isValidFlutter(resolved)) {
-            throw new GradleException("Flutter SDK not found. Set -Pflutter.sdk, flutter.sdk in local.properties, or FLUTTER_HOME/FLUTTER_ROOT.")
-        }
-
-        return resolved
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        return flutterSdkPath
     }()
 
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")

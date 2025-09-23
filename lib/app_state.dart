@@ -53,23 +53,6 @@ class FFAppState extends ChangeNotifier {
     _safeInit(() {
       _cardHolder = prefs.getString('ff_cardHolder') ?? _cardHolder;
     });
-    // Accessibility toggles
-    _safeInit(() {
-      _accessLowStimulation =
-          prefs.getBool('ff_accessLowStimulation') ?? _accessLowStimulation;
-    });
-    _safeInit(() {
-      _accessStreetNamesAudio =
-          prefs.getBool('ff_accessStreetNamesAudio') ?? _accessStreetNamesAudio;
-    });
-    _safeInit(() {
-      _accessHapticsAndSound =
-          prefs.getBool('ff_accessHapticsAndSound') ?? _accessHapticsAndSound;
-    });
-    _safeInit(() {
-      _accessVoiceRequest =
-          prefs.getBool('ff_accessVoiceRequest') ?? _accessVoiceRequest;
-    });
     _safeInit(() {
       _latlngAtual =
           latLngFromString(prefs.getString('ff_latlngAtual')) ?? _latlngAtual;
@@ -217,35 +200,6 @@ class FFAppState extends ChangeNotifier {
   set cardHolder(String value) {
     _cardHolder = value;
     prefs.setString('ff_cardHolder', value);
-  }
-
-  // ================= Accessibility =================
-  bool _accessLowStimulation = false;
-  bool get accessLowStimulation => _accessLowStimulation;
-  set accessLowStimulation(bool value) {
-    _accessLowStimulation = value;
-    prefs.setBool('ff_accessLowStimulation', value);
-  }
-
-  bool _accessStreetNamesAudio = false;
-  bool get accessStreetNamesAudio => _accessStreetNamesAudio;
-  set accessStreetNamesAudio(bool value) {
-    _accessStreetNamesAudio = value;
-    prefs.setBool('ff_accessStreetNamesAudio', value);
-  }
-
-  bool _accessHapticsAndSound = false;
-  bool get accessHapticsAndSound => _accessHapticsAndSound;
-  set accessHapticsAndSound(bool value) {
-    _accessHapticsAndSound = value;
-    prefs.setBool('ff_accessHapticsAndSound', value);
-  }
-
-  bool _accessVoiceRequest = false;
-  bool get accessVoiceRequest => _accessVoiceRequest;
-  set accessVoiceRequest(bool value) {
-    _accessVoiceRequest = value;
-    prefs.setBool('ff_accessVoiceRequest', value);
   }
 
   LatLng? _latlngAtual = LatLng(25.0443312, -77.3503609);

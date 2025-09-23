@@ -301,24 +301,10 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                           onTextField: (creditCardTextfield) async {
                             logFirebaseEvent(
                                 'CARD_PAYMENT_Container_9xbwubcj_CALLBACK');
-                            // Only persist when the widget signals a successful save event.
-                            try {
-                              if (creditCardTextfield is Map) {
-                                final event = creditCardTextfield['event'];
-                                if (event == 'saved') {
-                                  final json = creditCardTextfield['json'];
-                                  if (json != null) {
-                                    FFAppState().addToCreditCardSalves(json);
-                                    // Set default if none chosen yet.
-                                    if (FFAppState().defaultCard == null ||
-                                        FFAppState().defaultCard.toString().isEmpty) {
-                                      FFAppState().defaultCard = json;
-                                    }
-                                    safeSetState(() {});
-                                  }
-                                }
-                              }
-                            } catch (_) {}
+                            logFirebaseEvent('CardFormFF_update_app_state');
+                            FFAppState()
+                                .addToCreditCardSalves(creditCardTextfield);
+                            safeSetState(() {});
                           },
                           onSave: (jsonReturn) async {},
                         ),

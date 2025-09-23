@@ -1160,6 +1160,10 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                       builder: (context) {
                         final creditCards = FFAppState()
                             .creditCardSalves
+                            .map((e) => getJsonField(
+                                  e,
+                                  r'''$.numberMasked''',
+                                ))
                             .toList();
                         if (creditCards.isEmpty) {
                           return AddPaymentMethodWidget();
@@ -1171,13 +1175,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                               (creditCardsIndex) {
                             final creditCardsItem =
                                 creditCards[creditCardsIndex];
-                            return InkWell(
-                              onTap: () async {
-                                logFirebaseEvent('PAYMENT_RIDE7_select_card_on_tap');
-                                _model.selectCard = creditCardsItem;
-                                safeSetState(() {});
-                              },
-                              child: Container(
+                            return Container(
                               width: MediaQuery.sizeOf(context).width * 0.7,
                               decoration: BoxDecoration(
                                 color: getJsonField(
@@ -1235,6 +1233,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                   ))
                                               Flexible(
                                                 child: AutoSizeText(
+                                                Text(
                                                   FFLocalizations.of(context)
                                                       .getText(
                                                     'q0r0r5ua' /* This Default  */,
@@ -1317,6 +1316,19 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                                 .alternate,
                                                         fontSize: 10.0,
                                                         letterSpacing: 0.0,
+                                              Text(
+                                                '${getJsonField(
+                                                  creditCardsItem,
+                                                  r'''$.brand''',
+                                                ).toString()} ${functions.esconderCreditCard(getJsonField(
+                                                  creditCardsItem,
+                                                  r'''$.numberMasked''',
+                                                ).toString())}',
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
                                                         fontWeight:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1328,7 +1340,23 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                                 .bodyMedium
                                                                 .fontStyle,
                                                       ),
-                                                ),
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .alternate,
+                                                      fontSize: 10.0,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
                                               ),
                                             ],
                                           ),
@@ -1338,7 +1366,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                   ].divide(SizedBox(height: 6.0)),
                                 ),
                               ),
-                            ));
+                            );
                           }).divide(SizedBox(height: 8.0)),
                         );
                       },
@@ -1712,30 +1740,6 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                     'PAYMENT_RIDE7_ContainerConfirmPay_ON_TAP');
                                 logFirebaseEvent(
                                     'ContainerConfirmPay_widget_animation');
-                                // Guard: require a selected card to proceed
-                                if (_model.selectCard == null) {
-                                  await showModalBottomSheet(
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    enableDrag: false,
-                                    context: context,
-                                    builder: (context) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          FocusScope.of(context).unfocus();
-                                          FocusManager.instance.primaryFocus
-                                              ?.unfocus();
-                                        },
-                                        child: Padding(
-                                          padding:
-                                              MediaQuery.viewInsetsOf(context),
-                                          child: ErronopagamentoWidget(),
-                                        ),
-                                      );
-                                    },
-                                  ).then((value) => safeSetState(() {}));
-                                  return;
-                                }
                                 if (animationsMap[
                                         'containerOnActionTriggerAnimation5'] !=
                                     null) {

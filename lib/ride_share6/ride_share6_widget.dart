@@ -3,11 +3,8 @@ import '/backend/backend.dart';
 import '/components/share_q_r_code_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/custom_functions.dart' as functions;
-import '/index.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'ride_share6_model.dart';
@@ -380,7 +377,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                     child: ShareQRCodeWidget(
                                                       rideDoc: _model.session!,
                                                       linkCurrentPage:
-                                                          'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=${_model.session!.id}',
+                                                          'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
                                                     ),
                                                   ),
                                                 );
@@ -412,7 +409,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             await rideOrdersRecordReference
                                                 .set({
                                               ...createRideOrdersRecordData(
-                                                user: currentUserReference,
                                                 rideShare: true,
                                                 status: 'waiting',
                                                 latlngAtual: latA,
@@ -431,7 +427,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 RideOrdersRecord
                                                     .getDocumentFromData({
                                               ...createRideOrdersRecordData(
-                                                user: currentUserReference,
                                                 rideShare: true,
                                                 status: 'waiting',
                                                 latlngAtual: latA,
@@ -451,18 +446,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             _model.session =
                                                 _model.rideOrderQR?.reference;
                                             safeSetState(() {});
-                                            // Ensure shareable link includes rideId in the URL
-                                            if (_model.session != null) {
-                                              context.goNamed(
-                                                RideShare6Widget.routeName,
-                                                queryParameters: {
-                                                  'rideId': serializeParam(
-                                                    _model.session!.id,
-                                                    ParamType.String,
-                                                  ),
-                                                }.withoutNulls,
-                                              );
-                                            }
                                             logFirebaseEvent(
                                                 'Container_bottom_sheet');
                                             await showModalBottomSheet(
@@ -493,6 +476,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                           'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=' +
                                                               (_model.rideOrderQR?.reference.id ??
                                                                   _model.session!.id),
+                                                          'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
                                                     ),
                                                   ),
                                                 );

@@ -20,6 +20,8 @@ import 'package:flutter/services.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:provider/provider.dart';
 import '../../app_state.dart';
+
+// FlutterFlow auth (remova se não usa)
 import '/auth/firebase_auth/auth_util.dart';
 
 const bool kDebugPayments = false;
@@ -169,6 +171,7 @@ class _CardFormFFState extends State<CardFormFF> {
     if (FFAppState().accessHapticsAndSound) {
       HapticFeedback.selectionClick();
     }
+    HapticFeedback.selectionClick();
 
     if (!widget.chargeOnConfirm) {
       if (!(_formKey.currentState?.validate() ?? false)) {
@@ -242,6 +245,14 @@ class _CardFormFFState extends State<CardFormFF> {
               : ''),
           'brand': _detectBrand(data.number),
           'numberMasked': _maskNumber(data.number),
+        // JSON minimalista pedido: { token, name, last4 }
+        final jsonReturn = <String, dynamic>{
+          'token': saved.token ?? '',
+          'name': saved.name ?? data.holder,
+          'last4': saved.last4 ??
+              (data.number.length >= 4
+                  ? data.number.substring(data.number.length - 4)
+                  : ''),
         };
 
         try {
@@ -278,9 +289,7 @@ class _CardFormFFState extends State<CardFormFF> {
     }
 
     try {
-      if (FFAppState().accessHapticsAndSound) {
-        HapticFeedback.lightImpact();
-      }
+      HapticFeedback.lightImpact();
       setState(() => _isPaying = true);
 
       final data = _collect();
@@ -572,6 +581,7 @@ class _CardFormFFState extends State<CardFormFF> {
       opacity: enabled ? 1 : 0.7,
       child: GestureDetector(
         onTapDown: (_) { if (FFAppState().accessHapticsAndSound) { HapticFeedback.lightImpact(); } },
+        onTapDown: (_) => HapticFeedback.lightImpact(),
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
