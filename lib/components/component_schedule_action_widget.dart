@@ -1072,34 +1072,19 @@ class _ComponentScheduleActionWidgetState
                     logFirebaseEvent(
                         'COMPONENT_SCHEDULE_ACTION_Container_f1s8');
                     logFirebaseEvent('Container_backend_call');
-                    // Create the document and keep a local reference to avoid null errors
-                    var rideOrdersRecordReference =
-                        RideOrdersRecord.collection.doc();
-                    await rideOrdersRecordReference.set(
-                      createRideOrdersRecordData(
-                        user: currentUserReference,
-                        latlng: FFAppState().latlangAondeVaiIr,
-                        dia: widget.parameter3,
-                        option: _model.action,
-                        latlngAtual: FFAppState().latlngAtual,
-                        notas: _model.textController.text,
-                        repeat: _model.repeat,
-                        salvarSomente: false,
-                      ),
-                    );
-                    _model.orderRef = RideOrdersRecord.getDocumentFromData(
-                      createRideOrdersRecordData(
-                        user: currentUserReference,
-                        latlng: FFAppState().latlangAondeVaiIr,
-                        dia: widget.parameter3,
-                        option: _model.action,
-                        latlngAtual: FFAppState().latlngAtual,
-                        notas: _model.textController.text,
-                        repeat: _model.repeat,
-                        salvarSomente: false,
-                      ),
-                      rideOrdersRecordReference,
-                    );
+
+                    await RideOrdersRecord.collection
+                        .doc()
+                        .set(createRideOrdersRecordData(
+                          user: currentUserReference,
+                          latlng: FFAppState().latlangAondeVaiIr,
+                          dia: widget.parameter3,
+                          option: _model.action,
+                          latlngAtual: FFAppState().latlngAtual,
+                          notas: _model.textController.text,
+                          repeat: _model.repeat,
+                          salvarSomente: false,
+                        ));
                     logFirebaseEvent('Container_bottom_sheet');
                     await showModalBottomSheet(
                       isScrollControlled: true,

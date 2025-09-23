@@ -2209,10 +2209,37 @@ class _Home5WidgetState extends State<Home5Widget>
                                                           .forward(from: 0.0));
                                             }
                                             logFirebaseEvent(
+                                                'ContainerRideShare_firestore_query');
+                                            _model.orders =
+                                                await queryRideOrdersRecordOnce();
+                                            logFirebaseEvent(
                                                 'ContainerRideShare_navigate_to');
 
                                             context.pushNamed(
                                               RideShare6Widget.routeName,
+                                              queryParameters: {
+                                                'value': serializeParam(
+                                                  functions.mediaCorridaNesseKm(
+                                                      FFAppState().latlngAtual!,
+                                                      FFAppState()
+                                                          .latlangAondeVaiIr!,
+                                                      _model.orders!.toList()),
+                                                  ParamType.double,
+                                                ),
+                                                'latlngOrigem': serializeParam(
+                                                  FFAppState().latlngAtual,
+                                                  ParamType.LatLng,
+                                                ),
+                                                'latlngDestino': serializeParam(
+                                                  FFAppState()
+                                                      .latlangAondeVaiIr,
+                                                  ParamType.LatLng,
+                                                ),
+                                                'estilo': serializeParam(
+                                                  _model.rideChoose,
+                                                  ParamType.String,
+                                                ),
+                                              }.withoutNulls,
                                               extra: <String, dynamic>{
                                                 kTransitionInfoKey:
                                                     TransitionInfo(
@@ -2223,6 +2250,8 @@ class _Home5WidgetState extends State<Home5Widget>
                                                 ),
                                               },
                                             );
+
+                                            safeSetState(() {});
                                           },
                                           child: Container(
                                             width: 120.0,

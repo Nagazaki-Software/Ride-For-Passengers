@@ -946,7 +946,7 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                               alignment: AlignmentDirectional(0.0, 0.0),
                               child: Text(
                                 FFLocalizations.of(context).getText(
-                                  '3uex1c8l' /* Boots */,
+                                  '3uex1c8l' /* Boosts */,
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium

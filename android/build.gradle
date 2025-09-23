@@ -19,15 +19,6 @@ subprojects {
     }
 }
 
-// Suppress warnings about obsolete Java compile options (e.g., source/target 8 on newer JDKs)
-subprojects {
-    afterEvaluate { project ->
-        project.tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
-            options.compilerArgs += ["-Xlint:-options"]
-        }
-    }
-}
-
 subprojects {
     afterEvaluate { project ->
         if (project.plugins.hasPlugin("com.android.application") ||
@@ -52,6 +43,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-tasks.register("clean", Delete) {
-    delete rootProject.layout.buildDirectory
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

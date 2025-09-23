@@ -7,8 +7,8 @@ final isProdPayments = false;
 
 // Test Braintree Credentials
 const kTestBraintreeTokenizationKey = 'sandbox_ck9vkcgg_brg8dhjg5tqpw496';
-const kTestGoogleMerchantId = '';
-const kTestAppleMerchantId = '';
+const kTestGoogleMerchantId = 'com.quicky.ridebahamas';
+const kTestAppleMerchantId = 'com.quicky.ridebahamas';
 
 // Production Braintree Credentials
 const kProdBraintreeTokenizationKey = '';

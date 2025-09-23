@@ -4,14 +4,29 @@ import '/components/share_q_r_code_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
+import '/flutter_flow/custom_functions.dart' as functions;
+import '/index.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'ride_share6_model.dart';
 export 'ride_share6_model.dart';
 
 class RideShare6Widget extends StatefulWidget {
-  const RideShare6Widget({super.key});
+  const RideShare6Widget({
+    super.key,
+    required this.value,
+    required this.latlngOrigem,
+    required this.latlngDestino,
+    required this.estilo,
+  });
+
+  final double? value;
+  final LatLng? latlngOrigem;
+  final LatLng? latlngDestino;
+  final String? estilo;
 
   static String routeName = 'RideShare6';
   static String routePath = '/rideShare6';
@@ -31,34 +46,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
     _model = createModel(context, () => RideShare6Model());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'RideShare6'});
-
-    // Join session if opened via link/QR with ?rideId=... and auto-set model.session
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      try {
-        final uri = GoRouterState.of(context).uri;
-        final rideId = uri.queryParameters['rideId'];
-        if ((rideId != null && rideId.isNotEmpty) && _model.session == null) {
-          final ref = RideOrdersRecord.collection.doc(rideId);
-          final snap = await ref.get();
-          final hasStatus =
-              ((snap.data() as Map<String, dynamic>?)?.containsKey('status')) ??
-                  false;
-          if (currentUserReference != null) {
-            final updateData = mapToFirestore({
-              'participantes': FieldValue.arrayUnion([currentUserReference]),
-              if (!hasStatus) 'status': 'waiting',
-            });
-            await ref.update(updateData);
-          } else if (!hasStatus) {
-            await ref.update(createRideOrdersRecordData(status: 'waiting'));
-          }
-          _model.session = ref;
-          safeSetState(() {});
-        }
-      } catch (_) {
-        // ignore parse or permission errors; user can still start a session
-      }
-    });
   }
 
   @override
@@ -80,54 +67,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
         backgroundColor: FlutterFlowTheme.of(context).primary,
         body: Stack(
           children: [
-            // Session watcher: when host moves status to 'payment', both navigate.
-            if (_model.session != null)
-              StreamBuilder<RideOrdersRecord>(
-                stream: RideOrdersRecord.getDocument(_model.session!),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const SizedBox.shrink();
-                  }
-                  final s = snapshot.data!;
-
-                  // If two or more participants and host created it, auto-mark payment stage if still waiting
-                  final isHost = s.hasUser() && s.user == currentUserReference;
-                  if (isHost && s.participantes.length >= 2 && s.status != 'payment' && s.status != 'paid') {
-                    // Fire-and-forget; do not await in build
-                    _model.session!.update(createRideOrdersRecordData(status: 'payment'));
-                  }
-
-                  if (s.status == 'payment' && !_model.movedToPayment) {
-                    _model.movedToPayment = true;
-                    // Compute the same value as Confirm Ride (not split)
-                    Future.microtask(() async {
-                      double value = 18.0;
-                      LatLng? latA = FFAppState().latlngAtual;
-                      LatLng? latB = FFAppState().latlangAondeVaiIr;
-                      // Fallback: use session-stored coordinates if app state is missing
-                      latA ??= s.latlngAtual;
-                      latB ??= s.latlng;
-                      if (latA != null && latB != null) {
-                        final orders = await queryRideOrdersRecordOnce();
-                        value = functions.mediaCorridaNesseKm(latA, latB, orders);
-                      } else if (s.hasRideValue() && s.rideValue > 0) {
-                        value = s.rideValue;
-                      }
-
-                      context.pushNamed(
-                        PaymentRide7Widget.routeName,
-                        queryParameters: {
-                          'estilo': serializeParam('Ride Share', ParamType.String),
-                          'latlngAtual': serializeParam(latA ?? const LatLng(0, 0), ParamType.LatLng),
-                          'latlngWhereTo': serializeParam(latB ?? (latA ?? const LatLng(0, 0)), ParamType.LatLng),
-                          'value': serializeParam(value, ParamType.double),
-                        }.withoutNulls,
-                      );
-                    });
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
             Align(
               alignment: AlignmentDirectional(0.0, 0.0),
               child: Column(
@@ -391,29 +330,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             var rideOrdersRecordReference =
                                                 RideOrdersRecord.collection
                                                     .doc();
-                                            if (currentUserReference == null) {
-                                              // Must be logged in to create a session
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Please log in to create a RideShare session.')),
-                                              );
-                                              return;
-                                            }
-                                            // Prepare coords and estimate similar to Confirm Ride
-                                            final latA = FFAppState().latlngAtual;
-                                            final latB = FFAppState().latlangAondeVaiIr;
-                                            double? estimate;
-                                            if (latA != null && latB != null) {
-                                              final orders = await queryRideOrdersRecordOnce();
-                                              estimate = functions.mediaCorridaNesseKm(latA, latB, orders);
-                                            }
                                             await rideOrdersRecordReference
                                                 .set({
                                               ...createRideOrdersRecordData(
                                                 rideShare: true,
-                                                status: 'waiting',
-                                                latlngAtual: latA,
-                                                latlng: latB,
-                                                rideValue: estimate,
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -428,10 +348,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                     .getDocumentFromData({
                                               ...createRideOrdersRecordData(
                                                 rideShare: true,
-                                                status: 'waiting',
-                                                latlngAtual: latA,
-                                                latlng: latB,
-                                                rideValue: estimate,
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -468,14 +384,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                         MediaQuery.viewInsetsOf(
                                                             context),
                                                     child: ShareQRCodeWidget(
-                                                      rideDoc: (_model
-                                                                  .rideOrderQR
-                                                                  ?.reference ??
-                                                              _model.session!),
+                                                      rideDoc: _model
+                                                          .rideOrderQR!
+                                                          .reference,
                                                       linkCurrentPage:
-                                                          'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=' +
-                                                              (_model.rideOrderQR?.reference.id ??
-                                                                  _model.session!.id),
                                                           'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
                                                     ),
                                                   ),
@@ -531,46 +443,123 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        width: 64.0,
-                                        height: 26.0,
-                                        decoration: BoxDecoration(
-                                          color: Color(0xA8414141),
-                                          borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(8.0),
-                                            bottomRight: Radius.circular(8.0),
-                                            topLeft: Radius.circular(8.0),
-                                            topRight: Radius.circular(8.0),
-                                          ),
-                                        ),
-                                        alignment:
-                                            AlignmentDirectional(0.0, 0.0),
-                                        child: Text(
-                                          FFLocalizations.of(context).getText(
-                                            'yglrvlqu' /* Link */,
-                                          ),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
+                                      Builder(
+                                        builder: (context) => InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () async {
+                                            logFirebaseEvent(
+                                                'RIDE_SHARE6_Container_cuzyuozq_ON_TAP');
+                                            if (_model.session != null) {
+                                              logFirebaseEvent(
+                                                  'Container_share');
+                                              await Share.share(
+                                                'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                sharePositionOrigin:
+                                                    getWidgetBoundingBox(
+                                                        context),
+                                              );
+                                            } else {
+                                              logFirebaseEvent(
+                                                  'Container_backend_call');
+
+                                              var rideOrdersRecordReference =
+                                                  RideOrdersRecord.collection
+                                                      .doc();
+                                              await rideOrdersRecordReference
+                                                  .set({
+                                                ...createRideOrdersRecordData(
+                                                  rideShare: true,
                                                 ),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
-                                                fontSize: 10.0,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.w600,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                                ...mapToFirestore(
+                                                  {
+                                                    'participantes': [
+                                                      currentUserReference
+                                                    ],
+                                                  },
+                                                ),
+                                              });
+                                              _model.rideOrderQRCopy =
+                                                  RideOrdersRecord
+                                                      .getDocumentFromData({
+                                                ...createRideOrdersRecordData(
+                                                  rideShare: true,
+                                                ),
+                                                ...mapToFirestore(
+                                                  {
+                                                    'participantes': [
+                                                      currentUserReference
+                                                    ],
+                                                  },
+                                                ),
+                                              }, rideOrdersRecordReference);
+                                              logFirebaseEvent(
+                                                  'Container_update_page_state');
+                                              _model.session = _model
+                                                  .rideOrderQRCopy?.reference;
+                                              safeSetState(() {});
+                                              logFirebaseEvent(
+                                                  'Container_share');
+                                              await Share.share(
+                                                'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                sharePositionOrigin:
+                                                    getWidgetBoundingBox(
+                                                        context),
+                                              );
+                                            }
+
+                                            safeSetState(() {});
+                                          },
+                                          child: Container(
+                                            width: 64.0,
+                                            height: 26.0,
+                                            decoration: BoxDecoration(
+                                              color: Color(0xA8414141),
+                                              borderRadius: BorderRadius.only(
+                                                bottomLeft:
+                                                    Radius.circular(8.0),
+                                                bottomRight:
+                                                    Radius.circular(8.0),
+                                                topLeft: Radius.circular(8.0),
+                                                topRight: Radius.circular(8.0),
                                               ),
+                                            ),
+                                            alignment:
+                                                AlignmentDirectional(0.0, 0.0),
+                                            child: Text(
+                                              FFLocalizations.of(context)
+                                                  .getText(
+                                                'yglrvlqu' /* Link */,
+                                              ),
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .bodyMedium
+                                                  .override(
+                                                    font: GoogleFonts.poppins(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .secondaryText,
+                                                    fontSize: 10.0,
+                                                    letterSpacing: 0.0,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ].divide(SizedBox(width: 30.0)),
@@ -717,84 +706,135 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
 
                                     final rowRideOrdersRecord = snapshot.data!;
 
-                                    return Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Container(
-                                          width: 34.0,
-                                          height: 34.0,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xA5414141),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              Container(
-                                                width: 200.0,
-                                                height: 200.0,
-                                                clipBehavior: Clip.antiAlias,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: Image.network(
-                                                  'https://picsum.photos/seed/744/600',
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  '0flx0fil' /* Hello World */,
-                                                ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
+                                    return Builder(
+                                      builder: (context) {
+                                        final user = rowRideOrdersRecord
+                                            .participantes
+                                            .toList();
+
+                                        return Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: List.generate(user.length,
+                                              (userIndex) {
+                                            final userItem = user[userIndex];
+                                            return FutureBuilder<UsersRecord>(
+                                              future:
+                                                  UsersRecord.getDocumentOnce(
+                                                      userItem),
+                                              builder: (context, snapshot) {
+                                                // Customize what your widget looks like when it's loading.
+                                                if (!snapshot.hasData) {
+                                                  return Center(
+                                                    child: SizedBox(
+                                                      width: 50.0,
+                                                      height: 50.0,
+                                                      child:
+                                                          SpinKitDoubleBounce(
+                                                        color:
                                                             FlutterFlowTheme.of(
                                                                     context)
-                                                                .bodyMedium
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
+                                                                .accent1,
+                                                        size: 50.0,
                                                       ),
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
                                                     ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 34.0,
-                                          height: 34.0,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xA5414141),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 34.0,
-                                          height: 34.0,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xA5414141),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                      ].divide(SizedBox(width: 8.0)),
+                                                  );
+                                                }
+
+                                                final containerUsersRecord =
+                                                    snapshot.data!;
+
+                                                return Container(
+                                                  width: 34.0,
+                                                  height: 34.0,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xA5414141),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Stack(
+                                                    children: [
+                                                      if (containerUsersRecord
+                                                                  .photoUrl !=
+                                                              '')
+                                                        Container(
+                                                          width: 200.0,
+                                                          height: 200.0,
+                                                          clipBehavior:
+                                                              Clip.antiAlias,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                          ),
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            fadeInDuration:
+                                                                Duration(
+                                                                    milliseconds:
+                                                                        500),
+                                                            fadeOutDuration:
+                                                                Duration(
+                                                                    milliseconds:
+                                                                        500),
+                                                            imageUrl:
+                                                                containerUsersRecord
+                                                                    .photoUrl,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      if (containerUsersRecord
+                                                                  .photoUrl ==
+                                                              '')
+                                                        Align(
+                                                          alignment:
+                                                              AlignmentDirectional(
+                                                                  0.0, 0.0),
+                                                          child: Text(
+                                                            valueOrDefault<
+                                                                String>(
+                                                              functions.partesDoName(
+                                                                  containerUsersRecord
+                                                                      .displayName),
+                                                              'LC',
+                                                            ),
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font: GoogleFonts
+                                                                      .poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .alternate,
+                                                                  fontSize:
+                                                                      13.0,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          }).divide(SizedBox(width: 8.0)),
+                                        );
+                                      },
                                     );
                                   },
                                 ),
@@ -1188,9 +1228,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            FFLocalizations.of(context).getText(
-                                              'j447514y' /* of $19.50 total */,
-                                            ),
+                                            'of ${formatNumber(
+                                              widget.value,
+                                              formatType: FormatType.decimal,
+                                              decimalType:
+                                                  DecimalType.commaDecimal,
+                                              currency: '\$ ',
+                                            )} total',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -1443,27 +1487,69 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ),
                         ),
                       ),
-                      Container(
-                        width: 320.0,
-                        height: 32.0,
-                        decoration: BoxDecoration(
-                          color: Color(0xA5414141),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(18.0),
-                            bottomRight: Radius.circular(18.0),
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          logFirebaseEvent(
+                              'RIDE_SHARE6_Container_21iw93zs_ON_TAP');
+                          logFirebaseEvent('Container_navigate_to');
+
+                          context.pushNamed(
+                            PaymentRide7Widget.routeName,
+                            queryParameters: {
+                              'estilo': serializeParam(
+                                widget.estilo,
+                                ParamType.String,
+                              ),
+                              'latlngAtual': serializeParam(
+                                widget.latlngOrigem,
+                                ParamType.LatLng,
+                              ),
+                              'latlngWhereTo': serializeParam(
+                                widget.latlngDestino,
+                                ParamType.LatLng,
+                              ),
+                              'value': serializeParam(
+                                widget.value,
+                                ParamType.double,
+                              ),
+                            }.withoutNulls,
+                          );
+                        },
+                        child: Container(
+                          width: 320.0,
+                          height: 32.0,
+                          decoration: BoxDecoration(
+                            color: Color(0xA5414141),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(18.0),
+                              bottomRight: Radius.circular(18.0),
+                              topLeft: Radius.circular(18.0),
+                              topRight: Radius.circular(18.0),
+                            ),
                           ),
-                        ),
-                        alignment: AlignmentDirectional(0.0, 0.0),
-                        child: Text(
-                          FFLocalizations.of(context).getText(
-                            '4br05fcj' /* Skip for now */,
-                          ),
-                          style: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .override(
-                                font: GoogleFonts.poppins(
+                          alignment: AlignmentDirectional(0.0, 0.0),
+                          child: Text(
+                            FFLocalizations.of(context).getText(
+                              '4br05fcj' /* Skip for now */,
+                            ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  color: FlutterFlowTheme.of(context).alternate,
+                                  fontSize: 10.0,
+                                  letterSpacing: 0.0,
                                   fontWeight: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .fontWeight,
@@ -1471,16 +1557,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                       .bodyMedium
                                       .fontStyle,
                                 ),
-                                color: FlutterFlowTheme.of(context).alternate,
-                                fontSize: 10.0,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
+                          ),
                         ),
                       ),
                       Padding(

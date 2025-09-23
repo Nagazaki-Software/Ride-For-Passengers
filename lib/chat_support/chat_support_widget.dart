@@ -689,6 +689,11 @@ class _ChatSupportWidgetState extends State<ChatSupportWidget>
                             msgdosystema: false,
                             documentUser: currentUserReference,
                           ));
+                          logFirebaseEvent(
+                              'TextField_clear_text_fields_pin_codes');
+                          safeSetState(() {
+                            _model.textController?.clear();
+                          });
                         },
                         autofocus: false,
                         textCapitalization: TextCapitalization.sentences,
@@ -811,6 +816,11 @@ class _ChatSupportWidgetState extends State<ChatSupportWidget>
                           msgdosystema: false,
                           documentUser: currentUserReference,
                         ));
+                        logFirebaseEvent(
+                            'IconButtonSend_clear_text_fields_pin_cod');
+                        safeSetState(() {
+                          _model.textController?.clear();
+                        });
                       },
                     ),
                   ].divide(SizedBox(width: 12.0)),

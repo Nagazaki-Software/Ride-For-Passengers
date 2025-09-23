@@ -125,7 +125,14 @@ final parametersBuilderMap =
       ),
   'Home5': ParameterData.none(),
   'ChoosePass4': ParameterData.none(),
-  'RideShare6': ParameterData.none(),
+  'RideShare6': (data) async => ParameterData(
+        allParams: {
+          'value': getParameter<double>(data, 'value'),
+          'latlngOrigem': getParameter<LatLng>(data, 'latlngOrigem'),
+          'latlngDestino': getParameter<LatLng>(data, 'latlngDestino'),
+          'estilo': getParameter<String>(data, 'estilo'),
+        },
+      ),
   'PaymentRide7': (data) async => ParameterData(
         allParams: {
           'estilo': getParameter<String>(data, 'estilo'),
@@ -149,7 +156,7 @@ final parametersBuilderMap =
   'RideProgressCopy11': ParameterData.none(),
   'HowDriveDo12': ParameterData.none(),
   'Rewards13': ParameterData.none(),
-  'ScheduleRide14': ParameterData.none(),
+  'ScheduleRider': ParameterData.none(),
   'Profile15': ParameterData.none(),
   'PaymentMothods16': ParameterData.none(),
   'Rewards17': ParameterData.none(),

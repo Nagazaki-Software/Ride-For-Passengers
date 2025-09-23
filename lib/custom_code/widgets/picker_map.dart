@@ -11,6 +11,18 @@ import 'package:flutter/material.dart';
 // Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
+import 'index.dart'; // Imports other custom widgets
+
+import 'index.dart'; // Imports other custom widgets
+
+import 'index.dart'; // Imports other custom widgets
+
+import 'index.dart'; // Imports other custom widgets
+
+import 'index.dart'; // Imports other custom widgets
+
+import 'index.dart'; // Imports other custom widgets
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -20,8 +32,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:characters/characters.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fa;
 
 import '/flutter_flow/lat_lng.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,19 +57,25 @@ class PickerMap extends StatefulWidget {
     this.refreshMs = 8000,
     this.traceThrottleMs = 90,
     this.routeColor = const Color(0xFFFFC107),
-    this.routeWidth = 14,
+    this.routeWidth = 8,
     this.liveTraceColor = const Color(0xFF00E5FF),
     this.liveTraceWidth = 4,
     this.userMarkerSize = 64,
     this.driverIconWidth = 72,
-    this.driverDriverIconUrl,
-    this.driverTaxiIconUrl,
+
+    // Ãcones
+    this.driverDriverIconUrl =
+        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+    this.driverTaxiIconUrl =
+        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+    this.markerDestinationIconUrl =
+        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png', // <â€”â€” novo: destino dedicado
+
     this.borderRadius = 16,
     this.brandSafePaddingBottom = 0,
     this.fadeInMs = 420,
     this.enableRouteSnake = true,
-    this.snakeDurationMsOverride, // se quiser forçar (ms)
-    this.snakeSpeedFactor = 1.4,
+    this.snakeDurationMsOverride, // se quiser forÃ§ar (ms)
     this.snakeSpeedFactor = 1.0,
     this.driverTweenMs = 320,
     this.ultraLowSpecMode = false,
@@ -78,15 +98,17 @@ class PickerMap extends StatefulWidget {
   final int userMarkerSize;
   final int driverIconWidth;
 
-  final String? driverDriverIconUrl; // usado p/ driver ou destino (driver)
-  final String? driverTaxiIconUrl; // usado p/ driver ou destino (taxi)
+  final String? driverDriverIconUrl; // usado p/ driver
+  final String? driverTaxiIconUrl; // usado p/ driver
+  final String? markerDestinationIconUrl; // <â€”â€” usado p/ destino
 
   final double borderRadius;
   final double brandSafePaddingBottom;
 
   final bool enableRouteSnake;
   final int? snakeDurationMsOverride;
-  final double snakeSpeedFactor; // 1.0 = esperto; <1 mais rápido; >1 mais lento
+  final double
+      snakeSpeedFactor; // 1.0 = esperto; <1 mais rÃ¡pido; >1 mais lento
   final int driverTweenMs;
 
   final bool ultraLowSpecMode;
@@ -116,7 +138,7 @@ class _PickerMapState extends State<PickerMap>
   bool _veilVisible = true;
 
   final Map<String, nmap.LatLng> _markerPos = {};
-  final Map<String, String> _markerTitle = {};
+  final Map<String, String?> _markerTitle = {};
 
   final Map<String, StreamSubscription<DocumentSnapshot>> _subs = {};
   final Map<String, nmap.LatLng> _driverPos = {};
@@ -137,16 +159,8 @@ class _PickerMapState extends State<PickerMap>
   late final Ticker _ticker;
   bool _snaking = false;
   double _snakeT = 0.0;
-  int _snakeDurationMs = 9000; // mais rápido por padrão
+  int _snakeDurationMs = 9000; // mais rÃ¡pido por padrÃ£o
   int _lastCamUpdateMs = 0;
-
-  // Follow suave do usu�rio quando sem destino
-  nmap.LatLng? _lastUserCamTarget;
-  int _lastUserFollowMs = 0;
-
-  // Re-roteamento (debounce) e controle de concorr�ncia
-  Timer? _rerouteDebounce;
-  int _routeReqSeq = 0;
 
   // Idle camera quando destination == null
   Timer? _idleCamTimer;
@@ -157,7 +171,6 @@ class _PickerMapState extends State<PickerMap>
   static const String _kBaseMain = 'route_base_main';
   static const String _kSnakeOutline = 'route_snake_outline';
   static const String _kSnakeMain = 'route_snake_main';
-  static const String _kDestIconUrl = 'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png';
 
   final Map<String, bool> _polylineCanInplaceUpdate = {};
 
@@ -167,7 +180,7 @@ class _PickerMapState extends State<PickerMap>
   nmap.LatLng _gm(LatLng p) => nmap.LatLng(p.latitude, p.longitude);
 
   // Enquadramento mais aberto quando a linha entra
-  static const double _kSnakeFitPadding = 560.0;
+  static const double _kSnakeFitPadding = 1300.0;
 
   @override
   void initState() {
@@ -178,18 +191,9 @@ class _PickerMapState extends State<PickerMap>
         return;
 
       // velocidade do snake
-      // velocidade do snake
-      // Se override for fornecido, respeita-o (dentro de limites mais amplos),
-      // sen�o usa c�lculo autom�tico em uma faixa mais r�pida.
-      final int dur = (widget.snakeDurationMsOverride != null
-              ? widget.snakeDurationMsOverride!
-                  .clamp(500, 30000) // permite anima��es bem r�pidas
-              : _autoDurationMs(_totalDist, factor: widget.snakeSpeedFactor)
-                  .clamp(2000, 12000))
-          .toInt();
       final int dur = (widget.snakeDurationMsOverride ??
               _autoDurationMs(_totalDist, factor: widget.snakeSpeedFactor))
-          .clamp(6000, 14000); // rápido/esperto
+          .clamp(6000, 14000); // rÃ¡pido/esperto
       _snakeDurationMs = dur;
 
       final double raw = (elapsed.inMilliseconds / dur).clamp(0.0, 1.0);
@@ -224,7 +228,7 @@ class _PickerMapState extends State<PickerMap>
         geodesic: true,
       );
 
-      // Follow de câmera mais amplo
+      // Follow de cÃ¢mera mais amplo
       final int now = DateTime.now().millisecondsSinceEpoch;
       if (now - _lastCamUpdateMs > 140) {
         _lastCamUpdateMs = now;
@@ -236,8 +240,6 @@ class _PickerMapState extends State<PickerMap>
             target: headPos,
             zoom: _zoomForDistance(_totalDist),
             bearing: br,
-            tilt: 24.0,
-            durationMs: 380,
             tilt: 54.0,
             durationMs: 240,
           );
@@ -275,31 +277,39 @@ class _PickerMapState extends State<PickerMap>
   void didUpdateWidget(covariant PickerMap oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    // If any marker icon URLs changed, try to refresh markers (will no-op if map not ready)
+    if (oldWidget.markerDestinationIconUrl != widget.markerDestinationIconUrl ||
+        oldWidget.driverDriverIconUrl != widget.driverDriverIconUrl ||
+        oldWidget.driverTaxiIconUrl != widget.driverTaxiIconUrl) {
+      // attempt async update but don't await here
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => _placeCoreMarkers());
+    }
+
     // Mudou o destino? alterna modos e (re)planeja
     if (oldWidget.destination == null && widget.destination != null) {
+      // came from no-destination -> plan route
       _stopIdleCam();
       _prepareRoute().then((_) => _startSnake());
     } else if (oldWidget.destination != null && widget.destination == null) {
-      _clearRoute();
-      try { _controller?.removeMarker('dest'); } catch (_) {}
-      _markerIds.remove('dest');
-      _markerPos.remove('dest');
-      _markerTitle.remove('dest');
-      _returnToUserFromRoute();
-      _snapToUser();
-      _startIdleCam();
-    } else if (oldWidget.destination != null && widget.destination != null) {
-      // Ambos n�o nulos: se coordenadas mudarem, reagenda o re-roteamento
-      final LatLng a = oldWidget.destination!;
-      final LatLng b = widget.destination!;
-      final bool changed = (a.latitude - b.latitude).abs() > 1e-6 ||
-          (a.longitude - b.longitude).abs() > 1e-6;
-      if (changed) {
-        _stopIdleCam();
-        _scheduleReroute();
-        return;
-      }
+      // went to no-destination -> clear immediately, then cinematic return
+      _snaking = false;
+      _stopIdleCam();
+      // limpa rota e destino jÃ¡ (sem depender de animaÃ§Ã£o)
+      unawaited(_clearRoute());
+      unawaited(_removeDestMarker());
+      if (mounted) setState(() {});
+      _returnToUserCinematic();
+    } else if (oldWidget.destination != null &&
+        widget.destination != null &&
+        (oldWidget.destination!.latitude != widget.destination!.latitude ||
+            oldWidget.destination!.longitude !=
+                widget.destination!.longitude)) {
+      // destination changed to a different LatLng -> replan route
+      _stopIdleCam();
+      _prepareRoute().then((_) => _startSnake());
     } else {
+      // no significant change to destination: update markers and optionally snap
       _placeCoreMarkers();
       if (widget.destination == null) _snapToUser();
     }
@@ -366,7 +376,7 @@ class _PickerMapState extends State<PickerMap>
                 } catch (_) {}
 
                 SchedulerBinding.instance.addPostFrameCallback((_) async {
-                  await _placeCoreMarkers(); // cria já com ícone (sem vermelho)
+                  await _placeCoreMarkers(); // cria jÃ¡ com Ã­cone (sem vermelho)
                   _subscribeDrivers();
 
                   if (widget.destination != null) {
@@ -401,7 +411,7 @@ class _PickerMapState extends State<PickerMap>
     );
   }
 
-  // ===== Idle camera / Snap para usuário =====
+  // ===== Idle camera / Snap para usuÃ¡rio =====
   void _startIdleCam() {
     _stopIdleCam();
     if (!_mapReady || _controller == null) return;
@@ -444,32 +454,139 @@ class _PickerMapState extends State<PickerMap>
     } catch (_) {}
   }
 
-  Future<void> _returnToUserFromRoute() async {
-    if (!_mapReady || _controller == null) return;
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 16.2,
-        bearing: 0,
-        tilt: 0,
-        durationMs: 520,
-      );
-      _lastUserCamTarget = _gm(widget.userLocation);
-      _lastUserFollowMs = DateTime.now().millisecondsSinceEpoch;
-    } catch (_) {}
-  }
-
-  // ===== Limpa rota quando destination == null =====
+  // Limpa rota e polylines
   Future<void> _clearRoute() async {
     _snaking = false;
     _snakeT = 0.0;
+    try {
+      _ticker.stop();
+    } catch (_) {}
     _route = <nmap.LatLng>[];
     _cumDist = <double>[];
     _totalDist = 0.0;
     for (final id in [_kBaseOutline, _kBaseMain, _kSnakeOutline, _kSnakeMain]) {
       await _removePolyline(id);
     }
+    // ForÃ§a um "redraw" do mapa com micro-nudge para garantir remoÃ§Ã£o visual
+    try {
+      final dynamic dc = _controller;
+      await dc.animateCameraBy(dx: 0.1, dy: 0.0);
+      await Future<void>.delayed(const Duration(milliseconds: 24));
+      await dc.animateCameraBy(dx: -0.1, dy: 0.0);
+    } catch (_) {}
+  }
+
+  Future<void> _removeDestMarker() async {
+    if (_markerIds.contains('dest')) {
+      try {
+        await _controller?.removeMarker('dest');
+      } catch (_) {}
+      _markerIds.remove('dest');
+      _markerPos.remove('dest');
+      _markerTitle.remove('dest');
+    }
+  }
+
+  // ===== Volta cinematogrÃ¡fica quando destination == null =====
+  Future<void> _returnToUserCinematic() async {
+    _stopIdleCam();
+    // limpa imediatamente para refletir no mapa sem precisar tocar na tela
+    await _clearRoute();
+    await _removeDestMarker();
+    if (mounted) setState(() {});
+
+    // 1) zoom-out leve + giro
+    try {
+      final dynamic dc = _controller;
+      await dc.animateCameraTo(
+        target: _gm(widget.userLocation),
+        zoom: 14.4,
+        bearing: (_idleBearing + 120) % 360,
+        tilt: 48.0,
+        durationMs: 560,
+      );
+    } catch (_) {}
+
+    // 2) zoom-in suave + 3D nice
+    try {
+      final dynamic dc = _controller;
+      await dc.animateCameraTo(
+        target: _gm(widget.userLocation),
+        zoom: 16.9,
+        bearing: 0.0,
+        tilt: 58.0,
+        durationMs: 640,
+      );
+    } catch (_) {}
+
+    // 3) pulso no marcador do usuÃ¡rio
+    await _pulseUserOnce();
+
+    // Inicia idle cam
+    _startIdleCam();
+  }
+
+  Future<void> _pulseUserOnce() async {
+    try {
+      final int size = widget.userMarkerSize.clamp(36, 128);
+      final Uint8List pulse = await _makeUserAvatarBytes(
+        name: widget.userName ?? 'VocÃª',
+        photoUrl: widget.userPhotoUrl,
+        diameter: size,
+      ).then((base) => _withPulseRing(base, size));
+
+      final Uint8List normal = await _makeUserAvatarBytes(
+        name: widget.userName ?? 'VocÃª',
+        photoUrl: widget.userPhotoUrl,
+        diameter: size,
+      );
+
+      final dynamic dc = _controller;
+      await dc.setMarkerIconBytes(id: 'user', bytes: pulse);
+      await Future<void>.delayed(const Duration(milliseconds: 360));
+      await dc.setMarkerIconBytes(id: 'user', bytes: normal);
+    } catch (_) {}
+  }
+
+  Future<Uint8List> _withPulseRing(Uint8List base, int size) async {
+    final ui.Codec codec = await ui.instantiateImageCodec(base,
+        targetWidth: size, targetHeight: size);
+    final ui.Image img = (await codec.getNextFrame()).image;
+
+    final rec = ui.PictureRecorder();
+    final c = ui.Canvas(rec);
+    final s = size.toDouble();
+    final center = ui.Offset(s / 2, s / 2);
+
+    // glow
+    c.drawCircle(
+        center,
+        s * 0.55,
+        ui.Paint()
+          ..color = widget.routeColor.withOpacity(.28)
+          ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 18));
+
+    // base
+    c.drawImageRect(
+      img,
+      ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      ui.Rect.fromLTWH(0, 0, s, s),
+      ui.Paint(),
+    );
+
+    // anel
+    c.drawCircle(
+        center,
+        s * 0.50,
+        ui.Paint()
+          ..style = ui.PaintingStyle.stroke
+          ..strokeWidth = 6
+          ..color = widget.routeColor.withOpacity(.95));
+
+    final ui.Image out = await rec.endRecording().toImage(size, size);
+    final ByteData? bytes =
+        await out.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
   }
 
   // ================= MARKERS (sem pin vermelho) =================
@@ -477,78 +594,82 @@ class _PickerMapState extends State<PickerMap>
   Future<void> _placeCoreMarkers() async {
     if (!_mapReady || _controller == null) return;
 
-    // USER — só adiciona quando o PNG estiver pronto
     final nmap.LatLng user = _gm(widget.userLocation);
     if (!_markerIds.contains('user')) {
       final Uint8List userBytes = await _makeUserAvatarBytes(
-        name: widget.userName ?? 'Você',
+        name: widget.userName ?? 'VocÃª',
         photoUrl: widget.userPhotoUrl,
         diameter: widget.userMarkerSize.clamp(36, 128),
       );
-      await _addMarkerWithIconFile(
+      await _addOrUpdateMarker(
         id: 'user',
         position: user,
-        title: null,
-        title: widget.userName ?? 'Você',
+        title: widget.userName ?? 'VocÃª',
         anchorU: 0.5,
         anchorV: 0.5,
         zIndex: 30.0,
         bytesIcon: userBytes,
       );
-      _markerPos['user'] = user;
-      _markerTitle['user'] = widget.userName ?? 'Você';
     } else {
       try {
         await _controller!.updateMarker('user', position: user);
       } catch (_) {}
       _markerPos['user'] = user;
+      _markerTitle['user'] = widget.userName ?? 'VocÃª';
     }
 
-    // DESTINO — usa suas URLs (taxi/driver) p/ não criar prop nova
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
-        // �cone fixo do destino (for�ado)
-        Uint8List? bytes = await _downloadAndResize(_kDestIconUrl, widget.driverIconWidth.clamp(36, 128));
-        // fallback: bolinha estilizada (n�o vermelho)
-        // preferir taxi p/ destino; senão driver
-        final String? prefUrl =
-            ((widget.driverTaxiIconUrl ?? '').trim().isNotEmpty)
-                ? widget.driverTaxiIconUrl
-                : ((widget.driverDriverIconUrl ?? '').trim().isNotEmpty)
-                    ? widget.driverDriverIconUrl
-                    : null;
+        String? prefUrl =
+            ((widget.markerDestinationIconUrl ?? '').trim().isNotEmpty)
+                ? widget.markerDestinationIconUrl
+                : ((widget.driverTaxiIconUrl ?? '').trim().isNotEmpty)
+                    ? widget.driverTaxiIconUrl
+                    : ((widget.driverDriverIconUrl ?? '').trim().isNotEmpty)
+                        ? widget.driverDriverIconUrl
+                        : null;
 
         Uint8List? bytes;
-        if (prefUrl != null && !_looksSvg(prefUrl)) {
+        String? assetPath;
+        if (prefUrl != null) {
+          // 1) tenta asset local com o mesmo nome do arquivo
+          bytes = await _tryLoadAssetPng(
+              prefUrl, widget.driverIconWidth.clamp(36, 128));
+          if (bytes != null) assetPath = _assetPathFromUrlOrName(prefUrl);
+        }
+        // 2) fallback: baixar
+        if (bytes == null && prefUrl != null && !_looksSvg(prefUrl)) {
           bytes = await _downloadAndResize(
               _massageUrl(prefUrl), widget.driverIconWidth.clamp(36, 128));
         }
-        // fallback: bolinha estilizada (não vermelho)
         bytes ??= await _drawCirclePinPng(
             size: 96, color: widget.routeColor, stroke: 4.0);
 
-        await _addMarkerWithIconFile(
+        await _addOrUpdateMarker(
           id: 'dest',
           position: dest,
-          title: null,
+          title: 'Destino',
           anchorU: 0.5,
           anchorV: 0.5,
           zIndex: 25.0,
           bytesIcon: bytes,
+          assetIconPath: assetPath,
         );
-        _markerPos['dest'] = dest;
       } else {
         try {
           await _controller!.updateMarker('dest', position: dest);
         } catch (_) {}
         _markerPos['dest'] = dest;
+        _markerTitle['dest'] = 'Destino';
       }
+    } else {
+      await _removeDestMarker();
     }
   }
 
-  // Adiciona COM ícone de arquivo local e reforça com bytes (sem flicker vermelho)
-  Future<void> _addMarkerWithIconFile({
+  // Adiciona COM Ã­cone de arquivo local e reforÃ§a com bytes (sem flicker)
+  Future<void> _addMarkerWithIconPrepared_legacy({
     required String id,
     required nmap.LatLng position,
     String? title,
@@ -557,115 +678,67 @@ class _PickerMapState extends State<PickerMap>
     required double zIndex,
     required Uint8List bytesIcon,
   }) async {
-    final path = await _writeTempPng(bytesIcon);
-    if (path == null) return;
+    if (_controller == null) return;
+
+    // Prepara um arquivo temporÃ¡rio para evitar qualquer flash de pin vermelho.
+    final String? tmpPath = await _writeTempPng(bytesIcon);
 
     if (_markerIds.contains(id)) {
       try {
-        await _controller?.removeMarker(id);
+        await _controller!.updateMarker(id, position: position);
       } catch (_) {}
-      _markerIds.remove(id);
-    }
-
-    bool added = false;
-    Future<bool> tryAdd(String iconUrl) async {
+    } else {
       try {
-        await _controller?.addMarker(nmap.MarkerOptions(
+        await _controller!.addMarker(nmap.MarkerOptions(
           id: id,
           position: position,
-          title: null,
-          iconUrl: iconUrl,
+          title: title,
+          iconUrl: tmpPath != null ? 'file://$tmpPath' : null,
           anchorU: anchorU,
           anchorV: anchorV,
           zIndex: zIndex,
         ));
         _markerIds.add(id);
-        return true;
       } catch (_) {
-        return false;
+        return;
       }
     }
 
-    // Tenta com file:// e sem prefixo
-    if (await tryAdd('file://$path') || await tryAdd(path)) {
-      added = true;
-      try {
-        await _applyMarkerBytesWithRetry(id, bytesIcon);
-        final dynamic dc = _controller;
-        await dc.setMarkerIconBytes(id: id, bytes: bytesIcon);
-      } catch (_) {}
-    }
+    _markerPos[id] = position;
+    _markerTitle[id] = title;
 
-    if (!added) {
-      // Fallback: cria com PNG transparente para evitar flicker vermelho, depois aplica bytes reais
-      try {
-        final transparent = await _transparentPng();
-        final tpath = await _writeTempPng(transparent);
-        if (tpath != null) {
-          await _controller?.addMarker(nmap.MarkerOptions(
+    // ReforÃ§a com bytes (se possÃ­vel) para mÃ¡xima nitidez e evitar depender de arquivo.
+    try {
+      final dynamic dc = _controller;
+      await dc.setMarkerIconBytes(
+        id: id,
+        bytes: bytesIcon,
+        anchorU: anchorU,
+        anchorV: anchorV,
+      );
+    } catch (_) {
+      // Se falhar e o marcador nÃ£o foi criado com Ã­cone, tente reâ€‘criar com o arquivo.
+      if (tmpPath != null && _markerIds.contains(id)) {
+        try {
+          await _controller!.removeMarker(id);
+          _markerIds.remove(id);
+        } catch (_) {}
+        try {
+          await _controller!.addMarker(nmap.MarkerOptions(
             id: id,
             position: position,
-            title: null,
-            iconUrl: 'file://' + tpath,
+            title: title,
+            iconUrl: 'file://$tmpPath',
             anchorU: anchorU,
             anchorV: anchorV,
             zIndex: zIndex,
           ));
           _markerIds.add(id);
-          try {
-            await _applyMarkerBytesWithRetry(id, bytesIcon);
-          } catch (_) {}
-        }
-      } catch (_) {}
-    }
-  }
-
-  void _scheduleReroute() {
-    _rerouteDebounce?.cancel();
-    _rerouteDebounce = Timer(const Duration(milliseconds: 360), () async {
-      if (!mounted || widget.destination == null) return;
-      // marca nova requisi��o de rota
-      _routeReqSeq++;
-      await _clearRoute();
-      await _placeCoreMarkers();
-      await _prepareRoute();
-      if (mounted) _startSnake();
-    });
-  }
-
-  Future<void> _applyMarkerBytesWithRetry(String id, Uint8List bytes,
-      {int attempts = 5}) async {
-    for (int i = 0; i < attempts; i++) {
-      try {
-        final dynamic dc = _controller;
-        await Future<void>.delayed(Duration(milliseconds: 24 * (i + 1)));
-        await dc.setMarkerIconBytes(id: id, bytes: bytes);
-        return;
-      // fallback absoluto: adiciona sem ícone e depois aplica bytes
-      try {
-        await _controller?.addMarker(nmap.MarkerOptions(
-          id: id,
-          position: position,
-          title: title,
-          anchorU: anchorU,
-          anchorV: anchorV,
-          zIndex: zIndex,
-        ));
-        _markerIds.add(id);
-        try {
-          final dynamic dc = _controller;
-          await dc.setMarkerIconBytes(id: id, bytes: bytesIcon);
+          _markerPos[id] = position;
+          _markerTitle[id] = title;
         } catch (_) {}
-      } catch (_) {}
+      }
     }
-  }
-
-  Future<Uint8List> _transparentPng({int size = 4}) async {
-    final rec = ui.PictureRecorder();
-    final c = ui.Canvas(rec);
-    final img = await rec.endRecording().toImage(size, size);
-    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-    return bytes!.buffer.asUint8List();
   }
 
   Future<Uint8List> _drawCirclePinPng({
@@ -697,6 +770,80 @@ class _PickerMapState extends State<PickerMap>
   }
 
   // ================= DRIVERS =================
+
+  // Nova versÃ£o: adiciona marcador usando asset (se houver) e reforÃ§a com bytes para nitidez.
+  Future<void> _addOrUpdateMarker({
+    required String id,
+    required nmap.LatLng position,
+    String? title,
+    required double anchorU,
+    required double anchorV,
+    required double zIndex,
+    required Uint8List bytesIcon,
+    String? assetIconPath,
+  }) async {
+    if (_controller == null) return;
+
+    // Sempre tenta gerar um arquivo temporário a partir dos bytes para usar como ícone inicial.
+    final String? tmpPath = await _writeTempPng(bytesIcon);
+
+    if (_markerIds.contains(id)) {
+      try {
+        await _controller!.updateMarker(id, position: position);
+      } catch (_) {}
+    } else {
+      try {
+        await _controller!.addMarker(nmap.MarkerOptions(
+          id: id,
+          position: position,
+          title: title,
+          iconUrl: (tmpPath != null ? 'file://$tmpPath' : assetIconPath),
+          anchorU: anchorU,
+          anchorV: anchorV,
+          zIndex: zIndex,
+        ));
+        _markerIds.add(id);
+      } catch (_) {
+        return;
+      }
+    }
+
+    _markerPos[id] = position;
+    _markerTitle[id] = title;
+
+    try {
+      final dynamic dc = _controller;
+      await dc.setMarkerIconBytes(
+        id: id,
+        bytes: bytesIcon,
+        anchorU: anchorU,
+        anchorV: anchorV,
+      );
+    } catch (_) {
+      final String? fallbackUrl =
+          (tmpPath != null ? 'file://$tmpPath' : assetIconPath);
+      if (fallbackUrl != null && _markerIds.contains(id)) {
+        try {
+          await _controller!.removeMarker(id);
+          _markerIds.remove(id);
+        } catch (_) {}
+        try {
+          await _controller!.addMarker(nmap.MarkerOptions(
+            id: id,
+            position: position,
+            title: title,
+            iconUrl: fallbackUrl,
+            anchorU: anchorU,
+            anchorV: anchorV,
+            zIndex: zIndex,
+          ));
+          _markerIds.add(id);
+          _markerPos[id] = position;
+          _markerTitle[id] = title;
+        } catch (_) {}
+      }
+    }
+  }
 
   void _subscribeDrivers() {
     for (final s in _subs.values) {
@@ -774,21 +921,32 @@ class _PickerMapState extends State<PickerMap>
         final last = _driverPos[id];
         if (last == null) {
           Uint8List? bytes;
-          if ((rawUrl ?? '').trim().isNotEmpty && !_looksSvg(rawUrl)) {
+          String? assetPath;
+          if ((rawUrl ?? '').trim().isNotEmpty) {
+            // 1) tenta asset local por nome do arquivo
+            bytes = await _tryLoadAssetPng(
+                rawUrl, widget.driverIconWidth.clamp(36, 128));
+            if (bytes != null) assetPath = _assetPathFromUrlOrName(rawUrl);
+          }
+          // 2) fallback: baixar
+          if (bytes == null &&
+              (rawUrl ?? '').trim().isNotEmpty &&
+              !_looksSvg(rawUrl)) {
             bytes = await _downloadAndResize(
                 _massageUrl(rawUrl!), widget.driverIconWidth.clamp(36, 128));
           }
           bytes ??= await _initialsAvatarPng(
               name: title, size: widget.driverIconWidth);
 
-          await _addMarkerWithIconFile(
+          await _addOrUpdateMarker(
             id: 'driver_$id',
             position: p,
-            title: null,
+            title: title,
             anchorU: 0.5,
             anchorV: 0.62,
             zIndex: 22.0,
             bytesIcon: bytes,
+            assetIconPath: assetPath,
           );
 
           _driverPos[id] = p;
@@ -799,14 +957,33 @@ class _PickerMapState extends State<PickerMap>
           return;
         }
 
+        final double distMeters = _meters(last, p);
+        if (distMeters < 0.5) {
+          final double rot = _bearing(last, p);
+          _driverPos[id] = p;
+          _driverRot[id] = rot;
+          try {
+            await _controller?.updateMarker('driver_$id',
+                position: p, rotation: rot);
+          } catch (_) {}
+          _markerPos['driver_$id'] = p;
+          _markerTitle['driver_$id'] = title;
+          await _updateDriverTrace(id, p);
+          return;
+        }
+
         _driverTween[id]?.dispose();
         final double brFrom = _driverRot[id] ?? _bearing(last, p);
         final double brTo = _bearing(last, p);
+        final int baseDur = math.max(160, math.min(1600, widget.driverTweenMs));
+        final int dynamicMs =
+            math.min(baseDur + 1400, baseDur + (distMeters * 28).round());
         _driverTween[id] = _TweenRunner(
           from: last,
           to: p,
-          durationMs: widget.driverTweenMs,
+          durationMs: dynamicMs,
           curve: Curves.easeInOutCubic,
+          vsync: this,
           onStep: (pos, t) async {
             _driverPos[id] = pos;
             final rot = _bearingLerp(brFrom, brTo, t);
@@ -816,6 +993,7 @@ class _PickerMapState extends State<PickerMap>
                   position: pos, rotation: rot);
             } catch (_) {}
             _markerPos['driver_$id'] = pos;
+            _markerTitle['driver_$id'] = title;
             await _updateDriverTrace(id, pos);
           },
         )..start();
@@ -841,7 +1019,6 @@ class _PickerMapState extends State<PickerMap>
   // ================= ROTA / LINHA =================
 
   Future<void> _prepareRoute() async {
-    final int req = ++_routeReqSeq;
     _snaking = false;
     _snakeT = 0.0;
     for (final id in [_kBaseOutline, _kBaseMain, _kSnakeOutline, _kSnakeMain]) {
@@ -923,8 +1100,6 @@ class _PickerMapState extends State<PickerMap>
     // Inicializa as camadas do snake
     final List<nmap.LatLng> start = <nmap.LatLng>[_route.first, _route.first];
 
-    if (!mounted || req != _routeReqSeq) return;
-
     await _updatePolyline(
       id: _kSnakeOutline,
       points: start,
@@ -940,7 +1115,6 @@ class _PickerMapState extends State<PickerMap>
       geodesic: true,
     );
 
-    if (!mounted || req != _routeReqSeq) return;
     await _fitRouteBounds(padding: _kSnakeFitPadding);
   }
 
@@ -951,52 +1125,10 @@ class _PickerMapState extends State<PickerMap>
     _snaking = true;
     _ticker.stop();
 
-    // Enquadra bem aberto e começa
+    // Enquadra bem aberto e comeÃ§a
     await _fitRouteBounds(padding: _kSnakeFitPadding);
     await Future<void>.delayed(const Duration(milliseconds: 220));
     _ticker.start();
-  }
-
-  // ================= Accessibility helpers =================
-  Future<void> _maybeAnnouncePlace(String label, nmap.LatLng pos) async {
-    if (!FFAppState().accessStreetNamesAudio) return;
-    try {
-      final String? addr = await _reverseGeocodeForAudio(pos);
-      final String msg = (addr == null || addr.isEmpty)
-          ? '$label definido'
-          : '$label: $addr';
-      SemanticsService.announce(msg, ui.TextDirection.ltr);
-    } catch (_) {}
-  }
-
-  Future<void> _maybeAnnounceRouteSummary() async {
-    if (!FFAppState().accessStreetNamesAudio) return;
-    if (_route.length < 2) return;
-    try {
-      final String? a = await _reverseGeocodeForAudio(_route.first);
-      final String? b = await _reverseGeocodeForAudio(_route.last);
-      final String msg =
-          'Rota pronta.' + (a != null && a.isNotEmpty ? ' Sa�da: $a.' : '') + (b != null && b.isNotEmpty ? ' Destino: $b.' : '');
-      SemanticsService.announce(msg, ui.TextDirection.ltr);
-    } catch (_) {}
-  }
-
-  Future<String?> _reverseGeocodeForAudio(nmap.LatLng pos) async {
-    final key = (widget.googleApiKey ?? '').trim();
-    if (key.isEmpty) return null;
-    try {
-      final uri = Uri.parse(
-          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${pos.latitude},${pos.longitude}&language=pt-BR&key=$key');
-      final resp = await http.get(uri);
-      if (resp.statusCode != 200) return null;
-      final data = json.decode(resp.body) as Map<String, dynamic>;
-      final results = (data['results'] as List?) ?? const [];
-      if (results.isEmpty) return null;
-      final first = results.first as Map<String, dynamic>;
-      return (first['formatted_address'] ?? '').toString();
-    } catch (_) {
-      return null;
-    }
   }
 
   Future<void> _animateFinal3DView() async {
@@ -1013,8 +1145,6 @@ class _PickerMapState extends State<PickerMap>
         target: end,
         zoom: _zoomForDistance(_totalDist),
         bearing: br,
-        tilt: 8.0,
-        durationMs: 680,
         tilt: 56.0,
         durationMs: 800,
       );
@@ -1025,25 +1155,88 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
-  // ================= ÍCONES / BYTES =================
+  // ================= ÃCONES / BYTES =================
 
+  // URLs mais resilientes (gs://, firebasestorage, storage.googleapis.com, http->https, acentos/espacos)
   String _massageUrl(String url) {
-    String s = url.trim().replaceFirst('http://', 'https://');
-    // Firebase Storage: força download direto
+    String s = url.trim();
+    if (s.startsWith('http://')) s = 'https://${s.substring(7)}';
+
+    // gs://bucket/obj -> firebasestorage + alt=media
     if (s.startsWith('gs://')) {
       final noGs = s.substring(5);
       final slash = noGs.indexOf('/');
       if (slash > 0) {
         final bucket = noGs.substring(0, slash);
-        final path = Uri.encodeComponent(noGs.substring(slash + 1));
-        s = 'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$path?alt=media';
+        final path = noGs.substring(slash + 1);
+        final encodedPath = Uri.encodeComponent(path);
+        s = 'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$encodedPath?alt=media';
       }
     }
+
+    // firebasestorage: garante alt=media (download direto)
     if (s.contains('firebasestorage.googleapis.com') &&
         !s.contains('alt=media')) {
       s += s.contains('?') ? '&alt=media' : '?alt=media';
     }
+
+    // storage.googleapis.com (GCS path-style): apenas garante encoding â€œseguroâ€
+    // evita double-encode se jÃ¡ tiver %
+    if (s.contains('storage.googleapis.com') && !s.contains('%')) {
+      try {
+        // Reconstroi preservando query, codificando path
+        final u = Uri.parse(s);
+        final fixed = Uri(
+          scheme: u.scheme.isEmpty ? 'https' : u.scheme,
+          host: u.host,
+          port: u.hasPort ? u.port : null,
+          pathSegments: u.pathSegments.map(Uri.encodeComponent).toList(),
+          query: u.query.isEmpty ? null : u.query,
+        );
+        s = fixed.toString();
+      } catch (_) {
+        // fallback leve
+        s = Uri.encodeFull(s);
+      }
+    }
+
     return s;
+  }
+
+  // Tenta mapear uma URL ou nome para um asset local em assets/images/<basename>.png
+  String? _assetPathFromUrlOrName(String? urlOrName) {
+    final s = (urlOrName ?? '').trim();
+    if (s.isEmpty) return null;
+    try {
+      final uri = Uri.parse(s);
+      final seg = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : s;
+      final decoded = Uri.decodeComponent(seg);
+      final name = decoded.endsWith('.png') ? decoded : '$decoded.png';
+      return 'assets/images/$name';
+    } catch (_) {
+      final base = s.endsWith('.png') ? s : '$s.png';
+      return 'assets/images/$base';
+    }
+  }
+
+  Future<Uint8List?> _tryLoadAssetPng(
+      String? urlOrName, int targetWidthPx) async {
+    final String? asset = _assetPathFromUrlOrName(urlOrName);
+    if (asset == null) return null;
+    try {
+      final data = await rootBundle.load(asset);
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        data.buffer.asUint8List(),
+        targetWidth: targetWidthPx,
+      );
+      final ui.FrameInfo frame = await codec.getNextFrame();
+      final ui.Image img = frame.image;
+      final ByteData? out =
+          await img.toByteData(format: ui.ImageByteFormat.png);
+      return out?.buffer.asUint8List();
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<String?> _writeTempPng(Uint8List bytes) async {
@@ -1071,7 +1264,29 @@ class _PickerMapState extends State<PickerMap>
     if (_iconInFlight.containsKey(clean)) return await _iconInFlight[clean]!;
     Future<Uint8List?> task() async {
       try {
-        final resp = await http.get(Uri.parse(_massageUrl(clean)));
+        final Uri uri = Uri.parse(_massageUrl(clean));
+        final Map<String, String> baseHeaders = {
+          'accept': 'image/*,*/*;q=0.8',
+          'user-agent': 'PickerMap/1.0',
+        };
+        Future<http.Response> doGet([Map<String, String>? extra]) {
+          final headers = Map<String, String>.from(baseHeaders);
+          if (extra != null) headers.addAll(extra);
+          return http
+              .get(uri, headers: headers)
+              .timeout(const Duration(seconds: 8));
+        }
+
+        http.Response resp = await doGet();
+
+        if ((resp.statusCode == 401 || resp.statusCode == 403) &&
+            _looksFirebaseStorageUrl(uri.toString())) {
+          final auth = await _authHeadersForFirebaseIfAny();
+          if (auth.isNotEmpty) {
+            resp = await doGet(auth);
+          }
+        }
+
         if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
         final Uint8List bytes = resp.bodyBytes;
         final ui.Codec codec =
@@ -1094,6 +1309,25 @@ class _PickerMapState extends State<PickerMap>
     final res = await fut;
     _iconInFlight.remove(clean);
     return res;
+  }
+
+  bool _looksFirebaseStorageUrl(String s) {
+    final u = s.toLowerCase();
+    return u.contains('firebasestorage.googleapis.com') ||
+        u.contains('storage.googleapis.com');
+  }
+
+  Future<Map<String, String>> _authHeadersForFirebaseIfAny() async {
+    try {
+      final user = fa.FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final String? token = await user.getIdToken();
+        if ((token ?? '').isNotEmpty) {
+          return {'Authorization': 'Bearer ${token!}'};
+        }
+      }
+    } catch (_) {}
+    return const {};
   }
 
   Future<Uint8List> _makeUserAvatarBytes({
@@ -1167,6 +1401,11 @@ class _PickerMapState extends State<PickerMap>
           ..strokeWidth = 6.0
           ..color = const Color(0xFFFFFFFF).withOpacity(.9));
     final initials = _nameToInitials(name);
+    // Escolhe cor do texto com bom contraste
+    final bool isBgBright = bg.computeLuminance() > 0.5;
+    final Color textColor =
+        isBgBright ? const Color(0xFF111111) : const Color(0xFFFFFFFF);
+
     final pb = ui.ParagraphBuilder(
       ui.ParagraphStyle(
           textAlign: TextAlign.center,
@@ -1174,7 +1413,7 @@ class _PickerMapState extends State<PickerMap>
           fontFamily: 'Roboto',
           fontWeight: ui.FontWeight.w700),
     )
-      ..pushStyle(ui.TextStyle(color: const Color(0xFF111111)))
+      ..pushStyle(ui.TextStyle(color: textColor))
       ..addText(initials);
     final paragraph = pb.build()
       ..layout(ui.ParagraphConstraints(width: size.toDouble()));
@@ -1318,11 +1557,7 @@ class _PickerMapState extends State<PickerMap>
   }
 
   int _autoDurationMs(double meters, {double factor = 1.0}) {
-    // menor duration = mais r�pido e proporcional � dist�ncia
-    double base = 5200.0 + (meters / 1000.0) * 420.0;
-    base = base * factor.clamp(0.5, 1.8);
-    return base.clamp(2000.0, 12000.0).toInt();
-    // menor duration = mais rápido
+    // menor duration = mais rÃ¡pido
     double base = 9000.0 + (meters / 1000.0) * 800.0;
     base = base * factor.clamp(0.6, 2.0);
     return base.clamp(6000.0, 14000.0).toInt();
@@ -1456,8 +1691,20 @@ class _TweenRunner {
     required this.to,
     required this.durationMs,
     required this.onStep,
+    required TickerProvider vsync,
     this.curve = Curves.linear,
-  });
+  }) : _controller = AnimationController(
+          vsync: vsync,
+          duration: Duration(milliseconds: math.max(16, durationMs)),
+        ) {
+    _statusListener = (status) {
+      if (status == AnimationStatus.completed) {
+        _dispatch(1.0);
+      }
+    };
+    _controller.addListener(_handleTick);
+    _controller.addStatusListener(_statusListener);
+  }
 
   final nmap.LatLng from;
   final nmap.LatLng to;
@@ -1465,25 +1712,47 @@ class _TweenRunner {
   final Curve curve;
   final Future<void> Function(nmap.LatLng pos, double t) onStep;
 
-  Timer? _timer;
-  int _startMs = 0;
+  final AnimationController _controller;
+  late final void Function(AnimationStatus) _statusListener;
+
+  bool _busy = false;
+  double? _pendingLinear;
 
   void start() {
-    _timer?.cancel();
-    _startMs = DateTime.now().millisecondsSinceEpoch;
-    const int frameMs = 16;
-    _timer = Timer.periodic(const Duration(milliseconds: frameMs), (t) async {
-      final int now = DateTime.now().millisecondsSinceEpoch;
-      final double uRaw =
-          ((now - _startMs) / durationMs).clamp(0.0, 1.0).toDouble();
-      final double u = curve.transform(uRaw);
-      final double lat = _lerp(from.latitude, to.latitude, u);
-      final double lng = _lerp(from.longitude, to.longitude, u);
-      await onStep(nmap.LatLng(lat, lng), u);
-      if (uRaw >= 1.0) t.cancel();
+    if (_controller.isAnimating) {
+      _controller.stop();
+    }
+    _pendingLinear = null;
+    _dispatch(0.0);
+    _controller.forward(from: 0.0);
+  }
+
+  void _handleTick() => _dispatch(_controller.value);
+
+  void _dispatch(double linearT) {
+    if (_busy) {
+      _pendingLinear = linearT;
+      return;
+    }
+    _busy = true;
+    final double eased = curve.transform(linearT.clamp(0.0, 1.0));
+    final double lat = _lerp(from.latitude, to.latitude, eased);
+    final double lng = _lerp(from.longitude, to.longitude, eased);
+    onStep(nmap.LatLng(lat, lng), eased).whenComplete(() {
+      _busy = false;
+      final double? pending = _pendingLinear;
+      _pendingLinear = null;
+      if (pending != null && (pending - linearT).abs() > 1e-4) {
+        _dispatch(pending);
+      }
     });
   }
 
-  void dispose() => _timer?.cancel();
+  void dispose() {
+    _controller.removeListener(_handleTick);
+    _controller.removeStatusListener(_statusListener);
+    _controller.dispose();
+  }
+
   static double _lerp(double a, double b, double t) => a + (b - a) * t;
 }

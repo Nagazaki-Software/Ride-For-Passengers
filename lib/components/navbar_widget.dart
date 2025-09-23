@@ -100,7 +100,7 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 logFirebaseEvent('IconButton_navigate_to');
 
                 context.goNamed(
-                  ScheduleRide14Widget.routeName,
+                  ScheduleRiderWidget.routeName,
                   extra: <String, dynamic>{
                     kTransitionInfoKey: TransitionInfo(
                       hasTransition: true,

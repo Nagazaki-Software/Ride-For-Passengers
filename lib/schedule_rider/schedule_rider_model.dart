@@ -1,9 +1,9 @@
 import '/components/navbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'schedule_ride14_widget.dart' show ScheduleRide14Widget;
+import 'schedule_rider_widget.dart' show ScheduleRiderWidget;
 import 'package:flutter/material.dart';
 
-class ScheduleRide14Model extends FlutterFlowModel<ScheduleRide14Widget> {
+class ScheduleRiderModel extends FlutterFlowModel<ScheduleRiderWidget> {
   ///  Local state fields for this page.
 
   String? veiculos;

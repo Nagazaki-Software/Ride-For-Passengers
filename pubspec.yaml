@@ -70,6 +70,10 @@ dependencies:
       url: https://github.com/adlyyy4/flutter-braintree.git
       ref: e7a543415b100be98b4ac19c964e6d29b69e5464
   flutter_cache_manager: 3.4.1
+  flutter_credit_card: 
+    git:
+      url: https://github.com/FlutterFlow/flutter_credit_card
+      ref: v4.0.2
   flutter_displaymode: ^0.6.0
   flutter_native_splash: 2.4.1
   flutter_plugin_android_lifecycle: 2.0.28

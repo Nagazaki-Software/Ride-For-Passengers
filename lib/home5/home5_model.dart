@@ -29,6 +29,8 @@ class Home5Model extends FlutterFlowModel<Home5Widget> {
   DateTime? datePicked;
   // Stores action output result for [Firestore Query - Query a collection] action in ContainerConfirmRide widget.
   List<RideOrdersRecord>? order;
+  // Stores action output result for [Firestore Query - Query a collection] action in ContainerRideShare widget.
+  List<RideOrdersRecord>? orders;
   // Model for navbar component.
   late NavbarModel navbarModel;
 

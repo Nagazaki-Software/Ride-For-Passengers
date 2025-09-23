@@ -102,7 +102,7 @@ class _FrequentlyAskedQuestions25WidgetState
                     },
                     child: Text(
                       FFLocalizations.of(context).getText(
-                        '7jr17pv1' /* Frequently Asked Questions */,
+                        '7jr17pv1' /* FAQ */,
                       ),
                       textAlign: TextAlign.center,
                       style:

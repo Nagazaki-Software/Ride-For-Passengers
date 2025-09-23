@@ -131,7 +131,24 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: RideShare6Widget.routeName,
           path: RideShare6Widget.routePath,
-          builder: (context, params) => RideShare6Widget(),
+          builder: (context, params) => RideShare6Widget(
+            value: params.getParam(
+              'value',
+              ParamType.double,
+            ),
+            latlngOrigem: params.getParam(
+              'latlngOrigem',
+              ParamType.LatLng,
+            ),
+            latlngDestino: params.getParam(
+              'latlngDestino',
+              ParamType.LatLng,
+            ),
+            estilo: params.getParam(
+              'estilo',
+              ParamType.String,
+            ),
+          ),
         ),
         FFRoute(
           name: PaymentRide7Widget.routeName,
@@ -205,9 +222,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => Rewards13Widget(),
         ),
         FFRoute(
-          name: ScheduleRide14Widget.routeName,
-          path: ScheduleRide14Widget.routePath,
-          builder: (context, params) => ScheduleRide14Widget(),
+          name: ScheduleRiderWidget.routeName,
+          path: ScheduleRiderWidget.routePath,
+          builder: (context, params) => ScheduleRiderWidget(),
         ),
         FFRoute(
           name: Profile15Widget.routeName,

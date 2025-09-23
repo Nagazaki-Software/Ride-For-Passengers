@@ -15,7 +15,7 @@ export '/ride_progress_copy11/ride_progress_copy11_widget.dart'
     show RideProgressCopy11Widget;
 export '/how_drive_do12/how_drive_do12_widget.dart' show HowDriveDo12Widget;
 export '/rewards13/rewards13_widget.dart' show Rewards13Widget;
-export '/schedule_ride14/schedule_ride14_widget.dart' show ScheduleRide14Widget;
+export '/schedule_rider/schedule_rider_widget.dart' show ScheduleRiderWidget;
 export '/profile15/profile15_widget.dart' show Profile15Widget;
 export '/payment_mothods16/payment_mothods16_widget.dart'
     show PaymentMothods16Widget;

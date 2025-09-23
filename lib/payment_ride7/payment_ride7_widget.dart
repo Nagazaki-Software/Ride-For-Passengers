@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:provider/provider.dart';
 import 'payment_ride7_model.dart';
 export 'payment_ride7_model.dart';
@@ -197,14 +196,6 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
-
-    // Safe fallbacks to avoid null-check operator crashes
-    final LatLng safeLatA =
-        widget.latlngAtual ?? FFAppState().latlngAtual ?? const LatLng(0, 0);
-    final LatLng safeLatB = widget.latlngWhereTo ??
-        FFAppState().latlangAondeVaiIr ??
-        safeLatA;
-    final double safeValue = widget.value ?? 0.0;
 
     return GestureDetector(
       onTap: () {
@@ -602,7 +593,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                     children: [
                                                       Text(
                                                         formatNumber(
-                                                          safeValue,
+                                                          widget.value,
                                                           formatType: FormatType
                                                               .decimal,
                                                           decimalType:
@@ -705,8 +696,10 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                     children: [
                                                       Text(
                                                         functions.estimativeTime(
-                                                            safeLatA,
-                                                            safeLatB),
+                                                            widget
+                                                                .latlngAtual!,
+                                                            widget
+                                                                .latlngWhereTo!),
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -999,7 +992,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                           padding:
                                               MediaQuery.viewInsetsOf(context),
                                           child: CardPaymentWidget(
-                                                            value: safeValue,
+                                            value: widget.value!,
                                             passe: '',
                                             pagamento: true,
                                           ),
@@ -1231,18 +1224,11 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                     FFAppState().defaultCard,
                                                     r'''$.numberMasked''',
                                                   ))
-                                              Flexible(
-                                                child: AutoSizeText(
                                                 Text(
                                                   FFLocalizations.of(context)
                                                       .getText(
                                                     'q0r0r5ua' /* This Default  */,
                                                   ),
-                                                  maxLines: 1,
-                                                  minFontSize: 8,
-                                                  stepGranularity: 0.1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -1278,44 +1264,6 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                                 .fontStyle,
                                                       ),
                                                 ),
-                                              ),
-                                              SizedBox(width: 6.0),
-                                              Flexible(
-                                                child: AutoSizeText(
-                                                  '${getJsonField(
-                                                    creditCardsItem,
-                                                    r'''$.brand''',
-                                                  ).toString()} ${functions.esconderCreditCard(getJsonField(
-                                                    creditCardsItem,
-                                                    r'''$.numberMasked''',
-                                                  ).toString())}',
-                                                  maxLines: 1,
-                                                  minFontSize: 8,
-                                                  stepGranularity: 0.1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        font: GoogleFonts.poppins(
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
-                                                        ),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .alternate,
-                                                        fontSize: 10.0,
-                                                        letterSpacing: 0.0,
                                               Text(
                                                 '${getJsonField(
                                                   creditCardsItem,
@@ -1759,7 +1707,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                   _model.selectCard!,
                                   true,
                                   'sandbox_ck9vkcgg_brg8dhjg5tqpw496',
-                                  safeValue,
+                                  widget.value!,
                                 );
                                 if (getJsonField(
                                       _model.processPayment,
