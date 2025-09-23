@@ -50,6 +50,8 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
           hoverColor: Colors.transparent,
           highlightColor: Colors.transparent,
           onTap: () async {
+            logFirebaseEvent('ADD_PAYMENT_METHOD_Container_4hfhn3k3_ON');
+            logFirebaseEvent('Container_bottom_sheet');
             await showModalBottomSheet(
               isScrollControlled: true,
               backgroundColor: Colors.transparent,

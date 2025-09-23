@@ -95,6 +95,16 @@ class RideOrdersRecord extends FirestoreRecord {
   double get rideValue => _rideValue ?? 0.0;
   bool hasRideValue() => _rideValue != null;
 
+  // "status" field.
+  String? _status;
+  String get status => _status ?? '';
+  bool hasStatus() => _status != null;
+
+  // "whyCanceled" field.
+  String? _whyCanceled;
+  String get whyCanceled => _whyCanceled ?? '';
+  bool hasWhyCanceled() => _whyCanceled != null;
+
   void _initializeFields() {
     _user = snapshotData['user'] as DocumentReference?;
     _latlng = snapshotData['latlng'] as LatLng?;
@@ -112,6 +122,8 @@ class RideOrdersRecord extends FirestoreRecord {
     _rideShare = snapshotData['rideShare'] as bool?;
     _participantes = getDataList(snapshotData['participantes']);
     _rideValue = castToType<double>(snapshotData['rideValue']);
+    _status = snapshotData['status'] as String?;
+    _whyCanceled = snapshotData['whyCanceled'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -164,6 +176,8 @@ Map<String, dynamic> createRideOrdersRecordData({
   bool? paid,
   bool? rideShare,
   double? rideValue,
+  String? status,
+  String? whyCanceled,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -182,6 +196,8 @@ Map<String, dynamic> createRideOrdersRecordData({
       'paid': paid,
       'rideShare': rideShare,
       'rideValue': rideValue,
+      'status': status,
+      'whyCanceled': whyCanceled,
     }.withoutNulls,
   );
 
@@ -209,7 +225,9 @@ class RideOrdersRecordDocumentEquality implements Equality<RideOrdersRecord> {
         e1?.paid == e2?.paid &&
         e1?.rideShare == e2?.rideShare &&
         listEquality.equals(e1?.participantes, e2?.participantes) &&
-        e1?.rideValue == e2?.rideValue;
+        e1?.rideValue == e2?.rideValue &&
+        e1?.status == e2?.status &&
+        e1?.whyCanceled == e2?.whyCanceled;
   }
 
   @override
@@ -229,7 +247,9 @@ class RideOrdersRecordDocumentEquality implements Equality<RideOrdersRecord> {
         e?.paid,
         e?.rideShare,
         e?.participantes,
-        e?.rideValue
+        e?.rideValue,
+        e?.status,
+        e?.whyCanceled
       ]);
 
   @override

@@ -80,7 +80,7 @@ class _ComponentLanguageWidgetState extends State<ComponentLanguageWidget> {
                     children: [
                       Text(
                         FFLocalizations.of(context).getText(
-                          'wngiyp5s' /* Language Settings */,
+                          'ktjluzpd' /* Language Settings */,
                         ),
                         style:
                             FlutterFlowTheme.of(context).headlineSmall.override(
@@ -105,7 +105,7 @@ class _ComponentLanguageWidgetState extends State<ComponentLanguageWidget> {
                       ),
                       Text(
                         FFLocalizations.of(context).getText(
-                          '9k5edv8a' /* Choose your preferred language */,
+                          '8fc4xj3e' /* Choose your preferred language */,
                         ),
                         style: FlutterFlowTheme.of(context)
                             .labelMedium
@@ -150,389 +150,376 @@ class _ComponentLanguageWidgetState extends State<ComponentLanguageWidget> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: double.infinity,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Material(
-                          color: Colors.transparent,
-                          child: Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).alternate,
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      logFirebaseEvent(
+                          'COMPONENT_LANGUAGE_Container_lfhnzhcd_ON');
+                      logFirebaseEvent('Container_set_app_language');
+                      setAppLanguage(context, 'en');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50.0,
+                      decoration: BoxDecoration(
+                        color: FFLocalizations.of(context).languageCode == 'en'
+                            ? FlutterFlowTheme.of(context).secondary
+                            : FlutterFlowTheme.of(context).primary,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3.0,
+                            color: Color(0xFF060505),
+                            offset: Offset(
+                              0.0,
+                              2.0,
                             ),
-                            child: CheckboxListTile(
-                              value: _model.checkboxListTileValue1 ??=
-                                  FFLocalizations.of(context).languageCode ==
-                                      'English',
-                              onChanged: (newValue) async {
-                                safeSetState(() =>
-                                    _model.checkboxListTileValue1 = newValue!);
-                                if (newValue!) {
-                                  setAppLanguage(context, 'en');
-                                }
-                              },
-                              title: Text(
-                                FFLocalizations.of(context).getText(
-                                  '49244idk' /* English */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 14.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 18.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'p00lg82r' /* English */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
+                                          .bodyMedium
                                           .fontStyle,
                                     ),
-                              ),
-                              tileColor: FlutterFlowTheme.of(context).primary,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context).info,
-                              dense: false,
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              contentPadding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
+                                    color: FFLocalizations.of(context)
+                                                .languageCode ==
+                                            'en'
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Material(
-                          color: Colors.transparent,
-                          child: Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).alternate,
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      logFirebaseEvent(
+                          'COMPONENT_LANGUAGE_Container_vzzpdavi_ON');
+                      logFirebaseEvent('Container_set_app_language');
+                      setAppLanguage(context, 'fr');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50.0,
+                      decoration: BoxDecoration(
+                        color: FFLocalizations.of(context).languageCode == 'fr'
+                            ? FlutterFlowTheme.of(context).secondary
+                            : FlutterFlowTheme.of(context).primary,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3.0,
+                            color: Color(0xFF060505),
+                            offset: Offset(
+                              0.0,
+                              2.0,
                             ),
-                            child: CheckboxListTile(
-                              value: _model.checkboxListTileValue2 ??=
-                                  FFLocalizations.of(context).languageCode ==
-                                      'Portuguese',
-                              onChanged: (newValue) async {
-                                safeSetState(() =>
-                                    _model.checkboxListTileValue2 = newValue!);
-                                if (newValue!) {
-                                  setAppLanguage(context, 'pt');
-                                }
-                              },
-                              title: Text(
-                                FFLocalizations.of(context).getText(
-                                  'da2pnf2d' /* Portuguese */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 14.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 18.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'j99f4j2b' /* French */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
+                                          .bodyMedium
                                           .fontStyle,
                                     ),
-                              ),
-                              tileColor: FlutterFlowTheme.of(context).primary,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context).info,
-                              dense: false,
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              contentPadding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
+                                    color: FFLocalizations.of(context)
+                                                .languageCode ==
+                                            'fr'
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Material(
-                          color: Colors.transparent,
-                          child: Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).alternate,
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      logFirebaseEvent(
+                          'COMPONENT_LANGUAGE_Container_zpacclgn_ON');
+                      logFirebaseEvent('Container_set_app_language');
+                      setAppLanguage(context, 'de');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50.0,
+                      decoration: BoxDecoration(
+                        color: FFLocalizations.of(context).languageCode == 'ge'
+                            ? FlutterFlowTheme.of(context).secondary
+                            : FlutterFlowTheme.of(context).primary,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3.0,
+                            color: Color(0xFF060505),
+                            offset: Offset(
+                              0.0,
+                              2.0,
                             ),
-                            child: CheckboxListTile(
-                              value: _model.checkboxListTileValue3 ??=
-                                  FFLocalizations.of(context).languageCode ==
-                                      'French',
-                              onChanged: (newValue) async {
-                                safeSetState(() =>
-                                    _model.checkboxListTileValue3 = newValue!);
-                                if (newValue!) {
-                                  setAppLanguage(context, 'fr');
-                                }
-                              },
-                              title: Text(
-                                FFLocalizations.of(context).getText(
-                                  'rhc1hhh7' /* French */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 14.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 18.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                '0w0l688r' /* German */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
+                                          .bodyMedium
                                           .fontStyle,
                                     ),
-                              ),
-                              tileColor: FlutterFlowTheme.of(context).primary,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context).info,
-                              dense: false,
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              contentPadding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
+                                    color: FFLocalizations.of(context)
+                                                .languageCode ==
+                                            'de'
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Material(
-                          color: Colors.transparent,
-                          child: Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).alternate,
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      logFirebaseEvent(
+                          'COMPONENT_LANGUAGE_Container_yi3o4bzw_ON');
+                      logFirebaseEvent('Container_set_app_language');
+                      setAppLanguage(context, 'pt');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50.0,
+                      decoration: BoxDecoration(
+                        color: FFLocalizations.of(context).languageCode == 'pt'
+                            ? FlutterFlowTheme.of(context).secondary
+                            : FlutterFlowTheme.of(context).primary,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3.0,
+                            color: Color(0xFF060505),
+                            offset: Offset(
+                              0.0,
+                              2.0,
                             ),
-                            child: CheckboxListTile(
-                              value: _model.checkboxListTileValue4 ??=
-                                  FFLocalizations.of(context).languageCode ==
-                                      'Spanish',
-                              onChanged: (newValue) async {
-                                safeSetState(() =>
-                                    _model.checkboxListTileValue4 = newValue!);
-                                if (newValue!) {
-                                  setAppLanguage(context, 'es');
-                                }
-                              },
-                              title: Text(
-                                FFLocalizations.of(context).getText(
-                                  'z3ko4cln' /* Spanish */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 14.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 18.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                '91lj3fd8' /* Portuguese */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
+                                          .bodyMedium
                                           .fontStyle,
                                     ),
-                              ),
-                              tileColor: FlutterFlowTheme.of(context).primary,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context).info,
-                              dense: false,
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              contentPadding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
+                                    color: FFLocalizations.of(context)
+                                                .languageCode ==
+                                            'fr'
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Material(
-                          color: Colors.transparent,
-                          child: Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).alternate,
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      logFirebaseEvent(
+                          'COMPONENT_LANGUAGE_Container_uixgyp5c_ON');
+                      logFirebaseEvent('Container_set_app_language');
+                      setAppLanguage(context, 'es');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50.0,
+                      decoration: BoxDecoration(
+                        color: FFLocalizations.of(context).languageCode == 'es'
+                            ? FlutterFlowTheme.of(context).secondary
+                            : FlutterFlowTheme.of(context).primary,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3.0,
+                            color: Color(0xFF060505),
+                            offset: Offset(
+                              0.0,
+                              2.0,
                             ),
-                            child: CheckboxListTile(
-                              value: _model.checkboxListTileValue5 ??=
-                                  FFLocalizations.of(context).languageCode ==
-                                      'German',
-                              onChanged: (newValue) async {
-                                safeSetState(() =>
-                                    _model.checkboxListTileValue5 = newValue!);
-                                if (newValue!) {
-                                  setAppLanguage(context, 'de');
-                                }
-                              },
-                              title: Text(
-                                FFLocalizations.of(context).getText(
-                                  '79tu4svk' /* German */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleLarge
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 14.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            14.0, 0.0, 18.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'ryu3fgou' /* Spanish */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
+                                          .bodyMedium
                                           .fontStyle,
                                     ),
-                              ),
-                              tileColor: FlutterFlowTheme.of(context).primary,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context).info,
-                              dense: false,
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              contentPadding: EdgeInsetsDirectional.fromSTEB(
-                                  12.0, 0.0, 12.0, 0.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
+                                    color: FFLocalizations.of(context)
+                                                .languageCode ==
+                                            'fr'
+                                        ? FlutterFlowTheme.of(context).primary
+                                        : FlutterFlowTheme.of(context)
+                                            .alternate,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ].divide(SizedBox(height: 12.0)),
               ),
               FFButtonWidget(
                 onPressed: () async {
+                  logFirebaseEvent('COMPONENT_LANGUAGE_CONFIRM_BTN_ON_TAP');
+                  logFirebaseEvent('Button_bottom_sheet');
                   Navigator.pop(context);
                 },
                 text: FFLocalizations.of(context).getText(
-                  '836ylazf' /* Confirm */,
+                  '8objo8t2' /* Confirm */,
                 ),
                 options: FFButtonOptions(
                   width: double.infinity,

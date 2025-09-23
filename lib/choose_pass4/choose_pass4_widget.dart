@@ -1,3 +1,5 @@
+import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/components/card_payment_widget.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -32,6 +34,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
   var hasContainerTriggered4 = false;
   var hasContainerTriggered5 = false;
   var hasContainerTriggered6 = false;
+  var hasContainerTriggered7 = false;
   final animationsMap = <String, AnimationInfo>{};
 
   @override
@@ -39,6 +42,7 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
     super.initState();
     _model = createModel(context, () => ChoosePass4Model());
 
+    logFirebaseEvent('screen_view', parameters: {'screen_name': 'ChoosePass4'});
     _model.switchValue = true;
     animationsMap.addAll({
       'containerOnActionTriggerAnimation1': AnimationInfo(
@@ -123,6 +127,27 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
         ],
       ),
       'containerOnActionTriggerAnimation6': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation7': AnimationInfo(
         trigger: AnimationTrigger.onActionTrigger,
         applyInitialState: false,
         effectsBuilder: () => [
@@ -286,7 +311,11 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
                                         onTap: () async {
+                                          logFirebaseEvent(
+                                              'CHOOSE_PASS4_ContainerSelectDay_ON_TAP');
                                           if (_model.click == 'day') {
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_widget_animation');
                                             if (animationsMap[
                                                     'containerOnActionTriggerAnimation2'] !=
                                                 null) {
@@ -300,9 +329,13 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                           .controller
                                                           .forward(from: 0.0));
                                             }
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_update_page_state');
                                             _model.click = null;
                                             safeSetState(() {});
                                           } else {
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_widget_animation');
                                             if (animationsMap[
                                                     'containerOnActionTriggerAnimation2'] !=
                                                 null) {
@@ -316,6 +349,8 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                           .controller
                                                           .forward(from: 0.0));
                                             }
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_widget_animation');
                                             if (animationsMap[
                                                     'containerOnActionTriggerAnimation1'] !=
                                                 null) {
@@ -329,13 +364,19 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                           .controller
                                                           .forward());
                                             }
+                                            logFirebaseEvent(
+                                                'ContainerSelectDay_start_periodic_action');
                                             _model.instantTimer =
                                                 InstantTimer.periodic(
                                               duration:
                                                   Duration(milliseconds: 500),
                                               callback: (timer) async {
+                                                logFirebaseEvent(
+                                                    'ContainerSelectDay_update_page_state');
                                                 _model.click = 'day';
                                                 safeSetState(() {});
+                                                logFirebaseEvent(
+                                                    'ContainerSelectDay_stop_periodic_action');
                                                 _model.instantTimer?.cancel();
                                               },
                                               startImmediately: false,
@@ -742,7 +783,11 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                 hoverColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
                                 onTap: () async {
+                                  logFirebaseEvent(
+                                      'CHOOSE_PASS4_ContainerSelectWeek_ON_TAP');
                                   if (_model.click == 'week') {
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_widget_animation');
                                     if (animationsMap[
                                             'containerOnActionTriggerAnimation4'] !=
                                         null) {
@@ -755,9 +800,13 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                   .controller
                                                   .forward(from: 0.0));
                                     }
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_update_page_state');
                                     _model.click = null;
                                     safeSetState(() {});
                                   } else {
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_widget_animation');
                                     if (animationsMap[
                                             'containerOnActionTriggerAnimation4'] !=
                                         null) {
@@ -770,6 +819,8 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                   .controller
                                                   .forward(from: 0.0));
                                     }
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_widget_animation');
                                     if (animationsMap[
                                             'containerOnActionTriggerAnimation3'] !=
                                         null) {
@@ -782,12 +833,18 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                   .controller
                                                   .forward(from: 0.0));
                                     }
+                                    logFirebaseEvent(
+                                        'ContainerSelectWeek_start_periodic_actio');
                                     _model.instantTimerweek =
                                         InstantTimer.periodic(
                                       duration: Duration(milliseconds: 500),
                                       callback: (timer) async {
+                                        logFirebaseEvent(
+                                            'ContainerSelectWeek_update_page_state');
                                         _model.click = 'week';
                                         safeSetState(() {});
+                                        logFirebaseEvent(
+                                            'ContainerSelectWeek_stop_periodic_action');
                                         _model.instantTimerweek?.cancel();
                                       },
                                       startImmediately: false,
@@ -867,7 +924,11 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
+                            logFirebaseEvent(
+                                'CHOOSE_PASS4_PAGE_ContainerMonth_ON_TAP');
                             if (_model.click == 'month') {
+                              logFirebaseEvent(
+                                  'ContainerMonth_widget_animation');
                               if (animationsMap[
                                       'containerOnActionTriggerAnimation6'] !=
                                   null) {
@@ -879,6 +940,8 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         .controller
                                         .forward(from: 0.0));
                               }
+                              logFirebaseEvent(
+                                  'ContainerMonth_widget_animation');
                               if (animationsMap[
                                       'containerOnActionTriggerAnimation5'] !=
                                   null) {
@@ -890,9 +953,13 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         .controller
                                         .forward(from: 0.0));
                               }
+                              logFirebaseEvent(
+                                  'ContainerMonth_update_page_state');
                               _model.click = null;
                               safeSetState(() {});
                             } else {
+                              logFirebaseEvent(
+                                  'ContainerMonth_widget_animation');
                               if (animationsMap[
                                       'containerOnActionTriggerAnimation6'] !=
                                   null) {
@@ -904,6 +971,8 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                         .controller
                                         .forward(from: 0.0));
                               }
+                              logFirebaseEvent(
+                                  'ContainerMonth_update_page_state');
                               _model.click = 'month';
                               safeSetState(() {});
                             }
@@ -986,7 +1055,11 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
+                                            logFirebaseEvent(
+                                                'CHOOSE_PASS4_ContainerSelectMonth_ON_TAP');
                                             if (_model.click == 'month') {
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_widget_animation');
                                               if (animationsMap[
                                                       'containerOnActionTriggerAnimation6'] !=
                                                   null) {
@@ -1002,9 +1075,13 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                                 .forward(
                                                                     from: 0.0));
                                               }
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_update_page_state');
                                               _model.click = null;
                                               safeSetState(() {});
                                             } else {
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_widget_animation');
                                               if (animationsMap[
                                                       'containerOnActionTriggerAnimation6'] !=
                                                   null) {
@@ -1020,6 +1097,8 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                                 .forward(
                                                                     from: 0.0));
                                               }
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_widget_animation');
                                               if (animationsMap[
                                                       'containerOnActionTriggerAnimation5'] !=
                                                   null) {
@@ -1035,13 +1114,19 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                                                 .forward(
                                                                     from: 0.0));
                                               }
+                                              logFirebaseEvent(
+                                                  'ContainerSelectMonth_start_periodic_acti');
                                               _model.instantTimerMonth =
                                                   InstantTimer.periodic(
                                                 duration: Duration(
                                                     milliseconds: 1000),
                                                 callback: (timer) async {
+                                                  logFirebaseEvent(
+                                                      'ContainerSelectMonth_update_page_state');
                                                   _model.click = 'month';
                                                   safeSetState(() {});
+                                                  logFirebaseEvent(
+                                                      'ContainerSelectMonth_stop_periodic_actio');
                                                   _model.instantTimerMonth
                                                       ?.cancel();
                                                 },
@@ -1235,6 +1320,25 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                     hoverColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () async {
+                      logFirebaseEvent(
+                          'CHOOSE_PASS4_PAGE_Container1day_ON_TAP');
+                      logFirebaseEvent('Container1day_widget_animation');
+                      if (animationsMap['containerOnActionTriggerAnimation7'] !=
+                          null) {
+                        safeSetState(() => hasContainerTriggered7 = true);
+                        SchedulerBinding.instance.addPostFrameCallback(
+                            (_) async => await animationsMap[
+                                    'containerOnActionTriggerAnimation7']!
+                                .controller
+                                .forward(from: 0.0));
+                      }
+                      logFirebaseEvent('Container1day_backend_call');
+
+                      await currentUserReference!.update(createUsersRecordData(
+                        passe: 'day',
+                      ));
+                      logFirebaseEvent('Container1day_navigate_to');
+
                       context.pushNamed(Home5Widget.routeName);
                     },
                     child: Container(
@@ -1280,7 +1384,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                             ),
                       ),
                     ),
-                  ),
+                  ).animateOnActionTrigger(
+                      animationsMap['containerOnActionTriggerAnimation7']!,
+                      hasBeenTriggered: hasContainerTriggered7),
                   Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
@@ -1579,6 +1685,9 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
+                                logFirebaseEvent(
+                                    'CHOOSE_PASS4_Container_asv8z0gj_ON_TAP');
+                                logFirebaseEvent('Container_bottom_sheet');
                                 await showModalBottomSheet(
                                   isScrollControlled: true,
                                   backgroundColor: Colors.transparent,
@@ -1608,15 +1717,8 @@ class _ChoosePass4WidgetState extends State<ChoosePass4Widget>
                                             }
                                           }(),
                                           passe: _model.click!,
-<<<<<<< HEAD
-<<<<<<< HEAD
                                           pagamento: true,
-=======
-                                            pagamento: true,
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                                            pagamento: true,
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                                          autoRenew: _model.switchValue,
                                         ),
                                       ),
                                     );

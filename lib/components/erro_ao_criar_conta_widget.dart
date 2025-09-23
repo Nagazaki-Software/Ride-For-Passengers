@@ -150,6 +150,9 @@ class _ErroAoCriarContaWidgetState extends State<ErroAoCriarContaWidget> {
                 children: [
                   FFButtonWidget(
                     onPressed: () async {
+                      logFirebaseEvent(
+                          'ERRO_AO_CRIAR_CONTA_TRY_AGAIN_BTN_ON_TAP');
+                      logFirebaseEvent('Button_bottom_sheet');
                       Navigator.pop(context);
                     },
                     text: FFLocalizations.of(context).getText(

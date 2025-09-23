@@ -212,7 +212,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'I do not have A bahamian ID or Passport',
       'de': 'Ich habe keinen bahamaischen Ausweis oder Reisepass',
       'es': 'No tengo identificación ni pasaporte bahameño.',
-      'fr': 'Je n\'ai pas de carte d\'identité ou de passeport bahaméen',
+      'fr': 'Je n\'ai pas de carte d\'identité ni de passeport bahaméen.',
       'pt': 'Não tenho documento de identidade ou passaporte das Bahamas',
     },
     'nfgti4ce': {
@@ -239,7 +239,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr':
           'Aux Bahamas, le marché du taxi touristique est réglementé. Pour s\'y conformer, nous avons divisé les usagers en deux groupes : les touristes, qui peuvent se déplacer et ceux qui peuvent utiliser n\'importe quel chauffeur disponible.',
       'pt':
-          'Nas Bahamas, o mercado de táxis para turistas é protegido por regulamentação. Para cumprir, dividimos os passageiros em dois grupos: turistas, que podem ser locais, que podem viajar com qualquer motorista disponível.',
+          'Nas Bahamas, o mercado de táxis para turistas é protegido por regulamentação. Para cumprir, dividimos os passageiros em dois grupos: turistas, que podem viajar com qualquer motorista disponível.',
     },
     'cdie3eab': {
       'en': 'Next',
@@ -374,7 +374,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     '7ueonljt': {
       'en': 'Let us know where your accent is from!',
       'de': 'Lassen Sie uns wissen, woher Ihr Akzent kommt!',
-      'es': '¡Cuéntanos de donde viene tu acento!',
+      'es': '¡Cuéntanos de dónde viene tu acento!',
       'fr': 'Dites-nous d’où vient votre accent !',
       'pt': 'Conte-nos de onde vem seu sotaque!',
     },
@@ -438,10 +438,10 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   // VerifyAccount3
   {
     'ghn677x0': {
-      'en': 'Verify Your\naccount',
+      'en': 'Verify Your \nAccount',
       'de': 'Verifizieren Sie Ihr\nKonto',
-      'es': 'Verificar su cuenta',
-      'fr': 'Vérifiez votre\ncompte',
+      'es': 'Verifica tu cuenta',
+      'fr': 'Vérifiez votre compte',
       'pt': 'Verifique sua\nconta',
     },
     '5g27hqw3': {
@@ -451,25 +451,22 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Un e-mail a été envoyé à',
       'pt': 'Um e-mail foi enviado para',
     },
-    '5z2sblp8': {
-      'en': 'email',
-      'de': 'E-Mail',
-      'es': 'correo electrónico',
-      'fr': 'e-mail',
-      'pt': 'e-mail',
-    },
     'u0ctzyu7': {
-      'en': 'Insert the code sent on your email to continue',
+      'en':
+          'Please confirm by clicking on the email we sent to the email address provided.',
       'de':
-          'Geben Sie den Code ein, der Ihnen per E-Mail zugesandt wurde, um fortzufahren',
-      'es': 'Inserta el código enviado a tu correo para continuar',
-      'fr': 'Insérez le code envoyé sur votre email pour continuer',
-      'pt': 'Insira o código enviado no seu e-mail para continuar',
+          'Bitte bestätigen Sie dies durch Anklicken der E-Mail, die wir an die angegebene E-Mail-Adresse gesendet haben.',
+      'es':
+          'Por favor, confirme haciendo clic en el correo electrónico que le enviamos a la dirección de correo electrónico proporcionada.',
+      'fr':
+          'Veuillez confirmer en cliquant sur l\'e-mail que nous avons envoyé à l\'adresse e-mail fournie.',
+      'pt':
+          'Por favor, confirme clicando no e-mail que enviamos para o endereço de e-mail fornecido.',
     },
     'd1wov68j': {
       'en': 'Hang thight we´re almost there.....',
       'de': 'Haltet durch, wir sind fast da.....',
-      'es': 'Agárrate fuerte, que casi llegamos...',
+      'es': 'Agárrate fuerte, ya casi llegamos...',
       'fr': 'Accrochez-vous bien, nous y sommes presque...',
       'pt': 'Aguente firme, estamos quase lá.....',
     },
@@ -633,7 +630,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Wochenkarte',
       'es': 'Pase semanal',
       'fr': 'Passe hebdomadaire',
-      'pt': 'Passe de semana',
+      'pt': 'Passe semanal',
     },
     'xo1ob6ng': {
       'en': '\$8',
@@ -717,7 +714,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'o92dxp15': {
       'en': 'What is included?',
       'de': 'Was ist im Lieferumfang enthalten?',
-      'es': '¿Que incluye?',
+      'es': '¿Qué incluye?',
       'fr': 'Qu\'est-ce qui est inclus ?',
       'pt': 'O que está incluído?',
     },
@@ -732,7 +729,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'Each ride has a \$3 fuel fee',
       'de': 'Für jede Fahrt fällt eine Treibstoffgebühr von 3 \$ an.',
       'es': 'Cada viaje tiene una tarifa de combustible de \$3.',
-      'fr': 'Chaque trajet entraîne des frais de carburant de 3 \$.',
+      'fr': 'Chaque trajet comporte des frais de carburant de 3 \$',
       'pt': 'Cada viagem tem uma taxa de combustível de US\$ 3',
     },
     '3n3wfprk': {
@@ -740,7 +737,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Jederzeit kündbar (nur anteilig für den Monat).',
       'es': 'Cancelar en cualquier momento (prorrateo por mes solamente).',
       'fr': 'Annulez à tout moment (au prorata du mois seulement).',
-      'pt': 'Cancele a qualquer momento (somente no mesmo mês).',
+      'pt': 'Cancele a qualquer momento (somente no mês proporcional).',
     },
     'qnne6q0t': {
       'en': 'Help',
@@ -779,11 +776,11 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de':
           'Laden Sie Fahrgäste ein, den Fahrpreis zu teilen, oder lassen Sie uns automatisch Fahrgäste in der Nähe zuordnen.',
       'es':
-          'Invita a los pasajeros a dividir la tarifa o déjanos emparejar automáticamente a los pasajeros cercanos.',
+          'Invite a los pasajeros a dividir la tarifa o permítanos emparejar automáticamente a los pasajeros cercanos.',
       'fr':
           'Invitez les passagers à partager le tarif ou laissez-nous faire correspondre automatiquement les passagers à proximité.',
       'pt':
-          'Convide os passageiros a dividir a tarifa ou deixe-nos encontrar passageiros próximos automaticamente.',
+          'Convide os passageiros a dividir a tarifa ou deixe que façamos a correspondência automática com passageiros próximos.',
     },
     '5dxw36ml': {
       'en': 'Invite friends',
@@ -797,7 +794,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'QR',
       'es': 'Código QR',
       'fr': 'QR',
-      'pt': 'Código QR',
+      'pt': 'QR',
     },
     'yglrvlqu': {
       'en': 'Link',
@@ -820,6 +817,13 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Participants',
       'pt': 'Participantes',
     },
+    '0flx0fil': {
+      'en': 'Hello World',
+      'de': 'Hallo Welt',
+      'es': 'Hola Mundo',
+      'fr': 'Bonjour le monde',
+      'pt': 'Olá Mundo',
+    },
     'niwa8eid': {
       'en': 'Tab to remove • “- -“ are open spots',
       'de': 'Tab zum Entfernen • „- -“ sind offene Plätze',
@@ -837,7 +841,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'wpvhw4cs': {
       'en': 'Equal split',
       'de': 'Gleiche Aufteilung',
-      'es': 'División igualitaria',
+      'es': 'División equitativa',
       'fr': 'Partage égal',
       'pt': 'Divisão igual',
     },
@@ -892,7 +896,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr':
           'Mises à jour des prix si l\'itinéraire ou les passagers changent avant le ramassage.',
       'pt':
-          'Atualizações de preços se a rota ou os passageiros mudarem antes do embarque.',
+          'Atualizações de preços caso a rota ou os passageiros mudem antes do embarque.',
     },
     'y5mje1pu': {
       'en': 'Privacy',
@@ -912,7 +916,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'Open to nearby',
       'de': 'Offen für die Umgebung',
       'es': 'Abierto a los cercanos',
-      'fr': 'Ouvert aux alentours',
+      'fr': 'Ouvert à proximité',
       'pt': 'Aberto para pessoas próximas',
     },
     'ntglhxb6': {
@@ -920,7 +924,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Mitfahrgelegenheit bestätigen',
       'es': 'Confirmar viaje compartido',
       'fr': 'Confirmer le covoiturage',
-      'pt': 'Confirmar Compartilhamento de Viagem',
+      'pt': 'Confirmar compartilhamento de viagem',
     },
     '4br05fcj': {
       'en': 'Skip for now',
@@ -932,7 +936,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'ltqpaty4': {
       'en': 'Next: Matching - Get picked up faster',
       'de': 'Weiter: Matching – Schneller gefunden werden',
-      'es': 'Siguiente: Emparejamiento: ¡Que te recojan más rápido!',
+      'es': 'Siguiente: Emparejamiento - Consigue que te recojan más rápido',
       'fr': 'Suivant : Matching - Soyez pris en charge plus rapidement',
       'pt': 'Próximo: Correspondência - Seja escolhido mais rápido',
     },
@@ -958,12 +962,12 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Touristenpass: Woche (8 \$)',
       'es': 'Pase turístico: Semana (\$8)',
       'fr': 'Pass touristique : Semaine (8 \$)',
-      'pt': 'Passe turístico: Semana (\$8)',
+      'pt': 'Passe turístico: Semana (US\$ 8)',
     },
     'p6e8yole': {
       'en': 'Valid: Aug 20',
       'de': 'Gültig: 20. August',
-      'es': 'Válido: 20 de agosto',
+      'es': 'Válido: agosto de 2020',
       'fr': 'Valable jusqu\'au 20 août',
       'pt': 'Válido: 20 de agosto',
     },
@@ -981,12 +985,19 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Facturé sur Visa *****4343',
       'pt': 'Cobrado no Visa *****4343',
     },
+    '5f5qcm62': {
+      'en': 'Time Riding',
+      'de': 'Zeitreiten',
+      'es': 'Montar en el tiempo',
+      'fr': 'Le temps à cheval',
+      'pt': 'Cavalgando no Tempo',
+    },
     'lpcumiyr': {
       'en': 'Pay in app (Recommendad)',
       'de': 'Bezahlen in der App (Empfohlen)',
       'es': 'Pagar en la aplicación (Recomendado)',
       'fr': 'Payer dans l\'application (Recommandé)',
-      'pt': 'Pagar no aplicativo (Recomendado)',
+      'pt': 'Pagar no aplicativo (recomendado)',
     },
     'ow1d3q6k': {
       'en': 'Pay driver directly',
@@ -1000,7 +1011,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Treffen Sie sich beispielsweise in der Hotellobby',
       'es': 'Por ejemplo, reunirse en el vestíbulo del hotel.',
       'fr': 'par exemple, rendez-vous dans le hall de l\'hôtel',
-      'pt': 'por exemplo, encontrar-se no saguão do hotel',
+      'pt': 'por exemplo, encontrar-se no lobby do hotel',
     },
     'q0r0r5ua': {
       'en': 'This Default ',
@@ -1162,13 +1173,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   },
   // PickingYou9
   {
-    '5je20q5p': {
-      'en': 'Enisson',
-      'de': 'Enisson',
-      'es': 'Enisson',
-      'fr': 'Enisson',
-      'pt': 'Enisson',
-    },
     '3qv6jswv': {
       'en': 'will be Pickign you up!',
       'de': 'werde dich abholen!',
@@ -1204,13 +1208,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Prix:',
       'pt': 'Preço:',
     },
-    'jgnhjnec': {
-      'en': '\$ 14',
-      'de': '14 \$',
-      'es': '\$14',
-      'fr': '14 \$',
-      'pt': '\$ 14',
-    },
     '3mcyiiij': {
       'en': 'Driver level:',
       'de': 'Treiberebene:',
@@ -1229,7 +1226,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': '7 min.',
       'de': '7 Minuten.',
       'es': '7 minutos.',
-      'fr': '7 min.',
+      'fr': '7 minutes',
       'pt': '7 minutos.',
     },
     'b1xjlh7i': {
@@ -1262,13 +1259,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Ayuda',
       'fr': 'Aide',
       'pt': 'Ajuda',
-    },
-    'bdcuihas': {
-      'en': 'Autolocation',
-      'de': 'Automatische Ortung',
-      'es': 'Autolocalización',
-      'fr': 'Autolocalisation',
-      'pt': 'Autolocalização',
     },
     'tj04hhzt': {
       'en': 'Email address',
@@ -1368,7 +1358,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'Approximate ETA',
       'de': 'Ungefähre voraussichtliche Ankunftszeit',
       'es': 'ETA aproximada',
-      'fr': 'ETA approximative',
+      'fr': 'ETA approximatif',
       'pt': 'ETA aproximado',
     },
     '4p6fz6fh': {
@@ -1448,7 +1438,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'Approximate ETA',
       'de': 'Ungefähre voraussichtliche Ankunftszeit',
       'es': 'ETA aproximada',
-      'fr': 'ETA approximative',
+      'fr': 'ETA approximatif',
       'pt': 'ETA aproximado',
     },
     'asucpsxw': {
@@ -1562,7 +1552,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'k1d3rqsi': {
       'en': 'How did your Drive do?',
       'de': 'Wie hat sich Ihr Drive geschlagen?',
-      'es': '¿Cómo te fue con tu Drive?',
+      'es': '¿Cómo te fue en tu Drive?',
       'fr': 'Comment s\'est déroulé votre Drive ?',
       'pt': 'Como foi o seu desempenho no Drive?',
     },
@@ -1576,7 +1566,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'x48xuwe6': {
       'en': 'What stood out?',
       'de': 'Was ist aufgefallen?',
-      'es': '¿Qué fue lo que más destacó?',
+      'es': '¿Qué destacó?',
       'fr': 'Qu\'est-ce qui vous a marqué ?',
       'pt': 'O que se destacou?',
     },
@@ -1784,14 +1774,14 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Lade einen Freund ein (+500 Punkte)',
       'es': 'Invita a un amigo (+500 pts)',
       'fr': 'Inviter un ami (+500 pts)',
-      'pt': 'Convidar um amigo (+500 pts)',
+      'pt': 'Convide um amigo (+500 pts)',
     },
     '1273n14s': {
-      'en': 'Select',
-      'de': 'Wählen',
-      'es': 'Seleccionar',
-      'fr': 'Sélectionner',
-      'pt': 'Selecione',
+      'en': 'View',
+      'de': 'Sicht',
+      'es': 'Vista',
+      'fr': 'Voir',
+      'pt': 'Visualizar',
     },
     '10sy7axv': {
       'en': 'Share your cade QCKY-72',
@@ -1828,69 +1818,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Activité récente',
       'pt': 'Atividade recente',
     },
-    '770e7m0x': {
-      'en': 'Completed ride',
-      'de': 'Abgeschlossene Fahrt',
-      'es': 'Viaje completado',
-      'fr': 'Balade terminée',
-      'pt': 'Passeio concluído',
-    },
-    'yyccpg0t': {
-      'en': 'Aug 11',
-      'de': '11. August',
-      'es': '11 de agosto',
-      'fr': '11 août',
-      'pt': '11 de agosto',
-    },
-    'dfcn9v5r': {
-      'en': '+120 pts',
-      'de': '+120 Punkte',
-      'es': '+120 puntos',
-      'fr': '+120 pts',
-      'pt': '+120 pontos',
-    },
-    'jmax77kp': {
-      'en': 'Promo: Summer10',
-      'de': 'Promo: Sommer10',
-      'es': 'Promoción: Verano10',
-      'fr': 'Promo : Été 10',
-      'pt': 'Promoção: Summer10',
-    },
-    '4s9iesq2': {
-      'en': 'Aug 9',
-      'de': '9. August',
-      'es': '9 de agosto',
-      'fr': '9 août',
-      'pt': '9 de agosto',
-    },
-    '7qm0i1gl': {
-      'en': '+300 pts',
-      'de': '+300 Punkte',
-      'es': '+300 puntos',
-      'fr': '+300 pts',
-      'pt': '+300 pontos',
-    },
-    'njz0jd2c': {
-      'en': 'Invite bonus',
-      'de': 'Einladungsbonus',
-      'es': 'Bono de invitación',
-      'fr': 'Bonus d\'invitation',
-      'pt': 'Bônus de convite',
-    },
-    'hxb0pm94': {
-      'en': 'Aug 6',
-      'de': '6. August',
-      'es': '6 de agosto',
-      'fr': '6 août',
-      'pt': '6 de agosto',
-    },
-    'cdj74baj': {
-      'en': '+500 pts',
-      'de': '+500 Punkte',
-      'es': '+500 puntos',
-      'fr': '+500 pts',
-      'pt': '+500 pontos',
-    },
     '2z63ycqb': {
       'en': 'Home',
       'de': 'Heim',
@@ -1918,13 +1845,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   },
   // Profile15
   {
-    'g30tee4i': {
-      'en': 'Verified ID',
-      'de': 'Verifizierte ID',
-      'es': 'Identificación verificada',
-      'fr': 'Pièce d\'identité vérifiée',
-      'pt': 'ID verificado',
-    },
     'ty0dxium': {
       'en': 'Zone: Nassau',
       'de': 'Zone: Nassau',
@@ -1932,19 +1852,12 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Zone : Nassau',
       'pt': 'Zona: Nassau',
     },
-    'fgdknidq': {
-      'en': 'English',
-      'de': 'Englisch',
-      'es': 'Inglés',
-      'fr': 'Anglais',
-      'pt': 'Inglês',
-    },
     'm7hx9uxx': {
-      'en': 'S',
-      'de': 'S',
-      'es': 'S',
-      'fr': 'S',
-      'pt': 'S',
+      'en': 'P',
+      'de': 'P',
+      'es': 'PAG',
+      'fr': 'P',
+      'pt': 'P',
     },
     'j8inhljm': {
       'en': 'Payment methods',
@@ -1973,13 +1886,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Recompensas',
       'fr': 'Récompenses',
       'pt': 'Recompensas',
-    },
-    'g96msyuj': {
-      'en': '2450 points, 3 perks',
-      'de': '2450 Punkte, 3 Vergünstigungen',
-      'es': '2450 puntos, 3 ventajas',
-      'fr': '2450 points, 3 avantages',
-      'pt': '2450 pontos, 3 vantagens',
     },
     'i6q9uqth': {
       'en': 'A',
@@ -2068,7 +1974,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     '5ccwvf7m': {
       'en': 'L',
       'de': 'L',
-      'es': 'Yo',
+      'es': 'L',
       'fr': 'L',
       'pt': 'eu',
     },
@@ -2097,7 +2003,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'My Passes',
       'de': 'Meine Pässe',
       'es': 'Mis pases',
-      'fr': 'Mes Pass',
+      'fr': 'Mes passes',
       'pt': 'Meus Passes',
     },
     'k5oxfzxg': {
@@ -2190,34 +2096,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Étage',
       'pt': 'Nível',
     },
-    '8p3s5fdd': {
-      'en': '2,450',
-      'de': '2.450',
-      'es': '2.450',
-      'fr': '2 450',
-      'pt': '2.450',
-    },
-    'lk5k9pah': {
-      'en': 'Gold',
-      'de': 'Gold',
-      'es': 'Oro',
-      'fr': 'Or',
-      'pt': 'Ouro',
-    },
-    '5xvue46j': {
-      'en': 'Free ride boost',
-      'de': 'Freifahrt-Boost',
-      'es': 'Impulso de viaje gratis',
-      'fr': 'Coup de pouce pour le trajet gratuit',
-      'pt': 'Aumento de viagem gratuita',
-    },
-    'l486yc32': {
-      'en': '+5 min priority',
-      'de': '+5 Min. Priorität',
-      'es': '+5 min de prioridad',
-      'fr': '+5 min de priorité',
-      'pt': '+5 min de prioridade',
-    },
     'qldyld0o': {
       'en': 'Airport pickuo lane',
       'de': 'Flughafen-Pickuo-Spur',
@@ -2277,34 +2155,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Prochain',
       'pt': 'Por vir',
     },
-    'xrffj6km': {
-      'en': 'Today • 4:30 PM',
-      'de': 'Heute • 16:30 Uhr',
-      'es': 'Hoy • 4:30 p.m.',
-      'fr': 'Aujourd\'hui • 16h30',
-      'pt': 'Hoje • 16h30',
-    },
-    'qea840wh': {
-      'en': '\$18',
-      'de': '18 \$',
-      'es': '\$18',
-      'fr': '18 \$',
-      'pt': '\$ 18',
-    },
-    'few63cok': {
-      'en': 'Aug 10 • 9:14 PM',
-      'de': '10. Aug. • 21:14 Uhr',
-      'es': '10 de agosto • 21:14',
-      'fr': '10 août • 21h14',
-      'pt': '10 de agosto • 21h14',
-    },
-    '48htb83l': {
-      'en': '\$12.40',
-      'de': '12,40 €',
-      'es': '\$12.40',
-      'fr': '12,40 \$',
-      'pt': '\$ 12,40',
-    },
     '0pgr1i1t': {
       'en': 'Aug 9 • 7:02 PM',
       'de': '9. Aug. • 19:02 Uhr',
@@ -2337,7 +2187,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'Aug 6• 8:45 PM',
       'de': '6. August, 20:45 Uhr',
       'es': '6 de agosto • 20:45',
-      'fr': '6 août • 20h45',
+      'fr': '6 août • 20 h 45',
       'pt': '6 de agosto • 20h45',
     },
     '6m14pv9v': {
@@ -2371,13 +2221,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Langue',
       'pt': 'Linguagem',
     },
-    'w5gj38xu': {
-      'en': 'English',
-      'de': 'Englisch',
-      'es': 'Inglés',
-      'fr': 'Anglais',
-      'pt': 'Inglês',
-    },
     'ssumpo16': {
       'en': 'Accessibility',
       'de': 'Zugänglichkeit',
@@ -2405,20 +2248,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Viajes< Promociones',
       'fr': 'Voyages< Promotions',
       'pt': 'Viagens< Promoções',
-    },
-    'ywxjr5qn': {
-      'en': 'Location Services',
-      'de': 'Service an der Station',
-      'es': 'Servicios de ubicación',
-      'fr': 'Services de localisation',
-      'pt': 'Serviços de localização',
-    },
-    '4yfo4jil': {
-      'en': 'White using the app',
-      'de': 'Weiß mit der App',
-      'es': 'Blanco usando la aplicación',
-      'fr': 'Blanc utilisant l\'application',
-      'pt': 'Branco usando o aplicativo',
     },
     's3kw1rrh': {
       'en': 'Home',
@@ -2493,27 +2322,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Prochaine balade',
       'pt': 'Próximo passeio',
     },
-    '9gycapbt': {
-      'en': 'Today 4:30 PM  • Bay Street -> Paradise Island',
-      'de': 'Heute 16:30 Uhr • Bay Street -> Paradise Island',
-      'es': 'Hoy 4:30 PM • Bay Street -> Paradise Island',
-      'fr': 'Aujourd\'hui 16h30 • Bay Street -> Paradise Island',
-      'pt': 'Hoje 16h30 • Bay Street -> Paradise Island',
-    },
-    '11hntl9n': {
-      'en': '\$ 18',
-      'de': '18 \$',
-      'es': '\$18',
-      'fr': '18 \$',
-      'pt': '\$ 18',
-    },
-    'w9p8sory': {
-      'en': 'ETA 7 min',
-      'de': 'Voraussichtliche Ankunftszeit: 7 Min.',
-      'es': 'Tiempo estimado de llegada: 7 minutos',
-      'fr': 'ETA 7 min',
-      'pt': 'ETA 7 min',
-    },
     'e9ctu0o5': {
       'en': 'Edit',
       'de': 'Bearbeiten',
@@ -2534,27 +2342,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Viajes recientes',
       'fr': 'Voyages récents',
       'pt': 'Viagens recentes',
-    },
-    'f0cpkwuy': {
-      'en': 'Mon • 2.6 km  • 9 min',
-      'de': 'Mo • 2,6 km • 9 Min.',
-      'es': 'Lunes • 2,6 km • 9 min',
-      'fr': 'Lun • 2,6 km • 9 min',
-      'pt': 'Seg • 2,6 km • 9 min',
-    },
-    '1p4rt4i1': {
-      'en': '\$ 18.40',
-      'de': '18,40 €',
-      'es': '\$18.40',
-      'fr': '18,40 \$',
-      'pt': '\$ 18,40',
-    },
-    'liej22n7': {
-      'en': 'Receipt',
-      'de': 'Quittung',
-      'es': 'Recibo',
-      'fr': 'Reçu',
-      'pt': 'Recibo',
     },
     'yli9ckqz': {
       'en': 'Home',
@@ -2598,20 +2385,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Ajouter un contact',
       'pt': 'Adicionar contato',
     },
-    'u2gdlfw2': {
-      'en': 'Sofia P.',
-      'de': 'Sofia P.',
-      'es': 'Sofía P.',
-      'fr': 'Sofia P.',
-      'pt': 'Sofia P.',
-    },
-    'g8tmomdj': {
-      'en': 'Sofia P.',
-      'de': 'Sofia P.',
-      'es': 'Sofía P.',
-      'fr': 'Sofia P.',
-      'pt': 'Sofia P.',
-    },
     'lcpevj41': {
       'en': 'Share ETA defaults',
       'de': 'ETA-Standardwerte teilen',
@@ -2623,7 +2396,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'Automaticaly share on every trip.',
       'de': 'Bei jeder Fahrt automatisch teilen.',
       'es': 'Compartir automáticamente en cada viaje.',
-      'fr': 'Partagez automatiquement à chaque voyage.',
+      'fr': 'Partager automatiquement à chaque voyage.',
       'pt': 'Compartilhe automaticamente em cada viagem.',
     },
     'xshsh38w': {
@@ -2638,7 +2411,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Mit Notfallkontakt teilen',
       'es': 'Compartir con contacto de emergencia',
       'fr': 'Partager avec un contact d\'urgence',
-      'pt': 'Compartilhe com o contato de emergência',
+      'pt': 'Compartilhe com contato de emergência',
     },
     '9irhu2te': {
       'en': 'Emergency information',
@@ -2692,7 +2465,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'lkc1tsvh': {
       'en': 'L',
       'de': 'L',
-      'es': 'Yo',
+      'es': 'L',
       'fr': 'L',
       'pt': 'eu',
     },
@@ -2774,12 +2547,12 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Problem melden',
       'es': 'Informar un problema',
       'fr': 'Signaler un problème',
-      'pt': 'Relatar um problema',
+      'pt': 'Reportar um problema',
     },
     'kakc9sbx': {
       'en': 'Trip or app issues',
       'de': 'Reise- oder App-Probleme',
-      'es': 'Problemas con el viaje o la aplicación',
+      'es': 'Problemas de viaje o de la aplicación',
       'fr': 'Problèmes de voyage ou d\'application',
       'pt': 'Problemas de viagem ou aplicativo',
     },
@@ -2892,7 +2665,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Wochenkarte',
       'es': 'Pase semanal',
       'fr': 'Passe hebdomadaire',
-      'pt': 'Passe de semana',
+      'pt': 'Passe semanal',
     },
     '72o093g6': {
       'en': '\$8',
@@ -2904,7 +2677,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'f5zikyh4': {
       'en': 'Upgarde',
       'de': 'Upgrade',
-      'es': 'Upgarde',
+      'es': 'Actualización',
       'fr': 'Mise à niveau',
       'pt': 'Atualizar',
     },
@@ -2927,7 +2700,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Wochenkarte',
       'es': 'Pase semanal',
       'fr': 'Passe hebdomadaire',
-      'pt': 'Passe de semana',
+      'pt': 'Passe semanal',
     },
     'ozzk62hx': {
       'en': 'Aug 14',
@@ -3017,8 +2790,8 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'en': 'No surge princing: limited to standand vehicles.',
       'de': 'Keine Preiserhöhung: beschränkt auf Standardfahrzeuge.',
       'es': 'Sin aumento de precios: limitado a vehículos estándar.',
-      'fr': 'Pas de tarification dynamique : limité aux véhicules standard.',
-      'pt': 'Sem preços de pico: limitado a veículos padrão.',
+      'fr': 'Pas de tarification majorée : limité aux véhicules de série.',
+      'pt': 'Sem aumento de preço: limitado a veículos comuns.',
     },
     '9to0c6rc': {
       'en': 'Done',
@@ -3113,28 +2886,29 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr':
           'Si vous oubliez, ne vous inquiétez pas, nous serons là pour vous le rappeler.',
       'pt':
-          'Não se preocupe se você esquecer, estaremos aqui para \nlembrá-lo quando isso acontecer.',
+          'Não se preocupe se você esquecer, estaremos aqui para lembrá-lo quando isso acontecer.',
     },
     '30wuyuwo': {
       'en': 'Upload a Photo of your ID',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Laden Sie ein Foto Ihres Ausweises hoch',
+      'es': 'Sube una foto de tu identificación',
+      'fr': 'Téléchargez une photo de votre pièce d\'identité',
+      'pt': 'Carregue uma foto do seu documento de identidade',
     },
     '0o76z2zr': {
       'en': 'Bahaman Passport, Driver\'s license or Resident Card.',
-      'de': 'Lassen Sie uns wissen, woher Ihr Akzent kommt!',
-      'es': '¡Cuéntanos de donde viene tu acento!',
-      'fr': 'Dites-nous d’où vient votre accent !',
-      'pt': 'Conte-nos de onde vem seu sotaque!',
+      'de': 'Bahamaischer Reisepass, Führerschein oder Aufenthaltskarte.',
+      'es': 'Pasaporte bahameño, licencia de conducir o tarjeta de residente.',
+      'fr': 'Passeport, permis de conduire ou carte de résident des Bahamas.',
+      'pt':
+          'Passaporte das Bahamas, carteira de motorista ou cartão de residente.',
     },
     'chuireog': {
       'en': ' Select Your Nassau Zone',
-      'de': 'Wählen Sie Ihren US-Bundesstaat',
-      'es': 'Seleccione su estado de EE. UU.',
-      'fr': 'Sélectionnez votre État américain',
-      'pt': 'Selecione seu estado dos EUA',
+      'de': 'Wählen Sie Ihre Nassau-Zone',
+      'es': 'Seleccione su zona de Nassau',
+      'fr': 'Sélectionnez votre zone de Nassau',
+      'pt': 'Selecione sua zona de Nassau',
     },
     'akax8nd1': {
       'en': 'Search...',
@@ -3166,10 +2940,10 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     'tidzlbeg': {
       'en': 'East, Middle or West',
-      'de': 'Ignorieren Sie diesen Schritt, wenn Sie kein Amerikaner sind.',
-      'es': 'Ignore este paso si no es estadounidense.',
-      'fr': 'Ignorez cette étape si vous n’êtes pas américain.',
-      'pt': 'Ignore esta etapa se você não for americano.',
+      'de': 'Osten, Mitte oder Westen',
+      'es': 'Este, Medio u Oeste',
+      'fr': 'Est, Moyen ou Ouest',
+      'pt': 'Leste, Centro ou Oeste',
     },
     'adtc7pns': {
       'en': 'Next',
@@ -3221,7 +2995,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Wartender Fahrer',
       'es': 'Conductor en espera',
       'fr': 'Conducteur en attente',
-      'pt': 'Motorista em espera',
+      'pt': 'Motorista esperando',
     },
     'wbiofvcr': {
       'en': 'Ride ',
@@ -3315,7 +3089,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Problem melden',
       'es': 'Informar un problema',
       'fr': 'Signaler un problème',
-      'pt': 'Relatar um problema',
+      'pt': 'Reportar um problema',
     },
     'iydue966': {
       'en': 'Trip or app issues',
@@ -3344,6 +3118,1449 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Hogar',
       'fr': 'Maison',
       'pt': 'Lar',
+    },
+  },
+  // Notification27
+  {
+    '3gr64o6p': {
+      'en': 'Notification',
+      'de': 'Benachrichtigung',
+      'es': 'Notificación',
+      'fr': 'Notification',
+      'pt': 'Notificação',
+    },
+    'tt0vfi6x': {
+      'en': 'Viagem concluída',
+      'de': 'Viagem concluída',
+      'es': 'Viagem concluída',
+      'fr': 'Voyage conclu',
+      'pt': 'Viagem concluída',
+    },
+    '3bi5zmya': {
+      'en':
+          'Sua viagem para Shopping Iguatemi foi concluída com sucesso. Obrigado por usar o Ride!',
+      'de':
+          'Ihre Reise nach Iguatemi wurde mit Erfolg abgeschlossen. Obrigado por usar o Ride!',
+      'es':
+          'Su viaje a Shopping Iguatemi fue concluido con éxito. ¡Obrigado por usar o Ride!',
+      'fr':
+          'Votre voyage pour Shopping Iguatemi a été conclu avec succès. Obligé d\'utiliser Ride !',
+      'pt':
+          'Sua viagem ao Shopping Iguatemi foi concluída com sucesso. Obrigado por usar o Ride!',
+    },
+    'j30u5604': {
+      'en': 'há 2 minutos',
+      'de': 'há 2 minuteos',
+      'es': 'há 2 minutos',
+      'fr': 'il y a 2 minutes',
+      'pt': 'há 2 minutos',
+    },
+  },
+  // help
+  {
+    'po3zlfdx': {
+      'en': 'How can we help you?',
+      'de': 'Wie können wir Ihnen helfen?',
+      'es': '¿Cómo podemos ayudarle?',
+      'fr': 'Comment pouvons-nous vous aider?',
+      'pt': 'Como podemos ajudar você?',
+    },
+    'gntn79i0': {
+      'en': 'Search for help topics...',
+      'de': 'Nach Hilfethemen suchen ...',
+      'es': 'Buscar temas de ayuda...',
+      'fr': 'Rechercher des rubriques d\'aide...',
+      'pt': 'Pesquisar tópicos de ajuda...',
+    },
+    'cbka3gzv': {
+      'en': 'Popular Topics',
+      'de': 'Beliebte Themen',
+      'es': 'Temas populares',
+      'fr': 'Sujets populaires',
+      'pt': 'Tópicos populares',
+    },
+    'xpkno286': {
+      'en': 'Account & Profile',
+      'de': 'Konto und Profil',
+      'es': 'Cuenta y perfil',
+      'fr': 'Compte et profil',
+      'pt': 'Conta e Perfil',
+    },
+    'aavb8zen': {
+      'en': 'Manage your account settings and profile information',
+      'de': 'Verwalten Sie Ihre Kontoeinstellungen und Profilinformationen',
+      'es':
+          'Administrar la configuración de su cuenta y la información de su perfil',
+      'fr':
+          'Gérez les paramètres de votre compte et les informations de votre profil',
+      'pt': 'Gerencie as configurações da sua conta e informações do perfil',
+    },
+    'ruoxatsv': {
+      'en': 'Billing & Payments',
+      'de': 'Abrechnung und Zahlungen',
+      'es': 'Facturación y pagos',
+      'fr': 'Facturation et paiements',
+      'pt': 'Faturamento e Pagamentos',
+    },
+    'ovp4hj0v': {
+      'en': 'Questions about subscriptions, payments, and billing',
+      'de': 'Fragen zu Abonnements, Zahlungen und Abrechnung',
+      'es': 'Preguntas sobre suscripciones, pagos y facturación',
+      'fr': 'Questions sur les abonnements, les paiements et la facturation',
+      'pt': 'Perguntas sobre assinaturas, pagamentos e cobranças',
+    },
+    'vswtoyoz': {
+      'en': 'Privacy & Security',
+      'de': 'Privatsphäre & Sicherheit',
+      'es': 'Privacidad y seguridad',
+      'fr': 'Confidentialité et sécurité',
+      'pt': 'Privacidade e Segurança',
+    },
+    '1kt72qns': {
+      'en': 'Learn about data protection and security features',
+      'de': 'Informieren Sie sich über Datenschutz und Sicherheitsfunktionen',
+      'es':
+          'Obtenga más información sobre las funciones de seguridad y protección de datos',
+      'fr':
+          'En savoir plus sur la protection des données et les fonctionnalités de sécurité',
+      'pt': 'Saiba mais sobre proteção de dados e recursos de segurança',
+    },
+    'ozzpa0c1': {
+      'en': 'Technical Issues',
+      'de': 'Technische Probleme',
+      'es': 'Problemas técnicos',
+      'fr': 'Problèmes techniques',
+      'pt': 'Problemas técnicos',
+    },
+    'p0tfu4xb': {
+      'en': 'Troubleshoot app problems and technical difficulties',
+      'de': 'Beheben Sie App-Probleme und technische Schwierigkeiten',
+      'es': 'Solucionar problemas de aplicaciones y dificultades técnicas',
+      'fr':
+          'Résoudre les problèmes d\'application et les difficultés techniques',
+      'pt': 'Solucionar problemas de aplicativos e dificuldades técnicas',
+    },
+    'dc0zkaz4': {
+      'en': 'Need More Help?',
+      'de': 'Sie benötigen weitere Hilfe?',
+      'es': '¿Necesitas más ayuda?',
+      'fr': 'Besoin d\'aide supplémentaire?',
+      'pt': 'Precisa de mais ajuda?',
+    },
+    '1og1lf1v': {
+      'en': 'Live Chat Support',
+      'de': 'Live-Chat-Support',
+      'es': 'Soporte de chat en vivo',
+      'fr': 'Assistance par chat en direct',
+      'pt': 'Suporte por chat ao vivo',
+    },
+    'vsqhlpdx': {
+      'en': 'Chat with our support team in real-time',
+      'de': 'Chatten Sie in Echtzeit mit unserem Support-Team',
+      'es': 'Chatea con nuestro equipo de soporte en tiempo real',
+      'fr': 'Discutez avec notre équipe d\'assistance en temps réel',
+      'pt': 'Converse com nossa equipe de suporte em tempo real',
+    },
+    '5b2zeubh': {
+      'en': 'Start Chat',
+      'de': 'Chat starten',
+      'es': 'Iniciar chat',
+      'fr': 'Démarrer le chat',
+      'pt': 'Iniciar bate-papo',
+    },
+    'bp8298bg': {
+      'en': 'Email Support',
+      'de': 'E-Mail-Support',
+      'es': 'Soporte por correo electrónico',
+      'fr': 'Assistance par e-mail',
+      'pt': 'Suporte por e-mail',
+    },
+    'z8320h95': {
+      'en': 'Send us a detailed message about your issue',
+      'de': 'Senden Sie uns eine detaillierte Nachricht zu Ihrem Problem',
+      'es': 'Envíenos un mensaje detallado sobre su problema.',
+      'fr': 'Envoyez-nous un message détaillé sur votre problème',
+      'pt': 'Envie-nos uma mensagem detalhada sobre o seu problema',
+    },
+    'tk38d1ux': {
+      'en': 'Send Email',
+      'de': 'E-Mail senden',
+      'es': 'Enviar correo electrónico',
+      'fr': 'Envoyer un e-mail',
+      'pt': 'Enviar e-mail',
+    },
+    'l1thmm98': {
+      'en': 'Support Hours',
+      'de': 'Supportzeiten',
+      'es': 'Horario de soporte',
+      'fr': 'Heures d\'assistance',
+      'pt': 'Horário de atendimento',
+    },
+    'ehqwdiey': {
+      'en':
+          'Monday - Friday: 9:00 AM - 6:00 PM EST\nWeekends: 10:00 AM - 4:00 PM EST',
+      'de':
+          'Montag–Freitag: 9:00–18:00 Uhr EST\nWochenenden: 10:00–16:00 Uhr EST',
+      'es':
+          'Lunes a viernes: 9:00 a. m. - 6:00 p. m. EST\nFines de semana: 10:00 a. m. - 4:00 p. m. EST',
+      'fr':
+          'Lundi - Vendredi : 9 h 00 - 18 h 00 HNE\nWeek-ends : 10 h 00 - 16 h 00 HNE',
+      'pt':
+          'Segunda a sexta: 9h às 18h (horário do leste dos EUA)\nFins de semana: 10h às 16h (horário do leste dos EUA)',
+    },
+    'yc1m7cp8': {
+      'en': 'Help & Support',
+      'de': 'Hilfe & Support',
+      'es': 'Ayuda y soporte',
+      'fr': 'Aide et support',
+      'pt': 'Ajuda e Suporte',
+    },
+  },
+  // CustomerSupport26
+  {
+    'lv1xvs0f': {
+      'en': 'Customer Support',
+      'de': 'Kundenservice',
+      'es': 'Atención al cliente',
+      'fr': 'Assistance clientèle',
+      'pt': 'Suporte ao cliente',
+    },
+    'wrj9vpsd': {
+      'en': 'Our support',
+      'de': 'Unsere Unterstützung',
+      'es': 'Nuestro apoyo',
+      'fr': 'Notre soutien',
+      'pt': 'Nosso suporte',
+    },
+    'mmy0on8n': {
+      'en': 'Our team is ready to help you with any questions or problems.',
+      'de':
+          'Bei Fragen und Problemen steht Ihnen unser Team gerne zur Verfügung.',
+      'es':
+          'Nuestro equipo está listo para ayudarle con cualquier pregunta o problema.',
+      'fr':
+          'Notre équipe est prête à vous aider pour toutes questions ou problèmes.',
+      'pt':
+          'Nossa equipe está pronta para ajudar você com qualquer dúvida ou problema.',
+    },
+    '195hd8or': {
+      'en': 'Contact Forms',
+      'de': 'Kontaktformulare',
+      'es': 'Formularios de contacto',
+      'fr': 'Formulaires de contact',
+      'pt': 'Formulários de contato',
+    },
+    'nr86rssb': {
+      'en': 'Email',
+      'de': 'E-Mail',
+      'es': 'Correo electrónico',
+      'fr': 'E-mail',
+      'pt': 'E-mail',
+    },
+    '9lwt7ou3': {
+      'en': 'Info@quickyy.life',
+      'de': 'Info@quickyy.life',
+      'es': 'Información@quickyy.life',
+      'fr': 'Info@quickyy.life',
+      'pt': 'Info@quickyy.life',
+    },
+    'l2cxuurb': {
+      'en': 'Response within 24 hours',
+      'de': 'Antwort innerhalb von 24 Stunden',
+      'es': 'Respuesta en 24 horas',
+      'fr': 'Réponse dans les 24 heures',
+      'pt': 'Resposta em 24 horas',
+    },
+    '7cy172hi': {
+      'en': 'Telefone',
+      'de': 'Telefone',
+      'es': 'Teléfono',
+      'fr': 'Téléphone',
+      'pt': 'Telefone',
+    },
+    'cyc9v8gc': {
+      'en': '(305) 850-5042',
+      'de': '(305) 850-5042',
+      'es': '(305) 850-5042',
+      'fr': '(305) 850-5042',
+      'pt': '(305) 850-5042',
+    },
+    'qz5zqnhf': {
+      'en': 'Mon-Fri: 9am to 6pm',
+      'de': 'Mo-Fr: 9 bis 18 Uhr',
+      'es': 'Lunes a viernes: de 9 a 18 horas',
+      'fr': 'Lun-Ven : 9h à 18h',
+      'pt': 'Seg-Sex: 9h às 18h',
+    },
+    '8c6640j3': {
+      'en': 'Chat Online',
+      'de': 'Online-Chat',
+      'es': 'Chat en línea',
+      'fr': 'Chat en ligne',
+      'pt': 'Bate-papo on-line',
+    },
+    'p1pmv278': {
+      'en': 'Instant service',
+      'de': 'Sofortiger Service',
+      'es': 'Servicio instantáneo',
+      'fr': 'Service instantané',
+      'pt': 'Serviço instantâneo',
+    },
+    'l0cnc9b1': {
+      'en': 'Available now',
+      'de': 'Jetzt verfügbar',
+      'es': 'Disponible ahora',
+      'fr': 'Disponible maintenant',
+      'pt': 'Disponível agora',
+    },
+    'fzgc536x': {
+      'en': 'Send your Message',
+      'de': 'Senden Sie Ihre Nachricht',
+      'es': 'Envía tu mensaje',
+      'fr': 'Envoyez votre message',
+      'pt': 'Envie sua mensagem',
+    },
+    '7dp8uw6k': {
+      'en': 'Full name',
+      'de': 'Vollständiger Name',
+      'es': 'Nombre completo',
+      'fr': 'Nom et prénom',
+      'pt': 'Nome completo',
+    },
+    '8joqz6ej': {
+      'en': 'Enter your full name',
+      'de': 'Geben Sie Ihren vollständigen Namen ein',
+      'es': 'Ingrese su nombre completo',
+      'fr': 'Entrez votre nom complet',
+      'pt': 'Digite seu nome completo',
+    },
+    'u31e3vyh': {
+      'en': 'Email',
+      'de': 'E-Mail',
+      'es': 'Correo electrónico',
+      'fr': 'E-mail',
+      'pt': 'E-mail',
+    },
+    'qyqgzfe3': {
+      'en': '',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    '23bna73j': {
+      'en': 'your@email.com',
+      'de': 'Ihre@E-Mail-Adresse.com',
+      'es': 'tu@correoelectrónico.com',
+      'fr': 'votre@email.com',
+      'pt': 'seu@email.com',
+    },
+    'ujnsfx0b': {
+      'en': 'Subject',
+      'de': 'Thema',
+      'es': 'Sujeto',
+      'fr': 'Sujet',
+      'pt': 'Assunto',
+    },
+    '9x7q7hz4': {
+      'en': '',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'lwk1i3w1': {
+      'en': 'Select the subject',
+      'de': 'Wählen Sie das Thema',
+      'es': 'Seleccione el tema',
+      'fr': 'Sélectionnez le sujet',
+      'pt': 'Selecione o assunto',
+    },
+    'toi2zpr6': {
+      'en': 'Technical problems',
+      'de': 'Technische Probleme',
+      'es': 'Problemas técnicos',
+      'fr': 'Problèmes techniques',
+      'pt': 'Problemas técnicos',
+    },
+    'e4d29uqo': {
+      'en': 'Payment Issues & Refunds',
+      'de': 'Zahlungsprobleme und Rückerstattungen',
+      'es': 'Problemas de pago y reembolsos',
+      'fr': 'Problèmes de paiement et remboursements',
+      'pt': 'Problemas de pagamento e reembolsos',
+    },
+    'vqmmdwy0': {
+      'en': 'Complaint',
+      'de': 'Beschwerde',
+      'es': 'Queja',
+      'fr': 'Plainte',
+      'pt': 'Reclamação',
+    },
+    'qe1jv7t7': {
+      'en': 'Others',
+      'de': 'Sonstige',
+      'es': 'Otros',
+      'fr': 'Autres',
+      'pt': 'Outros',
+    },
+    '3ztawmse': {
+      'en': 'Message',
+      'de': 'Nachricht',
+      'es': 'Mensaje',
+      'fr': 'Message',
+      'pt': 'Mensagem',
+    },
+    '374q2d25': {
+      'en': 'Please describe your request in detail...',
+      'de': 'Bitte beschreiben Sie Ihr Anliegen detailliert...',
+      'es': 'Por favor describa su solicitud en detalle...',
+      'fr': 'Veuillez décrire votre demande en détail...',
+      'pt': 'Por favor, descreva sua solicitação em detalhes...',
+    },
+    'nts8vr5q': {
+      'en': 'Send Message',
+      'de': 'Nachricht senden',
+      'es': 'Enviar mensaje',
+      'fr': 'Envoyer un message',
+      'pt': 'Enviar mensagem',
+    },
+    'q0jymupb': {
+      'en': 'Response Time',
+      'de': 'Ansprechzeit',
+      'es': 'Tiempo de respuesta',
+      'fr': 'Temps de réponse',
+      'pt': 'Tempo de resposta',
+    },
+    'hvtsr364': {
+      'en': 'Our average response time is 2-4 hours during business hours.',
+      'de':
+          'Unsere durchschnittliche Reaktionszeit beträgt während der Geschäftszeiten 2–4 Stunden.',
+      'es':
+          'Nuestro tiempo de respuesta promedio es de 2 a 4 horas durante el horario comercial.',
+      'fr':
+          'Notre délai de réponse moyen est de 2 à 4 heures pendant les heures ouvrables.',
+      'pt':
+          'Nosso tempo médio de resposta é de 2 a 4 horas durante o horário comercial.',
+    },
+  },
+  // FrequentlyAskedQuestions25
+  {
+    '7jr17pv1': {
+      'en': 'Frequently Asked Questions',
+      'de': 'Häufig gestellte Fragen',
+      'es': 'Preguntas frecuentes',
+      'fr': 'Questions fréquemment posées',
+      'pt': 'Perguntas frequentes',
+    },
+    'h954zxq2': {
+      'en': 'Find answers to the most common questions about our services',
+      'de':
+          'Hier finden Sie Antworten auf die häufigsten Fragen zu unseren Dienstleistungen',
+      'es':
+          'Encuentre respuestas a las preguntas más frecuentes sobre nuestros servicios',
+      'fr':
+          'Trouvez des réponses aux questions les plus courantes sur nos services',
+      'pt':
+          'Encontre respostas para as perguntas mais comuns sobre nossos serviços',
+    },
+    'wz66lacp': {
+      'en': 'Payments',
+      'de': 'Zahlungen',
+      'es': 'Pagos',
+      'fr': 'Paiements',
+      'pt': 'Pagamentos',
+    },
+    'vdt8x0ls': {
+      'en': 'What payment methods are accepted?',
+      'de': 'Welche Zahlungsmethoden werden akzeptiert?',
+      'es': '¿Qué métodos de pago se aceptan?',
+      'fr': 'Quels modes de paiement sont acceptés ?',
+      'pt': 'Quais métodos de pagamento são aceitos?',
+    },
+    'ro087tg4': {
+      'en':
+          'We accept credit cards (Visa, Mastercard, American Express).\nDepending on your device, Apple Pay or Google Pay may also be available when enabled.',
+      'de':
+          'Wir akzeptieren Kreditkarten (Visa, Mastercard, American Express).\nJe nach Gerät sind möglicherweise auch Apple Pay oder Google Pay verfügbar, sofern aktiviert.',
+      'es':
+          'Aceptamos tarjetas de crédito (Visa, Mastercard, American Express).\nDependiendo de tu dispositivo, Apple Pay o Google Pay también podrían estar disponibles si están habilitados.',
+      'fr':
+          'Nous acceptons les cartes de crédit (Visa, Mastercard, American Express).\nSelon votre appareil, Apple Pay ou Google Pay peuvent également être disponibles lorsqu\'ils sont activés.',
+      'pt':
+          'Aceitamos cartões de crédito (Visa, Mastercard, American Express).\nDependendo do seu dispositivo, o Apple Pay ou o Google Pay também podem estar disponíveis quando ativados.',
+    },
+    'oqusjmn4': {
+      'en': 'How does the refund work?',
+      'de': 'Wie funktioniert die Rückerstattung?',
+      'es': '¿Cómo funciona el reembolso?',
+      'fr': 'Comment fonctionne le remboursement ?',
+      'pt': 'Como funciona o reembolso?',
+    },
+    'wghwzhgz': {
+      'en':
+          'If a ride is canceled or adjusted according to our policy, we issue a refund to the same credit card used at checkout.\nThe time to appear on your statement depends on your bank, but it usually takes 5–10 business days after we process it. Once we send the refund, settlement speed is controlled by your card issuer.\nIf you need help, contact support in the app with your ride ID.',
+      'de':
+          'Wenn eine Fahrt gemäß unseren Richtlinien storniert oder geändert wird, erstatten wir den Betrag auf die beim Bezahlvorgang verwendete Kreditkarte.\n\nWie lange der Betrag auf Ihrer Abrechnung erscheint, hängt von Ihrer Bank ab. In der Regel dauert es 5–10 Werktage nach der Bearbeitung. Sobald wir die Rückerstattung veranlassen, wird die Bearbeitungsgeschwindigkeit von Ihrem Kartenaussteller bestimmt.\n\nWenn Sie Hilfe benötigen, kontaktieren Sie den Support in der App mit Ihrer Fahrt-ID.',
+      'es':
+          'Si un viaje se cancela o se ajusta según nuestra política, emitiremos un reembolso a la misma tarjeta de crédito utilizada al pagar.\nEl tiempo que tarda en aparecer en tu estado de cuenta depende de tu banco, pero suele tardar entre 5 y 10 días hábiles desde que lo procesamos. Una vez enviado el reembolso, la velocidad de procesamiento la controla el emisor de tu tarjeta.\nSi necesitas ayuda, contacta con el soporte técnico en la app con tu ID de viaje.',
+      'fr':
+          'Si une course est annulée ou modifiée conformément à notre politique, nous effectuons un remboursement sur la carte de crédit utilisée lors du paiement.\nLe délai d\'apparition sur votre relevé dépend de votre banque, mais il faut généralement compter 5 à 10 jours ouvrés après traitement. Une fois le remboursement effectué, le délai de règlement est déterminé par l\'émetteur de votre carte.\nEn cas de besoin, contactez l\'assistance dans l\'application avec votre identifiant de course.',
+      'pt':
+          'Se uma viagem for cancelada ou ajustada de acordo com nossa política, emitiremos um reembolso para o mesmo cartão de crédito utilizado na finalização da compra.\nO prazo para aparecer no seu extrato depende do seu banco, mas geralmente leva de 5 a 10 dias úteis após o processamento. Após o envio do reembolso, a velocidade da liquidação é controlada pela administradora do seu cartão.\nSe precisar de ajuda, entre em contato com o suporte no aplicativo e informe o ID da sua viagem.',
+    },
+    'bnix2cjw': {
+      'en': 'Can I pay in installments for my race?',
+      'de': 'Kann ich mein Rennen in Raten bezahlen?',
+      'es': '¿Puedo pagar mi carrera a plazos?',
+      'fr': 'Puis-je payer ma course en plusieurs fois ?',
+      'pt': 'Posso pagar minha corrida em parcelas?',
+    },
+    'rbmdmqtz': {
+      'en':
+          'At the moment, installments aren’t available. We charge one single transaction to your credit card after the ride. We’re evaluating installments for the future.',
+      'de':
+          'Ratenzahlungen sind derzeit nicht möglich. Wir belasten Ihre Kreditkarte nach der Fahrt mit einer einmaligen Transaktion. Wir prüfen die Möglichkeit einer Ratenzahlung für die Zukunft.',
+      'es':
+          'Por el momento, no ofrecemos pagos a plazos. Se cargará una sola transacción a su tarjeta de crédito después del viaje. Estamos evaluando la posibilidad de ofrecer pagos a plazos en el futuro.',
+      'fr':
+          'Pour le moment, les paiements en plusieurs fois ne sont pas disponibles. Nous débitons votre carte de crédit une seule fois après la course. Nous étudions actuellement la possibilité de paiements en plusieurs fois.',
+      'pt':
+          'No momento, não estamos disponíveis parcelamentos. Cobraremos uma única transação no seu cartão de crédito após a viagem. Estamos avaliando a possibilidade de parcelamento para futuras viagens.',
+    },
+    'pcp4zyho': {
+      'en': 'Races',
+      'de': 'Rennen',
+      'es': 'Razas',
+      'fr': 'Courses',
+      'pt': 'Corridas',
+    },
+    '1sp7dqw1': {
+      'en': 'Can I change the destination or make stops during the race?',
+      'de':
+          'Kann ich das Ziel ändern oder während des Rennens Zwischenstopps einlegen?',
+      'es': '¿Puedo cambiar el destino o hacer paradas durante la carrera?',
+      'fr':
+          'Puis-je changer de destination ou faire des arrêts pendant la course ?',
+      'pt': 'Posso alterar o destino ou fazer paradas durante a corrida?',
+    },
+    'tgkzsiti': {
+      'en':
+          'Yes. Use Edit destination/Add stop in the app. The fare updates based on time and distance.',
+      'de':
+          'Ja. Verwenden Sie in der App die Option „Ziel bearbeiten/Haltestelle hinzufügen“. Der Fahrpreis wird basierend auf Zeit und Entfernung aktualisiert.',
+      'es':
+          'Sí. Usa la opción Editar destino/Añadir parada en la app. La tarifa se actualiza según el tiempo y la distancia.',
+      'fr':
+          'Oui. Utilisez l\'option « Modifier la destination » ou « Ajouter un arrêt » dans l\'application. Le tarif est mis à jour en fonction du temps et de la distance.',
+      'pt':
+          'Sim. Use Editar destino/Adicionar parada no aplicativo. A tarifa é atualizada com base no tempo e na distância.',
+    },
+    '1bhqj6fj': {
+      'en': 'How are prices and estimates calculated?',
+      'de': 'Wie werden Preise und Kostenvoranschläge berechnet?',
+      'es': '¿Cómo se calculan los precios y las estimaciones?',
+      'fr': 'Comment sont calculés les prix et les devis ?',
+      'pt': 'Como os preços e orçamentos são calculados?',
+    },
+    '3h99tqiu': {
+      'en':
+          'You get a fare estimate before confirming. Final price may change with traffic, route, wait time, and tolls (when applicable).',
+      'de':
+          'Sie erhalten vor der Bestätigung einen Fahrpreisvoranschlag. Der Endpreis kann sich je nach Verkehr, Route, Wartezeit und Mautgebühren (falls zutreffend) ändern.',
+      'es':
+          'Recibirá una estimación de la tarifa antes de confirmar. El precio final puede variar según el tráfico, la ruta, el tiempo de espera y los peajes (si corresponde).',
+      'fr':
+          'Vous recevrez une estimation du tarif avant de confirmer votre trajet. Le prix final peut varier en fonction de la circulation, de l\'itinéraire, du temps d\'attente et des péages (le cas échéant).',
+      'pt':
+          'Você recebe uma estimativa da tarifa antes da confirmação. O preço final pode variar dependendo do trânsito, da rota, do tempo de espera e dos pedágios (quando aplicável).',
+    },
+    '4khb0u5x': {
+      'en': 'The driver is late or I can’t find them. What should I do?',
+      'de':
+          'Der Fahrer ist zu spät oder ich kann ihn nicht finden. Was soll ich tun?',
+      'es': 'El conductor llega tarde o no lo encuentro. ¿Qué hago?',
+      'fr': 'Le chauffeur est en retard ou je ne le trouve pas. Que faire ?',
+      'pt':
+          'O motorista está atrasado ou não consigo encontrá-lo. O que devo fazer?',
+    },
+    'zqiis4u7': {
+      'en':
+          'Check the plate and live location, use the in-app chat/call. If the delay is excessive, you can cancel or contact support.',
+      'de':
+          'Überprüfen Sie das Kennzeichen und den Live-Standort und nutzen Sie den In-App-Chat/Anruf. Bei übermäßiger Verzögerung können Sie abbrechen oder den Support kontaktieren.',
+      'es':
+          'Consulta la matrícula y la ubicación en tiempo real mediante el chat o la llamada de la app. Si la demora es excesiva, puedes cancelar o contactar con soporte.',
+      'fr':
+          'Vérifiez la plaque d\'immatriculation et la localisation en temps réel, utilisez le chat/appel intégré à l\'application. Si le délai est excessif, vous pouvez annuler ou contacter l\'assistance.',
+      'pt':
+          'Verifique a placa e a localização em tempo real, use o chat/chamada no aplicativo. Se o atraso for excessivo, você pode cancelar ou entrar em contato com o suporte.',
+    },
+    '33a2jxbc': {
+      'en': 'Is there a cancellation fee?',
+      'de': 'Gibt es eine Stornierungsgebühr?',
+      'es': '¿Hay algún cargo por cancelación?',
+      'fr': 'Y a-t-il des frais d\'annulation ?',
+      'pt': 'Existe alguma taxa de cancelamento?',
+    },
+    'fkju1zzc': {
+      'en':
+          'A fee may apply once the driver is on the way or has arrived. The app shows the conditions before you confirm the cancellation.',
+      'de':
+          'Sobald der Fahrer unterwegs oder angekommen ist, kann eine Gebühr anfallen. Die App zeigt die Bedingungen an, bevor Sie die Stornierung bestätigen.',
+      'es':
+          'Se podría aplicar una tarifa una vez que el conductor esté en camino o haya llegado. La aplicación muestra las condiciones antes de confirmar la cancelación.',
+      'fr':
+          'Des frais peuvent s\'appliquer une fois le chauffeur en route ou arrivé. L\'application vous en informe avant de confirmer l\'annulation.',
+      'pt':
+          'Uma taxa pode ser aplicada quando o motorista estiver a caminho ou já tiver chegado. O aplicativo mostra as condições antes de você confirmar o cancelamento.',
+    },
+    '83rkpdet': {
+      'en': 'I left something in the car. How do I get it back?',
+      'de': 'Ich habe etwas im Auto vergessen. Wie bekomme ich es zurück?',
+      'es': 'Dejé algo en el coche. ¿Cómo lo recupero?',
+      'fr':
+          'J\'ai oublié quelque chose dans la voiture. Comment puis-je le récupérer ?',
+      'pt': 'Esqueci algo no carro. Como faço para recuperá-lo?',
+    },
+    'z10do02y': {
+      'en': 'Contact Support directly with the race ID',
+      'de': 'Kontaktieren Sie den Support direkt mit der Renn-ID',
+      'es': 'Contacta con Soporte directamente con el ID de la carrera',
+      'fr': 'Contactez directement le support avec l\'ID de course',
+      'pt': 'Entre em contato com o suporte diretamente com o ID da corrida',
+    },
+    'ddxas1pq': {
+      'en': 'Security',
+      'de': 'Sicherheit',
+      'es': 'Seguridad',
+      'fr': 'Sécurité',
+      'pt': 'Segurança',
+    },
+    'rulcu14k': {
+      'en': 'How do you keep vehicles/trips safe?',
+      'de': 'Wie sorgen Sie für die Sicherheit von Fahrzeugen/Fahrten?',
+      'es': '¿Cómo mantener seguros los vehículos y viajes?',
+      'fr':
+          'Comment assurez-vous la sécurité des véhicules et des déplacements ?',
+      'pt': 'Como você mantém veículos/viagens seguros?',
+    },
+    'h5jt9mtm': {
+      'en':
+          'Verified drivers, car details in the app (plate/model), GPS tracking, live sharing, Safety Button, and 24/7 support. If anything feels off, cancel and report.',
+      'de':
+          'Verifizierte Fahrer, Fahrzeugdetails in der App (Kennzeichen/Modell), GPS-Tracking, Live-Sharing, Sicherheitsknopf und 24/7-Support. Wenn Ihnen etwas nicht passt, kündigen und melden Sie es.',
+      'es':
+          'Conductores verificados, detalles del auto en la app (matrícula/modelo), rastreo GPS, transmisión en vivo, Botón de Seguridad y soporte 24/7. Si encuentras algo extraño, cancela y reporta.',
+      'fr':
+          'Conducteurs vérifiés, informations sur le véhicule dans l\'application (plaque d\'immatriculation/modèle), suivi GPS, partage en direct, bouton de sécurité et assistance 24h/24 et 7j/7. En cas d\'anomalie, annulez et signalez.',
+      'pt':
+          'Motoristas verificados, detalhes do carro no aplicativo (placa/modelo), rastreamento por GPS, compartilhamento em tempo real, Botão de Segurança e suporte 24 horas por dia, 7 dias por semana. Se algo parecer estranho, cancele e denuncie.',
+    },
+    'lxm4l29i': {
+      'en': 'What should I do in an accident?',
+      'de': 'Was muss ich bei einem Unfall tun?',
+      'es': '¿Qué debo hacer en caso de accidente?',
+      'fr': 'Que dois-je faire en cas d’accident ?',
+      'pt': 'O que devo fazer em caso de acidente?',
+    },
+    'kjchkgms': {
+      'en':
+          'Put safety first and use the Safety Button to reach emergency services and 24/7 support. We log the case, guide next steps, and fix any incorrect charges.',
+      'de':
+          'Sicherheit steht an erster Stelle. Nutzen Sie den Sicherheitsknopf, um Notdienste und Support rund um die Uhr zu erreichen. Wir protokollieren den Fall, leiten Sie die nächsten Schritte an und korrigieren etwaige fehlerhafte Gebühren.',
+      'es':
+          'Priorice la seguridad y use el Botón de Seguridad para comunicarse con servicios de emergencia y soporte 24/7. Registramos el caso, le indicamos los pasos a seguir y corregimos cualquier cargo incorrecto.',
+      'fr':
+          'Privilégiez la sécurité et utilisez le bouton de sécurité pour contacter les services d\'urgence et bénéficier d\'une assistance 24h/24 et 7j/7. Nous enregistrons le cas, vous guidons et corrigeons les frais facturés incorrectement.',
+      'pt':
+          'Coloque a segurança em primeiro lugar e use o Botão de Segurança para entrar em contato com serviços de emergência e suporte 24 horas por dia, 7 dias por semana. Registramos o caso, orientamos os próximos passos e corrigimos quaisquer cobranças indevidas.',
+    },
+    '5h0ezqtb': {
+      'en': 'Are my personal data protected?',
+      'de': 'Sind meine persönlichen Daten geschützt?',
+      'es': '¿Están protegidos mis datos personales?',
+      'fr': 'Mes données personnelles sont-elles protégées ?',
+      'pt': 'Meus dados pessoais estão protegidos?',
+    },
+    'v4fogsay': {
+      'en':
+          'Yes. Limited internal access and a clear policy. Payments via Braintree; we don’t store your full card number. In the app, you can view/edit/delete your data.',
+      'de':
+          'Ja. Eingeschränkter interner Zugriff und klare Richtlinien. Zahlungen erfolgen über Braintree; wir speichern Ihre vollständige Kartennummer nicht. In der App können Sie Ihre Daten einsehen, bearbeiten und löschen.',
+      'es':
+          'Sí. Acceso interno limitado y una política clara. Pagos a través de Braintree; no almacenamos el número completo de tu tarjeta. En la app, puedes ver, editar y eliminar tus datos.',
+      'fr':
+          'Oui. Accès interne limité et politique claire. Paiements via Braintree ; nous ne conservons pas votre numéro de carte complet. Dans l\'application, vous pouvez consulter, modifier et supprimer vos données.',
+      'pt':
+          'Sim. Acesso interno limitado e uma política clara. Pagamentos via Braintree; não armazenamos o número completo do seu cartão. No aplicativo, você pode visualizar/editar/excluir seus dados.',
+    },
+    '6p9e2d38': {
+      'en': 'Can I share my trip in real time?',
+      'de': 'Kann ich meine Reise in Echtzeit teilen?',
+      'es': '¿Puedo compartir mi viaje en tiempo real?',
+      'fr': 'Puis-je partager mon voyage en temps réel ?',
+      'pt': 'Posso compartilhar minha viagem em tempo real?',
+    },
+    'tm2exrnk': {
+      'en':
+          'Yes. In the app, use Share trip to send a live link with route, car/plate, and ETA; you can stop anytime.',
+      'de':
+          'Ja. Verwenden Sie in der App „Reise teilen“, um einen Live-Link mit Route, Auto/Kennzeichen und voraussichtlicher Ankunftszeit zu senden. Sie können jederzeit anhalten.',
+      'es':
+          'Sí. En la aplicación, usa Compartir viaje para enviar un enlace en vivo con la ruta, el auto/matrícula y el tiempo estimado de llegada (ETA); puedes detenerte en cualquier momento.',
+      'fr':
+          'Oui. Dans l\'application, utilisez Partager un trajet pour envoyer un lien en direct avec l\'itinéraire, le véhicule, la plaque d\'immatriculation et l\'heure d\'arrivée prévue ; vous pouvez vous arrêter à tout moment.',
+      'pt':
+          'Sim. No aplicativo, use o Compartilhar viagem para enviar um link ao vivo com a rota, carro/placa e ETA; você pode parar a qualquer momento.',
+    },
+    'oey1slxl': {
+      'en': 'Is there an emergency button or 24-hour support?',
+      'de': 'Gibt es einen Notfallknopf oder einen 24-Stunden-Support?',
+      'es': '¿Hay un botón de emergencia o soporte las 24 horas?',
+      'fr':
+          'Existe-t-il un bouton d’urgence ou une assistance 24 heures sur 24 ?',
+      'pt': 'Existe um botão de emergência ou suporte 24 horas?',
+    },
+    '6uhcwp8q': {
+      'en':
+          'Yes. In the app, you’ll find the Safety Button, which connects you to local emergency services and our 24/7 support, available throughout your trip.',
+      'de':
+          'Ja. In der App finden Sie den Sicherheitsknopf, der Sie mit den örtlichen Notdiensten und unserem 24/7-Support verbindet, der Ihnen während Ihrer gesamten Reise zur Verfügung steht.',
+      'es':
+          'Sí. En la aplicación, encontrarás el Botón de Seguridad, que te conecta con los servicios de emergencia locales y nuestro soporte 24/7, disponible durante todo tu viaje.',
+      'fr':
+          'Oui. Dans l\'application, vous trouverez le bouton de sécurité, qui vous met en contact avec les services d\'urgence locaux et notre assistance 24h/24 et 7j/7, disponible tout au long de votre voyage.',
+      'pt':
+          'Sim. No aplicativo, você encontrará o Botão de Segurança, que o conecta aos serviços de emergência locais e ao nosso suporte 24 horas por dia, 7 dias por semana, disponível durante toda a sua viagem.',
+    },
+    'pwt2n40k': {
+      'en': 'Still have questions?',
+      'de': 'Sie haben noch Fragen?',
+      'es': '¿Aún tienes preguntas?',
+      'fr': 'Vous avez encore des questions ?',
+      'pt': 'Ainda tem dúvidas?',
+    },
+    '4zz17fh2': {
+      'en': 'Our support team is available 24/7 to help you',
+      'de': 'Unser Support-Team steht Ihnen rund um die Uhr zur Verfügung',
+      'es':
+          'Nuestro equipo de soporte está disponible las 24 horas, los 7 días de la semana para ayudarle.',
+      'fr':
+          'Notre équipe d\'assistance est disponible 24h/24 et 7j/7 pour vous aider',
+      'pt':
+          'Nossa equipe de suporte está disponível 24 horas por dia, 7 dias por semana para ajudar você',
+    },
+    'st4umfn8': {
+      'en': 'Chat Online',
+      'de': 'Online-Chat',
+      'es': 'Chat en línea',
+      'fr': 'Chat en ligne',
+      'pt': 'Bate-papo on-line',
+    },
+    'gkj8n7js': {
+      'en': 'Call',
+      'de': 'Anruf',
+      'es': 'Llamar',
+      'fr': 'Appel',
+      'pt': 'Chamar',
+    },
+  },
+  // Reportaproblem28
+  {
+    '9svvq5rn': {
+      'en': 'Report a problem',
+      'de': 'Problem melden',
+      'es': 'Informar un problema',
+      'fr': 'Signaler un problème',
+      'pt': 'Reportar um problema',
+    },
+    'ya398usm': {
+      'en': 'What’s the issue?',
+      'de': 'Was ist das Problem?',
+      'es': '¿Cuál es el problema?',
+      'fr': 'Quel est le problème?',
+      'pt': 'Qual é o problema?',
+    },
+    'cz0e7hgr': {
+      'en': 'Bug in the App',
+      'de': 'Fehler in der App',
+      'es': 'Error en la aplicación',
+      'fr': 'Bug dans l\'application',
+      'pt': 'Bug no aplicativo',
+    },
+    '9g0gsmnq': {
+      'en': 'Login Error',
+      'de': 'Anmeldefehler',
+      'es': 'Error de inicio de sesión',
+      'fr': 'Erreur de connexion',
+      'pt': 'Erro de login',
+    },
+    'ybeqqxqa': {
+      'en': 'Payment Problem',
+      'de': 'Zahlungsproblem',
+      'es': 'Problema de pago',
+      'fr': 'Problème de paiement',
+      'pt': 'Problema de pagamento',
+    },
+    'ddyao3za': {
+      'en': 'Other',
+      'de': 'Andere',
+      'es': 'Otro',
+      'fr': 'Autre',
+      'pt': 'Outro',
+    },
+    'wyxjr51g': {
+      'en': 'Describe the Problem',
+      'de': 'Beschreiben Sie das Problem',
+      'es': 'Describe el problema',
+      'fr': 'Décrivez le problème',
+      'pt': 'Descreva o problema',
+    },
+    'ioe0qe1s': {
+      'en': 'Describe in detail the problem you are facing...',
+      'de':
+          'Beschreiben Sie detailliert das Problem, mit dem Sie konfrontiert sind ...',
+      'es': 'Describe detalladamente el problema al que te enfrentas...',
+      'fr': 'Décrivez en détail le problème auquel vous êtes confronté...',
+      'pt': 'Descreva em detalhes o problema que você está enfrentando...',
+    },
+    'hsgtgffw': {
+      'en': 'Attach Screenshot (Optional)',
+      'de': 'Screenshot anhängen (optional)',
+      'es': 'Adjuntar captura de pantalla (opcional)',
+      'fr': 'Joindre une capture d\'écran (facultatif)',
+      'pt': 'Anexar captura de tela (opcional)',
+    },
+    '4bzqefri': {
+      'en': 'Tap to add image',
+      'de': 'Tippen, um Bild hinzuzufügen',
+      'es': 'Toque para agregar imagen',
+      'fr': 'Appuyez pour ajouter une image',
+      'pt': 'Toque para adicionar imagem',
+    },
+    'lyijx39w': {
+      'en': 'Your Email (for Response)',
+      'de': 'Ihre E-Mail (für die Antwort)',
+      'es': 'Su correo electrónico (para respuesta)',
+      'fr': 'Votre e-mail (pour réponse)',
+      'pt': 'Seu e-mail (para resposta)',
+    },
+    '2ny2madx': {
+      'en': 'seu.email@exemplo.com',
+      'de': 'seu.email@exemplo.com',
+      'es': 'su.correo electrónico@exemplo.com',
+      'fr': 'seu.email@exemplo.com',
+      'pt': 'seu.email@exemplo.com',
+    },
+    '6s6l6myx': {
+      'en':
+          'Our team will review your report and get in touch within 24 hours.',
+      'de':
+          'Unser Team wird Ihren Bericht prüfen und sich innerhalb von 24 Stunden bei Ihnen melden.',
+      'es':
+          'Nuestro equipo revisará su informe y se pondrá en contacto con usted dentro de las 24 horas.',
+      'fr':
+          'Notre équipe examinera votre rapport et vous contactera dans les 24 heures.',
+      'pt':
+          'Nossa equipe analisará seu relatório e entrará em contato em até 24 horas.',
+    },
+    'ayn286k3': {
+      'en': 'Send feedback',
+      'de': 'Feedback senden',
+      'es': 'Enviar comentarios',
+      'fr': 'Envoyer des commentaires',
+      'pt': 'Enviar feedback',
+    },
+  },
+  // chatSupport
+  {
+    'yx0nkz64': {
+      'en': 'Ride Support',
+      'de': 'Fahrunterstützung',
+      'es': 'Soporte de viaje',
+      'fr': 'Assistance à la conduite',
+      'pt': 'Suporte de viagem',
+    },
+    '6vj19dt1': {
+      'en': 'Always active',
+      'de': 'Immer aktiv',
+      'es': 'Siempre activo',
+      'fr': 'Toujours actif',
+      'pt': 'Sempre ativo',
+    },
+    '8njxit05': {
+      'en': 'Digite uma mensagem...',
+      'de': 'Digite uma mensagem...',
+      'es': 'Digite uma mensagem...',
+      'fr': 'Digite uma mensagem...',
+      'pt': 'Digite uma mensagem...',
+    },
+  },
+  // PrivacyPolicy29
+  {
+    'g69z6fbe': {
+      'en': 'Privacy Policy',
+      'de': 'Datenschutzrichtlinie',
+      'es': 'política de privacidad',
+      'fr': 'politique de confidentialité',
+      'pt': 'política de Privacidade',
+    },
+    'dfbmb3np': {
+      'en': 'Your privacy comes first',
+      'de': 'Ihre Privatsphäre steht an erster Stelle',
+      'es': 'Tu privacidad es lo primero',
+      'fr': 'Votre vie privée est notre priorité',
+      'pt': 'Sua privacidade vem em primeiro lugar',
+    },
+    'i4qjctrd': {
+      'en':
+          'We’re committed to protecting your information. Below we explain what we collect, how we use it, and your choices.',
+      'de':
+          'Wir verpflichten uns, Ihre Daten zu schützen. Im Folgenden erklären wir, welche Daten wir erfassen, wie wir sie verwenden und welche Wahlmöglichkeiten Sie haben.',
+      'es':
+          'Nos comprometemos a proteger su información. A continuación, le explicamos qué recopilamos, cómo la usamos y sus opciones.',
+      'fr':
+          'Nous nous engageons à protéger vos informations. Vous trouverez ci-dessous des explications sur ce que nous collectons, comment nous les utilisons et vos choix.',
+      'pt':
+          'Estamos comprometidos em proteger suas informações. Abaixo, explicamos o que coletamos, como usamos e suas escolhas.',
+    },
+    'u9lda80p': {
+      'en': 'Information We Collect',
+      'de': 'Von uns erfasste Daten',
+      'es': 'Información que recopilamos',
+      'fr': 'Informations que nous collectons',
+      'pt': 'Informações que coletamos',
+    },
+    'eazo7a5p': {
+      'en':
+          '• Account details: name, email, phone number.\n\n• App usage: screens/features used and performance.\n\n• Device info: model, OS, language.\n\n• Location data (only with your permission).\n\n• Communication records (support and feedback).\n\n• Payments: processed by Braintree; we do not store your full card number.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'ad97tunv': {
+      'en': 'How We Use Your Information',
+      'de': 'Wie wir Ihre Daten verwenden',
+      'es': 'Cómo usamos su información',
+      'fr': 'Comment nous utilisons vos informations',
+      'pt': 'Como usamos suas informações',
+    },
+    'eyo83g4r': {
+      'en':
+          '• To operate and improve the app and features.\n\n• To personalize experience and prevent fraud/abuse.\n\n• To send important notices (e.g., confirmations and updates).\n\n• Customer support and safety.\n\n• Aggregated analytics to understand usage.',
+      'de':
+          '• Zur Bedienung und Verbesserung der App und ihrer Funktionen.\n\n• Zur Personalisierung des Erlebnisses und zur Verhinderung von Betrug/Missbrauch.\n\n• Zum Senden wichtiger Mitteilungen (z. B. Bestätigungen und Aktualisierungen).\n\n• Kundensupport und Sicherheit.\n\n• Aggregierte Analysen zum Verständnis der Nutzung.',
+      'es':
+          '• Para operar y mejorar la aplicación y sus funciones.\n\n• Para personalizar la experiencia y prevenir fraudes y abusos.\n\n• Para enviar avisos importantes (por ejemplo, confirmaciones y actualizaciones).\n\n• Atención al cliente y seguridad.\n\n• Análisis agregados para comprender el uso.',
+      'fr':
+          '• Pour exploiter et améliorer l\'application et ses fonctionnalités.\n\n• Pour personnaliser l\'expérience et prévenir la fraude et les abus.\n\n• Pour envoyer des notifications importantes (par exemple, des confirmations et des mises à jour).\n\n• Assistance et sécurité client.\n\n• Analyses agrégées pour comprendre l\'utilisation.',
+      'pt':
+          '• Para operar e aprimorar o aplicativo e seus recursos.\n\n• Para personalizar a experiência e prevenir fraudes/abuso.\n\n• Para enviar avisos importantes (por exemplo, confirmações e atualizações).\n\n• Suporte e segurança ao cliente.\n\n• Análises agregadas para entender o uso.',
+    },
+    'p3ddl69z': {
+      'en': 'Data Security',
+      'de': 'Datensicherheit',
+      'es': 'Seguridad de datos',
+      'fr': 'Sécurité des données',
+      'pt': 'Segurança de dados',
+    },
+    'n2osdvtu': {
+      'en':
+          '• Only authorized people can access your data.\n\n• We monitor and improve security all the time.\n\n• If something goes wrong, we notify you and act fast.\n\n• We keep data only as long as needed.',
+      'de':
+          '• Nur autorisierte Personen haben Zugriff auf Ihre Daten.\n\n• Wir überwachen und verbessern die Sicherheit kontinuierlich.\n\n• Sollte etwas schiefgehen, benachrichtigen wir Sie und reagieren schnell.\n\n• Wir speichern Daten nur so lange wie nötig.',
+      'es':
+          '• Solo las personas autorizadas pueden acceder a sus datos.\n\n• Monitoreamos y mejoramos la seguridad constantemente.\n\n• Si algo sale mal, le notificamos y actuamos con rapidez.\n\n• Conservamos los datos solo el tiempo necesario.',
+      'fr':
+          '• Seules les personnes autorisées peuvent accéder à vos données.\n\n• Nous surveillons et améliorons la sécurité en permanence.\n\n• En cas de problème, nous vous avertissons et intervenons rapidement.\n\n• Nous conservons les données uniquement le temps nécessaire.',
+      'pt':
+          '• Somente pessoas autorizadas podem acessar seus dados.\n\n• Monitoramos e aprimoramos a segurança constantemente.\n\n• Se algo der errado, notificamos você e agimos rapidamente.\n\n• Mantemos os dados apenas pelo tempo necessário.',
+    },
+    'e2oyobdq': {
+      'en': 'Third-Party Services',
+      'de': 'Dienste von Drittanbietern',
+      'es': 'Servicios de terceros',
+      'fr': 'Services tiers',
+      'pt': 'Serviços de terceiros',
+    },
+    'ojr87ifd': {
+      'en':
+          '• The app may use maps, payments, and other services.\n\n• Each has its own policy — please check it.\n\n• We share data only when needed to run the app or with your permission.',
+      'de':
+          '• Die App kann Karten, Zahlungen und andere Dienste nutzen.\n\n• Jeder Dienst hat seine eigenen Richtlinien – bitte überprüfen Sie diese.\n\n• Wir geben Daten nur weiter, wenn dies zum Ausführen der App erforderlich ist oder wenn Sie uns Ihre Zustimmung dazu geben.',
+      'es':
+          'La aplicación puede usar mapas, pagos y otros servicios.\n\nCada servicio tiene su propia política; consúltela.\n\nCompartimos datos solo cuando es necesario para el funcionamiento de la aplicación o con su permiso.',
+      'fr':
+          '• L\'application peut utiliser des cartes, des paiements et d\'autres services.\n\n• Chaque service possède sa propre politique ; veuillez la consulter.\n\n• Nous partageons les données uniquement lorsque cela est nécessaire au fonctionnement de l\'application ou avec votre autorisation.',
+      'pt':
+          '• O aplicativo pode usar mapas, pagamentos e outros serviços.\n\n• Cada um tem sua própria política — consulte-a.\n\n• Compartilhamos dados apenas quando necessário para executar o aplicativo ou com sua permissão.',
+    },
+    'cnplhd5p': {
+      'en': 'Your Rights',
+      'de': 'Ihre Rechte',
+      'es': 'Sus derechos',
+      'fr': 'Vos droits',
+      'pt': 'Seus direitos',
+    },
+    'ynwc1mzv': {
+      'en':
+          '• See and correct your data.\n\n• Delete your data or request a copy.\n\n• Manage device permissions and opt out of marketing.',
+      'de':
+          '• Ihre Daten einsehen und korrigieren.\n\n• Ihre Daten löschen oder eine Kopie anfordern.\n\n• Geräteberechtigungen verwalten und Marketing deaktivieren.',
+      'es':
+          '• Ver y corregir sus datos.\n\n• Eliminar sus datos o solicitar una copia.\n\n• Gestionar los permisos del dispositivo y darse de baja del marketing.',
+      'fr':
+          '• Consultez et corrigez vos données.\n\n• Supprimez vos données ou demandez-en une copie.\n\n• Gérez les autorisations de votre appareil et désactivez les communications marketing.',
+      'pt':
+          '• Visualizar e corrigir seus dados.\n\n• Excluir seus dados ou solicitar uma cópia.\n\n• Gerenciar permissões do dispositivo e cancelar o recebimento de marketing.',
+    },
+    'o6220pi9': {
+      'en': 'Contact Us',
+      'de': 'Kontaktieren Sie uns',
+      'es': 'Contáctenos',
+      'fr': 'Contactez-nous',
+      'pt': 'Contate-nos',
+    },
+    '4qlhmmd6': {
+      'en':
+          'Questions about privacy?\n\nEmail: info@quickyy.life\nIn-app: Profile → Support\n\nLast updated: December 2024',
+      'de':
+          'Fragen zum Datenschutz?\n\nE-Mail: info@quickyy.life\nIn-App: Profil → Support\n\nLetzte Aktualisierung: Dezember 2024',
+      'es':
+          '¿Preguntas sobre privacidad?\n\nCorreo electrónico: info@quickyy.life\nEn la app: Perfil → Soporte\n\nÚltima actualización: diciembre de 2024',
+      'fr':
+          'Des questions sur la confidentialité ?\n\nE-mail : info@quickyy.life\nDans l\'application : Profil → Assistance\n\nDernière mise à jour : décembre 2024',
+      'pt':
+          'Dúvidas sobre privacidade?\n\nE-mail: info@quickyy.life\nNo aplicativo: Perfil → Suporte\n\nÚltima atualização: dezembro de 2024',
+    },
+    'gc6z696t': {
+      'en':
+          'This policy may be updated from time to time. We will notify you of any significant changes.',
+      'de':
+          'Diese Richtlinie kann von Zeit zu Zeit aktualisiert werden. Wir werden Sie über alle wesentlichen Änderungen informieren.',
+      'es':
+          'Esta política puede actualizarse periódicamente. Le notificaremos cualquier cambio significativo.',
+      'fr':
+          'Cette politique peut être mise à jour périodiquement. Nous vous informerons de tout changement important.',
+      'pt':
+          'Esta política pode ser atualizada periodicamente. Notificaremos você sobre quaisquer alterações significativas.',
+    },
+  },
+  // TermsofService30
+  {
+    'ra6hewkk': {
+      'en': 'Terms of Service',
+      'de': 'Servicebedingungen',
+      'es': 'Condiciones de servicio',
+      'fr': 'Conditions d\'utilisation',
+      'pt': 'Termos de Serviço',
+    },
+    'ssubq09y': {
+      'en': 'App Use',
+      'de': 'App-Nutzung',
+      'es': 'Uso de la aplicación',
+      'fr': 'Utilisation de l\'application',
+      'pt': 'Uso do aplicativo',
+    },
+    'l3rbgns8': {
+      'en':
+          'Use the app to request rides with your own account. Don’t use it for illegal or abusive activity — we may suspend accounts that violate the rules.',
+      'de':
+          'Nutze die App, um Fahrten mit deinem eigenen Konto anzufordern. Nutze sie nicht für illegale oder missbräuchliche Aktivitäten – wir können Konten sperren, die gegen die Regeln verstoßen.',
+      'es':
+          'Usa la app para solicitar viajes con tu propia cuenta. No la uses para actividades ilegales o abusivas; podríamos suspender las cuentas que infrinjan las normas.',
+      'fr':
+          'Utilisez l\'application pour commander des courses avec votre compte. Ne l\'utilisez pas pour des activités illégales ou abusives ; nous pourrions suspendre les comptes qui enfreignent les règles.',
+      'pt':
+          'Use o aplicativo para solicitar viagens com sua própria conta. Não o utilize para atividades ilegais ou abusivas — podemos suspender contas que violem as regras.',
+    },
+    'hyneyff1': {
+      'en': 'Account & Eligibility',
+      'de': 'Konto und Berechtigung',
+      'es': 'Cuenta y elegibilidad',
+      'fr': 'Compte et éligibilité',
+      'pt': 'Conta e Elegibilidade',
+    },
+    'xz7q5oqy': {
+      'en':
+          'You must be 18+, provide accurate info, and keep your account secure. One account per person; we may close accounts for non-compliance.',
+      'de':
+          'Sie müssen mindestens 18 Jahre alt sein, korrekte Angaben machen und Ihr Konto sicher aufbewahren. Pro Person ist nur ein Konto zulässig. Bei Nichteinhaltung behalten wir uns das Recht vor, Konten zu schließen.',
+      'es':
+          'Debes ser mayor de 18 años, proporcionar información veraz y mantener tu cuenta segura. Solo se permite una cuenta por persona; podríamos cerrar cuentas por incumplimiento.',
+      'fr':
+          'Vous devez avoir plus de 18 ans, fournir des informations exactes et sécuriser votre compte. Un compte par personne ; nous pouvons fermer tout compte en cas de non-conformité.',
+      'pt':
+          'Você deve ter mais de 18 anos, fornecer informações precisas e manter sua conta segura. Uma conta por pessoa; podemos encerrar contas em caso de descumprimento.',
+    },
+    'o49590hu': {
+      'en': 'Rides & Fares',
+      'de': 'Fahrten & Preise',
+      'es': 'Viajes y tarifas',
+      'fr': 'Trajets et tarifs',
+      'pt': 'Passeios e tarifas',
+    },
+    'iq3q0eua': {
+      'en':
+          'We show a fare estimate before you confirm. Final price can change due to traffic, route, wait time, and tolls. Your receipt is in the app.',
+      'de':
+          'Wir zeigen Ihnen vor der Bestätigung einen Fahrpreisvoranschlag an. Der Endpreis kann sich je nach Verkehr, Route, Wartezeit und Mautgebühren ändern. Ihre Quittung finden Sie in der App.',
+      'es':
+          'Te mostramos una estimación de la tarifa antes de confirmar. El precio final puede variar según el tráfico, la ruta, el tiempo de espera y los peajes. Tu recibo está en la app.',
+      'fr':
+          'Nous vous affichons une estimation du tarif avant votre confirmation. Le prix final peut varier en fonction de la circulation, de l\'itinéraire, du temps d\'attente et des péages. Votre reçu est disponible dans l\'application.',
+      'pt':
+          'Mostramos uma estimativa da tarifa antes da sua confirmação. O preço final pode variar devido ao trânsito, rota, tempo de espera e pedágios. Seu recibo está no aplicativo.',
+    },
+    'hd9a2nxr': {
+      'en': 'Payments (Braintree)',
+      'de': 'Zahlungen (Braintree)',
+      'es': 'Pagos (Braintree)',
+      'fr': 'Paiements (Braintree)',
+      'pt': 'Pagamentos (Braintree)',
+    },
+    'e0hx8opo': {
+      'en':
+          'We charge credit cards (Apple/Google Pay may be available). We do not accept debit cards, Pix, or bank transfers. Processed by Braintree; we don’t store your full card number.',
+      'de':
+          'Wir belasten Kreditkarten (Apple/Google Pay ist möglicherweise verfügbar). Wir akzeptieren keine Debitkarten, Pix oder Banküberweisungen. Die Bearbeitung erfolgt durch Braintree; wir speichern Ihre vollständige Kartennummer nicht.',
+      'es':
+          'Aceptamos tarjetas de crédito (Apple/Google Pay puede estar disponible). No aceptamos tarjetas de débito, Pix ni transferencias bancarias. Procesado por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          'Nous acceptons les cartes de crédit (Apple/Google Pay peut être disponible). Nous n\'acceptons pas les cartes de débit, les cartes Pix ni les virements bancaires. Traitement par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          'Cobramos em cartões de crédito (Apple/Google Pay podem estar disponíveis). Não aceitamos cartões de débito, Pix ou transferências bancárias. Processado pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    '1j9ju4dv': {
+      'en': 'Cancellations & Refunds',
+      'de': 'Stornierungen und Rückerstattungen',
+      'es': 'Cancelaciones y reembolsos',
+      'fr': 'Annulations et remboursements',
+      'pt': 'Cancelamentos e Reembolsos',
+    },
+    '01ra7oy8': {
+      'en':
+          'A fee may apply if the driver is on the way. Refunds go to the same card; timing depends on your bank. Request it in the app.',
+      'de':
+          'Wenn der Fahrer unterwegs ist, kann eine Gebühr anfallen. Rückerstattungen werden auf dieselbe Karte gebucht; der Zeitpunkt hängt von Ihrer Bank ab. Fordern Sie die Rückerstattung in der App an.',
+      'es':
+          'Se podría aplicar una tarifa si el conductor está en camino. Los reembolsos se realizan a la misma tarjeta; el plazo depende de tu banco. Solicítalo en la app.',
+      'fr':
+          'Des frais peuvent s\'appliquer si le chauffeur est en route. Les remboursements sont effectués sur la même carte ; le délai dépend de votre banque. Demandez-le dans l\'application.',
+      'pt':
+          'Poderá ser cobrada uma taxa se o motorista estiver a caminho. Os reembolsos são feitos no mesmo cartão; o prazo depende do seu banco. Solicite no aplicativo.',
+    },
+    '1co4586b': {
+      'en': 'Safety & Conduct',
+      'de': 'Sicherheit & Verhalten',
+      'es': 'Seguridad y conducta',
+      'fr': 'Sécurité et conduite',
+      'pt': 'Segurança e Conduta',
+    },
+    'faa0m7y4': {
+      'en':
+          'Trips have GPS tracking, a Safety Button, and 24/7 support. Respect drivers and the law; risky behavior can lead to ban.',
+      'de':
+          'Fahrten werden mit GPS-Tracking, einem Sicherheitsknopf und 24/7-Support durchgeführt. Respektieren Sie Fahrer und Gesetze; riskantes Verhalten kann zum Fahrverbot führen.',
+      'es':
+          'Los viajes cuentan con rastreo GPS, botón de seguridad y soporte 24/7. Respete a los conductores y la ley; cualquier comportamiento arriesgado puede resultar en una suspensión.',
+      'fr':
+          'Les trajets sont suivis par GPS, dotés d\'un bouton de sécurité et d\'une assistance 24h/24 et 7j/7. Respectez les conducteurs et la loi ; tout comportement à risque peut entraîner une interdiction de conduire.',
+      'pt':
+          'As viagens contam com rastreamento por GPS, um Botão de Segurança e suporte 24 horas por dia, 7 dias por semana. Respeite os motoristas e a lei; comportamento de risco pode levar à proibição.',
+    },
+    '49how4av': {
+      'en': 'Data & Privacy',
+      'de': 'Daten & Datenschutz',
+      'es': 'Datos y privacidad',
+      'fr': 'Données et confidentialité',
+      'pt': 'Dados e Privacidade',
+    },
+    'arxd0mls': {
+      'en':
+          'We use your data to run the app, provide support, and prevent fraud. You can view/edit/delete your data and manage permissions. We don’t sell your data.',
+      'de':
+          'Wir verwenden Ihre Daten, um die App zu betreiben, Support zu leisten und Betrug zu verhindern. Sie können Ihre Daten einsehen, bearbeiten und löschen sowie Berechtigungen verwalten. Wir verkaufen Ihre Daten nicht.',
+      'es':
+          'Usamos tus datos para ejecutar la aplicación, brindar soporte y prevenir fraudes. Puedes ver, editar y eliminar tus datos, así como administrar permisos. No vendemos tus datos.',
+      'fr':
+          'Nous utilisons vos données pour faire fonctionner l\'application, fournir une assistance et prévenir la fraude. Vous pouvez consulter, modifier et supprimer vos données, ainsi que gérer vos autorisations. Nous ne vendons pas vos données.',
+      'pt':
+          'Usamos seus dados para executar o aplicativo, fornecer suporte e prevenir fraudes. Você pode visualizar/editar/excluir seus dados e gerenciar permissões. Não vendemos seus dados.',
+    },
+    'yhjazte1': {
+      'en': 'Liability',
+      'de': 'Haftung',
+      'es': 'Responsabilidad',
+      'fr': 'Responsabilité',
+      'pt': 'Responsabilidade',
+    },
+    'e5vhmpdf': {
+      'en':
+          'We’re not responsible for traffic delays or other external factors. Our liability is limited by law and by the app’s policies.',
+      'de':
+          'Wir sind nicht für Verkehrsverzögerungen oder andere externe Faktoren verantwortlich. Unsere Haftung ist gesetzlich und durch die Richtlinien der App beschränkt.',
+      'es':
+          'No nos responsabilizamos de retrasos en el tráfico ni de otros factores externos. Nuestra responsabilidad está limitada por la ley y las políticas de la aplicación.',
+      'fr':
+          'Nous ne sommes pas responsables des retards de circulation ni d\'autres facteurs externes. Notre responsabilité est limitée par la loi et les politiques de l\'application.',
+      'pt':
+          'Não nos responsabilizamos por atrasos no trânsito ou outros fatores externos. Nossa responsabilidade é limitada por lei e pelas políticas do aplicativo.',
+    },
+  },
+  // Licenses31
+  {
+    'd0bmlf5j': {
+      'en': 'Licenses',
+      'de': 'Lizenzen',
+      'es': 'Licencias',
+      'fr': 'Licences',
+      'pt': 'Licenças',
+    },
+    'bfxeohhr': {
+      'en': 'By Quicky Solutions',
+      'de': 'Von Quicky Solutions',
+      'es': 'Por Quicky Solutions',
+      'fr': 'Par Quicky Solutions',
+      'pt': 'Por Quicky Solutions',
+    },
+    'lizqlyb8': {
+      'en':
+          'This application uses the following open source libraries and components:',
+      'de':
+          'Diese Anwendung verwendet die folgenden Open Source-Bibliotheken und -Komponenten:',
+      'es':
+          'Esta aplicación utiliza las siguientes bibliotecas y componentes de código abierto:',
+      'fr':
+          'Cette application utilise les bibliothèques et composants open source suivants :',
+      'pt':
+          'Este aplicativo usa as seguintes bibliotecas e componentes de código aberto:',
+    },
+    'pyj8e4z2': {
+      'en': 'Flutter SDK (v3.32.4)',
+      'de': 'Flutter SDK (v3.32.4)',
+      'es': 'Kit de desarrollo de software de Flutter (v3.32.4)',
+      'fr': 'Kit de développement logiciel (SDK) Flutter (v3.32.4)',
+      'pt': 'SDK Flutter (v3.32.4)',
+    },
+    '1hw8ew0h': {
+      'en': 'Cross-platform app foundation.\nAuthor: Flutter contributors',
+      'de': 'Plattformübergreifende App-Grundlage.\nAutor: Flutter-Mitwirkende',
+      'es':
+          'Fundamento de la aplicación multiplataforma.\nAutor: Colaboradores de Flutter',
+      'fr':
+          'Fondation d\'application multiplateforme.\nAuteur : Contributeurs Flutter',
+      'pt':
+          'Base para aplicativos multiplataforma.\nAutor: Colaboradores do Flutter',
+    },
+    '21x9f71b': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    'sol3x3mu': {
+      'en': 'Dart (v3.7.2)',
+      'de': 'Dart (v3.7.2)',
+      'es': 'Dardo (v3.7.2)',
+      'fr': 'Dart (v3.7.2)',
+      'pt': 'Dardo (v3.7.2)',
+    },
+    'mnll0ehv': {
+      'en': 'Language and runtime.\nAuthor: Dart team.',
+      'de': 'Sprache und Laufzeit.\nAutor: Dart-Team.',
+      'es': 'Lenguaje y tiempo de ejecución. Autor: Equipo Dart.',
+      'fr': 'Langage et environnement d\'exécution.\nAuteur : Équipe Dart.',
+      'pt': 'Linguagem e tempo de execução.\nAutor: Equipe Dart.',
+    },
+    'si72hibu': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    '5tewmpty': {
+      'en': 'HTTP (v1.4.0)',
+      'de': 'HTTP (v1.4.0)',
+      'es': 'HTTP (versión 1.4.0)',
+      'fr': 'HTTP (v1.4.0)',
+      'pt': 'HTTP (v1.4.0)',
+    },
+    'x5mho8ys': {
+      'en': 'Web/API requests.\nAuthor: Dart project authors.',
+      'de': 'Web-/API-Anfragen.\nAutor: Dart-Projektautoren.',
+      'es': 'Solicitudes web/API.\nAutor: Autores del proyecto Dart.',
+      'fr': 'Requêtes Web/API.\nAuteur : Auteurs du projet Dart.',
+      'pt': 'Solicitações Web/API.\nAutor: Autores do projeto Dart.',
+    },
+    'bbm1mv6m': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    'pqj0brpn': {
+      'en': 'Shared Preferences (v2.5.3)',
+      'de': 'Gemeinsame Einstellungen (v2.5.3)',
+      'es': 'Preferencias compartidas (v2.5.3)',
+      'fr': 'Préférences partagées (v2.5.3)',
+      'pt': 'Preferências compartilhadas (v2.5.3)',
+    },
+    '97zuhrqn': {
+      'en': 'Simple key-value storage.\nAuthor: Flutter team.',
+      'de': 'Einfacher Schlüssel-Wert-Speicher.\nAutor: Flutter-Team.',
+      'es': 'Almacenamiento simple de clave-valor. Autor: Equipo Flutter.',
+      'fr': 'Stockage simple de clés et de valeurs.\nAuteur : Équipe Flutter.',
+      'pt': 'Armazenamento simples de chave-valor.\nAutor: Equipe Flutter.',
+    },
+    'qd86znqv': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    'c5b32dt6': {
+      'en': 'Path Provider (v2.1.4)',
+      'de': 'Pfadanbieter (v2.1.4)',
+      'es': 'Proveedor de rutas (v2.1.4)',
+      'fr': 'Fournisseur de chemin (v2.1.4)',
+      'pt': 'Provedor de Caminho (v2.1.4)',
+    },
+    'ww73vi5w': {
+      'en': 'Access to system directories.\nAuthor: Flutter team.',
+      'de': 'Zugriff auf Systemverzeichnisse.\nAutor: Flutter-Team.',
+      'es': 'Acceso a directorios del sistema.\nAutor: Equipo Flutter.',
+      'fr': 'Accès aux répertoires système.\nAuteur : Équipe Flutter.',
+      'pt': 'Acesso aos diretórios do sistema.\nAutor: Equipe Flutter.',
+    },
+    '22jswh9f': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    'c0h6nsdf': {
+      'en': 'Geolocator (v9.0.2)',
+      'de': 'Geolocator (v9.0.2)',
+      'es': 'Geolocalizador (v9.0.2)',
+      'fr': 'Géolocalisateur (v9.0.2)',
+      'pt': 'Geolocalizador (v9.0.2)',
+    },
+    'mn1rsx3t': {
+      'en': 'Device location.\nAuthor: Baseflow.',
+      'de': 'Gerätestandort.\nAutor: Baseflow.',
+      'es': 'Ubicación del dispositivo. Autor: Baseflow.',
+      'fr': 'Localisation de l\'appareil.\nAuteur : Baseflow.',
+      'pt': 'Localização do dispositivo.\nAutor: Baseflow.',
+    },
+    'yqev98bu': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    '579hreac': {
+      'en': 'Google Maps Native SDK (v0.7.0)',
+      'de': 'Google Maps Native SDK (v0.7.0)',
+      'es': 'SDK nativo de Google Maps (v0.7.0)',
+      'fr': 'SDK natif de Google Maps (v0.7.0)',
+      'pt': 'SDK nativo do Google Maps (v0.7.0)',
+    },
+    'g7hb8l2q': {
+      'en':
+          'Maps and pins in the app.\nAuthor: Quicky Solution/Nagazaki Software.',
+      'de':
+          'Karten und Pins in der App.\nAutor: Quicky Solution/Nagazaki Software.',
+      'es':
+          'Mapas y marcadores en la aplicación.\nAutor: Quicky Solution/Nagazaki Software.',
+      'fr':
+          'Cartes et repères dans l\'application.\nAuteur : Quicky Solution/Nagazaki Software.',
+      'pt':
+          'Mapas e marcadores no aplicativo.\nAutor: Quicky Solution/Nagazaki Software.',
+    },
+    'e9wrli4n': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    'ux98u86n': {
+      'en': 'URL Launcher (v6.3.1)',
+      'de': 'URL-Starter (v6.3.1)',
+      'es': 'Lanzador de URL (v6.3.1)',
+      'fr': 'Lanceur d\'URL (v6.3.1)',
+      'pt': 'Iniciador de URL (v6.3.1)',
+    },
+    'g21sfe2v': {
+      'en': 'Open links/calls/emails.\nAuthor: Flutter team.',
+      'de': 'Öffnen Sie Links/Anrufe/E-Mails.\nAutor: Flutter-Team.',
+      'es':
+          'Abrir enlaces, llamadas y correos electrónicos.\nAutor: Equipo Flutter.',
+      'fr': 'Liens/appels/e-mails ouverts.\nAuteur : Équipe Flutter.',
+      'pt': 'Abrir links/chamadas/e-mails.\nAutor: Equipe Flutter.',
+    },
+    'gbcpuwmi': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    '6ihkgp1b': {
+      'en': 'intl (v0.20.2)',
+      'de': 'intl (v0.20.2)',
+      'es': 'internacional (v0.20.2)',
+      'fr': 'intl (v0.20.2)',
+      'pt': 'intl (v0.20.2)',
+    },
+    'ob1qv12f': {
+      'en': 'Dates, numbers, and locale formatting.\nAuthor: Dart team.',
+      'de':
+          'Datums-, Zahlen- und Gebietsschemaformatierung.\nAutor: Dart-Team.',
+      'es': 'Fechas, números y formato regional. Autor: Equipo Dart.',
+      'fr': 'Dates, nombres et formatage local.\nAuteur : Équipe Dart.',
+      'pt': 'Datas, números e formatação de localidade.\nAutor: Equipe Dart.',
+    },
+    'wqdowqa1': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
+    },
+    'p1ahtxu3': {
+      'en': 'Braintree Native UI (v0.4.0)',
+      'de': 'Native Benutzeroberfläche von Braintree (v0.4.0)',
+      'es': 'Interfaz de usuario nativa de Braintree (v0.4.0)',
+      'fr': 'Interface utilisateur native Braintree (v0.4.0)',
+      'pt': 'Interface de usuário nativa do Braintree (v0.4.0)',
+    },
+    'wo6vidne': {
+      'en': 'Payments.\nAuthor: Quicky Solutions/Nagazaki Software.',
+      'de': 'Zahlungen.\nAutor: Quicky Solutions/Nagazaki Software.',
+      'es': 'Pagos. Autor: Quicky Solutions/Nagazaki Software.',
+      'fr': 'Paiements.\nAuteur : Quicky Solutions/Nagazaki Software.',
+      'pt': 'Pagamentos.\nAutor: Quicky Solutions/Nagazaki Software.',
+    },
+    'vga103ah': {
+      'en': 'BSD 3-Clause License',
+      'de': 'BSD 3-Klausel-Lizenz',
+      'es': 'Licencia BSD de 3 cláusulas',
+      'fr': 'Licence BSD à 3 clauses',
+      'pt': 'Licença BSD de 3 cláusulas',
     },
   },
   // continuecom
@@ -3420,7 +4637,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Versuchen Sie es erneut',
       'es': 'Intentar otra vez',
       'fr': 'Essayer à nouveau',
-      'pt': 'Tentar novamente',
+      'pt': 'Tente novamente',
     },
     '8zf35a1x': {
       'en': 'Cancel',
@@ -3555,7 +4772,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'pt': 'Adicionar método de pagamento',
     },
   },
-  // componentLanguage
+  // componentLanguageXXX
   {
     'wngiyp5s': {
       'en': 'Language Settings',
@@ -3660,205 +4877,670 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     'n3bcuhfe': {
       'en': 'Low Stimulation Mode',
-      'de': 'Großer Text',
-      'es': 'Texto grande',
-      'fr': 'Texte de grande taille',
-      'pt': 'Texto grande',
+      'de': 'Modus mit geringer Stimulation',
+      'es': 'Modo de baja estimulación',
+      'fr': 'Mode de faible stimulation',
+      'pt': 'Modo de baixa estimulação',
     },
     'xgi9yobg': {
       'en':
           'Reduce animations, flashing elements, and intense colors for a calmer experience.',
-      'de': 'Erhöhen Sie die Textgröße für eine bessere Lesbarkeit',
-      'es': 'Aumentar el tamaño del texto para una mejor legibilidad',
-      'fr': 'Augmenter la taille du texte pour une meilleure lisibilité',
-      'pt': 'Aumente o tamanho do texto para melhor legibilidade',
+      'de':
+          'Reduzieren Sie Animationen, blinkende Elemente und intensive Farben für ein ruhigeres Erlebnis.',
+      'es':
+          'Reduce las animaciones, los elementos parpadeantes y los colores intensos para una experiencia más tranquila.',
+      'fr':
+          'Réduisez les animations, les éléments clignotants et les couleurs intenses pour une expérience plus calme.',
+      'pt':
+          'Reduza animações, elementos piscantes e cores intensas para uma experiência mais tranquila.',
     },
     'adcixq9l': {
       'en': 'Street Names in Audio',
-      'de': 'Hoher Kontrast',
-      'es': 'Alto contraste',
-      'fr': 'Contraste élevé',
-      'pt': 'Alto contraste',
+      'de': 'Straßennamen im Audio',
+      'es': 'Nombres de calles en audio',
+      'fr': 'Noms de rue en audio',
+      'pt': 'Nomes de ruas em áudio',
     },
     'hcrz87yr': {
       'en':
           'Announce pickup and destination street names out loud for easier navigation.',
-      'de': 'Verbessern Sie den Farbkontrast für bessere Sichtbarkeit',
-      'es': 'Mejorar el contraste de color para mayor visibilidad',
-      'fr': 'Améliorer le contraste des couleurs pour plus de visibilité',
-      'pt': 'Melhore o contraste de cores para maior visibilidade',
+      'de':
+          'Geben Sie die Straßennamen für Abholung und Ziel laut bekannt, um die Navigation zu erleichtern.',
+      'es':
+          'Anuncie en voz alta los nombres de las calles de recogida y destino para facilitar la navegación.',
+      'fr':
+          'Annoncez à voix haute les noms des rues de prise en charge et de destination pour faciliter la navigation.',
+      'pt':
+          'Anuncie em voz alta os nomes das ruas de embarque e desembarque para facilitar a navegação.',
     },
     '7ipthfmh': {
       'en': 'Haptic & Sound Feedback',
-      'de': 'Sprachassistent',
-      'es': 'Asistente de voz',
-      'fr': 'Assistant vocal',
-      'pt': 'Assistente de voz',
+      'de': 'Haptisches und akustisches Feedback',
+      'es': 'Retroalimentación háptica y sonora',
+      'fr': 'Retour haptique et sonore',
+      'pt': 'Feedback tátil e sonoro',
     },
     'gvv1b50c': {
       'en':
           'Provide vibration or sound alerts when confirming rides, driver arrival, or trip start.',
-      'de': 'Sprachbefehle und Feedback aktivieren',
-      'es': 'Habilitar comandos de voz y comentarios',
-      'fr': 'Activer les commandes vocales et les commentaires',
-      'pt': 'Habilitar comandos de voz e feedback',
+      'de':
+          'Geben Sie Vibrations- oder Tonwarnungen aus, wenn Sie Fahrten, die Ankunft des Fahrers oder den Fahrtbeginn bestätigen.',
+      'es':
+          'Proporciona alertas de vibración o sonido al confirmar viajes, la llegada del conductor o el inicio del viaje.',
+      'fr':
+          'Fournit des alertes vibrantes ou sonores lors de la confirmation des courses, de l\'arrivée du chauffeur ou du début du voyage.',
+      'pt':
+          'Forneça alertas sonoros ou de vibração ao confirmar viagens, chegada do motorista ou início da viagem.',
     },
     'pm63xjdk': {
       'en': 'Request Ride by Voice',
-      'de': 'Bildschirmleser',
-      'es': 'Lector de pantalla',
-      'fr': 'lecteur d\'écran',
-      'pt': 'Leitor de tela',
+      'de': 'Fahrt per Sprachbefehl anfordern',
+      'es': 'Solicitar viaje por voz',
+      'fr': 'Demander un trajet par la voix',
+      'pt': 'Solicitar viagem por voz',
     },
     'hdtoo0vh': {
       'en':
           'Allows users to request a car by speaking their destination, without needing to type or use the map.',
-      'de': 'Für Bildschirmlesesoftware optimieren',
-      'es': 'Optimizar para software de lectura de pantalla',
-      'fr': 'Optimiser pour les logiciels de lecture d\'écran',
-      'pt': 'Otimizar para software de leitura de tela',
+      'de':
+          'Ermöglicht Benutzern, ein Auto anzufordern, indem sie ihr Ziel aussprechen, ohne etwas eintippen oder die Karte verwenden zu müssen.',
+      'es':
+          'Permite a los usuarios solicitar un coche diciendo su destino, sin necesidad de escribir o utilizar el mapa.',
+      'fr':
+          'Permet aux utilisateurs de demander une voiture en indiquant leur destination, sans avoir besoin de taper ou d\'utiliser la carte.',
+      'pt':
+          'Permite que os usuários solicitem um carro falando seu destino, sem precisar digitar ou usar o mapa.',
     },
     '0vrkyi4m': {
       'en': 'Confirm',
-      'de': 'Einstellungen speichern',
-      'es': 'Guardar configuración',
-      'fr': 'Enregistrer les paramètres',
-      'pt': 'Salvar configurações',
+      'de': 'Bestätigen',
+      'es': 'Confirmar',
+      'fr': 'Confirmer',
+      'pt': 'Confirmar',
     },
   },
   // componentScheduleAction
   {
     '856t18lj': {
       'en': 'Pickup',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Abholen',
+      'es': 'Levantar',
+      'fr': 'Ramasser',
+      'pt': 'Escolher',
     },
     'no2shcld': {
       'en': 'Dropoff',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Abgabe',
+      'es': 'Dejar',
+      'fr': 'Dépôt',
+      'pt': 'Desistência',
     },
     'jamhybvq': {
       'en': 'Vehicle',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Fahrzeug',
+      'es': 'Vehículo',
+      'fr': 'Véhicule',
+      'pt': 'Veículo',
     },
     '43r7ws5u': {
       'en': 'Ride',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Fahrt',
+      'es': 'Conducir',
+      'fr': 'Monter',
+      'pt': 'Andar de',
     },
     '35k8wmyh': {
       'en': 'XL',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'XL',
+      'es': 'SG',
+      'fr': 'XL',
+      'pt': 'GG',
     },
     'pxgch01i': {
       'en': 'Luxury',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Luxus',
+      'es': 'Lujo',
+      'fr': 'Luxe',
+      'pt': 'Luxo',
     },
     'iqml58mw': {
       'en': 'Repeat',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Wiederholen',
+      'es': 'Repetir',
+      'fr': 'Répéter',
+      'pt': 'Repita',
     },
     'wpj5tgnr': {
       'en': 'One-time',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Einmalig',
+      'es': 'Una sola vez',
+      'fr': 'Une fois',
+      'pt': 'Uma vez',
     },
     'quw1f8h7': {
       'en': 'Weekdays',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Wochentage',
+      'es': 'Días laborables',
+      'fr': 'Jours de la semaine',
+      'pt': 'Dias da semana',
     },
     '7cei3svq': {
       'en': 'Custom',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Brauch',
+      'es': 'Costumbre',
+      'fr': 'Coutume',
+      'pt': 'Personalizado',
     },
     '0mtvp1iq': {
       'en': 'Estimate',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Schätzen',
+      'es': 'Estimar',
+      'fr': 'Estimation',
+      'pt': 'Estimativa',
     },
     'atbe9izh': {
       'en': '\$18 • pickup recalculated at trip time',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': '18 \$ • Abholung zum Zeitpunkt der Fahrt neu berechnet',
+      'es': '\$18 • la recogida se recalcula al momento del viaje',
+      'fr': '18 \$ • prise en charge recalculée au moment du voyage',
+      'pt': '\$ 18 • retirada recalculada no momento da viagem',
     },
     'v3644x1m': {
       'en': 'Notes (optional)',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Notizen (optional)',
+      'es': 'Notas (opcional)',
+      'fr': 'Remarques (facultatif)',
+      'pt': 'Notas (opcional)',
     },
     'irm5g15g': {
       'en': 'Shedule ride',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Fahrplanfahrt',
+      'es': 'Horario de viaje',
+      'fr': 'Horaire du trajet',
+      'pt': 'Passeio programado',
     },
     '49itxhbn': {
       'en': 'Schedule Ride Share',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Fahrgemeinschaft planen',
+      'es': 'Programar viaje compartido',
+      'fr': 'Planifier un covoiturage',
+      'pt': 'Agendar Compartilhamento de Viagem',
     },
     'jqfg3zeg': {
       'en': 'Save to canlendar',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Im Kalender speichern',
+      'es': 'Guardar en calendario',
+      'fr': 'Enregistrer dans Canlendar',
+      'pt': 'Salvar no canlendar',
     },
   },
   // erroAoCriarConta
   {
     '1bthb301': {
       'en': 'Error creating your account',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Fehler beim Erstellen Ihres Kontos',
+      'es': 'Error al crear su cuenta',
+      'fr': 'Erreur lors de la création de votre compte',
+      'pt': 'Erro ao criar sua conta',
     },
     '4v5yohmn': {
       'en': 'An error occurred while creating your account, please try again.',
+      'de':
+          'Beim Erstellen Ihres Kontos ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.',
+      'es':
+          'Se produjo un error al crear su cuenta, por favor inténtelo nuevamente.',
+      'fr':
+          'Une erreur s\'est produite lors de la création de votre compte, veuillez réessayer.',
+      'pt': 'Ocorreu um erro ao criar sua conta, tente novamente.',
+    },
+    'oy2qxef8': {
+      'en': 'Try again',
+      'de': 'Versuchen Sie es erneut',
+      'es': 'Intentar otra vez',
+      'fr': 'Essayer à nouveau',
+      'pt': 'Tente novamente',
+    },
+  },
+  // componentLanguage
+  {
+    'ktjluzpd': {
+      'en': 'Language Settings',
+      'de': 'Spracheinstellungen',
+      'es': 'Configuración de idioma',
+      'fr': 'Paramètres de langue',
+      'pt': 'Configurações de idioma',
+    },
+    '8fc4xj3e': {
+      'en': 'Choose your preferred language',
+      'de': 'Wählen Sie Ihre bevorzugte Sprache',
+      'es': 'Elige tu idioma preferido',
+      'fr': 'Choisissez votre langue préférée',
+      'pt': 'Escolha seu idioma preferido',
+    },
+    'p00lg82r': {
+      'en': 'English',
+      'de': 'Englisch',
+      'es': 'Inglés',
+      'fr': 'Anglais',
+      'pt': 'Inglês',
+    },
+    'j99f4j2b': {
+      'en': 'French',
+      'de': 'Französisch',
+      'es': 'Francés',
+      'fr': 'Français',
+      'pt': 'Francês',
+    },
+    '0w0l688r': {
+      'en': 'German',
+      'de': 'Deutsch',
+      'es': 'Alemán',
+      'fr': 'Allemand',
+      'pt': 'Alemão',
+    },
+    '91lj3fd8': {
+      'en': 'Portuguese',
+      'de': 'Portugiesisch',
+      'es': 'portugués',
+      'fr': 'portugais',
+      'pt': 'Português',
+    },
+    'ryu3fgou': {
+      'en': 'Spanish',
+      'de': 'Spanisch',
+      'es': 'Español',
+      'fr': 'Espagnol',
+      'pt': 'Espanhol',
+    },
+    '8objo8t2': {
+      'en': 'Confirm',
+      'de': 'Bestätigen',
+      'es': 'Confirmar',
+      'fr': 'Confirmer',
+      'pt': 'Confirmar',
+    },
+  },
+  // whyCancelThisRide
+  {
+    'l88o43xh': {
+      'en': 'Why do you want to cancel this ride?',
+      'de': 'Warum möchten Sie diese Fahrt absagen?',
+      'es': '¿Por qué quieres cancelar este viaje?',
+      'fr': 'Pourquoi voulez-vous annuler ce trajet ?',
+      'pt': 'Por que você quer cancelar esta viagem?',
+    },
+    'wewzqocc': {
+      'en': 'I need to change destination',
+      'de': 'Ich muss das Ziel ändern',
+      'es': 'Necesito cambiar de destino',
+      'fr': 'Je dois changer de destination',
+      'pt': 'Preciso mudar de destino',
+    },
+    'uss7y04c': {
+      'en': 'The driver isn’t moving',
+      'de': 'Der Fahrer bewegt sich nicht',
+      'es': 'El conductor no se mueve',
+      'fr': 'Le conducteur ne bouge pas',
+      'pt': 'O motorista não está se movendo',
+    },
+    'kpemoo7o': {
+      'en': 'The driver asked me to cancel',
+      'de': 'Der Fahrer hat mich gebeten, abzusagen',
+      'es': 'El conductor me pidió que cancelara.',
+      'fr': 'Le chauffeur m\'a demandé d\'annuler',
+      'pt': 'O motorista me pediu para cancelar',
+    },
+    'q2ag5jvt': {
+      'en': 'I can’t find the driver',
+      'de': 'Ich kann den Treiber nicht finden',
+      'es': 'No puedo encontrar el controlador',
+      'fr': 'Je ne trouve pas le pilote',
+      'pt': 'Não consigo encontrar o driver',
+    },
+    'qfd1pgf9': {
+      'en': 'I no longer need this ride',
+      'de': 'Ich brauche diese Fahrt nicht mehr',
+      'es': 'Ya no necesito este viaje',
+      'fr': 'Je n\'ai plus besoin de ce trajet',
+      'pt': 'Eu não preciso mais desse passeio',
+    },
+    'biymab2t': {
+      'en': 'Help Now',
+      'de': 'Jetzt helfen',
+      'es': 'Ayuda ahora',
+      'fr': 'Aidez-moi maintenant',
+      'pt': 'Ajuda agora',
+    },
+    '58sxiip3': {
+      'en': 'Cancel Ride',
+      'de': 'Fahrt abbrechen',
+      'es': 'Cancelar viaje',
+      'fr': 'Annuler le trajet',
+      'pt': 'Cancelar viagem',
+    },
+  },
+  // emailSupport
+  {
+    '9ffhhw22': {
+      'en': 'Send your Message',
+      'de': 'Senden Sie Ihre Nachricht',
+      'es': 'Envía tu mensaje',
+      'fr': 'Envoyez votre message',
+      'pt': 'Envie sua mensagem',
+    },
+    '32ldxog8': {
+      'en': 'Full name',
+      'de': 'Vollständiger Name',
+      'es': 'Nombre completo',
+      'fr': 'Nom et prénom',
+      'pt': 'Nome completo',
+    },
+    's8chekvp': {
+      'en': 'Enter your full name',
+      'de': 'Geben Sie Ihren vollständigen Namen ein',
+      'es': 'Ingrese su nombre completo',
+      'fr': 'Entrez votre nom complet',
+      'pt': 'Digite seu nome completo',
+    },
+    'woz2p50q': {
+      'en': 'Email',
+      'de': 'E-Mail',
+      'es': 'Correo electrónico',
+      'fr': 'E-mail',
+      'pt': 'E-mail',
+    },
+    'f0at0nuw': {
+      'en': 'your@email.com',
+      'de': 'Ihre@E-Mail-Adresse.com',
+      'es': 'tu@correoelectrónico.com',
+      'fr': 'votre@email.com',
+      'pt': 'seu@email.com',
+    },
+    '0kit5lu4': {
+      'en': 'Subject',
+      'de': 'Thema',
+      'es': 'Sujeto',
+      'fr': 'Sujet',
+      'pt': 'Assunto',
+    },
+    'g8z8zlv6': {
+      'en': '',
       'de': '',
       'es': '',
       'fr': '',
       'pt': '',
     },
-    'oy2qxef8': {
-      'en': 'Try again',
+    't22uy1h1': {
+      'en': 'Select the subject',
+      'de': 'Wählen Sie das Thema',
+      'es': 'Seleccione el tema',
+      'fr': 'Sélectionnez le sujet',
+      'pt': 'Selecione o assunto',
+    },
+    '8viql6dn': {
+      'en': 'Technical problems',
+      'de': 'Technische Probleme',
+      'es': 'Problemas técnicos',
+      'fr': 'Problèmes techniques',
+      'pt': 'Problemas técnicos',
+    },
+    'yycbigmu': {
+      'en': 'Payment Issues & Refunds',
+      'de': 'Zahlungsprobleme und Rückerstattungen',
+      'es': 'Problemas de pago y reembolsos',
+      'fr': 'Problèmes de paiement et remboursements',
+      'pt': 'Problemas de pagamento e reembolsos',
+    },
+    '15lhfi9v': {
+      'en': 'Complaint',
+      'de': 'Beschwerde',
+      'es': 'Queja',
+      'fr': 'Plainte',
+      'pt': 'Reclamação',
+    },
+    '4wiuitn4': {
+      'en': 'Others',
+      'de': 'Sonstige',
+      'es': 'Otros',
+      'fr': 'Autres',
+      'pt': 'Outros',
+    },
+    'czbkso9k': {
+      'en': 'Message',
+      'de': 'Nachricht',
+      'es': 'Mensaje',
+      'fr': 'Message',
+      'pt': 'Mensagem',
+    },
+    'vprspwx8': {
+      'en': 'Please describe your request in detail...',
+      'de': 'Bitte beschreiben Sie Ihr Anliegen detailliert...',
+      'es': 'Por favor describa su solicitud en detalle...',
+      'fr': 'Veuillez décrire votre demande en détail...',
+      'pt': 'Por favor, descreva sua solicitação em detalhes...',
+    },
+    'uowrdv6x': {
+      'en': 'Send Message',
+      'de': 'Nachricht senden',
+      'es': 'Enviar mensaje',
+      'fr': 'Envoyer un message',
+      'pt': 'Enviar mensagem',
+    },
+  },
+  // emailsupportsuccess
+  {
+    'pj6fecz4': {
+      'en': 'Email Sent Successfully!',
+      'de': 'E-Mail erfolgreich gesendet!',
+      'es': '¡Correo electrónico enviado exitosamente!',
+      'fr': 'E-mail envoyé avec succès!',
+      'pt': 'E-mail enviado com sucesso!',
+    },
+    'vyuy00n9': {
+      'en':
+          'Your support request has been submitted. Our team will review your message and respond within 24-48 hours.',
+      'de':
+          'Ihre Supportanfrage wurde übermittelt. Unser Team wird Ihre Nachricht prüfen und innerhalb von 24–48 Stunden antworten.',
+      'es':
+          'Su solicitud de soporte ha sido enviada. Nuestro equipo revisará su mensaje y le responderá en un plazo de 24 a 48 horas.',
+      'fr':
+          'Votre demande d\'assistance a été envoyée. Notre équipe examinera votre message et vous répondra sous 24 à 48 heures.',
+      'pt':
+          'Sua solicitação de suporte foi enviada. Nossa equipe analisará sua mensagem e responderá em até 24 a 48 horas.',
+    },
+  },
+  // addEmergencyContact
+  {
+    'mfwq3ofd': {
+      'en': 'Add Emergency Contact',
+      'de': 'Notfallkontakt hinzufügen',
+      'es': 'Agregar contacto de emergencia',
+      'fr': 'Ajouter un contact d\'urgence',
+      'pt': 'Adicionar contato de emergência',
+    },
+    'atbj1o5h': {
+      'en': 'Contact Name',
+      'de': 'Kontaktname',
+      'es': 'Nombre del contacto',
+      'fr': 'Nom du contact',
+      'pt': 'Nome do contato',
+    },
+    'mt8z25p9': {
+      'en': 'Enter full name',
+      'de': 'Geben Sie den vollständigen Namen ein',
+      'es': 'Ingrese el nombre completo',
+      'fr': 'Entrez le nom complet',
+      'pt': 'Digite o nome completo',
+    },
+    'wgd10fwp': {
+      'en': 'Phone Number',
+      'de': 'Telefonnummer',
+      'es': 'Número de teléfono',
+      'fr': 'Numéro de téléphone',
+      'pt': 'Número de telefone',
+    },
+    'd8795j49': {
+      'en': 'Enter phone number',
+      'de': 'Telefonnummer eingeben',
+      'es': 'Introduzca el número de teléfono',
+      'fr': 'Entrez le numéro de téléphone',
+      'pt': 'Digite o número de telefone',
+    },
+    '0ahipprs': {
+      'en': 'Relationship',
+      'de': 'Beziehung',
+      'es': 'Relación',
+      'fr': 'Relation',
+      'pt': 'Relação',
+    },
+    'hmhmwnnn': {
+      'en': 'e.g., Spouse, Parent, Sibling',
+      'de': 'z. B. Ehepartner, Elternteil, Geschwister',
+      'es': 'p. ej., cónyuge, padre, hermano',
+      'fr': 'par exemple, conjoint, parent, frère ou sœur',
+      'pt': 'por exemplo, cônjuge, pai, irmão',
+    },
+    '3ekpfb1c': {
+      'en': 'Cancel',
+      'de': 'Stornieren',
+      'es': 'Cancelar',
+      'fr': 'Annuler',
+      'pt': 'Cancelar',
+    },
+    'n8enip4b': {
+      'en': 'Add Contact',
+      'de': 'Kontakt hinzufügen',
+      'es': 'Agregar contacto',
+      'fr': 'Ajouter un contact',
+      'pt': 'Adicionar contato',
+    },
+  },
+  // componentScheduleActionCopy
+  {
+    'ij2hcwcb': {
+      'en': 'Edit Upcoming Ride',
+      'de': 'Nächste Fahrt bearbeiten',
+      'es': 'Editar próximo viaje',
+      'fr': 'Modifier la prochaine course',
+      'pt': 'Editar próximo passeio',
+    },
+    'mpraj2et': {
+      'en': 'Pickup',
+      'de': 'Abholen',
+      'es': 'Levantar',
+      'fr': 'Ramasser',
+      'pt': 'Escolher',
+    },
+    '88x37m4y': {
+      'en': 'Dropoff',
+      'de': 'Abgabe',
+      'es': 'Dejar',
+      'fr': 'Dépôt',
+      'pt': 'Desistência',
+    },
+    'r84cwhyt': {
+      'en': 'Date',
+      'de': 'Datum',
+      'es': 'Fecha',
+      'fr': 'Date',
+      'pt': 'Data',
+    },
+    'lwnsyshh': {
+      'en': 'Vehicle',
+      'de': 'Fahrzeug',
+      'es': 'Vehículo',
+      'fr': 'Véhicule',
+      'pt': 'Veículo',
+    },
+    'jursmwli': {
+      'en': 'Ride',
+      'de': 'Fahrt',
+      'es': 'Conducir',
+      'fr': 'Monter',
+      'pt': 'Andar de',
+    },
+    '8wmx2w3o': {
+      'en': 'XL',
+      'de': 'XL',
+      'es': 'SG',
+      'fr': 'XL',
+      'pt': 'GG',
+    },
+    'ch4nhczz': {
+      'en': 'Luxury',
+      'de': 'Luxus',
+      'es': 'Lujo',
+      'fr': 'Luxe',
+      'pt': 'Luxo',
+    },
+    'f2g4etm4': {
+      'en': 'Repeat',
+      'de': 'Wiederholen',
+      'es': 'Repetir',
+      'fr': 'Répéter',
+      'pt': 'Repita',
+    },
+    'ty6cc6kz': {
+      'en': 'One-time',
+      'de': 'Einmalig',
+      'es': 'Una sola vez',
+      'fr': 'Une fois',
+      'pt': 'Uma vez',
+    },
+    '2fxdirm3': {
+      'en': 'Weekdays',
+      'de': 'Wochentage',
+      'es': 'Días laborables',
+      'fr': 'Jours de la semaine',
+      'pt': 'Dias da semana',
+    },
+    'vm1ojjhn': {
+      'en': 'Custom',
+      'de': 'Brauch',
+      'es': 'Costumbre',
+      'fr': 'Coutume',
+      'pt': 'Personalizado',
+    },
+    'dpqktgjp': {
+      'en': 'Notes (optional)',
+      'de': 'Notizen (optional)',
+      'es': 'Notas (opcional)',
+      'fr': 'Remarques (facultatif)',
+      'pt': 'Notas (opcional)',
+    },
+    '1i1fpgpm': {
+      'en': 'Save edit',
+      'de': 'Bearbeitung speichern',
+      'es': 'Guardar edición',
+      'fr': 'Enregistrer la modification',
+      'pt': 'Salvar edição',
+    },
+  },
+  // waystoearninformation
+  {
+    'petfkzmg': {
+      'en': 'Ways to Earn',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'icuokifq': {
+      'en': 'Daily Tasks',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    '5fxi5gr2': {
+      'en': 'Refer Friends',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'bqj28oiz': {
+      'en': 'Running races',
       'de': '',
       'es': '',
       'fr': '',

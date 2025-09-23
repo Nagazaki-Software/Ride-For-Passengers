@@ -131,6 +131,10 @@ class _RideScheduleSucessWidgetState extends State<RideScheduleSucessWidget> {
               children: [
                 FFButtonWidget(
                   onPressed: () async {
+                    logFirebaseEvent(
+                        'RIDE_SCHEDULE_SUCESS_VIEW_DETAILS_BTN_ON');
+                    logFirebaseEvent('Button_navigate_to');
+
                     context.pushNamed(
                       ViewDetalhesWidget.routeName,
                       queryParameters: {
@@ -174,6 +178,8 @@ class _RideScheduleSucessWidgetState extends State<RideScheduleSucessWidget> {
                 ),
                 FFButtonWidget(
                   onPressed: () async {
+                    logFirebaseEvent('RIDE_SCHEDULE_SUCESS_DONE_BTN_ON_TAP');
+                    logFirebaseEvent('Button_bottom_sheet');
                     Navigator.pop(context);
                   },
                   text: FFLocalizations.of(context).getText(

@@ -37,9 +37,9 @@ class CreateProfile2Model extends FlutterFlowModel<CreateProfile2Widget> {
   // State field(s) for DropDown widget.
   String? dropDownValue2;
   FormFieldController<String>? dropDownValueController2;
-  // Stores action output result for [Firestore Query - Query a collection] action in Container widget.
+  // Stores action output result for [Firestore Query - Query a collection] action in Containerxt widget.
   List<UsersRecord>? users;
-  // Stores action output result for [Custom Action - verifiqueRandomNumber] action in Container widget.
+  // Stores action output result for [Custom Action - verifiqueRandomNumber] action in Containerxt widget.
   String? randomNumber;
 
   @override

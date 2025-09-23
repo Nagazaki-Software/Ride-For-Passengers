@@ -30,10 +30,16 @@ class RewardsRecord extends FirestoreRecord {
   List<DocumentReference> get usersActivate => _usersActivate ?? const [];
   bool hasUsersActivate() => _usersActivate != null;
 
+  // "code" field.
+  String? _code;
+  String get code => _code ?? '';
+  bool hasCode() => _code != null;
+
   void _initializeFields() {
     _title = snapshotData['title'] as String?;
     _description = snapshotData['description'] as String?;
     _usersActivate = getDataList(snapshotData['usersActivate']);
+    _code = snapshotData['code'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -73,11 +79,13 @@ class RewardsRecord extends FirestoreRecord {
 Map<String, dynamic> createRewardsRecordData({
   String? title,
   String? description,
+  String? code,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
       'title': title,
       'description': description,
+      'code': code,
     }.withoutNulls,
   );
 
@@ -92,12 +100,13 @@ class RewardsRecordDocumentEquality implements Equality<RewardsRecord> {
     const listEquality = ListEquality();
     return e1?.title == e2?.title &&
         e1?.description == e2?.description &&
-        listEquality.equals(e1?.usersActivate, e2?.usersActivate);
+        listEquality.equals(e1?.usersActivate, e2?.usersActivate) &&
+        e1?.code == e2?.code;
   }
 
   @override
-  int hash(RewardsRecord? e) =>
-      const ListEquality().hash([e?.title, e?.description, e?.usersActivate]);
+  int hash(RewardsRecord? e) => const ListEquality()
+      .hash([e?.title, e?.description, e?.usersActivate, e?.code]);
 
   @override
   bool isValidKey(Object? o) => o is RewardsRecord;

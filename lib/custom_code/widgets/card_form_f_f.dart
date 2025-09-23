@@ -1,5 +1,7 @@
+// Automatic FlutterFlow imports
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/actions/actions.dart' as action_blocks;
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'index.dart'; // Imports other custom widgets
@@ -11,31 +13,13 @@ import 'package:flutter/material.dart';
 
 // lib/custom_code/widgets/card_form_f_f.dart
 import 'package:flutter/foundation.dart' show kIsWeb;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import 'package:flutter/services.dart';
->>>>>>> 10c9b5c (new frkdfm)
-=======
-import 'package:flutter/services.dart';
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-// Replaced flutter_braintree with native SDK bridge
-import '../native/braintree_native.dart';
+import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import 'package:flutter/services.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 // FlutterFlow auth (remova se não usa)
-=======
-// FlutterFlow auth (remove if not used)
->>>>>>> 10c9b5c (new frkdfm)
-=======
-// FlutterFlow auth (remove if not used)
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 import '/auth/firebase_auth/auth_util.dart';
 
 const bool kDebugPayments = false;
@@ -84,8 +68,6 @@ class CardFormFF extends StatefulWidget {
     super.key,
     this.width,
     this.height,
-<<<<<<< HEAD
-<<<<<<< HEAD
     required this.value, // valor para cobrar
     required this.passe, // texto do passe
     required this.tokenizationKey, // Braintree tokenization key
@@ -93,21 +75,6 @@ class CardFormFF extends StatefulWidget {
     this.chargeOnConfirm = true, // true = pagar; false = salvar (vault)
     this.onSave, // callback específico de salvar
     this.closeOnSave = true, // fecha bottom sheet após salvar
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-    required this.value, // value to charge
-    required this.passe, // pass text
-    required this.tokenizationKey, // Braintree tokenization key
-    this.onTextField, // Future Function(dynamic)
-    this.chargeOnConfirm = true, // true = charge; false = save to vault
-    this.onSave, // callback for save mode
-    this.closeOnSave = true, // close bottom sheet after save
-    this.enableThreeDS = true, // run 3D Secure verification in charge mode
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   });
 
   final double? width;
@@ -116,8 +83,6 @@ class CardFormFF extends StatefulWidget {
   final String passe;
   final String tokenizationKey;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   /// Callback chamado a cada digitação e no submit (modo UI).
   /// No FlutterFlow: Future Function(dynamic)
   final Future<dynamic> Function(dynamic creditCardTextfield)? onTextField;
@@ -131,28 +96,6 @@ class CardFormFF extends StatefulWidget {
   /// Se true, dá dismiss no BottomSheet depois de salvar.
   final bool closeOnSave;
 
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-  /// Callback fired on change/submit to emit form JSON to FF
-  final Future<dynamic> Function(dynamic creditCardTextfield)? onTextField;
-
-  /// true = charge; false = save to Vault
-  final bool chargeOnConfirm;
-
-  /// Receives a minimal JSON { token, name, last4 }
-  final Future<dynamic> Function(dynamic jsonReturn)? onSave;
-
-  /// Dismiss bottom sheet after save
-  final bool closeOnSave;
-
-  /// Enable 3D Secure verification for charge mode
-  final bool enableThreeDS;
-
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   @override
   State<CardFormFF> createState() => _CardFormFFState();
 }
@@ -175,15 +118,7 @@ class _CardFormFFState extends State<CardFormFF> {
   @override
   void initState() {
     super.initState();
-<<<<<<< HEAD
-<<<<<<< HEAD
     _emitState(event: 'change'); // estado inicial
-=======
-    _emitState(event: 'change'); // initial state
->>>>>>> 10c9b5c (new frkdfm)
-=======
-    _emitState(event: 'change'); // initial state
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   }
 
   @override
@@ -198,19 +133,9 @@ class _CardFormFFState extends State<CardFormFF> {
   @override
   Widget build(BuildContext context) {
     final ctaLabel = widget.chargeOnConfirm
-<<<<<<< HEAD
-<<<<<<< HEAD
         ? (_isPaying ? 'Processing…' : 'Confirm and Pay')
         : (_isPaying ? 'Saving…' : 'Save');
 
-=======
-        ? (_isPaying ? 'Processing...' : 'Confirm and Pay')
-        : (_isPaying ? 'Saving...' : 'Save');
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        ? (_isPaying ? 'Processing...' : 'Confirm and Pay')
-        : (_isPaying ? 'Saving...' : 'Save');
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     return Container(
       width: widget.width ?? double.infinity,
       height: widget.height,
@@ -252,24 +177,14 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   // =======================
-<<<<<<< HEAD
-<<<<<<< HEAD
   // CONFIRMAR (pagar ou só salvar)
-=======
-  // CONFIRM (charge or save)
->>>>>>> 10c9b5c (new frkdfm)
-=======
-  // CONFIRM (charge or save)
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   // =======================
   Future<void> _onConfirmPressed() async {
     HapticFeedback.selectionClick();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     // ---------- MODO SALVAR (VAULT) ----------
     if (!widget.chargeOnConfirm) {
-      // exige os 4 campos
+      // Para salvar no Vault, exigimos os 4 campos (número, validade, CVV, nome)
       if (!(_formKey.currentState?.validate() ?? false)) {
         await _emitState(event: 'submit', mode: 'save');
         showSnackbar(context, 'Complete os dados do cartão.');
@@ -278,18 +193,6 @@ class _CardFormFFState extends State<CardFormFF> {
 
       if (kIsWeb) {
         showSnackbar(context, 'Saving on web is not supported.');
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-    // ---------- SAVE MODE (Vault) ----------
-    if (!widget.chargeOnConfirm) {
-      // require all fields
-      if (!(_formKey.currentState?.validate() ?? false)) {
-        showSnackbar(context, 'Please fill in all fields.');
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         return;
       }
 
@@ -299,8 +202,6 @@ class _CardFormFFState extends State<CardFormFF> {
         return;
       }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
       final data = _collect();
 
       try {
@@ -321,58 +222,19 @@ class _CardFormFFState extends State<CardFormFF> {
             widget.tokenizationKey,
             req,
           );
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      setState(() => _isPaying = true);
-
-      try {
-        final data = _collect();
-
-        // 1) Tokenize in client
-        String nonce;
-        try {
-          final res = await BraintreeNative.tokenizeCard(
-            tokenizationKey: widget.tokenizationKey,
-            number: data.number,
-            expirationMonth: data.month,
-            expirationYear: data.year,
-            cvv: data.cvv,
-            cardholderName: data.holder.isEmpty ? null : data.holder,
-          );
-          nonce = (res['nonce'] as String?) ?? '';
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         } on PlatformException catch (pe) {
           showSnackbar(context, _friendlyBraintreeError(pe));
           return;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         if (result == null) {
-          showSnackbar(context, 'Operação cancelada.');
+          showSnackbar(context, 'Operation cancelled.');
           return;
         }
 
         final nonce = result.nonce;
 
         // 2) Salvar no Vault via Cloud Function
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-        if (nonce.isEmpty) {
-          showSnackbar(context, 'Operation cancelled.');
-          return;
-        }
-
-        // 2) Save to Vault via Cloud Function
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
         final isSandbox = widget.tokenizationKey.trim().startsWith('sandbox_');
         final saved = await _callSavePaymentMethodCallable(
           nonce: nonce,
@@ -384,16 +246,7 @@ class _CardFormFFState extends State<CardFormFF> {
           return;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        // JSON enriquecido para a UI
-=======
-        // JSON for UI
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        // JSON for UI
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-        final brand = _detectBrand(data.number);
+        // JSON minimalista pedido: { token, name, last4 }
         final jsonReturn = <String, dynamic>{
           'token': saved.token ?? '',
           'name': saved.name ?? data.holder,
@@ -401,10 +254,6 @@ class _CardFormFFState extends State<CardFormFF> {
               (data.number.length >= 4
                   ? data.number.substring(data.number.length - 4)
                   : ''),
-          'numberMasked': _maskNumber(data.number),
-          'brand': brand,
-          'expMonth': data.month,
-          'expYear': data.year,
         };
 
         try {
@@ -418,37 +267,20 @@ class _CardFormFFState extends State<CardFormFF> {
           }
         } catch (_) {}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        showSnackbar(context, 'Cartão salvo.');
-=======
-        showSnackbar(context, 'Card saved.');
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        showSnackbar(context, 'Card saved.');
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+        showSnackbar(context, 'Saved.');
+
         if (widget.closeOnSave) {
           await _dismiss();
         }
       } catch (e) {
         if (kDebugPayments) debugPrint('Save failure: $e');
-<<<<<<< HEAD
-<<<<<<< HEAD
-        showSnackbar(context, 'Erro inesperado ao salvar.');
-=======
         showSnackbar(context, 'Unexpected error while saving.');
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        showSnackbar(context, 'Unexpected error while saving.');
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       } finally {
         if (mounted) setState(() => _isPaying = false);
       }
       return;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     // ---------- MODO PAGAR ----------
     if (!(_formKey.currentState?.validate() ?? false)) {
       await _emitState(event: 'submit', mode: 'charge');
@@ -459,14 +291,6 @@ class _CardFormFFState extends State<CardFormFF> {
       showSnackbar(context, 'Payments are not supported on web.');
       return;
     }
-=======
-    // ---------- CHARGE MODE ----------
-    if (!(_formKey.currentState?.validate() ?? false)) return;
->>>>>>> 10c9b5c (new frkdfm)
-=======
-    // ---------- CHARGE MODE ----------
-    if (!(_formKey.currentState?.validate() ?? false)) return;
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
     final precheckError = await _ensureReady();
     if (precheckError != null) {
@@ -474,8 +298,6 @@ class _CardFormFFState extends State<CardFormFF> {
       return;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     try {
       HapticFeedback.lightImpact();
       setState(() => _isPaying = true);
@@ -503,30 +325,6 @@ class _CardFormFFState extends State<CardFormFF> {
           widget.tokenizationKey,
           req,
         );
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-    setState(() => _isPaying = true);
-
-    try {
-      final data = _collect();
-
-      // 1) Tokenize
-      String nonce;
-      try {
-        final res = await BraintreeNative.tokenizeCard(
-          tokenizationKey: widget.tokenizationKey,
-          number: data.number,
-          expirationMonth: data.month,
-          expirationYear: data.year,
-          cvv: data.cvv,
-          cardholderName: data.holder.isEmpty ? null : data.holder,
-        );
-        nonce = (res['nonce'] as String?) ?? '';
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       } on PlatformException catch (pe) {
         if (kDebugPayments) {
           debugPrint(
@@ -536,50 +334,14 @@ class _CardFormFFState extends State<CardFormFF> {
         return;
       }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
       if (result == null) {
-        showSnackbar(context, 'Operação cancelada.');
+        showSnackbar(context, 'Operation cancelled.');
         return;
       }
 
       final nonce = result.nonce;
 
       // 2) Server
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      if (nonce.isEmpty) {
-        showSnackbar(context, 'Operation cancelled.');
-        return;
-      }
-
-      // 2) Optional: 3D Secure verification before charging
-      if (widget.enableThreeDS) {
-        try {
-          final threeDS = await BraintreeNative.threeDSecureVerify(
-            tokenizationKey: widget.tokenizationKey,
-            nonce: nonce,
-            amount: widget.value.toStringAsFixed(2),
-            email: currentUserEmail,
-          );
-          final threeDSNonce = (threeDS['nonce'] as String?) ?? '';
-          if (threeDSNonce.isNotEmpty) {
-            nonce = threeDSNonce;
-          }
-        } on PlatformException catch (pe) {
-          if (kDebugPayments) {
-            debugPrint('3DS verify error: code=${pe.code} message=${pe.message}');
-          }
-          // proceed without 3DS if it fails unexpectedly
-        }
-      }
-
-      // 3) Server: call Cloud Function
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       final isSandbox = widget.tokenizationKey.trim().startsWith('sandbox_');
       final pay = await _callProcessPaymentCallable(
         amount: widget.value,
@@ -591,13 +353,14 @@ class _CardFormFFState extends State<CardFormFF> {
         final msg = pay.errorMessage!;
         showSnackbar(context, msg);
         if (!mounted) return;
-        await _emitState(event: 'submit', mode: 'charge');
+        await _emitState(
+            event: 'submit', mode: 'charge'); // emite estado com erro
         await _showErrorBottomSheet(msg);
         return;
       }
 
       _transactionId = pay.transactionId;
-      await _emitState(event: 'submit', mode: 'charge');
+      await _emitState(event: 'submit', mode: 'charge'); // inclui transactionId
       showSnackbar(context, 'Payment approved!');
 
       if (_transactionId != null && _transactionId!.isNotEmpty) {
@@ -624,15 +387,7 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   // =======================
-<<<<<<< HEAD
-<<<<<<< HEAD
   // Form state + JSON emit (para UI)
-=======
-  // Form state + JSON emit (for UI)
->>>>>>> 10c9b5c (new frkdfm)
-=======
-  // Form state + JSON emit (for UI)
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   // =======================
   CardData _collect() => CardData(
         number: _digitsOnly(_numberCtrl.text),
@@ -641,6 +396,7 @@ class _CardFormFFState extends State<CardFormFF> {
         holder: _holderCtrl.text.trim(),
       );
 
+  // Para UI (mudanças/erros), mantém payload informativo.
   Future<void> _emitState({String event = 'change', String? mode}) async {
     if (widget.onTextField == null) return;
 
@@ -663,15 +419,19 @@ class _CardFormFFState extends State<CardFormFF> {
           : null,
       'holder': data.holder,
       'brand': brand,
-      'number': numDigits,
-      'expiry': data.expiry,
+
+      'number': numDigits, // visível para UI
+      'expiry': data.expiry, // "MM/YY"
       'expMonth': data.month,
       'expYear': data.year,
+
       'cvvLength': data.cvv.length,
+
       'isComplete': isComplete,
       'errors': errors,
       'mode': mode ?? (widget.chargeOnConfirm ? 'charge' : 'save'),
       'event': event,
+
       if (_transactionId != null) 'transactionId': _transactionId,
     };
 
@@ -689,6 +449,7 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   String? _validateExpiry(String text) {
+    // Obrigatório em pagar e salvar (para tokenizar/vault)
     final regex = RegExp(r'^(0[1-9]|1[0-2])\/\d{2}$');
     if (text.isEmpty) return 'Required';
     if (!regex.hasMatch(text)) return 'Use MM/YY';
@@ -697,6 +458,7 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   String? _validateCvv(String text) {
+    // Obrigatório em pagar e salvar (para tokenizar/vault)
     if (text.isEmpty) return 'Required';
     if (text.length < 3 || text.length > 4) return 'Invalid CVV';
     return null;
@@ -819,15 +581,7 @@ class _CardFormFFState extends State<CardFormFF> {
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       obscureText: true,
-<<<<<<< HEAD
-<<<<<<< HEAD
       obscuringCharacter: '•',
-=======
-      obscuringCharacter: '*',
->>>>>>> 10c9b5c (new frkdfm)
-=======
-      obscuringCharacter: '*',
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
         LengthLimitingTextInputFormatter(4),
@@ -857,7 +611,8 @@ class _CardFormFFState extends State<CardFormFF> {
     );
   }
 
-  InputDecoration _inputDecoration({required String hint, required IconData icon}) {
+  InputDecoration _inputDecoration(
+      {required String hint, required IconData icon}) {
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: Colors.black),
@@ -911,7 +666,8 @@ class _CardFormFFState extends State<CardFormFF> {
               ? const SizedBox(
                   width: 22,
                   height: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.black),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2.4, color: Colors.black),
                 )
               : Text(
                   label,
@@ -936,15 +692,7 @@ class _CardFormFFState extends State<CardFormFF> {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
               'Secure payment via Quicky© platform.',
-=======
-              'Secure payment via Quicky platform.',
->>>>>>> 10c9b5c (new frkdfm)
-=======
-              'Secure payment via Quicky platform.',
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -1000,7 +748,7 @@ class _CardFormFFState extends State<CardFormFF> {
                 _pillButton(
                   label: 'Close',
                   onTap: () async {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // fecha o sheet de sucesso
                   },
                 ),
               ],
@@ -1034,19 +782,11 @@ class _CardFormFFState extends State<CardFormFF> {
                 const Icon(Icons.error_outline, color: Colors.red, size: 36),
                 const SizedBox(height: 12),
                 Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
                   'We couldn’t process your payment.',
-=======
-                  'We could not process your payment.',
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                  'We could not process your payment.',
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1077,6 +817,7 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   Future<void> _dismiss() async {
+    // Fecha o BottomSheet pai (onde o formulário está)
     if (Navigator.canPop(context)) {
       Navigator.of(context).pop();
     }
@@ -1088,10 +829,9 @@ class _CardFormFFState extends State<CardFormFF> {
     bool isProd = false,
   }) async {
     try {
-<<<<<<< HEAD
-<<<<<<< HEAD
       final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
-      final name = isProd ? 'processBraintreePayment' : 'processBraintreeTestPayment';
+      final name =
+          isProd ? 'processBraintreePayment' : 'processBraintreeTestPayment';
       final callable = functions.httpsCallable(name);
 
       final resp = await callable.call(<String, dynamic>{
@@ -1100,49 +840,6 @@ class _CardFormFFState extends State<CardFormFF> {
       });
 
       final data = Map<String, dynamic>.from(resp.data as Map);
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      final regions = <String>['us-central1', 'southamerica-east1', 'us-east1', 'europe-west1'];
-      final name = isProd ? 'processBraintreePayment' : 'processBraintreeTestPayment';
-
-      Future<HttpsCallableResult<dynamic>> callOn(FirebaseFunctions fns, String n) async {
-        return await fns.httpsCallable(n).call(<String, dynamic>{
-          'amount': amount.toStringAsFixed(2),
-          'paymentNonce': paymentNonce,
-        });
-      }
-
-      HttpsCallableResult<dynamic>? resp;
-      final alt = isProd ? 'processBraintreeTestPayment' : 'processBraintreePayment';
-      FirebaseFunctionsException? lastErr;
-      for (final region in regions) {
-        final fns = FirebaseFunctions.instanceFor(region: region);
-        try {
-          resp = await callOn(fns, name);
-          break;
-        } on FirebaseFunctionsException catch (e1) {
-          lastErr = e1;
-          if (e1.code == 'not-found') {
-            try {
-              resp = await callOn(fns, alt);
-              break;
-            } on FirebaseFunctionsException catch (e2) {
-              lastErr = e2;
-              continue;
-            }
-          } else {
-            continue;
-          }
-        }
-      }
-      if (resp == null && lastErr != null) { throw lastErr!; }
-
-      final data = Map<String, dynamic>.from(resp!.data as Map);
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       return PaymentResponse(transactionId: data['transactionId'] as String?);
     } on FirebaseFunctionsException catch (e) {
       final parts = <String>[];
@@ -1153,15 +850,7 @@ class _CardFormFFState extends State<CardFormFF> {
         parts.add(e.details.toString().trim());
       }
       parts.add('CODE: ${e.code.toUpperCase()}');
-<<<<<<< HEAD
-<<<<<<< HEAD
       final msg = parts.join(' · ');
-=======
-      final msg = parts.join(' • ');
->>>>>>> 10c9b5c (new frkdfm)
-=======
-      final msg = parts.join(' • ');
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       if (kDebugPayments) {
         debugPrint('[PAY][FunctionsException] $msg');
       }
@@ -1177,8 +866,6 @@ class _CardFormFFState extends State<CardFormFF> {
     bool isProd = false,
   }) async {
     try {
-<<<<<<< HEAD
-<<<<<<< HEAD
       final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
       final name = isProd ? 'savePaymentMethod' : 'savePaymentMethodTest';
       final callable = functions.httpsCallable(name);
@@ -1189,50 +876,6 @@ class _CardFormFFState extends State<CardFormFF> {
       });
 
       final data = Map<String, dynamic>.from(resp.data as Map);
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      final regions = <String>['us-central1', 'southamerica-east1', 'us-east1', 'europe-west1'];
-      final name = isProd ? 'savePaymentMethod' : 'savePaymentMethodTest';
-      final payload = <String, dynamic>{
-        'nonce': nonce,
-        'customerId': 'u_${FirebaseAuth.instance.currentUser?.uid}',
-      };
-
-      Future<HttpsCallableResult<dynamic>> callOn(FirebaseFunctions fns, String n) async {
-        return await fns.httpsCallable(n).call(payload);
-      }
-
-      HttpsCallableResult<dynamic>? resp;
-      final alt = isProd ? 'savePaymentMethodTest' : 'savePaymentMethod';
-      FirebaseFunctionsException? lastErr;
-      for (final region in regions) {
-        final fns = FirebaseFunctions.instanceFor(region: region);
-        try {
-          resp = await callOn(fns, name);
-          break;
-        } on FirebaseFunctionsException catch (e1) {
-          lastErr = e1;
-          if (e1.code == 'not-found') {
-            try {
-              resp = await callOn(fns, alt);
-              break;
-            } on FirebaseFunctionsException catch (e2) {
-              lastErr = e2;
-              continue;
-            }
-          } else {
-            continue;
-          }
-        }
-      }
-      if (resp == null && lastErr != null) { throw lastErr!; }
-
-      final data = Map<String, dynamic>.from(resp!.data as Map);
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       return SaveMethodResponse(
         token: data['token'] as String?,
         last4: data['last4'] as String?,
@@ -1247,15 +890,7 @@ class _CardFormFFState extends State<CardFormFF> {
         parts.add(e.details.toString().trim());
       }
       parts.add('CODE: ${e.code.toUpperCase()}');
-<<<<<<< HEAD
-<<<<<<< HEAD
       final msg = parts.join(' · ');
-=======
-      final msg = parts.join(' • ');
->>>>>>> 10c9b5c (new frkdfm)
-=======
-      final msg = parts.join(' • ');
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       if (kDebugPayments) {
         debugPrint('[SAVE][FunctionsException] $msg');
       }
@@ -1267,15 +902,7 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 // ====== Formatadores ======
-=======
-// ====== Formatters ======
->>>>>>> 10c9b5c (new frkdfm)
-=======
-// ====== Formatters ======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 class _CardNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -1338,17 +965,9 @@ String _friendlyBraintreeError(Object e) {
       return 'Network error while tokenizing. Check your connection and try again.';
     }
     if (msg.contains('authorization') || msg.contains('invalid token')) {
-      return 'Invalid/incompatible tokenization key. Use a sandbox_* key from the same merchant as your server.';
+      return 'Invalid/incompatible tokenization key. Use a sandbox_ key from the same merchant as your server.';
     }
     return e.message ?? e.code;
   }
   return e.toString();
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> 10c9b5c (new frkdfm)
-=======
-
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be

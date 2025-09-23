@@ -64,8 +64,11 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
+                logFirebaseEvent('NAVBAR_COMP_gift_ICN_ON_TAP');
+                logFirebaseEvent('IconButton_update_app_state');
                 FFAppState().pagesNavBar = 'rewards';
                 safeSetState(() {});
+                logFirebaseEvent('IconButton_navigate_to');
 
                 context.goNamed(
                   Rewards13Widget.routeName,
@@ -90,8 +93,11 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
+                logFirebaseEvent('NAVBAR_COMP_calendarDay_ICN_ON_TAP');
+                logFirebaseEvent('IconButton_update_app_state');
                 FFAppState().pagesNavBar = 'calendar';
                 safeSetState(() {});
+                logFirebaseEvent('IconButton_navigate_to');
 
                 context.goNamed(
                   ScheduleRide14Widget.routeName,
@@ -111,8 +117,11 @@ class _NavbarWidgetState extends State<NavbarWidget> {
               hoverColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onTap: () async {
+                logFirebaseEvent('NAVBAR_COMP_Stack_60rgcvir_ON_TAP');
+                logFirebaseEvent('Stack_update_app_state');
                 FFAppState().pagesNavBar = 'home';
                 safeSetState(() {});
+                logFirebaseEvent('Stack_navigate_to');
 
                 context.goNamed(
                   Home5Widget.routeName,
@@ -174,8 +183,11 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
+                logFirebaseEvent('NAVBAR_COMP_fileInvoice_ICN_ON_TAP');
+                logFirebaseEvent('IconButton_update_app_state');
                 FFAppState().pagesNavBar = 'activity';
                 safeSetState(() {});
+                logFirebaseEvent('IconButton_navigate_to');
 
                 context.goNamed(
                   Activity20Widget.routeName,
@@ -200,8 +212,11 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                 size: 24.0,
               ),
               onPressed: () async {
+                logFirebaseEvent('NAVBAR_COMP_solidUserCircle_ICN_ON_TAP');
+                logFirebaseEvent('IconButton_update_app_state');
                 FFAppState().pagesNavBar = 'profile';
                 safeSetState(() {});
+                logFirebaseEvent('IconButton_navigate_to');
 
                 context.goNamed(
                   Profile15Widget.routeName,

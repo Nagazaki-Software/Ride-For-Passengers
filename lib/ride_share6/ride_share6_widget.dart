@@ -3,42 +3,10 @@ import '/backend/backend.dart';
 import '/components/share_q_r_code_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/custom_code/widgets/index.dart' as custom_widgets;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-import 'dart:async';                       // NOVO
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';    // NOVO (Clipboard)
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-=======
-import '/index.dart';
-
-import 'dart:async'; // NOVO
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // NOVO (Clipboard)
-import 'package:flutter/foundation.dart'; // kIsWeb
-import 'package:share_plus/share_plus.dart';
-import '/flutter_flow/custom_functions.dart' as functions;
-import 'package:google_fonts/google_fonts.dart';
->>>>>>> 10c9b5c (new frkdfm)
-=======
-import '/index.dart';
-
-import 'dart:async'; // NOVO
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // NOVO (Clipboard)
-import 'package:flutter/foundation.dart'; // kIsWeb
-import 'package:share_plus/share_plus.dart';
-import '/flutter_flow/custom_functions.dart' as functions;
-import 'package:google_fonts/google_fonts.dart';
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-
 import 'ride_share6_model.dart';
 export 'ride_share6_model.dart';
 
@@ -54,358 +22,24 @@ class RideShare6Widget extends StatefulWidget {
 
 class _RideShare6WidgetState extends State<RideShare6Widget> {
   late RideShare6Model _model;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // --- Estado adicional ---
-  StreamSubscription<DocumentSnapshot>? _sessionSub;
-  List<DocumentReference> _participants = [];
-  double _totalFare = 19.50; // fallback local; será sobrescrito pelo Firestore
-  Map<String, double> _shares = {}; // uid -> valor $
-  String _splitType = 'equal';
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  String _activeShareTab = 'invite'; // invite|qr|link
->>>>>>> 10c9b5c (new frkdfm)
-=======
-  String _activeShareTab = 'invite'; // invite|qr|link
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => RideShare6Model());
 
-    // Tenta juntar pela URL (ex.: ride://.../rideShare6?join=<rideId>)
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _maybeJoinByLink();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-      // Carrega tarifa com base nos pontos da Home5
-      await _preloadFareFromHome();
->>>>>>> 10c9b5c (new frkdfm)
-=======
-      // Carrega tarifa com base nos pontos da Home5
-      await _preloadFareFromHome();
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      if (_model.session != null) {
-        _subscribeToSession(_model.session!);
-      }
-    });
+    logFirebaseEvent('screen_view', parameters: {'screen_name': 'RideShare6'});
   }
 
   @override
   void dispose() {
-    _sessionSub?.cancel();
     _model.dispose();
+
     super.dispose();
   }
 
-  // ===================== FUNÇÕES CORE =====================
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-  Future<void> _preloadFareFromHome() async {
-    try {
-      final o = FFAppState().latlngAtual;
-      final d = FFAppState().latlangAondeVaiIr;
-      if (o == null || d == null) return;
-      final hist = await queryRideOrdersRecordOnce();
-      final price = functions.mediaCorridaNesseKm(o, d, hist);
-      if (price > 0) {
-        _totalFare = double.parse(price.toStringAsFixed(2));
-        if (mounted) setState(() {});
-      }
-    } catch (_) {}
-  }
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-
-  /// Cria sessão (doc em rideOrders) se ainda não existir.
-  Future<void> _createSessionIfNeeded() async {
-    if (_model.session != null) return;
-
-    final docRef = RideOrdersRecord.collection.doc();
-    final now = DateTime.now();
-    await docRef.set({
-      ...createRideOrdersRecordData(
-        rideShare: true,
-      ),
-      'hostRef': currentUserReference,
-      'participantes': [currentUserReference],
-<<<<<<< HEAD
-<<<<<<< HEAD
-      'totalFare': _totalFare,   // se você calcula em outro lugar, escreva lá
-=======
-      'totalFare': _totalFare, // se você calcula em outro lugar, escreva lá
->>>>>>> 10c9b5c (new frkdfm)
-=======
-      'totalFare': _totalFare, // se você calcula em outro lugar, escreva lá
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      'splitType': 'equal',
-      'customShares': <String, num>{},
-      'isOpen': true,
-      'createdAt': now,
-      'updatedAt': now,
-    });
-
-    _model.session = docRef;
-    _subscribeToSession(docRef);
-  }
-
-  /// Se veio com ?join=<rideId>, entra na sessão (arrayUnion + listener).
-  Future<void> _maybeJoinByLink() async {
-    final uri = GoRouterState.of(context).uri;
-    final join = uri.queryParameters['join'];
-    if (join == null || join.isEmpty) return;
-
-    final docRef = RideOrdersRecord.collection.doc(join);
-    final snap = await docRef.get();
-    if (!snap.exists) return;
-
-    _model.session = docRef;
-
-    // Adiciona participante (se ainda não está)
-    await docRef.update({
-      'participantes': FieldValue.arrayUnion([currentUserReference]),
-      'updatedAt': DateTime.now(),
-    });
-
-    _subscribeToSession(docRef);
-  }
-
-  /// Observa o doc em tempo real e recalcula shares/participantes.
-  void _subscribeToSession(DocumentReference sessionRef) {
-    _sessionSub?.cancel();
-    _sessionSub = sessionRef.snapshots().listen((doc) async {
-      if (!doc.exists) return;
-      final data = doc.data() as Map<String, dynamic>;
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-      final List<dynamic> refsDyn = (data['participantes'] ?? []) as List<dynamic>;
-      _participants = refsDyn.whereType<DocumentReference>().toList();
-
-      _totalFare = (data['totalFare'] is num) ? (data['totalFare'] as num).toDouble() : _totalFare;
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      final List<dynamic> refsDyn =
-          (data['participantes'] ?? []) as List<dynamic>;
-      _participants = refsDyn.whereType<DocumentReference>().toList();
-
-      _totalFare = (data['totalFare'] is num)
-          ? (data['totalFare'] as num).toDouble()
-          : _totalFare;
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      _splitType = (data['splitType'] as String?) ?? 'equal';
-      final Map<String, dynamic> customShares =
-          (data['customShares'] as Map<String, dynamic>?) ?? {};
-
-      _recalculateShares(
-        splitType: _splitType,
-<<<<<<< HEAD
-<<<<<<< HEAD
-        customShares: customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
-=======
-        customShares:
-            customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        customShares:
-            customShares.map((k, v) => MapEntry(k, (v as num).toDouble())),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      );
-
-      if (mounted) setState(() {});
-    });
-  }
-
-  /// Divide valores conforme splitType (equal ou custom).
-  void _recalculateShares({
-    required String splitType,
-    required Map<String, double> customShares,
-  }) {
-    _shares = {};
-    if (_participants.isEmpty) return;
-
-    if (splitType == 'equal') {
-      final each = (_totalFare / _participants.length);
-      for (final ref in _participants) {
-        _shares[ref.id] = double.parse(each.toStringAsFixed(2));
-      }
-    } else {
-      // 'custom' — assume que customShares soma ~100 (%). Fazemos uma normalização defensiva.
-      final sum = customShares.values.fold<double>(0, (a, b) => a + b);
-      final safeSum = sum == 0 ? 100.0 : sum;
-      for (final ref in _participants) {
-        final pct = customShares[ref.id] ?? 0.0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-        _shares[ref.id] = double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
-=======
-        _shares[ref.id] =
-            double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        _shares[ref.id] =
-            double.parse(((_totalFare * (pct / safeSum))).toStringAsFixed(2));
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      }
-    }
-  }
-
-  /// Gera o link de convite com ?join=<rideId>
-<<<<<<< HEAD
-<<<<<<< HEAD
-  String _inviteLink() {
-    final basePath = GoRouterState.of(context).uri.path; // /rideShare6
-    final id = _model.session!.id;
-    return 'ride://ride.com$basePath?join=$id';
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-  ///
-  /// Em web: usa o host atual. Em mobile: usa um host HTTPS estável
-  /// (ajuste para o domínio do seu app quando tiver).
-  String _inviteLink() {
-    final id = _model.session!.id;
-    final path = RideShare6Widget.routePath; // "/rideShare6"
-    final uri = kIsWeb
-        ? Uri(
-            scheme: Uri.base.scheme,
-            host: Uri.base.host,
-            port: Uri.base.hasPort ? Uri.base.port : null,
-            path: path,
-            queryParameters: {'join': id},
-          )
-        : Uri(
-            scheme: 'https',
-            host: 'ride-bahamas.web.app', // TODO: troque pelo domínio real
-            path: path,
-            queryParameters: {'join': id},
-          );
-    return uri.toString();
-  }
-
-  Future<void> _shareInvite() async {
-    await _createSessionIfNeeded();
-    final link = _inviteLink();
-    await Share.share('Join my ride: $link');
-    setState(() => _activeShareTab = 'invite');
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-  }
-
-  /// Copia link de convite
-  Future<void> _copyInviteLink() async {
-    await _createSessionIfNeeded();
-    final link = _inviteLink();
-    await Clipboard.setData(ClipboardData(text: link));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Link copiado: $link')),
-    );
-  }
-
-  /// Abre o bottom sheet do QR já passando o link certo.
-  Future<void> _openQR() async {
-    await _createSessionIfNeeded();
-    final ref = _model.session!;
-    final link = _inviteLink();
-
-    await showModalBottomSheet(
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      enableDrag: false,
-      context: context,
-      builder: (context) {
-        return GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: Padding(
-            padding: MediaQuery.viewInsetsOf(context),
-            child: ShareQRCodeWidget(
-              rideDoc: ref,
-              linkCurrentPage: link, // <<<<<<<<<<<<<<<<<<<<<<<< link correto
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  /// Helper: avatar do participante (pega nome no UsersRecord)
-  Widget _participantAvatar(DocumentReference userRef) {
-    return StreamBuilder<UsersRecord>(
-      stream: UsersRecord.getDocument(userRef),
-      builder: (context, snapshot) {
-        final user = snapshot.data;
-        final initials = (user?.displayName ?? '??')
-            .trim()
-            .split(RegExp(r'\s+'))
-            .map((p) => p.isNotEmpty ? p[0] : '')
-            .take(2)
-            .join()
-            .toUpperCase();
-        return Container(
-          width: 34,
-          height: 34,
-          decoration: const BoxDecoration(
-            color: Color(0xA5414141),
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            initials,
-            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                  font: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-                    fontStyle:
-                        FlutterFlowTheme.of(context).bodyMedium.fontStyle,
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                    fontStyle:
-                        FlutterFlowTheme.of(context).bodyMedium.fontStyle,
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                  ),
-                  color: FlutterFlowTheme.of(context).alternate,
-                  fontSize: 12,
-                  letterSpacing: 0.2,
-                  fontWeight: FontWeight.w600,
-                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                ),
-          ),
-        );
-      },
-    );
-  }
-
-  double _myShare() {
-    final uid = currentUserReference?.id;
-    if (uid == null) return 0;
-    return _shares[uid] ?? 0;
-  }
-
-  String _totalFareText() => '\$${_totalFare.toStringAsFixed(2)}';
-  String _myShareText() => '\$${_myShare().toStringAsFixed(2)}';
-
-  // ===================== UI =====================
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -419,206 +53,169 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
         body: Stack(
           children: [
             Align(
-              alignment: const AlignmentDirectional(0, 0),
+              alignment: AlignmentDirectional(0.0, 0.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 28, 0, 0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Align(
-                          alignment: const AlignmentDirectional(1, 0),
-                          child: Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                            padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
-                            child: Text(
-                              _model.session != null ? 'Session started' : 'Session not started',
-                              style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.poppins(
-                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 0, 12, 0),
-                            child: Text(
-                              _model.session != null
-                                  ? 'Session started'
-                                  : 'Session not started',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    font: GoogleFonts.poppins(
+                  Flexible(
+                    child: Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(0.0, 35.0, 0.0, 0.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Align(
+                            alignment: AlignmentDirectional(1.0, 0.0),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 12.0, 0.0),
+                              child: Text(
+                                _model.session != null
+                                    ? 'Session started'
+                                    : 'Session not started',
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
+                                      ),
+                                      color: _model.session != null
+                                          ? FlutterFlowTheme.of(context)
+                                              .secondary
+                                          : FlutterFlowTheme.of(context).error,
+                                      letterSpacing: 0.0,
                                       fontWeight: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .fontWeight,
                                       fontStyle: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .fontStyle,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                     ),
-                                    color: _model.session != null
-                                        ? FlutterFlowTheme.of(context).secondary
-                                        : FlutterFlowTheme.of(context).error,
-                                    letterSpacing: 0.0,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Align(
+                                alignment: AlignmentDirectional(0.0, 0.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Align(
+                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          logFirebaseEvent(
+                                              'RIDE_SHARE6_PAGE_Text_kb4kxix4_ON_TAP');
+                                          logFirebaseEvent(
+                                              'Text_navigate_back');
+                                          context.safePop();
+                                        },
+                                        child: Text(
+                                          FFLocalizations.of(context).getText(
+                                            'c2ku81ov' /* Ride Share */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                fontSize: 22.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            FFLocalizations.of(context).getText(
+                              'vd485i7w' /* Invite riders to split the far... */,
+                            ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
                                     fontWeight: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .fontWeight,
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .fontStyle,
->>>>>>> 10c9b5c (new frkdfm)
                                   ),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Align(
-                              alignment: const AlignmentDirectional(0, 0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Align(
-                                    alignment: const AlignmentDirectional(0, 0),
-                                    child: Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                      FFLocalizations.of(context).getText('c2ku81ov' /* Ride Share */),
-                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                            font: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context).alternate,
-                                            fontSize: 22,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                      FFLocalizations.of(context)
-                                          .getText('c2ku81ov' /* Ride Share */),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(context)
-                                                .alternate,
-                                            fontSize: 22,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          FFLocalizations.of(context).getText('vd485i7w' /* Invite riders to split the far... */),
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                          FFLocalizations.of(context).getText(
-                              'vd485i7w' /* Invite riders to split the far... */),
-                          style: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .override(
->>>>>>> 10c9b5c (new frkdfm)
-                                font: GoogleFonts.poppins(
-                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryText,
+                                  fontSize: 10.0,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
                                 ),
-<<<<<<< HEAD
-                                color: FlutterFlowTheme.of(context).secondaryText,
-=======
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                fontSize: 10,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                              ),
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-
-                  // ====== BLOCO: Invite / Link / QR ======
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     child: Container(
-                      width: MediaQuery.sizeOf(context).width,
+                      width: MediaQuery.sizeOf(context).width * 1.0,
                       decoration: BoxDecoration(
                         color: FlutterFlowTheme.of(context).primaryText,
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            blurRadius: 1,
+                            blurRadius: 1.0,
                             color: Color(0x33000000),
-                            offset: Offset(0, 1),
+                            offset: Offset(
+                              0.0,
+                              1.0,
+                            ),
                           )
                         ],
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8)),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(8.0),
+                          bottomRight: Radius.circular(8.0),
+                          topLeft: Radius.circular(8.0),
+                          topRight: Radius.circular(8.0),
+                        ),
                       ),
                       child: Padding(
                         padding:
-                            const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                            EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 0.0, 8.0),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -626,86 +223,47 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-<<<<<<< HEAD
-<<<<<<< HEAD
                                 Container(
-                                  width: 124,
-                                  height: 26,
+                                  width: 124.0,
+                                  height: 26.0,
                                   decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context).alternate,
-                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                                  ),
-                                  alignment: const AlignmentDirectional(0, 0),
-                                  child: Text(
-                                    FFLocalizations.of(context).getText('5dxw36ml' /* Invite friends */),
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          font: GoogleFonts.poppins(
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                InkWell(
-                                  onTap: _shareInvite,
-                                  child: Container(
-                                    width: 124,
-                                    height: 26,
-                                    decoration: BoxDecoration(
-                                      color: _activeShareTab == 'invite'
-                                          ? FlutterFlowTheme.of(context)
-                                              .alternate
-                                          : const Color(0xA5414141),
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(8)),
+                                    color:
+                                        FlutterFlowTheme.of(context).alternate,
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(8.0),
+                                      bottomRight: Radius.circular(8.0),
+                                      topLeft: Radius.circular(8.0),
+                                      topRight: Radius.circular(8.0),
                                     ),
-                                    alignment: const AlignmentDirectional(0, 0),
-                                    child: Text(
-                                      FFLocalizations.of(context).getText(
-                                          '5dxw36ml' /* Invite friends */),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            fontSize: 10,
-                                            letterSpacing: 0.0,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                                  ),
+                                  alignment: AlignmentDirectional(0.0, 0.0),
+                                  child: Text(
+                                    FFLocalizations.of(context).getText(
+                                      '5dxw36ml' /* Invite friends */,
+                                    ),
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          font: GoogleFonts.poppins(
                                             fontWeight: FontWeight.bold,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
                                           ),
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                          fontSize: 10,
+                                          fontSize: 10.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.bold,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
                                         ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
-=======
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 10, 0),
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 10, 0),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 10.0, 0.0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -715,96 +273,135 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                         focusColor: Colors.transparent,
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                        onTap: _openQR,
+                                        onTap: () async {
+                                          logFirebaseEvent(
+                                              'RIDE_SHARE6_Container_zffm535q_ON_TAP');
+                                          if (_model.session != null) {
+                                            logFirebaseEvent(
+                                                'Container_bottom_sheet');
+                                            await showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              enableDrag: false,
+                                              context: context,
+                                              builder: (context) {
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    FocusScope.of(context)
+                                                        .unfocus();
+                                                    FocusManager
+                                                        .instance.primaryFocus
+                                                        ?.unfocus();
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        MediaQuery.viewInsetsOf(
+                                                            context),
+                                                    child: ShareQRCodeWidget(
+                                                      rideDoc: _model.session!,
+                                                      linkCurrentPage:
+                                                          'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ).then(
+                                                (value) => safeSetState(() {}));
+                                          } else {
+                                            logFirebaseEvent(
+                                                'Container_backend_call');
+
+                                            var rideOrdersRecordReference =
+                                                RideOrdersRecord.collection
+                                                    .doc();
+                                            await rideOrdersRecordReference
+                                                .set({
+                                              ...createRideOrdersRecordData(
+                                                rideShare: true,
+                                              ),
+                                              ...mapToFirestore(
+                                                {
+                                                  'participantes': [
+                                                    currentUserReference
+                                                  ],
+                                                },
+                                              ),
+                                            });
+                                            _model.rideOrderQR =
+                                                RideOrdersRecord
+                                                    .getDocumentFromData({
+                                              ...createRideOrdersRecordData(
+                                                rideShare: true,
+                                              ),
+                                              ...mapToFirestore(
+                                                {
+                                                  'participantes': [
+                                                    currentUserReference
+                                                  ],
+                                                },
+                                              ),
+                                            }, rideOrdersRecordReference);
+                                            logFirebaseEvent(
+                                                'Container_update_page_state');
+                                            _model.session =
+                                                _model.rideOrderQR?.reference;
+                                            safeSetState(() {});
+                                            logFirebaseEvent(
+                                                'Container_bottom_sheet');
+                                            await showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              enableDrag: false,
+                                              context: context,
+                                              builder: (context) {
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    FocusScope.of(context)
+                                                        .unfocus();
+                                                    FocusManager
+                                                        .instance.primaryFocus
+                                                        ?.unfocus();
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        MediaQuery.viewInsetsOf(
+                                                            context),
+                                                    child: ShareQRCodeWidget(
+                                                      rideDoc: _model
+                                                          .rideOrderQR!
+                                                          .reference,
+                                                      linkCurrentPage:
+                                                          'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ).then(
+                                                (value) => safeSetState(() {}));
+                                          }
+
+                                          safeSetState(() {});
+                                        },
                                         child: Container(
-                                          width: 64,
-                                          height: 26,
-                                          decoration: const BoxDecoration(
+                                          width: 64.0,
+                                          height: 26.0,
+                                          decoration: BoxDecoration(
                                             color: Color(0x89414141),
-                                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                                            borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(8.0),
+                                              bottomRight: Radius.circular(8.0),
+                                              topLeft: Radius.circular(8.0),
+                                              topRight: Radius.circular(8.0),
+                                            ),
                                           ),
-                                          alignment: const AlignmentDirectional(0, 0),
-                                          child: Text(
-                                            FFLocalizations.of(context).getText('9ensgtkt' /* QR */),
-                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(context).secondaryText,
-                                                  fontSize: 10,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                          ),
-                                        ),
-                                      ),
-                                      InkWell(
-                                        onTap: _copyInviteLink,
-                                        child: Container(
-                                          width: 64,
-                                          height: 26,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xA8414141),
-                                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                                          ),
-                                          alignment: const AlignmentDirectional(0, 0),
-                                          child: Text(
-                                            FFLocalizations.of(context).getText('yglrvlqu' /* Link */),
-                                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(context).secondaryText,
-                                                  fontSize: 10,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                          ),
-                                        ),
-=======
-                                        onTap: () async {
-                                          await _openQR();
-                                          setState(() => _activeShareTab = 'qr');
-                                        },
-                                        child: Container(
-                                          width: 64,
-                                          height: 26,
-                                          decoration: BoxDecoration(
-                                            color: _activeShareTab == 'qr'
-                                                ? FlutterFlowTheme.of(context)
-                                                    .alternate
-                                                : const Color(0x89414141),
-                                            borderRadius: const BorderRadius.all(
-                                                Radius.circular(8)),
-                                          ),
-=======
-                                        onTap: () async {
-                                          await _openQR();
-                                          setState(() => _activeShareTab = 'qr');
-                                        },
-                                        child: Container(
-                                          width: 64,
-                                          height: 26,
-                                          decoration: BoxDecoration(
-                                            color: _activeShareTab == 'qr'
-                                                ? FlutterFlowTheme.of(context)
-                                                    .alternate
-                                                : const Color(0x89414141),
-                                            borderRadius: const BorderRadius.all(
-                                                Radius.circular(8)),
-                                          ),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                           alignment:
-                                              const AlignmentDirectional(0, 0),
+                                              AlignmentDirectional(0.0, 0.0),
                                           child: Text(
-                                            FFLocalizations.of(context)
-                                                .getText('9ensgtkt' /* QR */),
+                                            FFLocalizations.of(context).getText(
+                                              '9ensgtkt' /* QR */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -819,7 +416,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                   color: FlutterFlowTheme.of(
                                                           context)
                                                       .secondaryText,
-                                                  fontSize: 10,
+                                                  fontSize: 10.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
@@ -831,43 +428,28 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                           ),
                                         ),
                                       ),
-                                      InkWell(
-                                        onTap: () async {
-                                          await _copyInviteLink();
-                                          setState(() => _activeShareTab = 'link');
-                                        },
-                                        child: Container(
-                                          width: 64,
-                                          height: 26,
-                                          decoration: BoxDecoration(
-                                            color: _activeShareTab == 'link'
-                                                ? FlutterFlowTheme.of(context)
-                                                    .alternate
-                                                : const Color(0xA8414141),
-                                            borderRadius: const BorderRadius.all(
-                                                Radius.circular(8)),
+                                      Container(
+                                        width: 64.0,
+                                        height: 26.0,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xA8414141),
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(8.0),
+                                            bottomRight: Radius.circular(8.0),
+                                            topLeft: Radius.circular(8.0),
+                                            topRight: Radius.circular(8.0),
                                           ),
-                                          alignment:
-                                              const AlignmentDirectional(0, 0),
-                                          child: Text(
-                                            FFLocalizations.of(context)
-                                                .getText('yglrvlqu' /* Link */),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryText,
-                                                  fontSize: 10,
-                                                  letterSpacing: 0.0,
+                                        ),
+                                        alignment:
+                                            AlignmentDirectional(0.0, 0.0),
+                                        child: Text(
+                                          FFLocalizations.of(context).getText(
+                                            'yglrvlqu' /* Link */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
                                                   fontWeight: FontWeight.w600,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
@@ -875,91 +457,79 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                           .bodyMedium
                                                           .fontStyle,
                                                 ),
-                                          ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                                fontSize: 10.0,
+                                                letterSpacing: 0.0,
+                                                fontWeight: FontWeight.w600,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+                                              ),
                                         ),
->>>>>>> 10c9b5c (new frkdfm)
                                       ),
-                                    ].divide(const SizedBox(width: 30)),
+                                    ].divide(SizedBox(width: 30.0)),
                                   ),
                                 ),
                               ],
                             ),
-                            // resto do bloco (switch etc.) mantido...
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                  padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 4.0, 0.0, 0.0),
                                   child: Text(
-                                    FFLocalizations.of(context).getText('wme97if5' /* Auto-match nearby riders */),
-                                    style: FlutterFlowTheme.of(context).bodyLarge.override(
-=======
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 4, 0, 0),
-                                  child: Text(
-=======
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 4, 0, 0),
-                                  child: Text(
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                     FFLocalizations.of(context).getText(
-                                        'wme97if5' /* Auto-match nearby riders */),
+                                      'wme97if5' /* Auto-match nearby riders */,
+                                    ),
                                     style: FlutterFlowTheme.of(context)
                                         .bodyLarge
                                         .override(
->>>>>>> 10c9b5c (new frkdfm)
                                           font: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w500,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyLarge.fontStyle,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyLarge
+                                                    .fontStyle,
                                           ),
-<<<<<<< HEAD
-                                          color: FlutterFlowTheme.of(context).secondaryText,
-=======
                                           color: FlutterFlowTheme.of(context)
                                               .secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                          fontSize: 10,
+                                          fontSize: 10.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyLarge.fontStyle,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyLarge
+                                                  .fontStyle,
                                         ),
                                   ),
                                 ),
                               ],
                             ),
                             Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                              padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
-=======
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 12, 0),
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  0, 0, 12, 0),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 12.0, 0.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.max,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        SizedBox(
-                                          width: 50,
-                                          height: 40,
+                                        Container(
+                                          width: 60.0,
+                                          height: 40.0,
                                           child: custom_widgets.Switchrideshare(
-                                            width: 50,
-                                            height: 40,
+                                            width: 60.0,
+                                            height: 40.0,
                                           ),
                                         ),
                                       ],
@@ -973,719 +543,426 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                       ),
                     ),
                   ),
-
-                  // ====== PARTICIPANTS ======
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           width: double.infinity,
-                          height: 66,
+                          height: 66.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(8.0),
+                            ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 0),
-=======
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8, 8, 0, 0),
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8, 8, 0, 0),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 0.0, 0.0),
                             child: Column(
+                              mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                  FFLocalizations.of(context).getText('ax3wm89h' /* Participants */),
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                  FFLocalizations.of(context)
-                                      .getText('ax3wm89h' /* Participants */),
+                                  FFLocalizations.of(context).getText(
+                                    'ax3wm89h' /* Participants */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
->>>>>>> 10c9b5c (new frkdfm)
                                         font: GoogleFonts.poppins(
                                           fontWeight: FontWeight.normal,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
                                         ),
-<<<<<<< HEAD
-                                        color: FlutterFlowTheme.of(context).secondaryText,
-=======
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        fontSize: 10,
+                                        fontSize: 10.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
                                       ),
                                 ),
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                Row(
-                                  children: _participants.isEmpty
-                                      ? [
-                                          // placeholders se vazio
-                                          Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xA5414141), shape: BoxShape.circle)),
-                                          const SizedBox(width: 8),
-                                          Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xA5414141), shape: BoxShape.circle)),
-                                          const SizedBox(width: 8),
-                                          Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0xA5414141), shape: BoxShape.circle)),
-                                        ]
-                                      : _participants.map((ref) => Padding(
-                                            padding: const EdgeInsets.only(right: 8),
-                                            child: _participantAvatar(ref),
-                                          )).toList(),
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 250),
-                                  child: Row(
-                                    key: ValueKey(_participants.length),
-                                    children: _participants.isEmpty
-                                        ? [
-                                            // placeholders se vazio
-                                            Container(
-                                                width: 34,
-                                                height: 34,
-                                                decoration: const BoxDecoration(
-                                                    color: Color(0xA5414141),
-                                                    shape: BoxShape.circle)),
-                                            const SizedBox(width: 8),
-                                            Container(
-                                                width: 34,
-                                                height: 34,
-                                                decoration: const BoxDecoration(
-                                                    color: Color(0xA5414141),
-                                                    shape: BoxShape.circle)),
-                                            const SizedBox(width: 8),
-                                            Container(
-                                                width: 34,
-                                                height: 34,
-                                                decoration: const BoxDecoration(
-                                                    color: Color(0xA5414141),
-                                                    shape: BoxShape.circle)),
-                                          ]
-                                        : _participants
-                                            .map((ref) => Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      right: 8),
-                                                  child: _participantAvatar(ref),
-                                                ))
-                                            .toList(),
-                                  ),
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                                StreamBuilder<RideOrdersRecord>(
+                                  stream: RideOrdersRecord.getDocument(
+                                      _model.rideOrderQR!.reference),
+                                  builder: (context, snapshot) {
+                                    // Customize what your widget looks like when it's loading.
+                                    if (!snapshot.hasData) {
+                                      return Center(
+                                        child: SizedBox(
+                                          width: 50.0,
+                                          height: 50.0,
+                                          child: SpinKitDoubleBounce(
+                                            color: FlutterFlowTheme.of(context)
+                                                .accent1,
+                                            size: 50.0,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    final rowRideOrdersRecord = snapshot.data!;
+
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Container(
+                                          width: 34.0,
+                                          height: 34.0,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xA5414141),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                width: 200.0,
+                                                height: 200.0,
+                                                clipBehavior: Clip.antiAlias,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Image.network(
+                                                  'https://picsum.photos/seed/744/600',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Text(
+                                                FFLocalizations.of(context)
+                                                    .getText(
+                                                  '0flx0fil' /* Hello World */,
+                                                ),
+                                                style: FlutterFlowTheme.of(
+                                                        context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontWeight,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontStyle,
+                                                      ),
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 34.0,
+                                          height: 34.0,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xA5414141),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 34.0,
+                                          height: 34.0,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xA5414141),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      ].divide(SizedBox(width: 8.0)),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
                           ),
                         ),
                         Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              2.0, 0.0, 0.0, 0.0),
                           child: Text(
-                            FFLocalizations.of(context).getText('niwa8eid' /* Tab to remove • “- -” are open spots */),
-                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
-                          child: Text(
-=======
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
-                          child: Text(
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                             FFLocalizations.of(context).getText(
-                                'niwa8eid' /* Tab to remove • “- -” are open spots */),
+                              'niwa8eid' /* Tab to remove • “- -“ are open... */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
->>>>>>> 10c9b5c (new frkdfm)
                                   font: GoogleFonts.poppins(
-                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
                                   ),
-<<<<<<< HEAD
-                                  color: FlutterFlowTheme.of(context).secondaryText,
-=======
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                  fontSize: 10,
+                                  fontSize: 10.0,
                                   letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
                                 ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  // ====== RIDERS SPLITTING (mantido UI). Você pode ligar botões para mudar splitType) ======
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           width: double.infinity,
-                          height: 124,
+                          height: 124.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(8.0),
+                            ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
-=======
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8, 8, 8, 8),
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8, 8, 8, 8),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 8.0, 8.0),
                             child: Column(
+                              mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                  FFLocalizations.of(context).getText('us6osckg' /* Riders splitting */),
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   FFLocalizations.of(context).getText(
-                                      'us6osckg' /* Riders splitting */),
+                                    'us6osckg' /* Riders splitting */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
->>>>>>> 10c9b5c (new frkdfm)
                                         font: GoogleFonts.poppins(
                                           fontWeight: FontWeight.normal,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
                                         ),
-<<<<<<< HEAD
-                                        color: FlutterFlowTheme.of(context).secondaryText,
-=======
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        fontSize: 10,
+                                        fontSize: 10.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
-                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
                                       ),
                                 ),
                                 Row(
+                                  mainAxisSize: MainAxisSize.max,
                                   children: [
-                                    SizedBox(
-                                      width: 100,
-                                      height: 24,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                      child: custom_widgets.Countcontrolerideshare(
-=======
+                                    Container(
+                                      width: 100.0,
+                                      height: 24.0,
                                       child:
                                           custom_widgets.Countcontrolerideshare(
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                                      child:
-                                          custom_widgets.Countcontrolerideshare(
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        width: 100,
-                                        height: 24,
+                                        width: 100.0,
+                                        height: 24.0,
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () async {
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                        if (_model.session == null) await _createSessionIfNeeded();
-=======
-                                        if (_model.session == null)
-                                          await _createSessionIfNeeded();
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                                        if (_model.session == null)
-                                          await _createSessionIfNeeded();
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        await _model.session!.update({
-                                          'splitType': 'equal',
-                                          'updatedAt': DateTime.now(),
-                                        });
-                                      },
-                                      child: Container(
-                                        width: 98,
-                                        height: 22,
-                                        decoration: BoxDecoration(
-                                          color: _splitType == 'equal'
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                              ? FlutterFlowTheme.of(context).alternate
-                                              : const Color(0xA5414141),
-                                          borderRadius: BorderRadius.circular(14),
+                                    Container(
+                                      width: 98.0,
+                                      height: 22.0,
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        borderRadius:
+                                            BorderRadius.circular(14.0),
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      child: Text(
+                                        FFLocalizations.of(context).getText(
+                                          'wpvhw4cs' /* Equal split */,
                                         ),
-                                        alignment: const AlignmentDirectional(0, 0),
-                                        child: Text(
-                                          FFLocalizations.of(context).getText('wpvhw4cs' /* Equal split */),
-                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                              ? FlutterFlowTheme.of(context)
-                                                  .alternate
-                                              : const Color(0xA5414141),
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                        ),
-                                        alignment:
-                                            const AlignmentDirectional(0, 0),
-                                        child: Text(
-                                          FFLocalizations.of(context).getText(
-                                              'wpvhw4cs' /* Equal split */),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                                ),
-                                                fontSize: 10,
-                                                letterSpacing: 0.0,
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.poppins(
                                                 fontWeight: FontWeight.w600,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        // Exemplo simples: seta "custom" e deixa você editar depois
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                        if (_model.session == null) await _createSessionIfNeeded();
-=======
-                                        if (_model.session == null)
-                                          await _createSessionIfNeeded();
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                                        if (_model.session == null)
-                                          await _createSessionIfNeeded();
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        await _model.session!.update({
-                                          'splitType': 'custom',
-                                          'updatedAt': DateTime.now(),
-                                        });
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Custom % ativado. Preencha customShares no doc.')),
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Custom % ativado. Preencha customShares no doc.')),
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        );
-                                      },
-                                      child: Container(
-                                        width: 96,
-                                        height: 22,
-                                        decoration: BoxDecoration(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                          color: _splitType == 'custom' ? FlutterFlowTheme.of(context).alternate : const Color(0xA5414141),
-                                          borderRadius: BorderRadius.circular(14),
-                                        ),
-                                        alignment: const AlignmentDirectional(0, 0),
-                                        child: Text(
-                                          FFLocalizations.of(context).getText('enexrc8j' /* Custom % */),
-                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                          color: _splitType == 'custom'
-                                              ? FlutterFlowTheme.of(context)
-                                                  .alternate
-                                              : const Color(0xA5414141),
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                        ),
-                                        alignment:
-                                            const AlignmentDirectional(0, 0),
-                                        child: Text(
-                                          FFLocalizations.of(context).getText(
-                                              'enexrc8j' /* Custom % */),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                                color:
+                                                fontStyle:
                                                     FlutterFlowTheme.of(context)
-                                                        .secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                                fontSize: 10,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.w600,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                        .bodyMedium
+                                                        .fontStyle,
                                               ),
-                                        ),
+                                              fontSize: 10.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w600,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
                                       ),
                                     ),
-                                  ].divide(const SizedBox(width: 8)),
+                                    Container(
+                                      width: 96.0,
+                                      height: 22.0,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xA5414141),
+                                        borderRadius:
+                                            BorderRadius.circular(14.0),
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      child: Text(
+                                        FFLocalizations.of(context).getText(
+                                          'enexrc8j' /* Custom % */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w600,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+                                              ),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondaryText,
+                                              fontSize: 10.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w600,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                      ),
+                                    ),
+                                  ].divide(SizedBox(width: 8.0)),
                                 ),
                                 Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                  FFLocalizations.of(context).getText('nvqck3af' /* Hold 1 extra seat for your friend */),
-                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   FFLocalizations.of(context).getText(
-                                      'nvqck3af' /* Hold 1 extra seat for your friend */),
+                                    'nvqck3af' /* Hold 1 extra seat for your fri... */,
+                                  ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
->>>>>>> 10c9b5c (new frkdfm)
                                         font: GoogleFonts.poppins(
-                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
                                         ),
-<<<<<<< HEAD
-                                        color: FlutterFlowTheme.of(context).secondaryText,
-=======
                                         color: FlutterFlowTheme.of(context)
                                             .secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                        fontSize: 10,
+                                        fontSize: 10.0,
                                         letterSpacing: 0.0,
-                                        fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
                                       ),
                                 ),
-                                SizedBox(
-                                  width: 50,
-                                  height: 30,
+                                Container(
+                                  width: 50.0,
+                                  height: 30.0,
                                   child: custom_widgets.Switchriderssplitting(
-                                    width: 50,
-                                    height: 30,
+                                    width: 50.0,
+                                    height: 30.0,
                                   ),
                                 ),
-                              ].divide(const SizedBox(height: 5)),
+                              ].divide(SizedBox(height: 5.0)),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  // ====== Your share / Total ======
                   Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: MediaQuery.sizeOf(context).width,
+                          width: MediaQuery.sizeOf(context).width * 1.0,
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).primaryText,
-                            boxShadow: const [
-<<<<<<< HEAD
-<<<<<<< HEAD
-                              BoxShadow(blurRadius: 1, color: Color(0x33000000), offset: Offset(0, 1))
-                            ],
-                            borderRadius: const BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(8, 8, 0, 8),
-=======
+                            boxShadow: [
                               BoxShadow(
-                                  blurRadius: 1,
-                                  color: Color(0x33000000),
-                                  offset: Offset(0, 1))
+                                blurRadius: 1.0,
+                                color: Color(0x33000000),
+                                offset: Offset(
+                                  0.0,
+                                  1.0,
+                                ),
+                              )
                             ],
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(8.0),
+                            ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8, 8, 0, 8),
->>>>>>> 10c9b5c (new frkdfm)
-=======
-                              BoxShadow(
-                                  blurRadius: 1,
-                                  color: Color(0x33000000),
-                                  offset: Offset(0, 1))
-                            ],
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8, 8, 0, 8),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 0.0, 8.0),
                             child: Column(
+                              mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 12.0, 0.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(children: [
-                                        Text(
-                                          FFLocalizations.of(context).getText('qycpjvd7' /* Your share */),
-                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                fontSize: 10,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 12, 0),
-                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(children: [
-                                        Text(
-                                          FFLocalizations.of(context).getText(
-                                              'qycpjvd7' /* Your share */),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontWeight,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
-                                                fontSize: 10,
-                                                letterSpacing: 0.0,
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                              ),
-                                        ),
-                                      ]),
-                                      Row(children: [
-                                        Text(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                          FFLocalizations.of(context).getText('a0l4grqi' /* +3 min detour */),
-                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).alternate,
-                                                fontSize: 14,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                          FFLocalizations.of(context).getText(
-                                              'a0l4grqi' /* +3 min detour */),
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontWeight,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .alternate,
-                                                fontSize: 14,
-                                                letterSpacing: 0.0,
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                              ),
-                                        ),
-                                      ]),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                  padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 12, 0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(children: [
-                                        Text(
-                                          _myShareText(),
-                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).alternate,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                        ),
-                                      ]),
-                                      Row(children: [
-                                        Text(
-                                          'of ${_totalFareText()} total',
-                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: GoogleFonts.poppins(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                fontSize: 10,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 12, 0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(children: [
-                                        AnimatedSwitcher(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          child: Text(
-                                            _myShareText(),
-                                            key: ValueKey(_myShareText()),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'qycpjvd7' /* Your share */,
+                                            ),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -1701,10 +978,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                             .bodyMedium
                                                             .fontStyle,
                                                   ),
-                                                  color:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .alternate,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                  fontSize: 10.0,
                                                   letterSpacing: 0.0,
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
@@ -1718,15 +995,35 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                           .fontStyle,
                                                 ),
                                           ),
-                                        ),
-                                      ]),
-                                      Row(children: [
-                                        Text(
-                                          'of ${_totalFareText()} total',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.poppins(
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'a0l4grqi' /* +3 min detour */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .alternate,
+                                                  fontSize: 14.0,
+                                                  letterSpacing: 0.0,
                                                   fontWeight:
                                                       FlutterFlowTheme.of(
                                                               context)
@@ -1738,26 +1035,93 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                           .bodyMedium
                                                           .fontStyle,
                                                 ),
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryText,
-                                                fontSize: 10,
-                                                letterSpacing: 0.0,
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                              ),
-                                        ),
-                                      ]),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 12.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'm8s3ygc5' /* $6.50 */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .alternate,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text(
+                                            FFLocalizations.of(context).getText(
+                                              'j447514y' /* of $19.50 total */,
+                                            ),
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                  fontSize: 10.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1766,118 +1130,16 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                           ),
                         ),
                         Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
-                          child: Text(
-                            FFLocalizations.of(context).getText('s3y7hgro' /* Price updates if route or riders change before pickup. */),
-                            style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              2.0, 0.0, 0.0, 0.0),
                           child: Text(
                             FFLocalizations.of(context).getText(
-                                's3y7hgro' /* Price updates if route or riders change before pickup. */),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
->>>>>>> 10c9b5c (new frkdfm)
-                                  font: GoogleFonts.poppins(
-                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                  ),
-<<<<<<< HEAD
-                                  color: FlutterFlowTheme.of(context).secondaryText,
-=======
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
->>>>>>> 10c9b5c (new frkdfm)
-                                  fontSize: 10,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // ====== Privacy, Confirm, etc. (layout original) ======
-                  // ... (mantive seu bloco, sem mudanças funcionais) ...
-
-                  // Seu bloco final mantido:
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-<<<<<<< HEAD
-                      Container(
-                        width: 320,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).alternate,
-                          borderRadius: const BorderRadius.all(Radius.circular(18)),
-                        ),
-                        alignment: const AlignmentDirectional(0, 0),
-                        child: Text(
-                          FFLocalizations.of(context).getText('ntglhxb6' /* Confirm Ride Share */),
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                font: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                ),
-                                color: FlutterFlowTheme.of(context).primary,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                              ),
-=======
-                      InkWell(
-                        onTap: () async {
-                          // Garante sessão criada
-                          await _createSessionIfNeeded();
-                          // Vai para a página de pagamento
-                          context.pushNamed(
-                            PaymentRide7Widget.routeName,
-                            queryParameters: {
-                              'estilo': 'ride_share',
-                            }.withoutNulls,
-                            extra: {
-                              kTransitionInfoKey: const TransitionInfo(
-                                hasTransition: true,
-                                transitionType: PageTransitionType.rightToLeft,
-                              ),
-                              'latlngAtual': FFAppState().latlngAtual,
-                              'latlngWhereTo': FFAppState().latlangAondeVaiIr,
-                            },
-                          );
-                        },
-                        child: Container(
-                          width: 320,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).alternate,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(18)),
-                          ),
-                          alignment: const AlignmentDirectional(0, 0),
-                          child: Text(
-                            FFLocalizations.of(context)
-                                .getText('ntglhxb6' /* Confirm Ride Share */),
-=======
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
-                          child: Text(
-                            FFLocalizations.of(context).getText(
-                                's3y7hgro' /* Price updates if route or riders change before pickup. */),
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                              's3y7hgro' /* Price updates if route or ride... */,
+                            ),
                             style: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .override(
                                   font: GoogleFonts.poppins(
-<<<<<<< HEAD
-=======
                                     fontWeight: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .fontWeight,
@@ -1887,7 +1149,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   ),
                                   color: FlutterFlowTheme.of(context)
                                       .secondaryText,
-                                  fontSize: 10,
+                                  fontSize: 10.0,
                                   letterSpacing: 0.0,
                                   fontWeight: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -1901,80 +1163,200 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                       ],
                     ),
                   ),
-
-                  // ====== Privacy, Confirm, etc. (layout original) ======
-                  // ... (mantive seu bloco, sem mudanças funcionais) ...
-
-                  // Seu bloco final mantido:
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 62.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).primaryText,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(8.0),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                8.0, 8.0, 8.0, 8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  FFLocalizations.of(context).getText(
+                                    'y5mje1pu' /* Privacy */,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.normal,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+                                        fontSize: 10.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.normal,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
+                                      ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 100.0,
+                                      height: 22.0,
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        borderRadius:
+                                            BorderRadius.circular(14.0),
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      child: Text(
+                                        FFLocalizations.of(context).getText(
+                                          '031obrr6' /* Invite link only */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w600,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+                                              ),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primary,
+                                              fontSize: 10.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w600,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 100.0,
+                                      height: 22.0,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xA5414141),
+                                        borderRadius:
+                                            BorderRadius.circular(14.0),
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      child: Text(
+                                        FFLocalizations.of(context).getText(
+                                          'kqvwz04w' /* Open to nearby */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w600,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+                                              ),
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondaryText,
+                                              fontSize: 10.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.w600,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+                                      ),
+                                    ),
+                                  ].divide(SizedBox(width: 20.0)),
+                                ),
+                              ].divide(SizedBox(height: 5.0)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Column(
                     mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InkWell(
-                        onTap: () async {
-                          // Garante sessão criada
-                          await _createSessionIfNeeded();
-                          // Vai para a página de pagamento
-                          context.pushNamed(
-                            PaymentRide7Widget.routeName,
-                            queryParameters: {
-                              'estilo': 'ride_share',
-                            }.withoutNulls,
-                            extra: {
-                              kTransitionInfoKey: const TransitionInfo(
-                                hasTransition: true,
-                                transitionType: PageTransitionType.rightToLeft,
-                              ),
-                              'latlngAtual': FFAppState().latlngAtual,
-                              'latlngWhereTo': FFAppState().latlangAondeVaiIr,
-                            },
-                          );
-                        },
-                        child: Container(
-                          width: 320,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).alternate,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(18)),
+                      Container(
+                        width: 320.0,
+                        height: 38.0,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).alternate,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(18.0),
+                            bottomRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0),
+                            topRight: Radius.circular(18.0),
                           ),
-                          alignment: const AlignmentDirectional(0, 0),
-                          child: Text(
-                            FFLocalizations.of(context)
-                                .getText('ntglhxb6' /* Confirm Ride Share */),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.poppins(
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+                        ),
+                        alignment: AlignmentDirectional(0.0, 0.0),
+                        child: Text(
+                          FFLocalizations.of(context).getText(
+                            'ntglhxb6' /* Confirm Ride Share */,
+                          ),
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .fontStyle,
                                   ),
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-<<<<<<< HEAD
-=======
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                          ),
                         ),
                       ),
                       Container(
-                        width: 320,
-                        height: 32,
-                        decoration: const BoxDecoration(
+                        width: 320.0,
+                        height: 32.0,
+                        decoration: BoxDecoration(
                           color: Color(0xA5414141),
-                          borderRadius: BorderRadius.all(Radius.circular(18)),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(18.0),
+                            bottomRight: Radius.circular(18.0),
+                            topLeft: Radius.circular(18.0),
+                            topRight: Radius.circular(18.0),
+                          ),
                         ),
-                        alignment: const AlignmentDirectional(0, 0),
+                        alignment: AlignmentDirectional(0.0, 0.0),
                         child: Text(
-                          FFLocalizations.of(context)
-                              .getText('4br05fcj' /* Skip for now */),
+                          FFLocalizations.of(context).getText(
+                            '4br05fcj' /* Skip for now */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
@@ -1982,91 +1364,56 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                   fontWeight: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .fontWeight,
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                                   fontStyle: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .fontStyle,
                                 ),
-                          ),
->>>>>>> 10c9b5c (new frkdfm)
-                        ),
-                      ),
-                      Container(
-                        width: 320,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: Color(0xA5414141),
-                          borderRadius: BorderRadius.all(Radius.circular(18)),
-                        ),
-                        alignment: const AlignmentDirectional(0, 0),
-                        child: Text(
-<<<<<<< HEAD
-                          FFLocalizations.of(context).getText('4br05fcj' /* Skip for now */),
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
-                          FFLocalizations.of(context)
-                              .getText('4br05fcj' /* Skip for now */),
-                          style: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .override(
->>>>>>> 10c9b5c (new frkdfm)
-                                font: GoogleFonts.poppins(
-                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                ),
                                 color: FlutterFlowTheme.of(context).alternate,
-                                fontSize: 10,
+                                fontSize: 10.0,
                                 letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontStyle,
                               ),
                         ),
                       ),
                       Padding(
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        padding: const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
-                        child: Text(
-                          FFLocalizations.of(context).getText('ltqpaty4' /* Next: Matching - Get picked up... */),
-                          style: FlutterFlowTheme.of(context).bodyMedium.override(
-=======
                         padding:
-                            const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
+                            EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),
                         child: Text(
-=======
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(2, 0, 0, 0),
-                        child: Text(
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
                           FFLocalizations.of(context).getText(
-                              'ltqpaty4' /* Next: Matching - Get picked up... */),
+                            'ltqpaty4' /* Next: Matching - Get picked up... */,
+                          ),
                           style: FlutterFlowTheme.of(context)
                               .bodyMedium
                               .override(
->>>>>>> 10c9b5c (new frkdfm)
                                 font: GoogleFonts.poppins(
-                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
                                 ),
-<<<<<<< HEAD
-                                color: FlutterFlowTheme.of(context).secondaryText,
-=======
                                 color:
                                     FlutterFlowTheme.of(context).secondaryText,
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-                                fontSize: 10,
+                                fontSize: 10.0,
                                 letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .fontStyle,
                               ),
                         ),
                       ),
-                    ].divide(const SizedBox(height: 8)),
+                    ].divide(SizedBox(height: 8.0)),
                   ),
-                ].divide(const SizedBox(height: 20)),
+                ].divide(SizedBox(height: 20.0)),
               ),
             ),
           ],

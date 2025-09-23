@@ -8,13 +8,6 @@ class ContinueAs1Model extends FlutterFlowModel<ContinueAs1Widget> {
 
   String? click;
 
-  ///  State fields for stateful widgets in this page.
-
-  // State field(s) for Checkbox widget.
-  bool? checkboxValue1;
-  // State field(s) for Checkbox widget.
-  bool? checkboxValue2;
-
   @override
   void initState(BuildContext context) {}
 

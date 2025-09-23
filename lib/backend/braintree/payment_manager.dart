@@ -1,7 +1,7 @@
 import '../cloud_functions/cloud_functions.dart';
 
 export 'package:flutter/foundation.dart';
-// Removed flutter_braintree export; using native bridge instead
+export 'package:flutter_braintree/flutter_braintree.dart';
 
 final isProdPayments = false;
 

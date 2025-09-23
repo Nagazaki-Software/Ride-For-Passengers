@@ -1,6 +1,7 @@
 // Automatic FlutterFlow imports
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
+import '/actions/actions.dart' as action_blocks;
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'index.dart'; // Imports other custom widgets
@@ -343,29 +344,6 @@ class _AddressPickerState extends State<AddressPicker> {
     } else {
       _destination = details;
       _destCtrl.text = details.mainText;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      // Se ainda não temos pickup e sabemos a posição do usuário, define um pickup imediato
-      if (_pickup == null && _hasUserLL) {
-        _pickup = PickedPlace(
-          placeId: 'user_location',
-          mainText: 'Current location',
-          secondaryText: '',
-          formattedAddress: 'Current location',
-          lat: _uLat,
-          lng: _uLng,
-        );
-        if (_pickupCtrl.text.isEmpty) {
-          _pickupCtrl.text = _pickup!.mainText;
-        }
-      }
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       setState(() {});
     }
   }
@@ -484,29 +462,6 @@ class _AddressPickerState extends State<AddressPicker> {
     if (useDest) {
       _destination = details;
       _destCtrl.text = details.mainText;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      // Se ainda não temos pickup e sabemos a posição do usuário, define um pickup imediato
-      if (_pickup == null && _hasUserLL) {
-        _pickup = PickedPlace(
-          placeId: 'user_location',
-          mainText: 'Current location',
-          secondaryText: '',
-          formattedAddress: 'Current location',
-          lat: _uLat,
-          lng: _uLng,
-        );
-        if (_pickupCtrl.text.isEmpty) {
-          _pickupCtrl.text = _pickup!.mainText;
-        }
-      }
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       setState(() {});
     } else {
       // Caso o usuário tenha focado explicitamente o Pickup, respeitamos.

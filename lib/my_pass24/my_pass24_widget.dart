@@ -25,6 +25,8 @@ class _MyPass24WidgetState extends State<MyPass24Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => MyPass24Model());
+
+    logFirebaseEvent('screen_view', parameters: {'screen_name': 'MyPass24'});
   }
 
   @override

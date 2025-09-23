@@ -57,10 +57,10 @@
         <key>CFBundleTypeRole</key>
         <string>Editor</string>
         <key>CFBundleURLName</key>
-        <string>ride.com</string>
+        <string>ridebahamas.com</string>
         <key>CFBundleURLSchemes</key>
         <array>
-        <string>ride</string>
+        <string>ridebahamas</string>
         </array>
         </dict>
     </array>
@@ -81,6 +81,11 @@
     <string>In order to upload data, this app requires permission to access the photo library.</string>
 	<key>NSMicrophoneUsageDescription</key>
     <string>Add mycrofiome</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
 
 
 

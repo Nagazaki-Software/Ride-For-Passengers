@@ -21,5 +21,24 @@ service cloud.firestore {
       allow write: if false;
       allow delete: if false;
     }
+
+    match /chat/{document} {
+      allow create: if true;
+      allow read: if true;
+      allow write: if true;
+      allow delete: if true;
+    }
+
+    match /chat/{parent}/chatHistory/{document} {
+      allow create: if true;
+      allow read: if true;
+      allow write: if true;
+      allow delete: if true;
+    }
+
+    match /{path=**}/chatHistory/{document} {
+      allow read: if true;
+    }
+
   }
 }

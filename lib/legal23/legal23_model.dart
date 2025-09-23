@@ -1,4 +1,5 @@
 import '/flutter_flow/flutter_flow_util.dart';
+import '/index.dart';
 import 'legal23_widget.dart' show Legal23Widget;
 import 'package:flutter/material.dart';
 

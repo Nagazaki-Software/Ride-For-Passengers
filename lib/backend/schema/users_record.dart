@@ -70,14 +70,6 @@ class UsersRecord extends FirestoreRecord {
   String get passe => _passe ?? '';
   bool hasPasse() => _passe != null;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   // "location" field.
   LatLng? _location;
   LatLng? get location => _location;
@@ -103,14 +95,23 @@ class UsersRecord extends FirestoreRecord {
   String get etnia => _etnia ?? '';
   bool hasEtnia() => _etnia != null;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+  // "activitys" field.
+  List<ActivityStruct>? _activitys;
+  List<ActivityStruct> get activitys => _activitys ?? const [];
+  bool hasActivitys() => _activitys != null;
+
+  // "emergencyContacts" field.
+  List<EmergencyContactStruct>? _emergencyContacts;
+  List<EmergencyContactStruct> get emergencyContacts =>
+      _emergencyContacts ?? const [];
+  bool hasEmergencyContacts() => _emergencyContacts != null;
+
+  // "identifyDocument" field.
+  UserIdentifyDocumentStruct? _identifyDocument;
+  UserIdentifyDocumentStruct get identifyDocument =>
+      _identifyDocument ?? UserIdentifyDocumentStruct();
+  bool hasIdentifyDocument() => _identifyDocument != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -123,27 +124,24 @@ class UsersRecord extends FirestoreRecord {
     _driver = snapshotData['driver'] as bool?;
     _driverOnline = snapshotData['driverOnline'] as bool?;
     _passe = snapshotData['passe'] as String?;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     _location = snapshotData['location'] as LatLng?;
     _ridePoints = castToType<int>(snapshotData['ridePoints']);
     _codeUser = snapshotData['codeUser'] as String?;
     _verifyaccount = snapshotData['verifyaccount'] as bool?;
     _etnia = snapshotData['etnia'] as String?;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+    _activitys = getStructList(
+      snapshotData['activitys'],
+      ActivityStruct.fromMap,
+    );
+    _emergencyContacts = getStructList(
+      snapshotData['emergencyContacts'],
+      EmergencyContactStruct.fromMap,
+    );
+    _identifyDocument =
+        snapshotData['identifyDocument'] is UserIdentifyDocumentStruct
+            ? snapshotData['identifyDocument']
+            : UserIdentifyDocumentStruct.maybeFromMap(
+                snapshotData['identifyDocument']);
   }
 
   static CollectionReference get collection =>
@@ -190,27 +188,12 @@ Map<String, dynamic> createUsersRecordData({
   bool? driver,
   bool? driverOnline,
   String? passe,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
   LatLng? location,
   int? ridePoints,
   String? codeUser,
   bool? verifyaccount,
   String? etnia,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+  UserIdentifyDocumentStruct? identifyDocument,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -224,29 +207,18 @@ Map<String, dynamic> createUsersRecordData({
       'driver': driver,
       'driverOnline': driverOnline,
       'passe': passe,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       'location': location,
       'ridePoints': ridePoints,
       'codeUser': codeUser,
       'verifyaccount': verifyaccount,
       'etnia': etnia,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+      'identifyDocument': UserIdentifyDocumentStruct().toMap(),
     }.withoutNulls,
   );
+
+  // Handle nested data for "identifyDocument" field.
+  addUserIdentifyDocumentStructData(
+      firestoreData, identifyDocument, 'identifyDocument');
 
   return firestoreData;
 }
@@ -272,7 +244,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.ridePoints == e2?.ridePoints &&
         e1?.codeUser == e2?.codeUser &&
         e1?.verifyaccount == e2?.verifyaccount &&
-        e1?.etnia == e2?.etnia;
+        e1?.etnia == e2?.etnia &&
+        listEquality.equals(e1?.activitys, e2?.activitys) &&
+        listEquality.equals(e1?.emergencyContacts, e2?.emergencyContacts) &&
+        e1?.identifyDocument == e2?.identifyDocument;
   }
 
   @override
@@ -292,15 +267,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.ridePoints,
         e?.codeUser,
         e?.verifyaccount,
-<<<<<<< HEAD
-<<<<<<< HEAD
-        e?.etnia
-=======
         e?.etnia,
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        e?.etnia,
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
+        e?.activitys,
+        e?.emergencyContacts,
+        e?.identifyDocument
       ]);
 
   @override

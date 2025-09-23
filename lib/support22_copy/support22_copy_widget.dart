@@ -24,6 +24,9 @@ class _Support22CopyWidgetState extends State<Support22CopyWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => Support22CopyModel());
+
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'Support22Copy'});
   }
 
   @override

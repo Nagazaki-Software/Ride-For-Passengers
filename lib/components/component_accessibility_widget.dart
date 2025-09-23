@@ -30,10 +30,10 @@ class _ComponentAccessibilityWidgetState
     super.initState();
     _model = createModel(context, () => ComponentAccessibilityModel());
 
-    _model.switchValue1 = true;
-    _model.switchValue2 = true;
-    _model.switchValue3 = true;
-    _model.switchValue4 = true;
+    _model.switchValue1 = false;
+    _model.switchValue2 = false;
+    _model.switchValue3 = false;
+    _model.switchValue4 = false;
   }
 
   @override
@@ -162,13 +162,13 @@ class _ComponentAccessibilityWidgetState
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue1 = newValue);
                         },
-                        activeColor: FlutterFlowTheme.of(context).secondary,
+                        activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
                             FlutterFlowTheme.of(context).primaryBackground,
                         inactiveTrackColor:
-                            FlutterFlowTheme.of(context).secondary,
-                        inactiveThumbColor:
                             FlutterFlowTheme.of(context).primaryBackground,
+                        inactiveThumbColor:
+                            FlutterFlowTheme.of(context).alternate,
                       ),
                     ],
                   ),
@@ -241,13 +241,13 @@ class _ComponentAccessibilityWidgetState
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue2 = newValue);
                         },
-                        activeColor: FlutterFlowTheme.of(context).secondary,
+                        activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
                             FlutterFlowTheme.of(context).primaryBackground,
                         inactiveTrackColor:
-                            FlutterFlowTheme.of(context).secondary,
-                        inactiveThumbColor:
                             FlutterFlowTheme.of(context).primaryBackground,
+                        inactiveThumbColor:
+                            FlutterFlowTheme.of(context).alternate,
                       ),
                     ],
                   ),
@@ -320,13 +320,13 @@ class _ComponentAccessibilityWidgetState
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue3 = newValue);
                         },
-                        activeColor: FlutterFlowTheme.of(context).secondary,
+                        activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
                             FlutterFlowTheme.of(context).primaryBackground,
                         inactiveTrackColor:
-                            FlutterFlowTheme.of(context).secondary,
-                        inactiveThumbColor:
                             FlutterFlowTheme.of(context).primaryBackground,
+                        inactiveThumbColor:
+                            FlutterFlowTheme.of(context).alternate,
                       ),
                     ],
                   ),
@@ -399,13 +399,13 @@ class _ComponentAccessibilityWidgetState
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue4 = newValue);
                         },
-                        activeColor: FlutterFlowTheme.of(context).secondary,
+                        activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
                             FlutterFlowTheme.of(context).primaryBackground,
                         inactiveTrackColor:
-                            FlutterFlowTheme.of(context).secondary,
-                        inactiveThumbColor:
                             FlutterFlowTheme.of(context).primaryBackground,
+                        inactiveThumbColor:
+                            FlutterFlowTheme.of(context).alternate,
                       ),
                     ],
                   ),

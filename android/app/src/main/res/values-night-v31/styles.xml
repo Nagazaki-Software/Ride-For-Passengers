@@ -12,17 +12,7 @@
          running.
          
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
-    <style name="NormalTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-<<<<<<< HEAD
-<<<<<<< HEAD
+    <style name="NormalTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">?android:colorBackground</item>
-=======
-        <item name="android:windowBackground">@color/ff_background_dark</item>
-        <item name="android:windowSplashScreenBackground">@color/ff_background_dark</item>
->>>>>>> 10c9b5c (new frkdfm)
-=======
-        <item name="android:windowBackground">@color/ff_background_dark</item>
-        <item name="android:windowSplashScreenBackground">@color/ff_background_dark</item>
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     </style>
 </resources>

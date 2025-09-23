@@ -7,6 +7,8 @@ import '/backend/schema/structs/index.dart';
 
 import '/auth/base_auth_user_provider.dart';
 
+import '/backend/push_notifications/push_notifications_handler.dart'
+    show PushNotificationsHandler;
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
@@ -109,7 +111,12 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: VerifyAccount3Widget.routeName,
           path: VerifyAccount3Widget.routePath,
-          builder: (context, params) => VerifyAccount3Widget(),
+          builder: (context, params) => VerifyAccount3Widget(
+            plataform: params.getParam(
+              'plataform',
+              ParamType.String,
+            ),
+          ),
         ),
         FFRoute(
           name: Home5Widget.routeName,
@@ -142,6 +149,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               'latlngWhereTo',
               ParamType.LatLng,
             ),
+            value: params.getParam(
+              'value',
+              ParamType.double,
+            ),
           ),
         ),
         FFRoute(
@@ -159,7 +170,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: PickingYou9Widget.routeName,
           path: PickingYou9Widget.routePath,
-          builder: (context, params) => PickingYou9Widget(),
+          builder: (context, params) => PickingYou9Widget(
+            order: params.getParam(
+              'order',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['rideOrders'],
+            ),
+          ),
         ),
         FFRoute(
           name: Login0Widget.routeName,
@@ -267,6 +285,58 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: Support22CopyWidget.routeName,
           path: Support22CopyWidget.routePath,
           builder: (context, params) => Support22CopyWidget(),
+        ),
+        FFRoute(
+          name: Notification27Widget.routeName,
+          path: Notification27Widget.routePath,
+          builder: (context, params) => Notification27Widget(),
+        ),
+        FFRoute(
+          name: HelpWidget.routeName,
+          path: HelpWidget.routePath,
+          builder: (context, params) => HelpWidget(),
+        ),
+        FFRoute(
+          name: CustomerSupport26Widget.routeName,
+          path: CustomerSupport26Widget.routePath,
+          builder: (context, params) => CustomerSupport26Widget(),
+        ),
+        FFRoute(
+          name: FrequentlyAskedQuestions25Widget.routeName,
+          path: FrequentlyAskedQuestions25Widget.routePath,
+          builder: (context, params) => FrequentlyAskedQuestions25Widget(),
+        ),
+        FFRoute(
+          name: Reportaproblem28Widget.routeName,
+          path: Reportaproblem28Widget.routePath,
+          builder: (context, params) => Reportaproblem28Widget(),
+        ),
+        FFRoute(
+          name: ChatSupportWidget.routeName,
+          path: ChatSupportWidget.routePath,
+          builder: (context, params) => ChatSupportWidget(
+            chat: params.getParam(
+              'chat',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['chat'],
+            ),
+          ),
+        ),
+        FFRoute(
+          name: PrivacyPolicy29Widget.routeName,
+          path: PrivacyPolicy29Widget.routePath,
+          builder: (context, params) => PrivacyPolicy29Widget(),
+        ),
+        FFRoute(
+          name: TermsofService30Widget.routeName,
+          path: TermsofService30Widget.routePath,
+          builder: (context, params) => TermsofService30Widget(),
+        ),
+        FFRoute(
+          name: Licenses31Widget.routeName,
+          path: Licenses31Widget.routePath,
+          builder: (context, params) => Licenses31Widget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -460,7 +530,7 @@ class FFRoute {
                     fit: BoxFit.contain,
                   ),
                 )
-              : page;
+              : PushNotificationsHandler(child: page);
 
           final transitionInfo = state.transitionInfo;
           return transitionInfo.hasTransition

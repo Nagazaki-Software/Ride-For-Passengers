@@ -42,11 +42,6 @@ class FFAppState extends ChangeNotifier {
           prefs.getStringList('ff_locationsPorPerto') ?? _locationsPorPerto;
     });
     _safeInit(() {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
       _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
     });
     _safeInit(() {
@@ -84,52 +79,6 @@ class FFAppState extends ChangeNotifier {
           print("Can't decode persisted json. Error: $e.");
         }
       }
-    });
-    _safeInit(() {
-<<<<<<< HEAD
->>>>>>> 10c9b5c (new frkdfm)
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
-      _cardNumber = prefs.getString('ff_cardNumber') ?? _cardNumber;
-    });
-    _safeInit(() {
-      _cardExpiry = prefs.getString('ff_cardExpiry') ?? _cardExpiry;
-    });
-    _safeInit(() {
-      _cardCvv = prefs.getString('ff_cardCvv') ?? _cardCvv;
-    });
-    _safeInit(() {
-      _cardHolder = prefs.getString('ff_cardHolder') ?? _cardHolder;
-<<<<<<< HEAD
-    });
-    _safeInit(() {
-      _latlngAtual =
-          latLngFromString(prefs.getString('ff_latlngAtual')) ?? _latlngAtual;
-    });
-    _safeInit(() {
-      _passangers = prefs.getInt('ff_passangers') ?? _passangers;
-    });
-    _safeInit(() {
-      _creditCardSalves = prefs.getStringList('ff_creditCardSalves')?.map((x) {
-            try {
-              return jsonDecode(x);
-            } catch (e) {
-              print("Can't decode persisted json. Error: $e.");
-              return {};
-            }
-          }).toList() ??
-          _creditCardSalves;
-    });
-    _safeInit(() {
-      if (prefs.containsKey('ff_defaultCard')) {
-        try {
-          _defaultCard = jsonDecode(prefs.getString('ff_defaultCard') ?? '');
-        } catch (e) {
-          print("Can't decode persisted json. Error: $e.");
-        }
-      }
-=======
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
     });
   }
 
@@ -140,7 +89,7 @@ class FFAppState extends ChangeNotifier {
 
   late SharedPreferences prefs;
 
-  String _appVersion = '';
+  String _appVersion = '1.1.56+28';
   String get appVersion => _appVersion;
   set appVersion(String value) {
     _appVersion = value;
@@ -189,13 +138,6 @@ class FFAppState extends ChangeNotifier {
   set locationsPorPerto(List<String> value) {
     _locationsPorPerto = value;
     prefs.setStringList('ff_locationsPorPerto', value);
-  }
-
-  // Mapa auxiliar (não persistido) com o LatLng de cada item próximo
-  Map<String, LatLng> _locationsPorPertoMap = {};
-  Map<String, LatLng> get locationsPorPertoMap => _locationsPorPertoMap;
-  set locationsPorPertoMap(Map<String, LatLng> value) {
-    _locationsPorPertoMap = value;
   }
 
   void addToLocationsPorPerto(String value) {
@@ -259,24 +201,14 @@ class FFAppState extends ChangeNotifier {
     _cardHolder = value;
     prefs.setString('ff_cardHolder', value);
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 
   LatLng? _latlngAtual = LatLng(25.0443312, -77.3503609);
   LatLng? get latlngAtual => _latlngAtual;
   set latlngAtual(LatLng? value) {
-    if (value == null) {
-      // Ignora atualizações nulas para evitar estado inconsistente.
-      return;
-    }
     _latlngAtual = value;
-    prefs.setString('ff_latlngAtual', value.serialize());
+    value != null
+        ? prefs.setString('ff_latlngAtual', value.serialize())
+        : prefs.remove('ff_latlngAtual');
   }
 
   LatLng? _latlangAondeVaiIr;
@@ -372,14 +304,6 @@ class FFAppState extends ChangeNotifier {
   void clearRecentTripsCache() => _recentTripsManager.clear();
   void clearRecentTripsCacheKey(String? uniqueKey) =>
       _recentTripsManager.clearRequest(uniqueKey);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
- 
->>>>>>> 10c9b5c (new frkdfm)
-=======
- 
->>>>>>> 10c9b5c9503d954411773ec70615ce97229cb3be
 }
 
 void _safeInit(Function() initializeField) {

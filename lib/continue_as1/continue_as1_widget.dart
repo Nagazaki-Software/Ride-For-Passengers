@@ -25,6 +25,7 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
   late ContinueAs1Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  var hasRowTriggered = false;
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
   var hasContainerTriggered3 = false;
@@ -35,7 +36,29 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
     super.initState();
     _model = createModel(context, () => ContinueAs1Model());
 
+    logFirebaseEvent('screen_view', parameters: {'screen_name': 'ContinueAs1'});
     animationsMap.addAll({
+      'rowOnActionTriggerAnimation': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0x91BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
       'containerOnActionTriggerAnimation1': AnimationInfo(
         trigger: AnimationTrigger.onActionTrigger,
         applyInitialState: false,
@@ -147,67 +170,95 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 37.2,
-                                height: 37.2,
-                                decoration: BoxDecoration(
-                                  color: Color(0x2C484B51),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      blurRadius: 5.0,
-                                      color: Color(0x5E000000),
-                                      offset: Offset(
-                                        0.0,
-                                        4.0,
-                                      ),
-                                      spreadRadius: 3.0,
-                                    )
-                                  ],
-                                  shape: BoxShape.circle,
-                                ),
-                                child: FlutterFlowIconButton(
-                                  borderRadius: 20.0,
-                                  buttonSize: 26.0,
-                                  icon: Icon(
-                                    Icons.question_mark,
-                                    color: FlutterFlowTheme.of(context).info,
-                                    size: 16.0,
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              logFirebaseEvent(
+                                  'CONTINUE_AS1_PAGE_Row_7rghznre_ON_TAP');
+                              logFirebaseEvent('Row_widget_animation');
+                              if (animationsMap[
+                                      'rowOnActionTriggerAnimation'] !=
+                                  null) {
+                                safeSetState(() => hasRowTriggered = true);
+                                SchedulerBinding.instance.addPostFrameCallback(
+                                    (_) async => await animationsMap[
+                                            'rowOnActionTriggerAnimation']!
+                                        .controller
+                                        .forward(from: 0.0));
+                              }
+                              logFirebaseEvent('Row_navigate_to');
+
+                              context.pushNamed(
+                                  FrequentlyAskedQuestions25Widget.routeName);
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 37.2,
+                                  height: 37.2,
+                                  decoration: BoxDecoration(
+                                    color: Color(0x2C484B51),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 5.0,
+                                        color: Color(0x5E000000),
+                                        offset: Offset(
+                                          0.0,
+                                          4.0,
+                                        ),
+                                        spreadRadius: 3.0,
+                                      )
+                                    ],
+                                    shape: BoxShape.circle,
                                   ),
-                                  onPressed: () {
-                                    print('IconButton pressed ...');
-                                  },
+                                  child: FlutterFlowIconButton(
+                                    borderRadius: 20.0,
+                                    buttonSize: 26.0,
+                                    icon: Icon(
+                                      Icons.question_mark,
+                                      color: FlutterFlowTheme.of(context).info,
+                                      size: 16.0,
+                                    ),
+                                    onPressed: () {
+                                      print('IconButton pressed ...');
+                                    },
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                FFLocalizations.of(context).getText(
-                                  'qgowcvqw' /* Help */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.poppins(
+                                Text(
+                                  FFLocalizations.of(context).getText(
+                                    'qgowcvqw' /* Help */,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w500,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        fontSize: 14.0,
+                                        letterSpacing: 0.0,
                                         fontWeight: FontWeight.w500,
                                         fontStyle: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .fontStyle,
                                       ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 14.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                              ),
-                            ].divide(SizedBox(width: 8.0)),
-                          ),
+                                ),
+                              ].divide(SizedBox(width: 8.0)),
+                            ),
+                          ).animateOnActionTrigger(
+                              animationsMap['rowOnActionTriggerAnimation']!,
+                              hasBeenTriggered: hasRowTriggered),
                         ],
                       ),
                     ),
@@ -240,7 +291,11 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
+                                logFirebaseEvent(
+                                    'CONTINUE_AS1_Container_8m3ahsxb_ON_TAP');
                                 if (_model.click == 'im visiting') {
+                                  logFirebaseEvent(
+                                      'Container_widget_animation');
                                   if (animationsMap[
                                           'containerOnActionTriggerAnimation1'] !=
                                       null) {
@@ -252,9 +307,13 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                             .controller
                                             .forward(from: 0.0));
                                   }
+                                  logFirebaseEvent(
+                                      'Container_update_page_state');
                                   _model.click = null;
                                   safeSetState(() {});
                                 } else {
+                                  logFirebaseEvent(
+                                      'Container_widget_animation');
                                   if (animationsMap[
                                           'containerOnActionTriggerAnimation1'] !=
                                       null) {
@@ -266,6 +325,8 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                             .controller
                                             .forward(from: 0.0));
                                   }
+                                  logFirebaseEvent(
+                                      'Container_update_page_state');
                                   _model.click = 'im visiting';
                                   safeSetState(() {});
                                 }
@@ -340,96 +401,17 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                         ),
                                       ],
                                     ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 10.0, 0.0),
-                                      child: Theme(
-                                        data: ThemeData(
-                                          checkboxTheme: CheckboxThemeData(
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(4.0),
-                                            ),
-                                          ),
-                                          unselectedWidgetColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .alternate,
-                                        ),
-                                        child: Checkbox(
-                                          value: _model.checkboxValue1 ??=
-                                              _model.click != 'im visiting',
-                                          onChanged: (_model.click ==
-                                                  'im bahamian')
-                                              ? null
-                                              : (newValue) async {
-                                                  safeSetState(() =>
-                                                      _model.checkboxValue1 =
-                                                          newValue!);
-                                                  if (newValue!) {
-                                                    if (animationsMap[
-                                                            'containerOnActionTriggerAnimation1'] !=
-                                                        null) {
-                                                      safeSetState(() =>
-                                                          hasContainerTriggered1 =
-                                                              true);
-                                                      SchedulerBinding.instance
-                                                          .addPostFrameCallback((_) async =>
-                                                              await animationsMap[
-                                                                      'containerOnActionTriggerAnimation1']!
-                                                                  .controller
-                                                                  .forward(
-                                                                      from:
-                                                                          0.0));
-                                                    }
-                                                    _model.click =
-                                                        'im visiting';
-                                                    safeSetState(() {});
-                                                  } else {
-                                                    if (animationsMap[
-                                                            'containerOnActionTriggerAnimation1'] !=
-                                                        null) {
-                                                      safeSetState(() =>
-                                                          hasContainerTriggered1 =
-                                                              true);
-                                                      SchedulerBinding.instance
-                                                          .addPostFrameCallback((_) async =>
-                                                              await animationsMap[
-                                                                      'containerOnActionTriggerAnimation1']!
-                                                                  .controller
-                                                                  .forward(
-                                                                      from:
-                                                                          0.0));
-                                                    }
-                                                    _model.click = null;
-                                                    safeSetState(() {});
-                                                  }
-                                                },
-                                          side: (FlutterFlowTheme.of(context)
-                                                      .alternate !=
-                                                  null)
-                                              ? BorderSide(
-                                                  width: 2,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .alternate,
-                                                )
-                                              : null,
-                                          activeColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primary,
-                                          checkColor:
-                                              (_model.click == 'im bahamian')
-                                                  ? null
-                                                  : FlutterFlowTheme.of(context)
-                                                      .info,
+                                    if (_model.click != 'im visiting')
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 15.0, 0.0),
+                                        child: Icon(
+                                          Icons.check_box,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          size: 24.0,
                                         ),
                                       ),
-                                    ),
                                   ].divide(SizedBox(width: 26.0)),
                                 ),
                               ),
@@ -480,7 +462,11 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
+                                logFirebaseEvent(
+                                    'CONTINUE_AS1_Container_3fyj978b_ON_TAP');
                                 if (_model.click == 'im bahamian') {
+                                  logFirebaseEvent(
+                                      'Container_widget_animation');
                                   if (animationsMap[
                                           'containerOnActionTriggerAnimation2'] !=
                                       null) {
@@ -492,9 +478,13 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                             .controller
                                             .forward(from: 0.0));
                                   }
+                                  logFirebaseEvent(
+                                      'Container_update_page_state');
                                   _model.click = null;
                                   safeSetState(() {});
                                 } else {
+                                  logFirebaseEvent(
+                                      'Container_widget_animation');
                                   if (animationsMap[
                                           'containerOnActionTriggerAnimation2'] !=
                                       null) {
@@ -506,6 +496,8 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                             .controller
                                             .forward(from: 0.0));
                                   }
+                                  logFirebaseEvent(
+                                      'Container_update_page_state');
                                   _model.click = 'im bahamian';
                                   safeSetState(() {});
                                 }
@@ -582,96 +574,17 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                         ),
                                       ],
                                     ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 10.0, 0.0),
-                                      child: Theme(
-                                        data: ThemeData(
-                                          checkboxTheme: CheckboxThemeData(
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            materialTapTargetSize:
-                                                MaterialTapTargetSize
-                                                    .shrinkWrap,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(4.0),
-                                            ),
-                                          ),
-                                          unselectedWidgetColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .alternate,
-                                        ),
-                                        child: Checkbox(
-                                          value: _model.checkboxValue2 ??=
-                                              _model.click != 'im bahamian',
-                                          onChanged: (_model.click ==
-                                                  'im visiting')
-                                              ? null
-                                              : (newValue) async {
-                                                  safeSetState(() =>
-                                                      _model.checkboxValue2 =
-                                                          newValue!);
-                                                  if (newValue!) {
-                                                    if (animationsMap[
-                                                            'containerOnActionTriggerAnimation2'] !=
-                                                        null) {
-                                                      safeSetState(() =>
-                                                          hasContainerTriggered2 =
-                                                              true);
-                                                      SchedulerBinding.instance
-                                                          .addPostFrameCallback((_) async =>
-                                                              await animationsMap[
-                                                                      'containerOnActionTriggerAnimation2']!
-                                                                  .controller
-                                                                  .forward(
-                                                                      from:
-                                                                          0.0));
-                                                    }
-                                                    _model.click =
-                                                        'im bahamian';
-                                                    safeSetState(() {});
-                                                  } else {
-                                                    if (animationsMap[
-                                                            'containerOnActionTriggerAnimation2'] !=
-                                                        null) {
-                                                      safeSetState(() =>
-                                                          hasContainerTriggered2 =
-                                                              true);
-                                                      SchedulerBinding.instance
-                                                          .addPostFrameCallback((_) async =>
-                                                              await animationsMap[
-                                                                      'containerOnActionTriggerAnimation2']!
-                                                                  .controller
-                                                                  .forward(
-                                                                      from:
-                                                                          0.0));
-                                                    }
-                                                    _model.click = null;
-                                                    safeSetState(() {});
-                                                  }
-                                                },
-                                          side: (FlutterFlowTheme.of(context)
-                                                      .alternate !=
-                                                  null)
-                                              ? BorderSide(
-                                                  width: 2,
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .alternate,
-                                                )
-                                              : null,
-                                          activeColor:
-                                              FlutterFlowTheme.of(context)
-                                                  .primary,
-                                          checkColor:
-                                              (_model.click == 'im visiting')
-                                                  ? null
-                                                  : FlutterFlowTheme.of(context)
-                                                      .info,
+                                    if (_model.click != 'im bahamian')
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 15.0, 0.0),
+                                        child: Icon(
+                                          Icons.check_box,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          size: 24.0,
                                         ),
                                       ),
-                                    ),
                                   ].divide(SizedBox(width: 26.0)),
                                 ),
                               ),
@@ -788,6 +701,10 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
+                                logFirebaseEvent(
+                                    'CONTINUE_AS1_PAGE_ContainerNext_ON_TAP');
+                                logFirebaseEvent(
+                                    'ContainerNext_widget_animation');
                                 if (animationsMap[
                                         'containerOnActionTriggerAnimation3'] !=
                                     null) {
@@ -800,11 +717,25 @@ class _ContinueAs1WidgetState extends State<ContinueAs1Widget>
                                           .forward(from: 0.0));
                                 }
                                 if (_model.click == 'im visiting') {
+                                  logFirebaseEvent('ContainerNext_navigate_to');
+
                                   context.pushNamed(
                                     CreateProfile2Widget.routeName,
                                     queryParameters: {
                                       'quickyPlataform': serializeParam(
                                         'Ride Visitor',
+                                        ParamType.String,
+                                      ),
+                                    }.withoutNulls,
+                                  );
+                                } else {
+                                  logFirebaseEvent('ContainerNext_navigate_to');
+
+                                  context.pushNamed(
+                                    CreateProfile2CopyWidget.routeName,
+                                    queryParameters: {
+                                      'quickyPlataform': serializeParam(
+                                        'Ride Bahamian',
                                         ParamType.String,
                                       ),
                                     }.withoutNulls,

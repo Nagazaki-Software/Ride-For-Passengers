@@ -136,6 +136,9 @@ class _PassecompradoWidgetState extends State<PassecompradoWidget> {
               ),
               FFButtonWidget(
                 onPressed: () async {
+                  logFirebaseEvent('PASSECOMPRADO_START_TRAVELING_BTN_ON_TAP');
+                  logFirebaseEvent('Button_navigate_to');
+
                   context.goNamed(Home5Widget.routeName);
                 },
                 text: FFLocalizations.of(context).getText(

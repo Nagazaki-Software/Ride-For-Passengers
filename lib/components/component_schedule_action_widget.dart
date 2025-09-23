@@ -56,7 +56,7 @@ class _ComponentScheduleActionWidgetState
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
@@ -115,6 +115,9 @@ class _ComponentScheduleActionWidgetState
                       hoverColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () async {
+                        logFirebaseEvent(
+                            'COMPONENT_SCHEDULE_ACTION_ContainerDay_O');
+                        logFirebaseEvent('ContainerDay_bottom_sheet');
                         await showModalBottomSheet(
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
@@ -223,6 +226,9 @@ class _ComponentScheduleActionWidgetState
                       hoverColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () async {
+                        logFirebaseEvent(
+                            'COMPONENT_SCHEDULE_ACTION_ContainerDay_O');
+                        logFirebaseEvent('ContainerDay_bottom_sheet');
                         await showModalBottomSheet(
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
@@ -338,10 +344,16 @@ class _ComponentScheduleActionWidgetState
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
+                          logFirebaseEvent(
+                              'COMPONENT_SCHEDULE_ACTION_Container_1wcm');
                           if (_model.action == 'Ride') {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.action = 'Ride';
                             safeSetState(() {});
                           } else {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.action = 'Ride';
                             safeSetState(() {});
                           }
@@ -412,10 +424,16 @@ class _ComponentScheduleActionWidgetState
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
+                          logFirebaseEvent(
+                              'COMPONENT_SCHEDULE_ACTION_Container_ato0');
                           if (_model.action == 'XL') {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.action = 'Ride';
                             safeSetState(() {});
                           } else {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.action = 'XL';
                             safeSetState(() {});
                           }
@@ -484,10 +502,16 @@ class _ComponentScheduleActionWidgetState
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
+                          logFirebaseEvent(
+                              'COMPONENT_SCHEDULE_ACTION_Container_z0x8');
                           if (_model.action == 'Luxury') {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.action = 'Ride';
                             safeSetState(() {});
                           } else {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.action = 'Luxury';
                             safeSetState(() {});
                           }
@@ -588,10 +612,16 @@ class _ComponentScheduleActionWidgetState
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
+                          logFirebaseEvent(
+                              'COMPONENT_SCHEDULE_ACTION_Container_qbyc');
                           if (_model.repeat == 'One-time') {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.repeat = 'One-time';
                             safeSetState(() {});
                           } else {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.repeat = 'One-time';
                             safeSetState(() {});
                           }
@@ -662,10 +692,16 @@ class _ComponentScheduleActionWidgetState
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
+                          logFirebaseEvent(
+                              'COMPONENT_SCHEDULE_ACTION_Container_5585');
                           if (_model.repeat == 'Weekdays') {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.repeat = 'One-time';
                             safeSetState(() {});
                           } else {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.repeat = 'Weekdays';
                             safeSetState(() {});
                           }
@@ -736,10 +772,16 @@ class _ComponentScheduleActionWidgetState
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
+                          logFirebaseEvent(
+                              'COMPONENT_SCHEDULE_ACTION_Container_jyjr');
                           if (_model.repeat == 'Custom') {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.repeat = 'One-time';
                             safeSetState(() {});
                           } else {
+                            logFirebaseEvent(
+                                'Container_update_component_state');
                             _model.repeat = 'Custom';
                             safeSetState(() {});
                           }
@@ -1027,6 +1069,10 @@ class _ComponentScheduleActionWidgetState
                   hoverColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onTap: () async {
+                    logFirebaseEvent(
+                        'COMPONENT_SCHEDULE_ACTION_Container_f1s8');
+                    logFirebaseEvent('Container_backend_call');
+
                     await RideOrdersRecord.collection
                         .doc()
                         .set(createRideOrdersRecordData(
@@ -1039,6 +1085,7 @@ class _ComponentScheduleActionWidgetState
                           repeat: _model.repeat,
                           salvarSomente: false,
                         ));
+                    logFirebaseEvent('Container_bottom_sheet');
                     await showModalBottomSheet(
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
@@ -1121,6 +1168,9 @@ class _ComponentScheduleActionWidgetState
             hoverColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () async {
+              logFirebaseEvent('COMPONENT_SCHEDULE_ACTION_Container_tgyw');
+              logFirebaseEvent('Container_backend_call');
+
               var rideOrdersRecordReference = RideOrdersRecord.collection.doc();
               await rideOrdersRecordReference.set(createRideOrdersRecordData(
                 user: currentUserReference,
@@ -1144,6 +1194,7 @@ class _ComponentScheduleActionWidgetState
                     salvarSomente: true,
                   ),
                   rideOrdersRecordReference);
+              logFirebaseEvent('Container_bottom_sheet');
               await showModalBottomSheet(
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,

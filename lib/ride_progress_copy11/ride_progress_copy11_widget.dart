@@ -27,6 +27,9 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => RideProgressCopy11Model());
+
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'RideProgressCopy11'});
   }
 
   @override
@@ -120,7 +123,7 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                             ),
                         colors: [
                           FlutterFlowTheme.of(context).secondary,
-                          FlutterFlowTheme.of(context).primaryBackground,
+                          FlutterFlowTheme.of(context).accent1,
                           Color(0xFFF9E9BE)
                         ],
                         gradientDirection: GradientDirection.btt,
@@ -260,7 +263,7 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                                   FlutterFlowTheme.of(context)
                                                       .secondary,
                                                   FlutterFlowTheme.of(context)
-                                                      .primaryBackground
+                                                      .accent1
                                                 ],
                                                 gradientDirection:
                                                     GradientDirection.ltr,
@@ -341,7 +344,7 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                                   FlutterFlowTheme.of(context)
                                                       .secondary,
                                                   FlutterFlowTheme.of(context)
-                                                      .primaryBackground
+                                                      .accent1
                                                 ],
                                                 gradientDirection:
                                                     GradientDirection.ltr,
@@ -466,8 +469,7 @@ class _RideProgressCopy11WidgetState extends State<RideProgressCopy11Widget> {
                                           ),
                                       colors: [
                                         FlutterFlowTheme.of(context).secondary,
-                                        FlutterFlowTheme.of(context)
-                                            .primaryBackground,
+                                        FlutterFlowTheme.of(context).accent1,
                                         Color(0xFFF0DBA6)
                                       ],
                                       gradientDirection: GradientDirection.btt,

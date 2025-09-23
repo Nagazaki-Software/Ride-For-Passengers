@@ -26,6 +26,9 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => RideProgress10Model());
+
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'RideProgress10'});
   }
 
   @override

@@ -32,3 +32,17 @@ export '/create_profile2_copy/create_profile2_copy_widget.dart'
     show CreateProfile2CopyWidget;
 export '/view_detalhes/view_detalhes_widget.dart' show ViewDetalhesWidget;
 export '/support22_copy/support22_copy_widget.dart' show Support22CopyWidget;
+export '/notification27/notification27_widget.dart' show Notification27Widget;
+export '/help/help_widget.dart' show HelpWidget;
+export '/customer_support26/customer_support26_widget.dart'
+    show CustomerSupport26Widget;
+export '/frequently_asked_questions25/frequently_asked_questions25_widget.dart'
+    show FrequentlyAskedQuestions25Widget;
+export '/reportaproblem28/reportaproblem28_widget.dart'
+    show Reportaproblem28Widget;
+export '/chat_support/chat_support_widget.dart' show ChatSupportWidget;
+export '/privacy_policy29/privacy_policy29_widget.dart'
+    show PrivacyPolicy29Widget;
+export '/termsof_service30/termsof_service30_widget.dart'
+    show TermsofService30Widget;
+export '/licenses31/licenses31_widget.dart' show Licenses31Widget;

@@ -2,6 +2,7 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/firebase_storage/storage.dart';
 import '/components/erro_ao_criar_conta_widget.dart';
+import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_drop_down.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -11,6 +12,8 @@ import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'create_profile2_model.dart';
 export 'create_profile2_model.dart';
@@ -30,16 +33,21 @@ class CreateProfile2Widget extends StatefulWidget {
   State<CreateProfile2Widget> createState() => _CreateProfile2WidgetState();
 }
 
-class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
+class _CreateProfile2WidgetState extends State<CreateProfile2Widget>
+    with TickerProviderStateMixin {
   late CreateProfile2Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  var hasContainerTriggered = false;
+  final animationsMap = <String, AnimationInfo>{};
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => CreateProfile2Model());
 
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'CreateProfile2'});
     _model.textController1 ??= TextEditingController();
     _model.textFieldFocusNode1 ??= FocusNode();
 
@@ -51,6 +59,36 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
 
     _model.textFieldPasswordTextController ??= TextEditingController();
     _model.textFieldPasswordFocusNode ??= FocusNode();
+
+    animationsMap.addAll({
+      'containerOnActionTriggerAnimation': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+    });
+    setupAnimations(
+      animationsMap.values.where((anim) =>
+          anim.trigger == AnimationTrigger.onActionTrigger ||
+          !anim.applyInitialState),
+      this,
+    );
   }
 
   @override
@@ -110,6 +148,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                     hoverColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () async {
+                      logFirebaseEvent(
+                          'CREATE_PROFILE2_PAGE_Row_dwb2mlqc_ON_TAP');
+                      logFirebaseEvent('Row_upload_media_to_firebase');
                       final selectedMedia =
                           await selectMediaWithSourceBottomSheet(
                         context: context,
@@ -1296,6 +1337,20 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
+                            logFirebaseEvent(
+                                'CREATE_PROFILE2_PAGE_Containerxt_ON_TAP');
+                            logFirebaseEvent('Containerxt_widget_animation');
+                            if (animationsMap[
+                                    'containerOnActionTriggerAnimation'] !=
+                                null) {
+                              safeSetState(() => hasContainerTriggered = true);
+                              SchedulerBinding.instance.addPostFrameCallback(
+                                  (_) async => await animationsMap[
+                                          'containerOnActionTriggerAnimation']!
+                                      .controller
+                                      .forward(from: 0.0));
+                            }
+                            logFirebaseEvent('Containerxt_auth');
                             GoRouter.of(context).prepareAuthEvent();
 
                             final user =
@@ -1308,13 +1363,16 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                               return;
                             }
 
+                            logFirebaseEvent('Containerxt_firestore_query');
                             _model.users = await queryUsersRecordOnce();
+                            logFirebaseEvent('Containerxt_custom_action');
                             _model.randomNumber =
                                 await actions.verifiqueRandomNumber(
                               _model.users!.toList(),
                             );
                             if (_model.randomNumber ==
                                 'Não foi possível gerar um código único agora. Tente novamente.') {
+                              logFirebaseEvent('Containerxt_bottom_sheet');
                               await showModalBottomSheet(
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
@@ -1335,6 +1393,8 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                 },
                               ).then((value) => safeSetState(() {}));
                             } else {
+                              logFirebaseEvent('Containerxt_backend_call');
+
                               await currentUserReference!.update({
                                 ...createUsersRecordData(
                                   displayName:
@@ -1342,6 +1402,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                   photoUrl:
                                       _model.uploadedFileUrl_uploadData0f7h,
                                   email: '',
+                                  codeUser: _model.randomNumber,
                                 ),
                                 ...mapToFirestore(
                                   {
@@ -1350,10 +1411,19 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                   },
                                 ),
                               });
-                            }
+                              logFirebaseEvent('Containerxt_navigate_to');
 
-                            context.pushNamedAuth(
-                                ChoosePass4Widget.routeName, context.mounted);
+                              context.goNamedAuth(
+                                VerifyAccount3Widget.routeName,
+                                context.mounted,
+                                queryParameters: {
+                                  'plataform': serializeParam(
+                                    'Ride Visitor',
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,
+                              );
+                            }
 
                             safeSetState(() {});
                           },
@@ -1400,7 +1470,9 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget> {
                                   ),
                             ),
                           ),
-                        ),
+                        ).animateOnActionTrigger(
+                            animationsMap['containerOnActionTriggerAnimation']!,
+                            hasBeenTriggered: hasContainerTriggered),
                       ),
                     ],
                   ),

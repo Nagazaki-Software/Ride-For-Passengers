@@ -25,6 +25,9 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => PaymentMothods16Model());
+
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'PaymentMothods16'});
   }
 
   @override
@@ -66,28 +69,41 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text(
-                                FFLocalizations.of(context).getText(
-                                  'vcm0xkg1' /* Payment methods */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.poppins(
+                              InkWell(
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () async {
+                                  logFirebaseEvent(
+                                      'PAYMENT_MOTHODS16_Text_6ihhnacf_ON_TAP');
+                                  logFirebaseEvent('Text_navigate_back');
+                                  context.safePop();
+                                },
+                                child: Text(
+                                  FFLocalizations.of(context).getText(
+                                    'vcm0xkg1' /* Payment methods */,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w500,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .alternate,
+                                        fontSize: 22.0,
+                                        letterSpacing: 0.0,
                                         fontWeight: FontWeight.w500,
                                         fontStyle: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .fontStyle,
                                       ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 22.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
+                                ),
                               ),
                             ].divide(SizedBox(width: 10.0)),
                           ),

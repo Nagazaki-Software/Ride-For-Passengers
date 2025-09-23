@@ -1,14 +1,21 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/custom_cloud_functions/custom_cloud_function_response_manager.dart';
 import '/backend/firebase_storage/storage.dart';
+import '/components/erro_ao_criar_conta_widget.dart';
+import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_drop_down.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import '/flutter_flow/upload_data.dart';
+import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'create_profile2_copy_model.dart';
 export 'create_profile2_copy_model.dart';
@@ -29,16 +36,22 @@ class CreateProfile2CopyWidget extends StatefulWidget {
       _CreateProfile2CopyWidgetState();
 }
 
-class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
+class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget>
+    with TickerProviderStateMixin {
   late CreateProfile2CopyModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  var hasContainerTriggered1 = false;
+  var hasContainerTriggered2 = false;
+  final animationsMap = <String, AnimationInfo>{};
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => CreateProfile2CopyModel());
 
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'CreateProfile2Copy'});
     _model.textController1 ??= TextEditingController();
     _model.textFieldFocusNode1 ??= FocusNode();
 
@@ -50,6 +63,57 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
 
     _model.textFieldPasswordTextController ??= TextEditingController();
     _model.textFieldPasswordFocusNode ??= FocusNode();
+
+    animationsMap.addAll({
+      'containerOnActionTriggerAnimation1': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0x75BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation2': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+    });
+    setupAnimations(
+      animationsMap.values.where((anim) =>
+          anim.trigger == AnimationTrigger.onActionTrigger ||
+          !anim.applyInitialState),
+      this,
+    );
   }
 
   @override
@@ -109,6 +173,9 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                     hoverColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () async {
+                      logFirebaseEvent(
+                          'CREATE_PROFILE2_COPY_Row_35k35d7l_ON_TAP');
+                      logFirebaseEvent('Row_upload_media_to_firebase');
                       final selectedMedia =
                           await selectMediaWithSourceBottomSheet(
                         context: context,
@@ -203,18 +270,32 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                           ),
                           child: Stack(
                             children: [
-                              Container(
-                                width: 200.0,
-                                height: 200.0,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
+                              if (_model.uploadedFileUrl_uploadDataF7h != '')
+                                Container(
+                                  width: 200.0,
+                                  height: 200.0,
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Image.network(
+                                    _model.uploadedFileUrl_uploadDataF7h,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                child: Image.network(
-                                  _model.uploadedFileUrl_uploadDataF7h,
-                                  fit: BoxFit.cover,
+                              if (_model.uploadedFileUrl_uploadDataF7h == '')
+                                Container(
+                                  width: 200.0,
+                                  height: 200.0,
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Image.network(
+                                    '',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -986,64 +1067,153 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: MediaQuery.sizeOf(context).width * 0.85,
-                              height: 40.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context).alternate,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 4.0,
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    offset: Offset(
-                                      0.0,
-                                      2.0,
-                                    ),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    12.0, 0.0, 10.0, 0.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      FFLocalizations.of(context).getText(
-                                        '30wuyuwo' /* Upload a Photo of your ID */,
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                logFirebaseEvent(
+                                    'CREATE_PROFILE2_COPY_ContainerUploadPhot');
+                                logFirebaseEvent(
+                                    'ContainerUploadPhoto_widget_animation');
+                                if (animationsMap[
+                                        'containerOnActionTriggerAnimation1'] !=
+                                    null) {
+                                  safeSetState(
+                                      () => hasContainerTriggered1 = true);
+                                  SchedulerBinding.instance.addPostFrameCallback(
+                                      (_) async => await animationsMap[
+                                              'containerOnActionTriggerAnimation1']!
+                                          .controller
+                                          .forward(from: 0.0));
+                                }
+                                logFirebaseEvent(
+                                    'ContainerUploadPhoto_upload_media_to_fir');
+                                final selectedMedia =
+                                    await selectMediaWithSourceBottomSheet(
+                                  context: context,
+                                  allowPhoto: true,
+                                  backgroundColor: FlutterFlowTheme.of(context)
+                                      .primaryBackground,
+                                  textColor:
+                                      FlutterFlowTheme.of(context).alternate,
+                                  pickerFontFamily: 'Poppins',
+                                );
+                                if (selectedMedia != null &&
+                                    selectedMedia.every((m) =>
+                                        validateFileFormat(
+                                            m.storagePath, context))) {
+                                  safeSetState(() => _model
+                                      .isDataUploading_uploadDataM11 = true);
+                                  var selectedUploadedFiles =
+                                      <FFUploadedFile>[];
+
+                                  var downloadUrls = <String>[];
+                                  try {
+                                    selectedUploadedFiles = selectedMedia
+                                        .map((m) => FFUploadedFile(
+                                              name:
+                                                  m.storagePath.split('/').last,
+                                              bytes: m.bytes,
+                                              height: m.dimensions?.height,
+                                              width: m.dimensions?.width,
+                                              blurHash: m.blurHash,
+                                            ))
+                                        .toList();
+
+                                    downloadUrls = (await Future.wait(
+                                      selectedMedia.map(
+                                        (m) async => await uploadData(
+                                            m.storagePath, m.bytes),
                                       ),
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.poppins(
+                                    ))
+                                        .where((u) => u != null)
+                                        .map((u) => u!)
+                                        .toList();
+                                  } finally {
+                                    _model.isDataUploading_uploadDataM11 =
+                                        false;
+                                  }
+                                  if (selectedUploadedFiles.length ==
+                                          selectedMedia.length &&
+                                      downloadUrls.length ==
+                                          selectedMedia.length) {
+                                    safeSetState(() {
+                                      _model.uploadedLocalFile_uploadDataM11 =
+                                          selectedUploadedFiles.first;
+                                      _model.uploadedFileUrl_uploadDataM11 =
+                                          downloadUrls.first;
+                                    });
+                                  } else {
+                                    safeSetState(() {});
+                                    return;
+                                  }
+                                }
+                              },
+                              child: Container(
+                                width: MediaQuery.sizeOf(context).width * 0.85,
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).alternate,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 4.0,
+                                      color:
+                                          FlutterFlowTheme.of(context).primary,
+                                      offset: Offset(
+                                        0.0,
+                                        2.0,
+                                      ),
+                                    )
+                                  ],
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12.0, 0.0, 10.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        FFLocalizations.of(context).getText(
+                                          '30wuyuwo' /* Upload a Photo of your ID */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .fontStyle,
+                                              ),
+                                              fontSize: 16.0,
+                                              letterSpacing: 0.0,
                                               fontWeight: FontWeight.w500,
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
                                                       .fontStyle,
                                             ),
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                    ),
-                                    Icon(
-                                      Icons.camera_alt_outlined,
-                                      color:
-                                          FlutterFlowTheme.of(context).tertiary,
-                                      size: 23.0,
-                                    ),
-                                  ],
+                                      ),
+                                      Icon(
+                                        Icons.camera_alt_outlined,
+                                        color: FlutterFlowTheme.of(context)
+                                            .tertiary,
+                                        size: 23.0,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            ).animateOnActionTrigger(
+                                animationsMap[
+                                    'containerOnActionTriggerAnimation1']!,
+                                hasBeenTriggered: hasContainerTriggered1),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 0.0, 0.0),
@@ -1235,6 +1405,43 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
+                            logFirebaseEvent(
+                                'CREATE_PROFILE2_COPY_ContainerNext_ON_TA');
+                            logFirebaseEvent('ContainerNext_widget_animation');
+                            if (animationsMap[
+                                    'containerOnActionTriggerAnimation2'] !=
+                                null) {
+                              safeSetState(() => hasContainerTriggered2 = true);
+                              SchedulerBinding.instance.addPostFrameCallback(
+                                  (_) async => await animationsMap[
+                                          'containerOnActionTriggerAnimation2']!
+                                      .controller
+                                      .forward(from: 0.0));
+                            }
+                            logFirebaseEvent('ContainerNext_cloud_function');
+                            try {
+                              final result = await FirebaseFunctions.instance
+                                  .httpsCallable('classificarDocBahamas')
+                                  .call({
+                                "img": _model.uploadedFileUrl_uploadDataF7h,
+                                "minConfidence": 1.0,
+                              });
+                              _model.classificarDocBhaaian =
+                                  ClassificarDocBahamasCloudFunctionCallResponse(
+                                data: result.data,
+                                succeeded: true,
+                                resultAsString: result.data.toString(),
+                                jsonBody: result.data,
+                              );
+                            } on FirebaseFunctionsException catch (error) {
+                              _model.classificarDocBhaaian =
+                                  ClassificarDocBahamasCloudFunctionCallResponse(
+                                errorCode: error.code,
+                                succeeded: false,
+                              );
+                            }
+
+                            logFirebaseEvent('ContainerNext_auth');
                             GoRouter.of(context).prepareAuthEvent();
 
                             final user =
@@ -1247,12 +1454,32 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                               return;
                             }
 
+                            logFirebaseEvent('ContainerNext_backend_call');
+
                             await currentUserReference!.update({
                               ...createUsersRecordData(
                                 displayName:
                                     '${_model.textController1.text} ${_model.textController2.text}',
                                 photoUrl: _model.uploadedFileUrl_uploadDataF7h,
-                                email: '',
+                                identifyDocument:
+                                    updateUserIdentifyDocumentStruct(
+                                  UserIdentifyDocumentStruct(
+                                    photo: _model.uploadedFileUrl_uploadDataF7h,
+                                    aceito: (String var1) {
+                                      return var1 == "accepted";
+                                    }(getJsonField(
+                                      _model.classificarDocBhaaian!.jsonBody,
+                                      r'''$.ok''',
+                                    ).toString())
+                                        ? true
+                                        : false,
+                                    razoes: getJsonField(
+                                      _model.classificarDocBhaaian?.jsonBody,
+                                      r'''$.reasons''',
+                                    ).toString(),
+                                  ),
+                                  clearUnsetFields: false,
+                                ),
                               ),
                               ...mapToFirestore(
                                 {
@@ -1261,9 +1488,57 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                 },
                               ),
                             });
+                            logFirebaseEvent('ContainerNext_firestore_query');
+                            _model.usersList = await queryUsersRecordOnce();
+                            logFirebaseEvent('ContainerNext_custom_action');
+                            _model.randomNumber =
+                                await actions.verifiqueRandomNumber(
+                              _model.usersList!.toList(),
+                            );
+                            if (_model.randomNumber ==
+                                'Não foi possível gerar um código único agora. Tente novamente.') {
+                              logFirebaseEvent('ContainerNext_bottom_sheet');
+                              await showModalBottomSheet(
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                enableDrag: false,
+                                context: context,
+                                builder: (context) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                    },
+                                    child: Padding(
+                                      padding: MediaQuery.viewInsetsOf(context),
+                                      child: ErroAoCriarContaWidget(),
+                                    ),
+                                  );
+                                },
+                              ).then((value) => safeSetState(() {}));
+                            } else {
+                              logFirebaseEvent('ContainerNext_backend_call');
 
-                            context.pushNamedAuth(
-                                ChoosePass4Widget.routeName, context.mounted);
+                              await currentUserReference!
+                                  .update(createUsersRecordData(
+                                codeUser: _model.randomNumber,
+                              ));
+                              logFirebaseEvent('ContainerNext_navigate_to');
+
+                              context.goNamedAuth(
+                                VerifyAccount3Widget.routeName,
+                                context.mounted,
+                                queryParameters: {
+                                  'plataform': serializeParam(
+                                    'Ride Bahamian',
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,
+                              );
+                            }
+
+                            safeSetState(() {});
                           },
                           child: Container(
                             width: 280.0,
@@ -1308,7 +1583,10 @@ class _CreateProfile2CopyWidgetState extends State<CreateProfile2CopyWidget> {
                                   ),
                             ),
                           ),
-                        ),
+                        ).animateOnActionTrigger(
+                            animationsMap[
+                                'containerOnActionTriggerAnimation2']!,
+                            hasBeenTriggered: hasContainerTriggered2),
                       ),
                     ],
                   ),

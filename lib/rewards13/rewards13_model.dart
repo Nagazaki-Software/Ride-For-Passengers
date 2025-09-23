@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class Rewards13Model extends FlutterFlowModel<Rewards13Widget> {
   ///  Local state fields for this page.
 
-  String? click;
+  String? click = 'All';
 
   ///  State fields for stateful widgets in this page.
 

@@ -1,3 +1,4 @@
+import '/backend/backend.dart';
 import '/components/navbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -26,6 +27,8 @@ class Home5Model extends FlutterFlowModel<Home5Widget> {
   // Stores action output result for [Custom Action - geocodeAddress] action in Container widget.
   dynamic geolocatoraddressonchoose;
   DateTime? datePicked;
+  // Stores action output result for [Firestore Query - Query a collection] action in ContainerConfirmRide widget.
+  List<RideOrdersRecord>? order;
   // Model for navbar component.
   late NavbarModel navbarModel;
 

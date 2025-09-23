@@ -27,6 +27,8 @@ class _HowDriveDo12WidgetState extends State<HowDriveDo12Widget> {
     super.initState();
     _model = createModel(context, () => HowDriveDo12Model());
 
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'HowDriveDo12'});
     _model.textController ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
   }

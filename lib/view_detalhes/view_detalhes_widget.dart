@@ -47,6 +47,8 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
     super.initState();
     _model = createModel(context, () => ViewDetalhesModel());
 
+    logFirebaseEvent('screen_view',
+        parameters: {'screen_name': 'viewDetalhes'});
     animationsMap.addAll({
       'containerOnPageLoadAnimation': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
@@ -1083,6 +1085,9 @@ class _ViewDetalhesWidgetState extends State<ViewDetalhesWidget>
                           size: 20.0,
                         ),
                         onPressed: () async {
+                          logFirebaseEvent(
+                              'VIEW_DETALHES_chevronLeft_ICN_ON_TAP');
+                          logFirebaseEvent('IconButton_navigate_back');
                           context.safePop();
                         },
                       ),

@@ -2,46 +2,40 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        // CardinalCommerce (3DS dependency)
-        maven { url 'https://cardinalcommerce.jfrog.io/artifactory/android' }
-        maven { url 'https://cardinalcommerceprod.jfrog.io/artifactory/android' }
     }
 }
 
 rootProject.buildDir = '../build'
 
-subprojects { sub ->
-    afterEvaluate {
-        def hasAndroid = sub.extensions.findByName("android")
-        if (hasAndroid != null) {
-            // Funciona tanto para com.android.application quanto com.android.library
-            sub.android.compileSdkVersion 35
-            // (opcional, mas ajuda)
-            sub.android.defaultConfig {
-                if (it.hasProperty('targetSdkVersion')) targetSdkVersion 35
-                if (it.hasProperty('minSdkVersion'))    minSdkVersion 23
-            }
-            // Namespace pra plugins antigos que não definem
-            if (!sub.android.hasProperty('namespace') || sub.android.namespace == null) {
-                sub.android.namespace = "${sub.group}.${sub.name}".replace('-', '_')
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("kotlin")) {
+            project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
             }
         }
     }
 }
 
-// Map CardinalCommerce artifact to a mirror if the official repo is unavailable
-subprojects { sub ->
-    configurations.all {
-        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group == 'org.jfrog.cardinalcommerce.gradle' &&
-                details.requested.name == 'cardinalmobilesdk') {
-                // Use a compatible mirror available on Maven Central
-                details.useTarget 'io.github.airwallex:cardinalmobilesdk:2.2.3-2'
+subprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin("com.android.application") ||
+                project.plugins.hasPlugin("com.android.library")) {
+            project.android {
+                compileSdkVersion 35
             }
         }
+        if (project.hasProperty('android')) {
+                project.android {
+                    if (namespace == null) {
+                        namespace project.group
+                    }
+                }
+            }
     }
 }
-
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
@@ -49,4 +43,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) { delete rootProject.buildDir }
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

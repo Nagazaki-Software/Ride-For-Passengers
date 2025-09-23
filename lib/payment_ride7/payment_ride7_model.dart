@@ -12,20 +12,28 @@ class PaymentRide7Model extends FlutterFlowModel<PaymentRide7Widget> {
 
   int? selectTip;
 
+  String? rideID;
+
   ///  State fields for stateful widgets in this page.
 
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController;
   String? Function(BuildContext, String?)? textControllerValidator;
-  // Stores action output result for [Custom Action - processCardPayload] action in Container widget.
+  // Stores action output result for [Custom Action - processCardPayload] action in ContainerConfirmPay widget.
   dynamic processPayment;
-  // Stores action output result for [Backend Call - API (latlng To String)] action in Container widget.
+  // Stores action output result for [Backend Call - API (latlng To String)] action in ContainerConfirmPay widget.
   ApiCallResponse? latlngOrigem;
-  // Stores action output result for [Backend Call - API (latlng To String)] action in Container widget.
+  // Stores action output result for [Backend Call - API (latlng To String)] action in ContainerConfirmPay widget.
   ApiCallResponse? latlngDestino;
-  // Stores action output result for [Backend Call - Create Document] action in Container widget.
+  // Stores action output result for [Backend Call - Create Document] action in ContainerConfirmPay widget.
   RideOrdersRecord? order;
+  // Stores action output result for [Backend Call - API (latlng To String)] action in Text widget.
+  ApiCallResponse? latlngOrigemcop;
+  // Stores action output result for [Backend Call - API (latlng To String)] action in Text widget.
+  ApiCallResponse? latlngDestinocop;
+  // Stores action output result for [Backend Call - Create Document] action in Text widget.
+  RideOrdersRecord? ordertest;
 
   @override
   void initState(BuildContext context) {}

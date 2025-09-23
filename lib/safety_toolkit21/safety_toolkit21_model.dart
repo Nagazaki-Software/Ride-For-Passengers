@@ -14,10 +14,6 @@ class SafetyToolkit21Model extends FlutterFlowModel<SafetyToolkit21Widget> {
   bool? switchValue1;
   // State field(s) for Switch widget.
   bool? switchValue2;
-  // State field(s) for Switch widget.
-  bool? switchValue3;
-  // State field(s) for Switch widget.
-  bool? switchValue4;
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode1;
   TextEditingController? textController1;

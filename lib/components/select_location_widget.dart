@@ -1,6 +1,7 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
+import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'select_location_model.dart';
@@ -91,33 +92,33 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
           latlngUser: currentUserLocationValue,
           quickPicksDefaultToDestination: true,
           onConfirm: (result) async {
+            logFirebaseEvent('SELECT_LOCATION_Container_96amib72_CALLB');
+            logFirebaseEvent('AddressPicker_update_component_state');
             _model.jsonAddresss = result;
-            // Extrai coordenadas como double e monta LatLng diretamente
-            final double? pLat =
-                (getJsonField(result, r'$.pickupLat') as num?)?.toDouble();
-            final double? pLng =
-                (getJsonField(result, r'$.pickupLng') as num?)?.toDouble();
-            final double? dLat =
-                (getJsonField(result, r'$.destinationLat') as num?)?.toDouble();
-            final double? dLng =
-                (getJsonField(result, r'$.destinationLng') as num?)?.toDouble();
-
-            final LatLng? origem =
-                (pLat != null && pLng != null) ? LatLng(pLat, pLng) : null;
-            final LatLng? destino =
-                (dLat != null && dLng != null) ? LatLng(dLat, dLng) : null;
-
-            // Atualiza o AppState e notifica listeners
-            FFAppState().latlngAtual = origem ?? FFAppState().latlngAtual;
+            safeSetState(() {});
+            logFirebaseEvent('AddressPicker_update_app_state');
+            FFAppState().latlngAtual = functions.stringToLatlng('${getJsonField(
+              result,
+              r'''$.pickupLat''',
+            ).toString()}, ${getJsonField(
+              result,
+              r'''$.pickupLng''',
+            ).toString()}');
             FFAppState().latlangAondeVaiIr =
-                destino ?? FFAppState().latlangAondeVaiIr;
+                functions.stringToLatlng('${getJsonField(
+              result,
+              r'''$.destinationLat''',
+            ).toString()}, ${getJsonField(
+              result,
+              r'''$.destinationLng''',
+            ).toString()}');
             FFAppState().locationWhereTo = getJsonField(
               result,
-              r'$.destinationMainText',
+              r'''$.destinationMainText''',
             ).toString();
-            FFAppState().update(() {});
-
-            if (mounted) Navigator.pop(context);
+            safeSetState(() {});
+            logFirebaseEvent('AddressPicker_bottom_sheet');
+            Navigator.pop(context);
           },
         ),
       ),
