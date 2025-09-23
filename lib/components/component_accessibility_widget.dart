@@ -31,11 +31,11 @@ class _ComponentAccessibilityWidgetState
   void initState() {
     super.initState();
     _model = createModel(context, () => ComponentAccessibilityModel());
-
-    _model.switchValue1 = false;
-    _model.switchValue2 = false;
-    _model.switchValue3 = false;
-    _model.switchValue4 = false;
+    // Initialize switches from persisted app state
+    _model.switchValue1 = FFAppState().accessLowStimulation;
+    _model.switchValue2 = FFAppState().accessStreetNamesAudio;
+    _model.switchValue3 = FFAppState().accessHapticsAndSound;
+    _model.switchValue4 = FFAppState().accessVoiceRequest;
   }
 
   @override
@@ -49,7 +49,7 @@ class _ComponentAccessibilityWidgetState
   Widget build(BuildContext context) {
     // Rebuild when global accessibility flags change
     context.watch<FFAppState>();
-    // Keep local switches in sync if needed
+    // Keep local switches in sync if needed (only if they are null)
     _model.switchValue1 ??= FFAppState().accessLowStimulation;
     _model.switchValue2 ??= FFAppState().accessStreetNamesAudio;
     _model.switchValue3 ??= FFAppState().accessHapticsAndSound;
@@ -169,10 +169,8 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue1!,
                         onChanged: (newValue) async {
+                          // Only update local state; apply on Confirm
                           safeSetState(() => _model.switchValue1 = newValue);
-                          FFAppState().update(() {
-                            FFAppState().accessLowStimulation = newValue;
-                          });
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -251,10 +249,8 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue2!,
                         onChanged: (newValue) async {
+                          // Only update local state; apply on Confirm
                           safeSetState(() => _model.switchValue2 = newValue);
-                          FFAppState().update(() {
-                            FFAppState().accessStreetNamesAudio = newValue;
-                          });
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -333,10 +329,8 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue3!,
                         onChanged: (newValue) async {
+                          // Only update local state; apply on Confirm
                           safeSetState(() => _model.switchValue3 = newValue);
-                          FFAppState().update(() {
-                            FFAppState().accessHapticsAndSound = newValue;
-                          });
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -415,10 +409,8 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue4!,
                         onChanged: (newValue) async {
+                          // Only update local state; apply on Confirm
                           safeSetState(() => _model.switchValue4 = newValue);
-                          FFAppState().update(() {
-                            FFAppState().accessVoiceRequest = newValue;
-                          });
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -434,14 +426,17 @@ class _ComponentAccessibilityWidgetState
               ),
               FFButtonWidget(
                 onPressed: () {
-                  // Sync switch #2 (Street Names Audio) if changed
-                  final v2 = _model.switchValue2 ?? false;
+                  // Apply all pending changes at once
+                  final v1 = _model.switchValue1 ?? FFAppState().accessLowStimulation;
+                  final v2 = _model.switchValue2 ?? FFAppState().accessStreetNamesAudio;
+                  final v3 = _model.switchValue3 ?? FFAppState().accessHapticsAndSound;
+                  final v4 = _model.switchValue4 ?? FFAppState().accessVoiceRequest;
                   FFAppState().update(() {
+                    FFAppState().accessLowStimulation = v1;
                     FFAppState().accessStreetNamesAudio = v2;
+                    FFAppState().accessHapticsAndSound = v3;
+                    FFAppState().accessVoiceRequest = v4;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Accessibility settings updated')),
-                  );
                 },
                 text: FFLocalizations.of(context).getText(
                   '0vrkyi4m' /* Confirm */,

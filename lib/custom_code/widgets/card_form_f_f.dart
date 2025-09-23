@@ -229,6 +229,13 @@ class _CardFormFFState extends State<CardFormFF> {
         } on PlatformException catch (pe) {
           showSnackbar(context, _friendlyBraintreeError(pe));
           return;
+        } catch (e) {
+          showSnackbar(
+              context,
+              e is MissingPluginException
+                  ? 'Payments not available on this build. Please reinstall or check plugins.'
+                  : 'Unexpected error while tokenizing: ${e.toString()}');
+          return;
         }
 
         if (result == null) {
@@ -339,6 +346,16 @@ class _CardFormFFState extends State<CardFormFF> {
               'Braintree PlatformException: code=${pe.code} message=${pe.message} details=${pe.details}');
         }
         showSnackbar(context, _friendlyBraintreeError(pe));
+        return;
+      } catch (e) {
+        if (kDebugPayments) {
+          debugPrint('Braintree unexpected error: $e');
+        }
+        showSnackbar(
+            context,
+            e is MissingPluginException
+                ? 'Payments not available on this build. Please reinstall or check plugins.'
+                : 'Unexpected error while tokenizing: ${e.toString()}');
         return;
       }
 

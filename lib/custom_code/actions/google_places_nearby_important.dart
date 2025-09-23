@@ -200,7 +200,22 @@ Future<List<dynamic>> googlePlacesNearbyImportant(
       return -ra.compareTo(rb);
     });
 
-    return aggregated.take(limit).toList();
+    // Filtra e ordena por distância antes de devolver
+    final int cutoff = (radius * 1.10).round();
+    final List<Map<String, dynamic>> filtered = aggregated.where((m) {
+      final int? d = (m['distanceMeters'] is int) ? (m['distanceMeters'] as int) : null;
+      if (d == null) return false;
+      return d <= cutoff;
+    }).toList();
+    filtered.sort((a, b) {
+      final da = (a['distanceMeters'] ?? 1 << 30) as int;
+      final db = (b['distanceMeters'] ?? 1 << 30) as int;
+      if (da != db) return da.compareTo(db);
+      final ra = (a['rating'] ?? 0.0) as double;
+      final rb = (b['rating'] ?? 0.0) as double;
+      return -ra.compareTo(rb);
+    });
+    return filtered.take(limit).toList();
   } catch (_) {
     return <dynamic>[];
   }

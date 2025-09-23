@@ -1226,11 +1226,15 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                     FFAppState().defaultCard,
                                                     r'''$.numberMasked''',
                                                   ))
-                                                Text(
+                                              Flexible(
+                                                child: Text(
                                                   FFLocalizations.of(context)
                                                       .getText(
                                                     'q0r0r5ua' /* This Default  */,
                                                   ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: FlutterFlowTheme.of(
                                                           context)
                                                       .bodyMedium
@@ -1266,19 +1270,42 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                                 .fontStyle,
                                                       ),
                                                 ),
-                                              Text(
-                                                '${getJsonField(
-                                                  creditCardsItem,
-                                                  r'''$.brand''',
-                                                ).toString()} ${functions.esconderCreditCard(getJsonField(
-                                                  creditCardsItem,
-                                                  r'''$.numberMasked''',
-                                                ).toString())}',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
+                                              ),
+                                              SizedBox(width: 6.0),
+                                              Flexible(
+                                                child: Text(
+                                                  '${getJsonField(
+                                                    creditCardsItem,
+                                                    r'''$.brand''',
+                                                  ).toString()} ${functions.esconderCreditCard(getJsonField(
+                                                    creditCardsItem,
+                                                    r'''$.numberMasked''',
+                                                  ).toString())}',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        font: GoogleFonts.poppins(
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .alternate,
+                                                        fontSize: 10.0,
+                                                        letterSpacing: 0.0,
                                                         fontWeight:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1290,23 +1317,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                                 .bodyMedium
                                                                 .fontStyle,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .alternate,
-                                                      fontSize: 10.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
+                                                ),
                                               ),
                                             ],
                                           ),

@@ -8,6 +8,9 @@ class RideShare6Model extends FlutterFlowModel<RideShare6Widget> {
 
   DocumentReference? session;
 
+  // Prevent duplicate navigations when session status changes.
+  bool movedToPayment = false;
+
   ///  State fields for stateful widgets in this page.
 
   // Stores action output result for [Backend Call - Create Document] action in Container widget.

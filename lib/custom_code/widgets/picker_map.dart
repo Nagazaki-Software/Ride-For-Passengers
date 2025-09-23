@@ -58,7 +58,7 @@ class PickerMap extends StatefulWidget {
     this.fadeInMs = 420,
     this.enableRouteSnake = true,
     this.snakeDurationMsOverride, // se quiser forÃ§ar (ms)
-    this.snakeSpeedFactor = 1.0,
+    this.snakeSpeedFactor = 1.4,
     this.driverTweenMs = 320,
     this.ultraLowSpecMode = false,
     this.traceMinStepMeters = 1.5,
@@ -142,6 +142,10 @@ class _PickerMapState extends State<PickerMap>
   int _snakeDurationMs = 9000; // mais rÃ¡pido por padrÃ£o
   int _lastCamUpdateMs = 0;
 
+  // Follow suave do usuário quando sem destino
+  nmap.LatLng? _lastUserCamTarget;
+  int _lastUserFollowMs = 0;
+
   // Idle camera quando destination == null
   Timer? _idleCamTimer;
   double _idleBearing = 0;
@@ -216,7 +220,7 @@ class _PickerMapState extends State<PickerMap>
 
       // Follow de cÃ¢mera mais amplo
       final int now = DateTime.now().millisecondsSinceEpoch;
-      if (now - _lastCamUpdateMs > 140) {
+      if (now - _lastCamUpdateMs > 300) {
         _lastCamUpdateMs = now;
         final nmap.LatLng ref = _posAt((headDist - 120).clamp(0.0, _totalDist));
         final double br = _bearing(ref, headPos);
@@ -227,7 +231,7 @@ class _PickerMapState extends State<PickerMap>
             zoom: _zoomForDistance(_totalDist),
             bearing: br,
             tilt: 24.0,
-            durationMs: 240,
+            durationMs: 280,
           );
         } catch (_) {}
       }
@@ -311,7 +315,7 @@ class _PickerMapState extends State<PickerMap>
     final nmap.CameraPosition initialCamera = nmap.CameraPosition(
       target: nmap.LatLng(
           widget.userLocation.latitude, widget.userLocation.longitude),
-      zoom: widget.destination == null ? 15.6 : 12.8,
+      zoom: widget.destination == null ? 16.6 : 12.8,
     );
 
     return SizedBox(
@@ -390,19 +394,21 @@ class _PickerMapState extends State<PickerMap>
     if (!_mapReady || _controller == null) return;
     if (FFAppState().accessLowStimulation) return;
     _idleCamTimer =
-        Timer.periodic(const Duration(milliseconds: 1800), (_) async {
+        Timer.periodic(const Duration(milliseconds: 5000), (_) async {
       if (!_mapReady ||
           _controller == null ||
           widget.destination != null ||
           _snaking) return;
+      final int now = DateTime.now().millisecondsSinceEpoch;
+      if (now - _lastUserFollowMs < 6000) return;
       try {
         final dynamic dc = _controller;
         await dc.animateCameraTo(
           target: _gm(widget.userLocation),
-          zoom: 16.0,
+          zoom: 16.2,
           bearing: 0.0,
           tilt: 0.0,
-          durationMs: 380,
+          durationMs: 350,
         );
       } catch (_) {}
     });
@@ -415,15 +421,27 @@ class _PickerMapState extends State<PickerMap>
 
   Future<void> _snapToUser() async {
     if (!_mapReady || _controller == null) return;
+    final nmap.LatLng target = _gm(widget.userLocation);
     try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 16.2,
-        bearing: 0,
-        tilt: 0,
-        durationMs: 380,
-      );
+      if (_lastUserCamTarget == null) {
+        await _controller!.moveCamera(target, zoom: 16.6);
+        _lastUserCamTarget = target;
+        _lastUserFollowMs = DateTime.now().millisecondsSinceEpoch;
+        return;
+      }
+      final double d = _meters(_lastUserCamTarget!, target);
+      if (d >= 3.5) {
+        final dynamic dc = _controller;
+        await dc.animateCameraTo(
+          target: target,
+          zoom: 16.2,
+          bearing: 0,
+          tilt: 0,
+          durationMs: 260,
+        );
+        _lastUserCamTarget = target;
+        _lastUserFollowMs = DateTime.now().millisecondsSinceEpoch;
+      }
     } catch (_) {}
   }
 
@@ -434,6 +452,7 @@ class _PickerMapState extends State<PickerMap>
     _route = <nmap.LatLng>[];
     _cumDist = <double>[];
     _totalDist = 0.0;
+    _lastUserCamTarget = null; // reseta follow para novo snap imediato
     for (final id in [_kBaseOutline, _kBaseMain, _kSnakeOutline, _kSnakeMain]) {
       await _removePolyline(id);
     }
@@ -556,6 +575,7 @@ class _PickerMapState extends State<PickerMap>
       added = true;
       try {
         final dynamic dc = _controller;
+        await Future<void>.delayed(const Duration(milliseconds: 16));
         await dc.setMarkerIconBytes(id: id, bytes: bytesIcon);
       } catch (_) {}
     }
@@ -574,6 +594,7 @@ class _PickerMapState extends State<PickerMap>
         _markerIds.add(id);
         try {
           final dynamic dc = _controller;
+          await Future<void>.delayed(const Duration(milliseconds: 16));
           await dc.setMarkerIconBytes(id: id, bytes: bytesIcon);
         } catch (_) {}
       } catch (_) {}
