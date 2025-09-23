@@ -80,7 +80,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>In order to upload data, this app requires permission to access the photo library.</string>
 	<key>NSMicrophoneUsageDescription</key>
-    <string>Add mycrofiome</string>
+	<string>This app needs microphone access for voice features.</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>fetch</string>
@@ -111,3 +111,4 @@
 
 </dict>
 </plist>
+
