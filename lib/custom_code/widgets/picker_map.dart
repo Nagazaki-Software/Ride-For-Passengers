@@ -1,15 +1,4 @@
 ﻿// Automatic FlutterFlow imports
-
-    // Remove marker de destino se existir
-    if (_markerIds.contains('dest')) {
-      try {
-        await _controller?.removeMarker('dest');
-      } catch (_) {}
-      _markerIds.remove('dest');
-      _markerPos.remove('dest');
-      _markerTitle.remove('dest');
-    }
-// Automatic FlutterFlow imports
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/actions/actions.dart' as action_blocks;
@@ -908,7 +897,7 @@ class _PickerMapState extends State<PickerMap>
       final String msg = (addr == null || addr.isEmpty)
           ? '$label definido'
           : '$label: $addr';
-      SemanticsService.announce(msg, TextDirection.ltr);
+      SemanticsService.announce(msg, ui.TextDirection.ltr);
     } catch (_) {}
   }
 
@@ -920,7 +909,7 @@ class _PickerMapState extends State<PickerMap>
       final String? b = await _reverseGeocodeForAudio(_route.last);
       final String msg =
           'Rota pronta.' + (a != null && a.isNotEmpty ? ' Saída: $a.' : '') + (b != null && b.isNotEmpty ? ' Destino: $b.' : '');
-      SemanticsService.announce(msg, TextDirection.ltr);
+      SemanticsService.announce(msg, ui.TextDirection.ltr);
     } catch (_) {}
   }
 
