@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 // lib/custom_code/widgets/card_form_f_f.dart
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -162,6 +162,10 @@ class _CardFormFFState extends State<CardFormFF> {
   }
 
   Future<void> _onConfirmPressed() async {
+    // Guard: plugin only works on Android/iOS. Prevent crashes on desktop/web.
+    final bool isMobile = !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS);
     if (FFAppState().accessHapticsAndSound) {
       HapticFeedback.selectionClick();
     }
@@ -172,8 +176,8 @@ class _CardFormFFState extends State<CardFormFF> {
         showSnackbar(context, 'Complete os dados do cartão.');
         return;
       }
-      if (kIsWeb) {
-        showSnackbar(context, 'Saving on web is not supported.');
+      if (!isMobile) {
+        showSnackbar(context, 'Saving is only supported on Android/iOS.');
         return;
       }
 
@@ -184,8 +188,8 @@ class _CardFormFFState extends State<CardFormFF> {
       }
 
       final data = _collect();
-      try {
-        setState(() => _isPaying = true);
+        try {
+          setState(() => _isPaying = true);
         final req = BraintreeCreditCardRequest(
           cardNumber: data.number,
           expirationMonth: data.month,
@@ -263,8 +267,8 @@ class _CardFormFFState extends State<CardFormFF> {
       await _emitState(event: 'submit', mode: 'charge');
       return;
     }
-    if (kIsWeb) {
-      showSnackbar(context, 'Payments are not supported on web.');
+    if (!isMobile) {
+      showSnackbar(context, 'Payments are only supported on Android/iOS.');
       return;
     }
     final precheckError = await _ensureReady();

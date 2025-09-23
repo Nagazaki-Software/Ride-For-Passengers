@@ -46,11 +46,15 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
           final hasStatus =
               ((snap.data() as Map<String, dynamic>?)?.containsKey('status')) ??
                   false;
-          final updateData = mapToFirestore({
-            'participantes': FieldValue.arrayUnion([currentUserReference]),
-            if (!hasStatus) 'status': 'waiting',
-          });
-          await ref.update(updateData);
+          if (currentUserReference != null) {
+            final updateData = mapToFirestore({
+              'participantes': FieldValue.arrayUnion([currentUserReference]),
+              if (!hasStatus) 'status': 'waiting',
+            });
+            await ref.update(updateData);
+          } else if (!hasStatus) {
+            await ref.update(createRideOrdersRecordData(status: 'waiting'));
+          }
           _model.session = ref;
           safeSetState(() {});
         }
@@ -390,6 +394,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             var rideOrdersRecordReference =
                                                 RideOrdersRecord.collection
                                                     .doc();
+                                            if (currentUserReference == null) {
+                                              // Must be logged in to create a session
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Please log in to create a RideShare session.')),
+                                              );
+                                              return;
+                                            }
                                             // Prepare coords and estimate similar to Confirm Ride
                                             final latA = FFAppState().latlngAtual;
                                             final latB = FFAppState().latlangAondeVaiIr;
