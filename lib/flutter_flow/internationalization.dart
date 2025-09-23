@@ -2013,7 +2013,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Cliquez ici pour gérer ou annuler votre Pass',
       'pt': 'Clique aqui para gerenciar ou cancelar seu passe',
     },
-<<<<<<< HEAD
     'ni6ifi3e': {
       'en': 'M',
       'de': 'M',
@@ -2035,8 +2034,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Cliquez ici pour gérer ou annuler votre Pass',
       'pt': 'Clique aqui para gerenciar ou cancelar seu passe',
     },
-=======
->>>>>>> master
     '7ou1tpcp': {
       'en': 'Log out',
       'de': 'Ausloggen',
@@ -4585,6 +4582,72 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Licencia BSD de 3 cláusulas',
       'fr': 'Licence BSD à 3 clauses',
       'pt': 'Licença BSD de 3 cláusulas',
+    },
+  },
+  // a1
+  {
+    '77apgdkx': {
+      'en': 'Recibos',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'd37tqc98': {
+      'en': 'Recibos Recentes',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'ytv19n2u': {
+      'en': 'Valor da corrida',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    '065212ul': {
+      'en': 'Pago',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'prdsa145': {
+      'en': '\$ 12',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'yecgsuxl': {
+      'en': 'Apartamento Centro - Janeiro 2024',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    '3ppcipw3': {
+      'en': '15 Jan 2024 • 14:30',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'nmtlwhwx': {
+      'en': 'Visualizar',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    '9dfawdqr': {
+      'en': 'Baixar PDF',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
     },
   },
   // continuecom

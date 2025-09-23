@@ -1,19 +1,8 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-<<<<<<< HEAD
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-=======
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
-import 'package:expandable/expandable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-
->>>>>>> master
 import 'termsof_service30_model.dart';
 export 'termsof_service30_model.dart';
 
@@ -38,7 +27,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
     super.initState();
     _model = createModel(context, () => TermsofService30Model());
 
-<<<<<<< HEAD
     logFirebaseEvent('screen_view',
         parameters: {'screen_name': 'TermsofService30'});
     _model.expandableExpandableController1 =
@@ -57,36 +45,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
         ExpandableController(initialExpanded: false);
     _model.expandableExpandableController8 =
         ExpandableController(initialExpanded: false);
-=======
-    logFirebaseEvent(
-      'screen_view',
-      parameters: {'screen_name': 'TermsofService30'},
-    );
-    _model.expandableExpandableController1 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController2 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController3 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController4 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController5 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController6 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController7 = ExpandableController(
-      initialExpanded: false,
-    );
-    _model.expandableExpandableController8 = ExpandableController(
-      initialExpanded: false,
-    );
->>>>>>> master
   }
 
   @override
@@ -111,11 +69,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Padding(
-<<<<<<< HEAD
                 padding: EdgeInsetsDirectional.fromSTEB(16.0, 40.0, 16.0, 0.0),
-=======
-                padding: EdgeInsetsDirectional.fromSTEB(16, 40, 16, 0),
->>>>>>> master
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
@@ -126,17 +80,11 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                       highlightColor: Colors.transparent,
                       onTap: () async {
                         logFirebaseEvent(
-<<<<<<< HEAD
                             'TERMSOF_SERVICE30_Text_3alwwwqn_ON_TAP');
-=======
-                          'TERMSOF_SERVICE30_Text_3alwwwqn_ON_TAP',
-                        );
->>>>>>> master
                         logFirebaseEvent('Text_navigate_back');
                         context.safePop();
                       },
                       child: Text(
-<<<<<<< HEAD
                         FFLocalizations.of(context).getText(
                           'ra6hewkk' /* Terms of Service */,
                         ),
@@ -152,40 +100,16 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                               fontStyle: FontStyle.italic,
                               lineHeight: 1.4,
                             ),
-=======
-                        FFLocalizations.of(
-                          context,
-                        ).getText('ra6hewkk' /* Terms of Service */),
-                        style: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          color: FlutterFlowTheme.of(context).alternate,
-                          fontSize: 22,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.w500,
-                          fontStyle: FontStyle.italic,
-                          lineHeight: 1.4,
-                        ),
->>>>>>> master
                       ),
                     ),
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: Color(0xFF1B1B1C),
-<<<<<<< HEAD
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(16.0),
-=======
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
->>>>>>> master
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -201,23 +125,11 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                     children: [
                                       Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                             8.0, 8.0, 0.0, 0.0),
                                         child: Text(
                                           FFLocalizations.of(context).getText(
                                             'ssubq09y' /* App Use */,
                                           ),
-=======
-                                          8,
-                                          8,
-                                          0,
-                                          0,
-                                        ),
-                                        child: Text(
-                                          FFLocalizations.of(
-                                            context,
-                                          ).getText('ssubq09y' /* App Use */),
->>>>>>> master
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -225,7 +137,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
-<<<<<<< HEAD
                                                               context)
                                                           .bodyMedium
                                                           .fontStyle,
@@ -243,36 +154,11 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         ),
                                       ),
                                     ].divide(SizedBox(width: 6.0)),
-=======
-                                                        context,
-                                                      ).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(
-                                                  context,
-                                                ).alternate,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.normal,
-                                                fontStyle: FlutterFlowTheme.of(
-                                                  context,
-                                                ).bodyMedium.fontStyle,
-                                              ),
-                                        ),
-                                      ),
-                                    ].divide(SizedBox(width: 6)),
->>>>>>> master
                                   ),
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'l3rbgns8' /* Use the app to request rides w... */,
@@ -281,7 +167,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -302,25 +187,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -336,24 +202,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -369,15 +225,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                     children: [
                                       Padding(
                                         padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                             8.0, 8.0, 0.0, 0.0),
-=======
-                                          8,
-                                          8,
-                                          0,
-                                          0,
-                                        ),
->>>>>>> master
                                         child: Text(
                                           FFLocalizations.of(context).getText(
                                             'hyneyff1' /* Account & Eligibility */,
@@ -389,7 +237,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle:
                                                       FlutterFlowTheme.of(
-<<<<<<< HEAD
                                                               context)
                                                           .bodyMedium
                                                           .fontStyle,
@@ -404,20 +251,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .fontStyle,
-=======
-                                                        context,
-                                                      ).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(
-                                                  context,
-                                                ).alternate,
-                                                fontSize: 14,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.normal,
-                                                fontStyle: FlutterFlowTheme.of(
-                                                  context,
-                                                ).bodyMedium.fontStyle,
->>>>>>> master
                                               ),
                                         ),
                                       ),
@@ -426,15 +259,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'xz7q5oqy' /* You must be 18+, provide accur... */,
@@ -443,7 +268,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -464,25 +288,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -498,24 +303,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -528,29 +323,16 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                 child: ExpandablePanel(
                                   header: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         8.0, 8.0, 0.0, 0.0),
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'o49590hu' /* Rides & Fares */,
                                       ),
-=======
-                                      8,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
-                                    child: Text(
-                                      FFLocalizations.of(
-                                        context,
-                                      ).getText('o49590hu' /* Rides & Fares */),
->>>>>>> master
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
                                               fontWeight: FontWeight.normal,
-<<<<<<< HEAD
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -564,35 +346,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).alternate,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                           ),
                                     ),
                                   ),
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'iq3q0eua' /* We show a fare estimate before... */,
@@ -601,7 +361,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -622,25 +381,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -656,24 +396,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -686,15 +416,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                 child: ExpandablePanel(
                                   header: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         8.0, 8.0, 0.0, 0.0),
-=======
-                                      8,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'hd9a2nxr' /* Payments (Braintree) */,
@@ -704,7 +426,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .override(
                                             font: GoogleFonts.poppins(
                                               fontWeight: FontWeight.normal,
-<<<<<<< HEAD
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -718,35 +439,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).alternate,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                           ),
                                     ),
                                   ),
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'e0hx8opo' /* We charge credit cards (Apple/... */,
@@ -755,7 +454,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -776,25 +474,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -810,24 +489,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -840,15 +509,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                 child: ExpandablePanel(
                                   header: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         8.0, 8.0, 0.0, 0.0),
-=======
-                                      8,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         '1j9ju4dv' /* Cancellations & Refunds */,
@@ -858,7 +519,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .override(
                                             font: GoogleFonts.poppins(
                                               fontWeight: FontWeight.normal,
-<<<<<<< HEAD
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -872,35 +532,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).alternate,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                           ),
                                     ),
                                   ),
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         '01ra7oy8' /* A fee may apply if the driver ... */,
@@ -909,7 +547,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -930,25 +567,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -964,24 +582,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -994,15 +602,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                 child: ExpandablePanel(
                                   header: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         8.0, 8.0, 0.0, 0.0),
-=======
-                                      8,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         '1co4586b' /* Safety & Conduct */,
@@ -1012,7 +612,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .override(
                                             font: GoogleFonts.poppins(
                                               fontWeight: FontWeight.normal,
-<<<<<<< HEAD
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -1026,35 +625,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).alternate,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                           ),
                                     ),
                                   ),
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'faa0m7y4' /* Trips have GPS tracking, a Saf... */,
@@ -1063,7 +640,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -1084,25 +660,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -1118,24 +675,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -1148,15 +695,7 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                 child: ExpandablePanel(
                                   header: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         8.0, 8.0, 0.0, 0.0),
-=======
-                                      8,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         '49how4av' /* Data & Privacy */,
@@ -1166,7 +705,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .override(
                                             font: GoogleFonts.poppins(
                                               fontWeight: FontWeight.normal,
-<<<<<<< HEAD
                                               fontStyle:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -1180,35 +718,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).alternate,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                           ),
                                     ),
                                   ),
                                   collapsed: Container(),
                                   expanded: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                         0.0, 8.0, 0.0, 0.0),
-=======
-                                      0,
-                                      8,
-                                      0,
-                                      0,
-                                    ),
->>>>>>> master
                                     child: Text(
                                       FFLocalizations.of(context).getText(
                                         'arxd0mls' /* We use your data to run the ap... */,
@@ -1217,7 +733,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           .bodyMedium
                                           .override(
                                             font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                               fontWeight:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -1238,25 +753,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontStyle,
-=======
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
-                                            ),
-                                            color: FlutterFlowTheme.of(
-                                              context,
-                                            ).secondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(
-                                              context,
-                                            ).bodyMedium.fontStyle,
->>>>>>> master
                                             lineHeight: 1.4,
                                           ),
                                     ),
@@ -1272,24 +768,14 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                         Icons.keyboard_arrow_down_rounded,
                                     collapseIcon:
                                         Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                     iconColor:
                                         FlutterFlowTheme.of(context).secondary,
-=======
-                                    iconColor: FlutterFlowTheme.of(
-                                      context,
-                                    ).secondary,
->>>>>>> master
                                   ),
                                 ),
                               ),
                             ),
                             Divider(
-<<<<<<< HEAD
                               height: 1.0,
-=======
-                              height: 1,
->>>>>>> master
                               thickness: 0.5,
                               color: FlutterFlowTheme.of(context).secondaryText,
                             ),
@@ -1305,29 +791,16 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                   child: ExpandablePanel(
                                     header: Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                           8.0, 8.0, 0.0, 0.0),
                                       child: Text(
                                         FFLocalizations.of(context).getText(
                                           'yhjazte1' /* Liability */,
                                         ),
-=======
-                                        8,
-                                        8,
-                                        0,
-                                        0,
-                                      ),
-                                      child: Text(
-                                        FFLocalizations.of(
-                                          context,
-                                        ).getText('yhjazte1' /* Liability */),
->>>>>>> master
                                         style: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .override(
                                               font: GoogleFonts.poppins(
                                                 fontWeight: FontWeight.normal,
-<<<<<<< HEAD
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -1342,35 +815,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
                                                       .fontStyle,
-=======
-                                                fontStyle: FlutterFlowTheme.of(
-                                                  context,
-                                                ).bodyMedium.fontStyle,
-                                              ),
-                                              color: FlutterFlowTheme.of(
-                                                context,
-                                              ).alternate,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.normal,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
->>>>>>> master
                                             ),
                                       ),
                                     ),
                                     collapsed: Container(),
                                     expanded: Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-<<<<<<< HEAD
                                           0.0, 8.0, 0.0, 0.0),
-=======
-                                        0,
-                                        8,
-                                        0,
-                                        0,
-                                      ),
->>>>>>> master
                                       child: Text(
                                         FFLocalizations.of(context).getText(
                                           'e5vhmpdf' /* We’re not responsible for traf... */,
@@ -1379,7 +830,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                             .bodyMedium
                                             .override(
                                               font: GoogleFonts.poppins(
-<<<<<<< HEAD
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -1401,25 +851,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
                                                       .fontStyle,
-=======
-                                                fontWeight: FlutterFlowTheme.of(
-                                                  context,
-                                                ).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(
-                                                  context,
-                                                ).bodyMedium.fontStyle,
-                                              ),
-                                              color: FlutterFlowTheme.of(
-                                                context,
-                                              ).secondaryText,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontWeight,
-                                              fontStyle: FlutterFlowTheme.of(
-                                                context,
-                                              ).bodyMedium.fontStyle,
->>>>>>> master
                                               lineHeight: 1.4,
                                             ),
                                       ),
@@ -1435,20 +866,13 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                                           Icons.keyboard_arrow_down_rounded,
                                       collapseIcon:
                                           Icons.keyboard_arrow_up_rounded,
-<<<<<<< HEAD
                                       iconColor: FlutterFlowTheme.of(context)
                                           .secondary,
-=======
-                                      iconColor: FlutterFlowTheme.of(
-                                        context,
-                                      ).secondary,
->>>>>>> master
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-<<<<<<< HEAD
                           ].divide(SizedBox(height: 8.0)),
                         ),
                       ),
@@ -1456,13 +880,6 @@ class _TermsofService30WidgetState extends State<TermsofService30Widget> {
                   ]
                       .divide(SizedBox(height: 20.0))
                       .addToEnd(SizedBox(height: 80.0)),
-=======
-                          ].divide(SizedBox(height: 8)),
-                        ),
-                      ),
-                    ),
-                  ].divide(SizedBox(height: 20)).addToEnd(SizedBox(height: 80)),
->>>>>>> master
                 ),
               ),
             ],

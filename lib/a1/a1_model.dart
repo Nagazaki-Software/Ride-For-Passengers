@@ -1,8 +1,8 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'licenses31_widget.dart' show Licenses31Widget;
+import 'a1_widget.dart' show A1Widget;
 import 'package:flutter/material.dart';
 
-class Licenses31Model extends FlutterFlowModel<Licenses31Widget> {
+class A1Model extends FlutterFlowModel<A1Widget> {
   @override
   void initState(BuildContext context) {}
 

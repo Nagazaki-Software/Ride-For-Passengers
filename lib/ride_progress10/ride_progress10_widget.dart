@@ -276,11 +276,7 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                             .secondary,
                                                         FlutterFlowTheme.of(
                                                                 context)
-<<<<<<< HEAD
                                                             .accent1
-=======
-                                                            .primaryBackground
->>>>>>> master
                                                       ],
                                                       gradientDirection:
                                                           GradientDirection.ltr,
@@ -370,11 +366,7 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                             .secondary,
                                                         FlutterFlowTheme.of(
                                                                 context)
-<<<<<<< HEAD
                                                             .accent1
-=======
-                                                            .primaryBackground
->>>>>>> master
                                                       ],
                                                       gradientDirection:
                                                           GradientDirection.ltr,
@@ -533,12 +525,7 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                         colors: [
                                           FlutterFlowTheme.of(context)
                                               .secondary,
-<<<<<<< HEAD
                                           FlutterFlowTheme.of(context).accent1,
-=======
-                                          FlutterFlowTheme.of(context)
-                                              .primaryBackground,
->>>>>>> master
                                           Color(0xFFF0DBA6)
                                         ],
                                         gradientDirection:

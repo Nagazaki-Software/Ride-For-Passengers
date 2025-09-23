@@ -64,11 +64,7 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
         body: SafeArea(
           top: true,
           child: Padding(
-<<<<<<< HEAD
             padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-=======
-            padding: EdgeInsetsDirectional.fromSTEB(24.0, 16.0, 24.0, 0.0),
->>>>>>> master
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.max,
@@ -78,7 +74,6 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-<<<<<<< HEAD
                       Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -115,48 +110,6 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
                             ),
                           ),
                         ],
-=======
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 40.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                logFirebaseEvent(
-                                    'REPORTAPROBLEM28_Text_814lc18j_ON_TAP');
-                                logFirebaseEvent('Text_navigate_back');
-                                context.safePop();
-                              },
-                              child: Text(
-                                FFLocalizations.of(context).getText(
-                                  '9svvq5rn' /* Report a problem */,
-                                ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .alternate,
-                                      fontSize: 22.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
->>>>>>> master
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.max,

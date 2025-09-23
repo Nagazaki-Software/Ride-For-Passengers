@@ -21,11 +21,6 @@ import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import '/flutter_flow/lat_lng.dart' show LatLng;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-<<<<<<< HEAD
-=======
-import 'package:provider/provider.dart';
-import '../../app_state.dart';
->>>>>>> master
 
 /// ------------------------------------------------------------ AddressPicker
 /// v4.5 - Quick Picks preenchem DESTINO por padrão antes de digitar/falar -
@@ -502,17 +497,6 @@ class _AddressPickerState extends State<AddressPicker> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-=======
-    // React to accessibility voice toggle
-    context.watch<FFAppState>();
-    final bool voiceEnabled = FFAppState().accessVoiceRequest;
-    if (!voiceEnabled && _isListening) {
-      // Ensure we stop listening if the feature is disabled
-      _speech.stop();
-      _isListening = false;
-    }
->>>>>>> master
     final w = widget.width ?? double.infinity;
     final h = widget.height ?? double.infinity;
 
@@ -580,21 +564,11 @@ class _AddressPickerState extends State<AddressPicker> {
                 }
               },
               // Botão de VOZ por TOQUE (fica sempre visível)
-<<<<<<< HEAD
               voiceTrailing: _VoiceTapButton(
                 isListening: _isListening,
                 enabled: _speechReady,
                 onTap: _toggleVoiceDestination,
               ),
-=======
-              voiceTrailing: voiceEnabled
-                  ? _VoiceTapButton(
-                      isListening: _isListening,
-                      enabled: _speechReady,
-                      onTap: _toggleVoiceDestination,
-                    )
-                  : null,
->>>>>>> master
             ),
 
             const SizedBox(height: 10),

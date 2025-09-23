@@ -50,11 +50,7 @@ class _PrivacyPolicy29WidgetState extends State<PrivacyPolicy29Widget> {
         body: SafeArea(
           top: true,
           child: Padding(
-<<<<<<< HEAD
             padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-=======
-            padding: EdgeInsetsDirectional.fromSTEB(16.0, 30.0, 16.0, 0.0),
->>>>>>> master
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.max,

@@ -152,12 +152,7 @@ class _ScheduleRide14WidgetState extends State<ScheduleRide14Widget> {
                                       abrirPage: (orderRef) async {},
                                       widgetAbaixo: (DateTime? date) =>
                                           ComponentScheduleActionWidget(
-<<<<<<< HEAD
                                         parameter3: _model.date!,
-=======
-                                        // Usa a seleção atual do calendário (sempre não-nula após init)
-                                        parameter3: date,
->>>>>>> master
                                       ),
                                     ),
                                   );

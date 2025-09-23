@@ -337,6 +337,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: Licenses31Widget.routeName,
           path: Licenses31Widget.routePath,
           builder: (context, params) => Licenses31Widget(),
+        ),
+        FFRoute(
+          name: A1Widget.routeName,
+          path: A1Widget.routePath,
+          builder: (context, params) => A1Widget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

@@ -18,11 +18,6 @@ import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-<<<<<<< HEAD
-=======
-import 'package:provider/provider.dart';
-import '../../app_state.dart';
->>>>>>> master
 
 // FlutterFlow auth (remova se não usa)
 import '/auth/firebase_auth/auth_util.dart';
@@ -185,13 +180,7 @@ class _CardFormFFState extends State<CardFormFF> {
   // CONFIRMAR (pagar ou só salvar)
   // =======================
   Future<void> _onConfirmPressed() async {
-<<<<<<< HEAD
     HapticFeedback.selectionClick();
-=======
-    if (FFAppState().accessHapticsAndSound) {
-      HapticFeedback.selectionClick();
-    }
->>>>>>> master
 
     // ---------- MODO SALVAR (VAULT) ----------
     if (!widget.chargeOnConfirm) {
@@ -236,16 +225,6 @@ class _CardFormFFState extends State<CardFormFF> {
         } on PlatformException catch (pe) {
           showSnackbar(context, _friendlyBraintreeError(pe));
           return;
-<<<<<<< HEAD
-=======
-        } catch (e) {
-          showSnackbar(
-              context,
-              e is MissingPluginException
-                  ? 'Payments not available on this build. Please reinstall or check plugins.'
-                  : 'Unexpected error while tokenizing: ${e.toString()}');
-          return;
->>>>>>> master
         }
 
         if (result == null) {
@@ -267,11 +246,7 @@ class _CardFormFFState extends State<CardFormFF> {
           return;
         }
 
-<<<<<<< HEAD
         // JSON minimalista pedido: { token, name, last4 }
-=======
-        // JSON enriquecido p/ reuso: token + metadados de exibição
->>>>>>> master
         final jsonReturn = <String, dynamic>{
           'token': saved.token ?? '',
           'name': saved.name ?? data.holder,
@@ -279,11 +254,6 @@ class _CardFormFFState extends State<CardFormFF> {
               (data.number.length >= 4
                   ? data.number.substring(data.number.length - 4)
                   : ''),
-<<<<<<< HEAD
-=======
-          'brand': _detectBrand(data.number),
-          'numberMasked': _maskNumber(data.number),
->>>>>>> master
         };
 
         try {
@@ -329,13 +299,7 @@ class _CardFormFFState extends State<CardFormFF> {
     }
 
     try {
-<<<<<<< HEAD
       HapticFeedback.lightImpact();
-=======
-      if (FFAppState().accessHapticsAndSound) {
-        HapticFeedback.lightImpact();
-      }
->>>>>>> master
       setState(() => _isPaying = true);
 
       final data = _collect();
@@ -368,19 +332,6 @@ class _CardFormFFState extends State<CardFormFF> {
         }
         showSnackbar(context, _friendlyBraintreeError(pe));
         return;
-<<<<<<< HEAD
-=======
-      } catch (e) {
-        if (kDebugPayments) {
-          debugPrint('Braintree unexpected error: $e');
-        }
-        showSnackbar(
-            context,
-            e is MissingPluginException
-                ? 'Payments not available on this build. Please reinstall or check plugins.'
-                : 'Unexpected error while tokenizing: ${e.toString()}');
-        return;
->>>>>>> master
       }
 
       if (result == null) {
@@ -689,15 +640,7 @@ class _CardFormFFState extends State<CardFormFF> {
       duration: const Duration(milliseconds: 120),
       opacity: enabled ? 1 : 0.7,
       child: GestureDetector(
-<<<<<<< HEAD
         onTapDown: (_) => HapticFeedback.lightImpact(),
-=======
-        onTapDown: (_) {
-          if (FFAppState().accessHapticsAndSound) {
-            HapticFeedback.lightImpact();
-          }
-        },
->>>>>>> master
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
