@@ -105,71 +105,89 @@ class _Login0WidgetState extends State<Login0Widget> {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 37.2,
-                                        height: 37.2,
-                                        decoration: BoxDecoration(
-                                          color: Color(0x2C484B51),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              blurRadius: 5.0,
-                                              color: Color(0x5E000000),
-                                              offset: Offset(
-                                                0.0,
-                                                4.0,
-                                              ),
-                                              spreadRadius: 3.0,
-                                            )
-                                          ],
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: FlutterFlowIconButton(
-                                          borderRadius: 20.0,
-                                          buttonSize: 26.0,
-                                          icon: Icon(
-                                            Icons.question_mark,
-                                            color: FlutterFlowTheme.of(context)
-                                                .info,
-                                            size: 16.0,
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      logFirebaseEvent(
+                                          'LOGIN0_PAGE_Row_jhuefrot_ON_TAP');
+                                      logFirebaseEvent('Row_navigate_to');
+
+                                      context.pushNamed(
+                                          FrequentlyAskedQuestions25Widget
+                                              .routeName);
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 37.2,
+                                          height: 37.2,
+                                          decoration: BoxDecoration(
+                                            color: Color(0x2C484B51),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                blurRadius: 5.0,
+                                                color: Color(0x5E000000),
+                                                offset: Offset(
+                                                  0.0,
+                                                  4.0,
+                                                ),
+                                                spreadRadius: 3.0,
+                                              )
+                                            ],
+                                            shape: BoxShape.circle,
                                           ),
-                                          onPressed: () {
-                                            print('IconButton pressed ...');
-                                          },
+                                          child: FlutterFlowIconButton(
+                                            borderRadius: 20.0,
+                                            buttonSize: 26.0,
+                                            icon: Icon(
+                                              Icons.question_mark,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .info,
+                                              size: 16.0,
+                                            ),
+                                            onPressed: () {
+                                              print('IconButton pressed ...');
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        FFLocalizations.of(context).getText(
-                                          'm895k4ns' /* Help */,
-                                        ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.poppins(
+                                        Text(
+                                          FFLocalizations.of(context).getText(
+                                            'm895k4ns' /* Help */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                fontSize: 14.0,
+                                                letterSpacing: 0.0,
                                                 fontWeight: FontWeight.w500,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .fontStyle,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
-                                              fontSize: 14.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                      ),
-                                    ].divide(SizedBox(width: 8.0)),
+                                        ),
+                                      ].divide(SizedBox(width: 8.0)),
+                                    ),
                                   ),
                                 ],
                               ),

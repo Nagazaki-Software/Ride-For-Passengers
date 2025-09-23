@@ -2,6 +2,7 @@ import '/components/navbar_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'safety_toolkit21_widget.dart' show SafetyToolkit21Widget;
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class SafetyToolkit21Model extends FlutterFlowModel<SafetyToolkit21Widget> {
   ///  Local state fields for this page.
@@ -21,6 +22,7 @@ class SafetyToolkit21Model extends FlutterFlowModel<SafetyToolkit21Widget> {
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode2;
   TextEditingController? textController2;
+  late MaskTextInputFormatter textFieldMask2;
   String? Function(BuildContext, String?)? textController2Validator;
   // Model for navbar component.
   late NavbarModel navbarModel;

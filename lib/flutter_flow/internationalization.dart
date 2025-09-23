@@ -2013,6 +2013,27 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Cliquez ici pour gérer ou annuler votre Pass',
       'pt': 'Clique aqui para gerenciar ou cancelar seu passe',
     },
+    'ni6ifi3e': {
+      'en': 'M',
+      'de': 'M',
+      'es': 'METRO',
+      'fr': 'M',
+      'pt': 'M',
+    },
+    'i3c4x0y3': {
+      'en': 'My Passes',
+      'de': 'Meine Pässe',
+      'es': 'Mis pases',
+      'fr': 'Mes passes',
+      'pt': 'Meus Passes',
+    },
+    'ce9vh550': {
+      'en': 'Click here to mansge or cancel your Pass',
+      'de': 'Klicken Sie hier, um Ihren Pass zu verwalten oder zu stornieren',
+      'es': 'Haga clic aquí para gestionar o cancelar su Pase',
+      'fr': 'Cliquez ici pour gérer ou annuler votre Pass',
+      'pt': 'Clique aqui para gerenciar ou cancelar seu passe',
+    },
     '7ou1tpcp': {
       'en': 'Log out',
       'de': 'Ausloggen',
