@@ -42,18 +42,15 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
         final rideId = uri.queryParameters['rideId'];
         if ((rideId != null && rideId.isNotEmpty) && _model.session == null) {
           final ref = RideOrdersRecord.collection.doc(rideId);
-          // Add current user as a participant
-          await ref.update(
-            mapToFirestore({
-              'participantes': FieldValue.arrayUnion([
-                currentUserReference
-              ]),
-              if (!((await ref.get()).data() as Map<String, dynamic>?)
-                      ?.containsKey('status') ??
-                  true)
-                'status': 'waiting',
-            }),
-          );
+          final snap = await ref.get();
+          final hasStatus =
+              ((snap.data() as Map<String, dynamic>?)?.containsKey('status')) ??
+                  false;
+          final updateData = mapToFirestore({
+            'participantes': FieldValue.arrayUnion([currentUserReference]),
+            if (!hasStatus) 'status': 'waiting',
+          });
+          await ref.update(updateData);
           _model.session = ref;
           safeSetState(() {});
         }
@@ -106,7 +103,8 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                     final latA = FFAppState().latlngAtual;
                     final latB = FFAppState().latlangAondeVaiIr;
                     if (latA != null && latB != null) {
-                      total = functions.mediaCorridaNesseKm(latA, latB, const []);
+                      total = functions.mediaCorridaNesseKm(
+                          latA, latB, const <RideOrdersRecord>[]);
                     } else if (s.hasRideValue() && s.rideValue > 0) {
                       total = s.rideValue;
                     }
