@@ -565,18 +565,18 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'pt': '10 minutos',
     },
     'iv1ii278': {
-      'en': 'Confirm Ride  ',
+      'en': 'Confirm Ride',
       'de': 'Fahrt bestätigen',
       'es': 'Confirmar viaje',
-      'fr': 'Confirmer le trajet',
-      'pt': 'Confirmar viagem',
+      'fr': 'Confirmer',
+      'pt': 'Confirmar',
     },
     'nzvn5ujp': {
       'en': 'Ride Share',
       'de': 'Mitfahrgelegenheit',
       'es': 'Viaje compartido',
       'fr': 'Covoiturage',
-      'pt': 'Compartilhamento de viagens',
+      'pt': 'Compartilhar',
     },
     '0tmlssyf': {
       'en': 'Home',

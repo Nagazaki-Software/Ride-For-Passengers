@@ -43,7 +43,7 @@ class PickerMap extends StatefulWidget {
     this.refreshMs = 8000,
     this.traceThrottleMs = 90,
     this.routeColor = const Color(0xFFFFC107),
-    this.routeWidth = 8,
+    this.routeWidth = 14,
     this.liveTraceColor = const Color(0xFF00E5FF),
     this.liveTraceWidth = 4,
     this.userMarkerSize = 64,
@@ -55,6 +55,7 @@ class PickerMap extends StatefulWidget {
     this.fadeInMs = 420,
     this.enableRouteSnake = true,
     this.snakeDurationMsOverride, // se quiser forçar (ms)
+    this.snakeSpeedFactor = 1.4,
     this.snakeSpeedFactor = 1.0,
     this.driverTweenMs = 320,
     this.ultraLowSpecMode = false,
@@ -139,6 +140,14 @@ class _PickerMapState extends State<PickerMap>
   int _snakeDurationMs = 9000; // mais rápido por padrão
   int _lastCamUpdateMs = 0;
 
+  // Follow suave do usu�rio quando sem destino
+  nmap.LatLng? _lastUserCamTarget;
+  int _lastUserFollowMs = 0;
+
+  // Re-roteamento (debounce) e controle de concorr�ncia
+  Timer? _rerouteDebounce;
+  int _routeReqSeq = 0;
+
   // Idle camera quando destination == null
   Timer? _idleCamTimer;
   double _idleBearing = 0;
@@ -148,6 +157,7 @@ class _PickerMapState extends State<PickerMap>
   static const String _kBaseMain = 'route_base_main';
   static const String _kSnakeOutline = 'route_snake_outline';
   static const String _kSnakeMain = 'route_snake_main';
+  static const String _kDestIconUrl = 'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png';
 
   final Map<String, bool> _polylineCanInplaceUpdate = {};
 
@@ -168,6 +178,15 @@ class _PickerMapState extends State<PickerMap>
         return;
 
       // velocidade do snake
+      // velocidade do snake
+      // Se override for fornecido, respeita-o (dentro de limites mais amplos),
+      // sen�o usa c�lculo autom�tico em uma faixa mais r�pida.
+      final int dur = (widget.snakeDurationMsOverride != null
+              ? widget.snakeDurationMsOverride!
+                  .clamp(500, 30000) // permite anima��es bem r�pidas
+              : _autoDurationMs(_totalDist, factor: widget.snakeSpeedFactor)
+                  .clamp(2000, 12000))
+          .toInt();
       final int dur = (widget.snakeDurationMsOverride ??
               _autoDurationMs(_totalDist, factor: widget.snakeSpeedFactor))
           .clamp(6000, 14000); // rápido/esperto
@@ -217,6 +236,8 @@ class _PickerMapState extends State<PickerMap>
             target: headPos,
             zoom: _zoomForDistance(_totalDist),
             bearing: br,
+            tilt: 24.0,
+            durationMs: 380,
             tilt: 54.0,
             durationMs: 240,
           );
@@ -260,8 +281,24 @@ class _PickerMapState extends State<PickerMap>
       _prepareRoute().then((_) => _startSnake());
     } else if (oldWidget.destination != null && widget.destination == null) {
       _clearRoute();
+      try { _controller?.removeMarker('dest'); } catch (_) {}
+      _markerIds.remove('dest');
+      _markerPos.remove('dest');
+      _markerTitle.remove('dest');
+      _returnToUserFromRoute();
       _snapToUser();
       _startIdleCam();
+    } else if (oldWidget.destination != null && widget.destination != null) {
+      // Ambos n�o nulos: se coordenadas mudarem, reagenda o re-roteamento
+      final LatLng a = oldWidget.destination!;
+      final LatLng b = widget.destination!;
+      final bool changed = (a.latitude - b.latitude).abs() > 1e-6 ||
+          (a.longitude - b.longitude).abs() > 1e-6;
+      if (changed) {
+        _stopIdleCam();
+        _scheduleReroute();
+        return;
+      }
     } else {
       _placeCoreMarkers();
       if (widget.destination == null) _snapToUser();
@@ -407,6 +444,22 @@ class _PickerMapState extends State<PickerMap>
     } catch (_) {}
   }
 
+  Future<void> _returnToUserFromRoute() async {
+    if (!_mapReady || _controller == null) return;
+    try {
+      final dynamic dc = _controller;
+      await dc.animateCameraTo(
+        target: _gm(widget.userLocation),
+        zoom: 16.2,
+        bearing: 0,
+        tilt: 0,
+        durationMs: 520,
+      );
+      _lastUserCamTarget = _gm(widget.userLocation);
+      _lastUserFollowMs = DateTime.now().millisecondsSinceEpoch;
+    } catch (_) {}
+  }
+
   // ===== Limpa rota quando destination == null =====
   Future<void> _clearRoute() async {
     _snaking = false;
@@ -435,6 +488,7 @@ class _PickerMapState extends State<PickerMap>
       await _addMarkerWithIconFile(
         id: 'user',
         position: user,
+        title: null,
         title: widget.userName ?? 'Você',
         anchorU: 0.5,
         anchorV: 0.5,
@@ -454,6 +508,9 @@ class _PickerMapState extends State<PickerMap>
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
+        // �cone fixo do destino (for�ado)
+        Uint8List? bytes = await _downloadAndResize(_kDestIconUrl, widget.driverIconWidth.clamp(36, 128));
+        // fallback: bolinha estilizada (n�o vermelho)
         // preferir taxi p/ destino; senão driver
         final String? prefUrl =
             ((widget.driverTaxiIconUrl ?? '').trim().isNotEmpty)
@@ -516,7 +573,7 @@ class _PickerMapState extends State<PickerMap>
         await _controller?.addMarker(nmap.MarkerOptions(
           id: id,
           position: position,
-          title: title,
+          title: null,
           iconUrl: iconUrl,
           anchorU: anchorU,
           anchorV: anchorV,
@@ -533,12 +590,57 @@ class _PickerMapState extends State<PickerMap>
     if (await tryAdd('file://$path') || await tryAdd(path)) {
       added = true;
       try {
+        await _applyMarkerBytesWithRetry(id, bytesIcon);
         final dynamic dc = _controller;
         await dc.setMarkerIconBytes(id: id, bytes: bytesIcon);
       } catch (_) {}
     }
 
     if (!added) {
+      // Fallback: cria com PNG transparente para evitar flicker vermelho, depois aplica bytes reais
+      try {
+        final transparent = await _transparentPng();
+        final tpath = await _writeTempPng(transparent);
+        if (tpath != null) {
+          await _controller?.addMarker(nmap.MarkerOptions(
+            id: id,
+            position: position,
+            title: null,
+            iconUrl: 'file://' + tpath,
+            anchorU: anchorU,
+            anchorV: anchorV,
+            zIndex: zIndex,
+          ));
+          _markerIds.add(id);
+          try {
+            await _applyMarkerBytesWithRetry(id, bytesIcon);
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+  }
+
+  void _scheduleReroute() {
+    _rerouteDebounce?.cancel();
+    _rerouteDebounce = Timer(const Duration(milliseconds: 360), () async {
+      if (!mounted || widget.destination == null) return;
+      // marca nova requisi��o de rota
+      _routeReqSeq++;
+      await _clearRoute();
+      await _placeCoreMarkers();
+      await _prepareRoute();
+      if (mounted) _startSnake();
+    });
+  }
+
+  Future<void> _applyMarkerBytesWithRetry(String id, Uint8List bytes,
+      {int attempts = 5}) async {
+    for (int i = 0; i < attempts; i++) {
+      try {
+        final dynamic dc = _controller;
+        await Future<void>.delayed(Duration(milliseconds: 24 * (i + 1)));
+        await dc.setMarkerIconBytes(id: id, bytes: bytes);
+        return;
       // fallback absoluto: adiciona sem ícone e depois aplica bytes
       try {
         await _controller?.addMarker(nmap.MarkerOptions(
@@ -556,6 +658,14 @@ class _PickerMapState extends State<PickerMap>
         } catch (_) {}
       } catch (_) {}
     }
+  }
+
+  Future<Uint8List> _transparentPng({int size = 4}) async {
+    final rec = ui.PictureRecorder();
+    final c = ui.Canvas(rec);
+    final img = await rec.endRecording().toImage(size, size);
+    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
   }
 
   Future<Uint8List> _drawCirclePinPng({
@@ -674,7 +784,7 @@ class _PickerMapState extends State<PickerMap>
           await _addMarkerWithIconFile(
             id: 'driver_$id',
             position: p,
-            title: title,
+            title: null,
             anchorU: 0.5,
             anchorV: 0.62,
             zIndex: 22.0,
@@ -731,6 +841,7 @@ class _PickerMapState extends State<PickerMap>
   // ================= ROTA / LINHA =================
 
   Future<void> _prepareRoute() async {
+    final int req = ++_routeReqSeq;
     _snaking = false;
     _snakeT = 0.0;
     for (final id in [_kBaseOutline, _kBaseMain, _kSnakeOutline, _kSnakeMain]) {
@@ -812,6 +923,8 @@ class _PickerMapState extends State<PickerMap>
     // Inicializa as camadas do snake
     final List<nmap.LatLng> start = <nmap.LatLng>[_route.first, _route.first];
 
+    if (!mounted || req != _routeReqSeq) return;
+
     await _updatePolyline(
       id: _kSnakeOutline,
       points: start,
@@ -827,6 +940,7 @@ class _PickerMapState extends State<PickerMap>
       geodesic: true,
     );
 
+    if (!mounted || req != _routeReqSeq) return;
     await _fitRouteBounds(padding: _kSnakeFitPadding);
   }
 
@@ -843,6 +957,48 @@ class _PickerMapState extends State<PickerMap>
     _ticker.start();
   }
 
+  // ================= Accessibility helpers =================
+  Future<void> _maybeAnnouncePlace(String label, nmap.LatLng pos) async {
+    if (!FFAppState().accessStreetNamesAudio) return;
+    try {
+      final String? addr = await _reverseGeocodeForAudio(pos);
+      final String msg = (addr == null || addr.isEmpty)
+          ? '$label definido'
+          : '$label: $addr';
+      SemanticsService.announce(msg, ui.TextDirection.ltr);
+    } catch (_) {}
+  }
+
+  Future<void> _maybeAnnounceRouteSummary() async {
+    if (!FFAppState().accessStreetNamesAudio) return;
+    if (_route.length < 2) return;
+    try {
+      final String? a = await _reverseGeocodeForAudio(_route.first);
+      final String? b = await _reverseGeocodeForAudio(_route.last);
+      final String msg =
+          'Rota pronta.' + (a != null && a.isNotEmpty ? ' Sa�da: $a.' : '') + (b != null && b.isNotEmpty ? ' Destino: $b.' : '');
+      SemanticsService.announce(msg, ui.TextDirection.ltr);
+    } catch (_) {}
+  }
+
+  Future<String?> _reverseGeocodeForAudio(nmap.LatLng pos) async {
+    final key = (widget.googleApiKey ?? '').trim();
+    if (key.isEmpty) return null;
+    try {
+      final uri = Uri.parse(
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${pos.latitude},${pos.longitude}&language=pt-BR&key=$key');
+      final resp = await http.get(uri);
+      if (resp.statusCode != 200) return null;
+      final data = json.decode(resp.body) as Map<String, dynamic>;
+      final results = (data['results'] as List?) ?? const [];
+      if (results.isEmpty) return null;
+      final first = results.first as Map<String, dynamic>;
+      return (first['formatted_address'] ?? '').toString();
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _animateFinal3DView() async {
     if (_controller == null || _route.length < 2) return;
     final nmap.LatLng end = _route.last;
@@ -857,6 +1013,8 @@ class _PickerMapState extends State<PickerMap>
         target: end,
         zoom: _zoomForDistance(_totalDist),
         bearing: br,
+        tilt: 8.0,
+        durationMs: 680,
         tilt: 56.0,
         durationMs: 800,
       );
@@ -1160,6 +1318,10 @@ class _PickerMapState extends State<PickerMap>
   }
 
   int _autoDurationMs(double meters, {double factor = 1.0}) {
+    // menor duration = mais r�pido e proporcional � dist�ncia
+    double base = 5200.0 + (meters / 1000.0) * 420.0;
+    base = base * factor.clamp(0.5, 1.8);
+    return base.clamp(2000.0, 12000.0).toInt();
     // menor duration = mais rápido
     double base = 9000.0 + (meters / 1000.0) * 800.0;
     base = base * factor.clamp(0.6, 2.0);

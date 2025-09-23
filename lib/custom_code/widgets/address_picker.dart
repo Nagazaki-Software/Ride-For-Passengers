@@ -109,6 +109,17 @@ class _AddressPickerState extends State<AddressPicker> {
     return List.generate(24, (_) => chars[r.nextInt(chars.length)]).join();
   }
 
+  // Announce helper for accessibility voice (no-op fallback)
+  void _announceIfEnabled(String message) {
+    try {
+      if (FFAppState().accessVoiceRequest) {
+        // Integrate with TTS or SemanticsService if desired.
+        // For now, this is a no-op to avoid breaking builds.
+        debugPrint('[AddressPicker][A11y] ' + message);
+      }
+    } catch (_) {}
+  }
+
   String _componentsQuery() {
     final csv = (widget.countriesCsv ?? '').trim();
     if (csv.isNotEmpty) {
@@ -474,6 +485,11 @@ class _AddressPickerState extends State<AddressPicker> {
 
   // ---------------- Voice (Destination) ----------------
   Future<void> _toggleVoiceDestination() async {
+    // Guard: feature must be enabled in Accessibility
+    if (!FFAppState().accessVoiceRequest) {
+      _announceIfEnabled('Recurso de voz desativado nas acessibilidades');
+      return;
+    }
     if (!_speechReady) return;
     if (_isListening) {
       await _speech.stop();
@@ -560,10 +576,18 @@ class _AddressPickerState extends State<AddressPicker> {
                     _pickup = p;
                     _pickupCtrl.text = p.formattedAddress;
                     setState(() {});
+                    _announceIfEnabled('Origem definida pela sua localização atual: ' + p.mainText);
                   }
                 }
               },
               // Botão de VOZ por TOQUE (fica sempre visível)
+              voiceTrailing: voiceEnabled
+                  ? _VoiceTapButton(
+                      isListening: _isListening,
+                      enabled: _speechReady && FFAppState().accessVoiceRequest,
+                      onTap: _toggleVoiceDestination,
+                    )
+                  : null,
               voiceTrailing: _VoiceTapButton(
                 isListening: _isListening,
                 enabled: _speechReady,

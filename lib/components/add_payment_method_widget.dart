@@ -2,6 +2,7 @@ import '/components/card_payment_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'add_payment_method_model.dart';
 export 'add_payment_method_model.dart';
@@ -94,6 +95,25 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
                       size: 24.0,
                     ),
                   ),
+                  Expanded(
+                    child: AutoSizeText(
+                      FFLocalizations.of(context).getText(
+                        '31sjcapr' /* Add Payment Method */,
+                      ),
+                      maxLines: 1,
+                      minFontSize: 10,
+                      stepGranularity: 0.1,
+                      style: FlutterFlowTheme.of(context).bodyLarge.override(
+                            font: GoogleFonts.poppins(
+                              fontWeight: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .fontWeight,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .fontStyle,
+                            ),
+                            color: FlutterFlowTheme.of(context).alternate,
+                            letterSpacing: 0.0,
                   Text(
                     FFLocalizations.of(context).getText(
                       '31sjcapr' /* Add Payment Method */,
