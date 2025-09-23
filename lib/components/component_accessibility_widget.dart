@@ -4,6 +4,11 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'component_accessibility_model.dart';
+<<<<<<< HEAD
+=======
+import 'package:provider/provider.dart';
+import '../app_state.dart';
+>>>>>>> master
 export 'component_accessibility_model.dart';
 
 /// Create a component acessibility
@@ -29,11 +34,19 @@ class _ComponentAccessibilityWidgetState
   void initState() {
     super.initState();
     _model = createModel(context, () => ComponentAccessibilityModel());
+<<<<<<< HEAD
 
     _model.switchValue1 = false;
     _model.switchValue2 = false;
     _model.switchValue3 = false;
     _model.switchValue4 = false;
+=======
+    // Initialize switches from persisted app state
+    _model.switchValue1 = FFAppState().accessLowStimulation;
+    _model.switchValue2 = FFAppState().accessStreetNamesAudio;
+    _model.switchValue3 = FFAppState().accessHapticsAndSound;
+    _model.switchValue4 = FFAppState().accessVoiceRequest;
+>>>>>>> master
   }
 
   @override
@@ -45,6 +58,16 @@ class _ComponentAccessibilityWidgetState
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
+=======
+    // Rebuild when global accessibility flags change
+    context.watch<FFAppState>();
+    // Keep local switches in sync if needed (only if they are null)
+    _model.switchValue1 ??= FFAppState().accessLowStimulation;
+    _model.switchValue2 ??= FFAppState().accessStreetNamesAudio;
+    _model.switchValue3 ??= FFAppState().accessHapticsAndSound;
+    _model.switchValue4 ??= FFAppState().accessVoiceRequest;
+>>>>>>> master
     return Container(
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -160,6 +183,10 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue1!,
                         onChanged: (newValue) async {
+<<<<<<< HEAD
+=======
+                          // Only update local state; apply on Confirm
+>>>>>>> master
                           safeSetState(() => _model.switchValue1 = newValue);
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
@@ -239,6 +266,10 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue2!,
                         onChanged: (newValue) async {
+<<<<<<< HEAD
+=======
+                          // Only update local state; apply on Confirm
+>>>>>>> master
                           safeSetState(() => _model.switchValue2 = newValue);
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
@@ -318,6 +349,10 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue3!,
                         onChanged: (newValue) async {
+<<<<<<< HEAD
+=======
+                          // Only update local state; apply on Confirm
+>>>>>>> master
                           safeSetState(() => _model.switchValue3 = newValue);
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
@@ -397,6 +432,10 @@ class _ComponentAccessibilityWidgetState
                       Switch(
                         value: _model.switchValue4!,
                         onChanged: (newValue) async {
+<<<<<<< HEAD
+=======
+                          // Only update local state; apply on Confirm
+>>>>>>> master
                           safeSetState(() => _model.switchValue4 = newValue);
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
@@ -413,7 +452,21 @@ class _ComponentAccessibilityWidgetState
               ),
               FFButtonWidget(
                 onPressed: () {
+<<<<<<< HEAD
                   print('Button pressed ...');
+=======
+                  // Apply all pending changes at once
+                  final v1 = _model.switchValue1 ?? FFAppState().accessLowStimulation;
+                  final v2 = _model.switchValue2 ?? FFAppState().accessStreetNamesAudio;
+                  final v3 = _model.switchValue3 ?? FFAppState().accessHapticsAndSound;
+                  final v4 = _model.switchValue4 ?? FFAppState().accessVoiceRequest;
+                  FFAppState().update(() {
+                    FFAppState().accessLowStimulation = v1;
+                    FFAppState().accessStreetNamesAudio = v2;
+                    FFAppState().accessHapticsAndSound = v3;
+                    FFAppState().accessVoiceRequest = v4;
+                  });
+>>>>>>> master
                 },
                 text: FFLocalizations.of(context).getText(
                   '0vrkyi4m' /* Confirm */,

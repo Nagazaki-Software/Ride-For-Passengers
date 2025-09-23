@@ -1,5 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
+<<<<<<< HEAD
 import '/backend/backend.dart';
+=======
+>>>>>>> master
 import '/components/add_emergency_contact_widget.dart';
 import '/components/navbar_widget.dart';
 import '/components/switchsafetoolkit_widget.dart';
@@ -10,7 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+<<<<<<< HEAD
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+=======
+>>>>>>> master
 import 'safety_toolkit21_model.dart';
 export 'safety_toolkit21_model.dart';
 
@@ -48,7 +54,10 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
     _model.textController2 ??= TextEditingController();
     _model.textFieldFocusNode2 ??= FocusNode();
 
+<<<<<<< HEAD
     _model.textFieldMask2 = MaskTextInputFormatter(mask: '(###) ###-####');
+=======
+>>>>>>> master
     animationsMap.addAll({
       'containerOnActionTriggerAnimation1': AnimationInfo(
         trigger: AnimationTrigger.onActionTrigger,
@@ -805,6 +814,7 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                         ),
                                       ].divide(SizedBox(height: 4.0)),
                                     ),
+<<<<<<< HEAD
                                     InkWell(
                                       splashColor: Colors.transparent,
                                       focusColor: Colors.transparent,
@@ -894,13 +904,70 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                 ),
                                                 fontSize: 10.0,
                                                 letterSpacing: 0.0,
+=======
+                                    Container(
+                                      width: 72.0,
+                                      height: 44.4,
+                                      constraints: BoxConstraints(
+                                        maxHeight: 26.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            blurRadius: 4.0,
+                                            color: Color(0x33000000),
+                                            offset: Offset(
+                                              0.0,
+                                              2.0,
+                                            ),
+                                          )
+                                        ],
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            FlutterFlowTheme.of(context)
+                                                .secondary,
+                                            FlutterFlowTheme.of(context).accent1
+                                          ],
+                                          stops: [0.0, 1.0],
+                                          begin:
+                                              AlignmentDirectional(0.17, -1.0),
+                                          end: AlignmentDirectional(-0.17, 1.0),
+                                        ),
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(8.0),
+                                          bottomRight: Radius.circular(8.0),
+                                          topLeft: Radius.circular(8.0),
+                                          topRight: Radius.circular(8.0),
+                                        ),
+                                      ),
+                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      child: Text(
+                                        FFLocalizations.of(context).getText(
+                                          'd1w74ruw' /* Save */,
+                                        ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.poppins(
+>>>>>>> master
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
                                                         .fontStyle,
                                               ),
+<<<<<<< HEAD
                                         ),
+=======
+                                              fontSize: 10.0,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .fontStyle,
+                                            ),
+>>>>>>> master
                                       ),
                                     ).animateOnActionTrigger(
                                         animationsMap[
@@ -932,6 +999,7 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
+<<<<<<< HEAD
                                         Expanded(
                                           child: Padding(
                                             padding:
@@ -1088,6 +1156,30 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                                     6.0),
                                                       ),
                                                       style:
+=======
+                                        Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  12.0, 0.0, 12.0, 0.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  width: 200.0,
+                                                  child: TextFormField(
+                                                    controller:
+                                                        _model.textController1,
+                                                    focusNode: _model
+                                                        .textFieldFocusNode1,
+                                                    autofocus: false,
+                                                    obscureText: false,
+                                                    decoration: InputDecoration(
+                                                      isDense: true,
+                                                      labelStyle:
+>>>>>>> master
                                                           FlutterFlowTheme.of(
                                                                   context)
                                                               .bodyMedium
@@ -1118,6 +1210,7 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                                     .bodyMedium
                                                                     .fontStyle,
                                                               ),
+<<<<<<< HEAD
                                                       cursorColor:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -1132,6 +1225,145 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                 ),
                                               ],
                                             ),
+=======
+                                                      hintText:
+                                                          FFLocalizations.of(
+                                                                  context)
+                                                              .getText(
+                                                        'nb9rc4s8' /* Emergency contact name */,
+                                                      ),
+                                                      hintStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .override(
+                                                                font: GoogleFonts
+                                                                    .poppins(
+                                                                  fontWeight: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontWeight,
+                                                                  fontStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                ),
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondaryText,
+                                                                fontSize: 10.0,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                                fontWeight: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color:
+                                                              Color(0x00000000),
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                      focusedBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color:
+                                                              Color(0x00000000),
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                      errorBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .error,
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                      focusedErrorBorder:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .error,
+                                                          width: 1.0,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                      contentPadding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  6.0),
+                                                    ),
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          font: GoogleFonts
+                                                              .poppins(
+                                                            fontWeight:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                            fontStyle:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                          ),
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .secondaryText,
+                                                          fontSize: 10.0,
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                    cursorColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .primaryText,
+                                                    enableInteractiveSelection:
+                                                        true,
+                                                    validator: _model
+                                                        .textController1Validator
+                                                        .asValidator(context),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+>>>>>>> master
                                           ),
                                         ),
                                       ],
@@ -1337,8 +1569,11 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                                   .bodyMedium
                                                                   .fontStyle,
                                                         ),
+<<<<<<< HEAD
                                                     keyboardType:
                                                         TextInputType.phone,
+=======
+>>>>>>> master
                                                     cursorColor:
                                                         FlutterFlowTheme.of(
                                                                 context)
@@ -1348,9 +1583,12 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                                                     validator: _model
                                                         .textController2Validator
                                                         .asValidator(context),
+<<<<<<< HEAD
                                                     inputFormatters: [
                                                       _model.textFieldMask2
                                                     ],
+=======
+>>>>>>> master
                                                   ),
                                                 ),
                                               ),

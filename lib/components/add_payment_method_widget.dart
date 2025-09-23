@@ -94,12 +94,33 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
                       size: 24.0,
                     ),
                   ),
+<<<<<<< HEAD
                   Text(
                     FFLocalizations.of(context).getText(
                       '31sjcapr' /* Add Payment Method */,
                     ),
                     style: FlutterFlowTheme.of(context).bodyLarge.override(
                           font: GoogleFonts.poppins(
+=======
+                  Expanded(
+                    child: Text(
+                      FFLocalizations.of(context).getText(
+                        '31sjcapr' /* Add Payment Method */,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: FlutterFlowTheme.of(context).bodyLarge.override(
+                            font: GoogleFonts.poppins(
+                              fontWeight: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .fontWeight,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .fontStyle,
+                            ),
+                            color: FlutterFlowTheme.of(context).alternate,
+                            letterSpacing: 0.0,
+>>>>>>> master
                             fontWeight: FlutterFlowTheme.of(context)
                                 .bodyLarge
                                 .fontWeight,
@@ -107,6 +128,7 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
                                 .bodyLarge
                                 .fontStyle,
                           ),
+<<<<<<< HEAD
                           color: FlutterFlowTheme.of(context).alternate,
                           letterSpacing: 0.0,
                           fontWeight:
@@ -114,6 +136,9 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
                           fontStyle:
                               FlutterFlowTheme.of(context).bodyLarge.fontStyle,
                         ),
+=======
+                    ),
+>>>>>>> master
                   ),
                 ].divide(SizedBox(width: 12.0)),
               ),

@@ -2013,6 +2013,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Cliquez ici pour gérer ou annuler votre Pass',
       'pt': 'Clique aqui para gerenciar ou cancelar seu passe',
     },
+<<<<<<< HEAD
     'ni6ifi3e': {
       'en': 'M',
       'de': 'M',
@@ -2034,6 +2035,8 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Cliquez ici pour gérer ou annuler votre Pass',
       'pt': 'Clique aqui para gerenciar ou cancelar seu passe',
     },
+=======
+>>>>>>> master
     '7ou1tpcp': {
       'en': 'Log out',
       'de': 'Ausloggen',

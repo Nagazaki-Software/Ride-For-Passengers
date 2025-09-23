@@ -3,8 +3,16 @@ import '/backend/backend.dart';
 import '/components/share_q_r_code_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+<<<<<<< HEAD
 import '/custom_code/widgets/index.dart' as custom_widgets;
 import 'package:flutter/material.dart';
+=======
+import '/flutter_flow/custom_functions.dart' as functions;
+import '/index.dart';
+import '/custom_code/widgets/index.dart' as custom_widgets;
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+>>>>>>> master
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'ride_share6_model.dart';
@@ -31,6 +39,33 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
     _model = createModel(context, () => RideShare6Model());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'RideShare6'});
+<<<<<<< HEAD
+=======
+
+    // Join session if opened via link/QR with ?rideId=... and auto-set model.session
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final uri = GoRouterState.of(context).uri;
+        final rideId = uri.queryParameters['rideId'];
+        if ((rideId != null && rideId.isNotEmpty) && _model.session == null) {
+          final ref = RideOrdersRecord.collection.doc(rideId);
+          final snap = await ref.get();
+          final hasStatus =
+              ((snap.data() as Map<String, dynamic>?)?.containsKey('status')) ??
+                  false;
+          final updateData = mapToFirestore({
+            'participantes': FieldValue.arrayUnion([currentUserReference]),
+            if (!hasStatus) 'status': 'waiting',
+          });
+          await ref.update(updateData);
+          _model.session = ref;
+          safeSetState(() {});
+        }
+      } catch (_) {
+        // ignore parse or permission errors; user can still start a session
+      }
+    });
+>>>>>>> master
   }
 
   @override
@@ -52,6 +87,55 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
         backgroundColor: FlutterFlowTheme.of(context).primary,
         body: Stack(
           children: [
+<<<<<<< HEAD
+=======
+            // Session watcher: when host moves status to 'payment', both navigate.
+            if (_model.session != null)
+              StreamBuilder<RideOrdersRecord>(
+                stream: RideOrdersRecord.getDocument(_model.session!),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const SizedBox.shrink();
+                  }
+                  final s = snapshot.data!;
+
+                  // If two or more participants and host created it, auto-mark payment stage if still waiting
+                  final isHost = s.hasUser() && s.user == currentUserReference;
+                  if (isHost && s.participantes.length >= 2 && s.status != 'payment' && s.status != 'paid') {
+                    // Fire-and-forget; do not await in build
+                    _model.session!.update(createRideOrdersRecordData(status: 'payment'));
+                  }
+
+                  if (s.status == 'payment' && !_model.movedToPayment) {
+                    _model.movedToPayment = true;
+                    // Compute a fair split using app state and default estimator if needed
+                    double total = 18.0;
+                    final latA = FFAppState().latlngAtual;
+                    final latB = FFAppState().latlangAondeVaiIr;
+                    if (latA != null && latB != null) {
+                      total = functions.mediaCorridaNesseKm(
+                          latA, latB, const <RideOrdersRecord>[]);
+                    } else if (s.hasRideValue() && s.rideValue > 0) {
+                      total = s.rideValue;
+                    }
+                    final count = s.participantes.isNotEmpty ? s.participantes.length : 1;
+                    final perHead = (total / count).toDouble();
+
+                    // Navigate both users to payment page for their share
+                    context.pushNamed(
+                      PaymentRide7Widget.routeName,
+                      queryParameters: {
+                        'estilo': serializeParam('Ride Share', ParamType.String),
+                        'latlngAtual': serializeParam(latA, ParamType.LatLng),
+                        'latlngWhereTo': serializeParam(latB, ParamType.LatLng),
+                        'value': serializeParam(perHead, ParamType.double),
+                      }.withoutNulls,
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+>>>>>>> master
             Align(
               alignment: AlignmentDirectional(0.0, 0.0),
               child: Column(
@@ -301,7 +385,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                     child: ShareQRCodeWidget(
                                                       rideDoc: _model.session!,
                                                       linkCurrentPage:
+<<<<<<< HEAD
                                                           'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+=======
+                                                          'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=${_model.session!.id}',
+>>>>>>> master
                                                     ),
                                                   ),
                                                 );
@@ -318,7 +406,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             await rideOrdersRecordReference
                                                 .set({
                                               ...createRideOrdersRecordData(
+<<<<<<< HEAD
                                                 rideShare: true,
+=======
+                                                user: currentUserReference,
+                                                rideShare: true,
+                                                status: 'waiting',
+>>>>>>> master
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -332,7 +426,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                 RideOrdersRecord
                                                     .getDocumentFromData({
                                               ...createRideOrdersRecordData(
+<<<<<<< HEAD
                                                 rideShare: true,
+=======
+                                                user: currentUserReference,
+                                                rideShare: true,
+                                                status: 'waiting',
+>>>>>>> master
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -347,6 +447,21 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                             _model.session =
                                                 _model.rideOrderQR?.reference;
                                             safeSetState(() {});
+<<<<<<< HEAD
+=======
+                                            // Ensure shareable link includes rideId in the URL
+                                            if (_model.session != null) {
+                                              context.goNamed(
+                                                RideShare6Widget.routeName,
+                                                queryParameters: {
+                                                  'rideId': serializeParam(
+                                                    _model.session!.id,
+                                                    ParamType.String,
+                                                  ),
+                                                }.withoutNulls,
+                                              );
+                                            }
+>>>>>>> master
                                             logFirebaseEvent(
                                                 'Container_bottom_sheet');
                                             await showModalBottomSheet(
@@ -373,7 +488,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                                           .rideOrderQR!
                                                           .reference,
                                                       linkCurrentPage:
+<<<<<<< HEAD
                                                           'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+=======
+                                                          'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?rideId=${_model.rideOrderQR!.reference.id}',
+>>>>>>> master
                                                     ),
                                                   ),
                                                 );
