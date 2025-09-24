@@ -25,7 +25,6 @@ import 'index.dart'; // Imports other custom widgets
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -34,7 +33,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:characters/characters.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 
 import '/flutter_flow/lat_lng.dart';
@@ -637,7 +635,8 @@ class _PickerMapState extends State<PickerMap>
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
-        String? prefUrl =
+        final int iconSize = widget.driverIconWidth.clamp(36, 128);
+        final String? prefUrl =
             ((widget.markerDestinationIconUrl ?? '').trim().isNotEmpty)
                 ? widget.markerDestinationIconUrl
                 : ((widget.driverTaxiIconUrl ?? '').trim().isNotEmpty)
@@ -647,20 +646,32 @@ class _PickerMapState extends State<PickerMap>
                         : null;
 
         Uint8List? bytes;
-        String? assetPath;
+        String? iconUrl;
+
         if (prefUrl != null) {
-          // 1) tenta asset local com o mesmo nome do arquivo
-          bytes = await _tryLoadAssetPng(
-              prefUrl, widget.driverIconWidth.clamp(36, 128));
-          if (bytes != null) assetPath = _assetPathFromUrlOrName(prefUrl);
+          final String? assetPath = _assetPathFromUrlOrName(prefUrl);
+          if (assetPath != null) {
+            bytes = await _tryLoadAssetPng(prefUrl, iconSize);
+            if (bytes != null) {
+              iconUrl = _bytesToDataUrl(bytes);
+            } else {
+              iconUrl = 'asset://$assetPath';
+            }
+          }
+
+          if (bytes == null && !_looksSvg(prefUrl)) {
+            bytes = await _downloadAndResize(_massageUrl(prefUrl), iconSize);
+            if (bytes != null) {
+              iconUrl = _bytesToDataUrl(bytes);
+            }
+          }
+
+          iconUrl ??= _normalizeIconUrl(prefUrl);
         }
-        // 2) fallback: baixar
-        if (bytes == null && prefUrl != null && !_looksSvg(prefUrl)) {
-          bytes = await _downloadAndResize(
-              _massageUrl(prefUrl), widget.driverIconWidth.clamp(36, 128));
-        }
+
         bytes ??= await _drawCirclePinPng(
             size: 96, color: widget.routeColor, stroke: 4.0);
+        iconUrl ??= _bytesToDataUrl(bytes);
 
         await _addOrUpdateMarker(
           id: 'dest',
@@ -670,7 +681,7 @@ class _PickerMapState extends State<PickerMap>
           anchorV: 0.5,
           zIndex: 25.0,
           bytesIcon: bytes,
-          assetIconPath: assetPath,
+          iconUrl: iconUrl,
         );
       } else {
         try {
@@ -684,107 +695,7 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
-  // Adiciona COM Ã­cone de arquivo local e reforÃ§a com bytes (sem flicker)
-  Future<void> _addMarkerWithIconPrepared_legacy({
-    required String id,
-    required nmap.LatLng position,
-    String? title,
-    required double anchorU,
-    required double anchorV,
-    required double zIndex,
-    required Uint8List bytesIcon,
-  }) async {
-    if (_controller == null) return;
-
-    // Prepara um arquivo temporÃ¡rio para evitar qualquer flash de pin vermelho.
-    final String? tmpPath = await _writeTempPng(bytesIcon);
-
-    if (_markerIds.contains(id)) {
-      try {
-        await _controller!.updateMarker(id, position: position);
-      } catch (_) {}
-    } else {
-      try {
-        await _controller!.addMarker(nmap.MarkerOptions(
-          id: id,
-          position: position,
-          title: title,
-          iconUrl: tmpPath != null ? 'file://$tmpPath' : null,
-          anchorU: anchorU,
-          anchorV: anchorV,
-          zIndex: zIndex,
-        ));
-        _markerIds.add(id);
-      } catch (_) {
-        return;
-      }
-    }
-
-    _markerPos[id] = position;
-    _markerTitle[id] = title;
-
-    // ReforÃ§a com bytes (se possÃ­vel) para mÃ¡xima nitidez e evitar depender de arquivo.
-    try {
-      final dynamic dc = _controller;
-      await dc.setMarkerIconBytes(
-        id: id,
-        bytes: bytesIcon,
-        anchorU: anchorU,
-        anchorV: anchorV,
-      );
-    } catch (_) {
-      // Se falhar e o marcador nÃ£o foi criado com Ã­cone, tente reâ€‘criar com o arquivo.
-      if (tmpPath != null && _markerIds.contains(id)) {
-        try {
-          await _controller!.removeMarker(id);
-          _markerIds.remove(id);
-        } catch (_) {}
-        try {
-          await _controller!.addMarker(nmap.MarkerOptions(
-            id: id,
-            position: position,
-            title: title,
-            iconUrl: 'file://$tmpPath',
-            anchorU: anchorU,
-            anchorV: anchorV,
-            zIndex: zIndex,
-          ));
-          _markerIds.add(id);
-          _markerPos[id] = position;
-          _markerTitle[id] = title;
-        } catch (_) {}
-      }
-    }
-  }
-
-  Future<Uint8List> _drawCirclePinPng({
-    int size = 96,
-    Color color = const Color(0xFFFFC107),
-    double stroke = 4.0,
-  }) async {
-    final rec = ui.PictureRecorder();
-    final c = ui.Canvas(rec);
-    final s = size.toDouble();
-    final center = ui.Offset(s / 2, s / 2);
-    c.drawCircle(
-        center,
-        s * 0.32,
-        ui.Paint()
-          ..color = Colors.black.withOpacity(.28)
-          ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 8));
-    c.drawCircle(
-        center,
-        s * 0.30,
-        ui.Paint()
-          ..style = ui.PaintingStyle.stroke
-          ..strokeWidth = stroke
-          ..color = const Color(0xFF000000));
-    c.drawCircle(center, s * 0.28, ui.Paint()..color = color);
-    final img = await rec.endRecording().toImage(size, size);
-    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-    return bytes!.buffer.asUint8List();
-  }
-
+  
   // ================= DRIVERS =================
 
   // Nova versÃ£o: adiciona marcador usando asset (se houver) e reforÃ§a com bytes para nitidez.
@@ -795,13 +706,13 @@ class _PickerMapState extends State<PickerMap>
     required double anchorU,
     required double anchorV,
     required double zIndex,
-    required Uint8List bytesIcon,
-    String? assetIconPath,
+    Uint8List? bytesIcon,
+    String? iconUrl,
   }) async {
     if (_controller == null) return;
 
-    // Sempre tenta gerar um arquivo temporário a partir dos bytes para usar como ícone inicial.
-    final String? tmpPath = await _writeTempPng(bytesIcon);
+    final String? effectiveIconUrl =
+        iconUrl ?? (bytesIcon != null ? _bytesToDataUrl(bytesIcon) : null);
 
     if (_markerIds.contains(id)) {
       try {
@@ -813,7 +724,7 @@ class _PickerMapState extends State<PickerMap>
           id: id,
           position: position,
           title: title,
-          iconUrl: (tmpPath != null ? 'file://$tmpPath' : assetIconPath),
+          iconUrl: effectiveIconUrl,
           anchorU: anchorU,
           anchorV: anchorV,
           zIndex: zIndex,
@@ -827,37 +738,16 @@ class _PickerMapState extends State<PickerMap>
     _markerPos[id] = position;
     _markerTitle[id] = title;
 
-    try {
-      final dynamic dc = _controller;
-      await dc.setMarkerIconBytes(
-        id: id,
-        bytes: bytesIcon,
-        anchorU: anchorU,
-        anchorV: anchorV,
-      );
-    } catch (_) {
-      final String? fallbackUrl =
-          (tmpPath != null ? 'file://$tmpPath' : assetIconPath);
-      if (fallbackUrl != null && _markerIds.contains(id)) {
-        try {
-          await _controller!.removeMarker(id);
-          _markerIds.remove(id);
-        } catch (_) {}
-        try {
-          await _controller!.addMarker(nmap.MarkerOptions(
-            id: id,
-            position: position,
-            title: title,
-            iconUrl: fallbackUrl,
-            anchorU: anchorU,
-            anchorV: anchorV,
-            zIndex: zIndex,
-          ));
-          _markerIds.add(id);
-          _markerPos[id] = position;
-          _markerTitle[id] = title;
-        } catch (_) {}
-      }
+    if (bytesIcon != null) {
+      try {
+        final dynamic dc = _controller;
+        await dc.setMarkerIconBytes(
+          id: id,
+          bytes: bytesIcon,
+          anchorU: anchorU,
+          anchorV: anchorV,
+        );
+      } catch (_) {}
     }
   }
 
@@ -941,22 +831,34 @@ class _PickerMapState extends State<PickerMap>
         final last = _driverPos[id];
         if (last == null) {
           Uint8List? bytes;
-          String? assetPath;
+          String? iconUrl;
+          final int iconSize = widget.driverIconWidth.clamp(36, 128);
           if ((rawUrl ?? '').trim().isNotEmpty) {
-            // 1) tenta asset local por nome do arquivo
-            bytes = await _tryLoadAssetPng(
-                rawUrl, widget.driverIconWidth.clamp(36, 128));
-            if (bytes != null) assetPath = _assetPathFromUrlOrName(rawUrl);
+            final String? assetPath = _assetPathFromUrlOrName(rawUrl);
+            if (assetPath != null) {
+              bytes = await _tryLoadAssetPng(rawUrl, iconSize);
+              if (bytes != null) {
+                iconUrl = _bytesToDataUrl(bytes);
+              } else {
+                iconUrl = 'asset://$assetPath';
+              }
+            }
+
+            if (bytes == null && !_looksSvg(rawUrl)) {
+              final Uint8List? fetched =
+                  await _downloadAndResize(_massageUrl(rawUrl!), iconSize);
+              if (fetched != null) {
+                bytes = fetched;
+                iconUrl = _bytesToDataUrl(fetched);
+              }
+            }
+
+            iconUrl ??= _normalizeIconUrl(rawUrl);
           }
-          // 2) fallback: baixar
-          if (bytes == null &&
-              (rawUrl ?? '').trim().isNotEmpty &&
-              !_looksSvg(rawUrl)) {
-            bytes = await _downloadAndResize(
-                _massageUrl(rawUrl!), widget.driverIconWidth.clamp(36, 128));
-          }
+
           bytes ??= await _initialsAvatarPng(
               name: title, size: widget.driverIconWidth);
+          iconUrl ??= _bytesToDataUrl(bytes);
 
           await _addOrUpdateMarker(
             id: 'driver_$id',
@@ -966,7 +868,7 @@ class _PickerMapState extends State<PickerMap>
             anchorV: 0.62,
             zIndex: 22.0,
             bytesIcon: bytes,
-            assetIconPath: assetPath,
+            iconUrl: iconUrl,
           );
 
           _driverPos[id] = p;
@@ -1459,6 +1361,36 @@ class _PickerMapState extends State<PickerMap>
     return s;
   }
 
+  String _bytesToDataUrl(Uint8List bytes) {
+    final String b64 = base64Encode(bytes);
+    return 'data:image/png;base64,$b64';
+  }
+
+  String? _normalizeIconUrl(String? raw) {
+    final String? cleaned = _cleanUrl(raw);
+    if (cleaned == null) return null;
+    final String lower = cleaned.toLowerCase();
+    if (lower.startsWith('data:') || lower.startsWith('asset://')) {
+      return cleaned;
+    }
+    if (lower.startsWith('file://')) {
+      return cleaned;
+    }
+    if (lower.startsWith('http://') ||
+        lower.startsWith('https://') ||
+        lower.startsWith('gs://')) {
+      return _massageUrl(cleaned);
+    }
+    if (cleaned.contains('://')) {
+      return _massageUrl(cleaned);
+    }
+    final String? assetPath = _assetPathFromUrlOrName(cleaned);
+    if (assetPath != null) {
+      return 'asset://$assetPath';
+    }
+    return null;
+  }
+
   // Tenta mapear uma URL ou nome para um asset local em assets/images/<basename>.png
   String? _assetPathFromUrlOrName(String? urlOrName) {
     final s = (urlOrName ?? '').trim();
@@ -1490,18 +1422,6 @@ class _PickerMapState extends State<PickerMap>
       final ByteData? out =
           await img.toByteData(format: ui.ImageByteFormat.png);
       return out?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<String?> _writeTempPng(Uint8List bytes) async {
-    try {
-      final dir = await getTemporaryDirectory();
-      final file = File(
-          '${dir.path}/marker_${DateTime.now().microsecondsSinceEpoch}.png');
-      await file.writeAsBytes(bytes, flush: true);
-      return file.path;
     } catch (_) {
       return null;
     }
