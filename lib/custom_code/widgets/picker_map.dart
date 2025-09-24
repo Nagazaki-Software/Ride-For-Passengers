@@ -61,7 +61,7 @@ class PickerMap extends StatefulWidget {
     this.liveTraceColor = const Color(0xFF00E5FF),
     this.liveTraceWidth = 4,
     this.userMarkerSize = 128,
-    this.driverIconWidth = 136,
+    this.driverIconWidth = 152,
 
     // Ãcones
     this.driverDriverIconUrl =
@@ -181,8 +181,34 @@ class _PickerMapState extends State<PickerMap>
 
   nmap.LatLng _gm(LatLng p) => nmap.LatLng(p.latitude, p.longitude);
 
-  // Enquadramento mais aberto quando a linha entra
-  static const double _kSnakeFitPadding = 2000.0;
+  double get _adaptiveSnakePadding {
+    final double dist = _totalDist;
+    if (dist <= 0) {
+      return 320.0;
+    }
+    if (dist < 800) {
+      return 340.0;
+    }
+    if (dist < 2500) {
+      return 360.0;
+    }
+    if (dist < 8000) {
+      return 420.0;
+    }
+    if (dist < 16000) {
+      return 470.0;
+    }
+    return 520.0;
+  }
+
+  int _boostedDriverIconSize({bool forDestination = false}) {
+    final double base = widget.driverIconWidth.toDouble().clamp(64.0, 208.0);
+    final double factor = forDestination ? 1.22 : 1.12;
+    final double scaled = base * factor;
+    final double minSize = forDestination ? 84.0 : 72.0;
+    final double maxSize = forDestination ? 224.0 : 208.0;
+    return scaled.clamp(minSize, maxSize).round();
+  }
 
   @override
   void initState() {
@@ -267,8 +293,7 @@ class _PickerMapState extends State<PickerMap>
           color: widget.routeColor.withOpacity(.98),
           geodesic: true,
         );
-        await _removePolyline(_kSnakeOutline);
-        await _removePolyline(_kSnakeMain);
+        await _fadeOutPolylines(base: false, snake: true);
 
         await _animateFinal3DView();
       }
@@ -493,9 +518,111 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
+  Future<void> _fadeOutPolylines({bool base = false, bool snake = false}) async {
+    if (_controller == null) return;
+    final bool hasBaseMain =
+        base && _polylineIds.contains(_kBaseMain) && _route.length >= 2;
+    final bool hasBaseOutline =
+        base && _polylineIds.contains(_kBaseOutline) && _route.length >= 2;
+    final bool hasSnakeMain =
+        snake && _polylineIds.contains(_kSnakeMain) && _route.length >= 2;
+    final bool hasSnakeOutline =
+        snake && _polylineIds.contains(_kSnakeOutline) && _route.length >= 2;
+
+    if (!(hasBaseMain || hasBaseOutline || hasSnakeMain || hasSnakeOutline)) {
+      if (snake) {
+        if (_polylineIds.contains(_kSnakeMain)) {
+          await _removePolyline(_kSnakeMain);
+        }
+        if (_polylineIds.contains(_kSnakeOutline)) {
+          await _removePolyline(_kSnakeOutline);
+        }
+      }
+      if (base) {
+        if (_polylineIds.contains(_kBaseMain)) {
+          await _removePolyline(_kBaseMain);
+        }
+        if (_polylineIds.contains(_kBaseOutline)) {
+          await _removePolyline(_kBaseOutline);
+        }
+      }
+      return;
+    }
+
+    final List<nmap.LatLng> pts = List<nmap.LatLng>.from(_route);
+    const int steps = 7;
+    for (int i = 1; i <= steps; i++) {
+      final double t = i / steps;
+      final double fade = math.pow(1.0 - t, 1.2).toDouble();
+      final double widthFactor = math.max(0.18, 1.0 - (0.65 * t));
+      final double mainWidth =
+          math.max(2.2, widget.routeWidth.toDouble() * widthFactor);
+      final double outlineWidth = math.max(
+        mainWidth + 2.0,
+        (widget.routeWidth + 8).toDouble() * widthFactor,
+      );
+
+      if (hasBaseOutline) {
+        await _updatePolyline(
+          id: _kBaseOutline,
+          points: pts,
+          width: outlineWidth,
+          color: const Color(0xFF0A0A0A).withOpacity(0.85 * fade),
+          geodesic: true,
+        );
+      }
+      if (hasBaseMain) {
+        await _updatePolyline(
+          id: _kBaseMain,
+          points: pts,
+          width: mainWidth,
+          color: widget.routeColor.withOpacity(0.92 * fade),
+          geodesic: true,
+        );
+      }
+      if (hasSnakeOutline) {
+        await _updatePolyline(
+          id: _kSnakeOutline,
+          points: pts,
+          width: outlineWidth,
+          color: const Color(0xFF0A0A0A).withOpacity(0.68 * fade),
+          geodesic: true,
+        );
+      }
+      if (hasSnakeMain) {
+        await _updatePolyline(
+          id: _kSnakeMain,
+          points: pts,
+          width: mainWidth,
+          color: widget.routeColor.withOpacity(0.78 * fade),
+          geodesic: true,
+        );
+      }
+
+      await Future<void>.delayed(const Duration(milliseconds: 48));
+    }
+
+    if (hasBaseMain) {
+      await _removePolyline(_kBaseMain);
+    }
+    if (hasBaseOutline) {
+      await _removePolyline(_kBaseOutline);
+    }
+    if (hasSnakeMain) {
+      await _removePolyline(_kSnakeMain);
+    }
+    if (hasSnakeOutline) {
+      await _removePolyline(_kSnakeOutline);
+    }
+  }
+
   // ===== Volta cinematogrÃ¡fica quando destination == null =====
   Future<void> _returnToUserCinematic() async {
     _stopIdleCam();
+    _snaking = false;
+    try {
+      _ticker.stop();
+    } catch (_) {}
     final bool hadRoute = _route.length >= 2;
     final bool hadDest = _markerIds.contains('dest');
     final nmap.LatLng user = _gm(widget.userLocation);
@@ -522,6 +649,7 @@ class _PickerMapState extends State<PickerMap>
       ]);
     }
 
+    await _fadeOutPolylines(base: true, snake: true);
     await _clearRoute();
     if (hadDest) {
       await _removeDestMarker();
@@ -696,7 +824,7 @@ class _PickerMapState extends State<PickerMap>
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
-        final int iconSize = widget.driverIconWidth.clamp(64, 192);
+        final int iconSize = _boostedDriverIconSize(forDestination: true);
         final String? prefUrl =
             ((widget.markerDestinationIconUrl ?? '').trim().isNotEmpty)
                 ? widget.markerDestinationIconUrl
@@ -731,7 +859,7 @@ class _PickerMapState extends State<PickerMap>
         }
 
         bytes ??= await _drawCirclePinPng(
-            size: widget.driverIconWidth.clamp(72, 192),
+            size: _boostedDriverIconSize(forDestination: true),
             color: widget.routeColor,
             stroke: 4.0);
         iconUrl ??= _bytesToDataUrl(bytes!);
@@ -905,7 +1033,7 @@ class _PickerMapState extends State<PickerMap>
         if (last == null) {
           Uint8List? bytes;
           String? iconUrl;
-          final int iconSize = widget.driverIconWidth.clamp(64, 192);
+          final int iconSize = _boostedDriverIconSize();
           if ((rawUrl ?? '').trim().isNotEmpty) {
             final String? assetPath = _assetPathFromUrlOrName(rawUrl);
             if (assetPath != null) {
@@ -957,7 +1085,7 @@ class _PickerMapState extends State<PickerMap>
             iconUrl ??= _normalizeIconUrl(rawUrl);
           } else {
             bytes ??= await _initialsAvatarPng(
-                name: title, size: widget.driverIconWidth);
+                name: title, size: _boostedDriverIconSize());
             iconUrl ??= _bytesToDataUrl(bytes);
           }
 
@@ -1365,7 +1493,7 @@ class _PickerMapState extends State<PickerMap>
       geodesic: true,
     );
 
-    await _fitRouteBounds(padding: _kSnakeFitPadding);
+    await _fitRouteBounds(padding: _adaptiveSnakePadding);
   }
 
   void _startSnake() async {
@@ -1376,7 +1504,7 @@ class _PickerMapState extends State<PickerMap>
     _ticker.stop();
 
     // Enquadra bem aberto e comeÃ§a
-    await _fitRouteBounds(padding: _kSnakeFitPadding);
+    await _fitRouteBounds(padding: _adaptiveSnakePadding);
     await Future<void>.delayed(const Duration(milliseconds: 220));
     _ticker.start();
   }
@@ -1392,7 +1520,7 @@ class _PickerMapState extends State<PickerMap>
     final double brMid = _bearing(midOne, midTwo);
     final double brEnd = _bearing(_route[_route.length - 2], end);
     try {
-      await _fitRouteBounds(padding: _kSnakeFitPadding * 0.92);
+      await _fitRouteBounds(padding: _adaptiveSnakePadding * 0.9);
     } catch (_) {}
     await Future<void>.delayed(const Duration(milliseconds: 200));
     if (_controller == null) return;
