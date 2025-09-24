@@ -538,6 +538,21 @@ class _PickerMapState extends State<PickerMap>
     await _clearRoute();
     if (hadDest) {
       await Future<void>.delayed(const Duration(milliseconds: 60));
+            ? math.max(13.6, _zoomForDistance(_totalDist) - 1.2)
+            : 15.2;
+        await dc.animateCameraTo(
+          target: user,
+          zoom: baseZoom,
+          bearing: (_idleBearing + 96) % 360,
+          tilt: hadRoute ? 52.0 : 46.0,
+          durationMs: hadRoute ? 560 : 420,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+      } catch (_) {}
+    }
+
+    await _clearRoute();
+    if (hadDest) {
       await _removeDestMarker();
     }
     if (mounted) setState(() {});
@@ -553,6 +568,11 @@ class _PickerMapState extends State<PickerMap>
           durationMs: 540,
         );
         await Future<void>.delayed(const Duration(milliseconds: 120));
+          bearing: 4.0,
+          tilt: 52.0,
+          durationMs: 520,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
         await dc.animateCameraTo(
           target: user,
           zoom: 16.9,
@@ -709,6 +729,9 @@ class _PickerMapState extends State<PickerMap>
         bytes = resolvedBytes;
         final String resolvedIconUrl =
             iconUrl ?? _bytesToDataUrl(resolvedBytes);
+        bytes ??= await _drawCirclePinPng(
+            size: 96, color: widget.routeColor, stroke: 4.0);
+        iconUrl ??= _bytesToDataUrl(bytes);
 
         await _addOrUpdateMarker(
           id: 'dest',
@@ -719,6 +742,8 @@ class _PickerMapState extends State<PickerMap>
           zIndex: 25.0,
           bytesIcon: resolvedBytes,
           iconUrl: resolvedIconUrl,
+          bytesIcon: bytes,
+          iconUrl: iconUrl,
         );
       } else {
         try {
@@ -878,7 +903,6 @@ class _PickerMapState extends State<PickerMap>
         rawUrl ??= _cleanUrl(visual.isTaxi
             ? widget.driverTaxiIconUrl
             : widget.driverDriverIconUrl);
-
         final String fallbackSignature =
             'initials:${_foldToAsciiLower(title).replaceAll(RegExp(r'\s+'), '')}:${visual.isTaxi ? 'taxi' : 'driver'}';
         final String iconSignature = rawUrl != null
@@ -894,6 +918,11 @@ class _PickerMapState extends State<PickerMap>
           final int iconSize = widget.driverIconWidth.clamp(36, 128);
           Uint8List? bytes;
           String? iconUrl;
+        final last = _driverPos[id];
+        if (last == null) {
+          Uint8List? bytes;
+          String? iconUrl;
+          final int iconSize = widget.driverIconWidth.clamp(36, 128);
           if ((rawUrl ?? '').trim().isNotEmpty) {
             final String? assetPath = _assetPathFromUrlOrName(rawUrl);
             if (assetPath != null) {
@@ -922,6 +951,9 @@ class _PickerMapState extends State<PickerMap>
                   name: title, size: widget.driverIconWidth);
           final String resolvedIconUrl =
               iconUrl ?? _bytesToDataUrl(resolvedBytes);
+          bytes ??= await _initialsAvatarPng(
+              name: title, size: widget.driverIconWidth);
+          iconUrl ??= _bytesToDataUrl(bytes);
 
           await _addOrUpdateMarker(
             id: 'driver_$id',
@@ -932,6 +964,8 @@ class _PickerMapState extends State<PickerMap>
             zIndex: 22.0,
             bytesIcon: resolvedBytes,
             iconUrl: resolvedIconUrl,
+            bytesIcon: bytes,
+            iconUrl: iconUrl,
           );
 
           _driverIconSignature[id] = iconSignature;
@@ -1014,8 +1048,20 @@ class _PickerMapState extends State<PickerMap>
       String? url = pickFromMarkers(const <String>[
         'ride taxi',
         'ride_taxi',
-        'ridetaxi',
-        'taxi',
+        'Ride Taxi',
+    if (info.isRideDriver) {
+      return _DriverVisualChoice(
+        url: driverFallback,
+        fallback: driverFallback ?? taxiFallback,
+        isTaxi: false,
+      );
+    }
+
+    if (info.isRideTaxi || info.hasTaxiKeyword) {
+      String? url = _markerUrlForKeys(markerUrls, const <String>[
+        'ride taxi',
+        'ride_taxi',
+        'Ride Taxi',
         'car',
         'vehicle',
       ]);
@@ -1052,6 +1098,8 @@ class _PickerMapState extends State<PickerMap>
         usersMap?['image'],
         usersMap?['image_url'],
         usersMap?['imageUrl'],
+        usersMap?['vehiclePhoto'],
+        usersMap?['carPhoto'],
       ]);
       return _DriverVisualChoice(
         url: url,
@@ -1063,7 +1111,9 @@ class _PickerMapState extends State<PickerMap>
     String? url = pickFromMarkers(const <String>[
       'ride driver',
       'ride_driver',
-      'ridedriver',
+      'Ride Driver',
+    String? url = _markerUrlForKeys(markerUrls, const <String>[
+      'ride driver',
       'driver',
       'default',
       'principal',
@@ -1080,6 +1130,10 @@ class _PickerMapState extends State<PickerMap>
 
     return _DriverVisualChoice(
       url: url ?? driverFallback,
+    ]);
+
+    return _DriverVisualChoice(
+      url: url,
       fallback: driverFallback ?? taxiFallback,
       isTaxi: false,
     );
@@ -1205,6 +1259,7 @@ class _PickerMapState extends State<PickerMap>
     if (map.isEmpty) return null;
     String normalize(String value) =>
         _foldToAsciiLower(value).replaceAll(RegExp(r'[^a-z0-9]+'), '');
+        value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
     final Map<String, String> normalized = <String, String>{};
     map.forEach((String key, String value) {
       final String norm = normalize(key);
@@ -1392,6 +1447,25 @@ class _PickerMapState extends State<PickerMap>
         zoom: zoomIn,
         bearing: (br + 6.0) % 360,
         tilt: 68.0,
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    try {
+      final dynamic dc = _controller;
+      final double baseZoom = _zoomForDistance(_totalDist);
+      final double zoomOut = math.max(12.2, baseZoom - 0.6);
+      final double zoomIn = math.min(18.2, baseZoom + 0.45);
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomOut,
+        bearing: br,
+        tilt: 38.0,
+        durationMs: 640,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 160));
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomIn,
+        bearing: br,
+        tilt: 64.0,
         durationMs: 720,
       );
     } catch (_) {
@@ -2041,6 +2115,15 @@ class _PlatformInfo {
         final String collapsed = value.replaceAll(' ', '');
         return value == 'ride taxi' || collapsed == 'ridetaxi';
       });
+      .map((String value) => value.trim().toLowerCase())
+      .where((String value) => value.isNotEmpty)
+      .toList();
+
+  bool get isRideDriver =>
+      _normalized.any((value) => value == 'ride driver' || value == 'ridedriver');
+
+  bool get isRideTaxi =>
+      _normalized.any((value) => value == 'ride taxi' || value == 'ridetaxi');
 
   bool get hasTaxiKeyword =>
       _normalized.any((value) => value.contains('taxi'));
