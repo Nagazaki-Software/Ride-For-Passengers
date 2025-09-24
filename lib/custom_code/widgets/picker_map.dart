@@ -295,10 +295,6 @@ class _PickerMapState extends State<PickerMap>
       // went to no-destination -> clear immediately, then cinematic return
       _snaking = false;
       _stopIdleCam();
-      // limpa rota e destino jÃ¡ (sem depender de animaÃ§Ã£o)
-      unawaited(_clearRoute());
-      unawaited(_removeDestMarker());
-      if (mounted) setState(() {});
       _returnToUserCinematic();
     } else if (oldWidget.destination != null &&
         widget.destination != null &&
@@ -490,39 +486,59 @@ class _PickerMapState extends State<PickerMap>
   // ===== Volta cinematogrÃ¡fica quando destination == null =====
   Future<void> _returnToUserCinematic() async {
     _stopIdleCam();
-    // limpa imediatamente para refletir no mapa sem precisar tocar na tela
+    final bool hadRoute = _route.length >= 2;
+    final bool hadDest = _markerIds.contains('dest');
+    final nmap.LatLng user = _gm(widget.userLocation);
+
+    if (_mapReady && _controller != null && (hadRoute || hadDest)) {
+      try {
+        final dynamic dc = _controller;
+        final double baseZoom = hadRoute
+            ? math.max(13.6, _zoomForDistance(_totalDist) - 1.2)
+            : 15.2;
+        await dc.animateCameraTo(
+          target: user,
+          zoom: baseZoom,
+          bearing: (_idleBearing + 96) % 360,
+          tilt: hadRoute ? 52.0 : 46.0,
+          durationMs: hadRoute ? 560 : 420,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+      } catch (_) {}
+    }
+
     await _clearRoute();
-    await _removeDestMarker();
+    if (hadDest) {
+      await _removeDestMarker();
+    }
     if (mounted) setState(() {});
 
-    // 1) zoom-out leve + giro
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 14.4,
-        bearing: (_idleBearing + 120) % 360,
-        tilt: 48.0,
-        durationMs: 560,
-      );
-    } catch (_) {}
+    if (_mapReady && _controller != null) {
+      try {
+        final dynamic dc = _controller;
+        await dc.animateCameraTo(
+          target: user,
+          zoom: 16.2,
+          bearing: 4.0,
+          tilt: 52.0,
+          durationMs: 520,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+        await dc.animateCameraTo(
+          target: user,
+          zoom: 16.9,
+          bearing: 0.0,
+          tilt: 58.0,
+          durationMs: 640,
+        );
+      } catch (_) {
+        try {
+          await _controller!.moveCamera(user, zoom: 16.8);
+        } catch (_) {}
+      }
+    }
 
-    // 2) zoom-in suave + 3D nice
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 16.9,
-        bearing: 0.0,
-        tilt: 58.0,
-        durationMs: 640,
-      );
-    } catch (_) {}
-
-    // 3) pulso no marcador do usuÃ¡rio
     await _pulseUserOnce();
-
-    // Inicia idle cam
     _startIdleCam();
   }
 
@@ -906,17 +922,21 @@ class _PickerMapState extends State<PickerMap>
                 'Motorista')
             .toString();
 
-        String? rawUrl = (data?['photoUrl'] ??
-                data?['avatar'] ??
-                data?['avatar_url'] ??
-                data?['image'])
-            ?.toString();
-        if (rawUrl == null || rawUrl.trim().isEmpty || _looksSvg(rawUrl)) {
-          final type = _driverTypeFromData(data);
-          rawUrl = type == 'taxi'
-              ? widget.driverTaxiIconUrl
-              : widget.driverDriverIconUrl;
+        final _DriverVisualChoice visual = _resolveDriverVisual(data);
+        String? rawUrl = _cleanUrl(visual.url);
+        rawUrl ??= _firstNonEmpty([
+          data?['photoUrl'],
+          data?['photo_url'],
+          data?['avatar'],
+          data?['avatar_url'],
+          data?['image'],
+        ]);
+        if (rawUrl == null || _looksSvg(rawUrl)) {
+          rawUrl = _cleanUrl(visual.fallback);
         }
+        rawUrl ??= _cleanUrl(visual.isTaxi
+            ? widget.driverTaxiIconUrl
+            : widget.driverDriverIconUrl);
 
         final last = _driverPos[id];
         if (last == null) {
@@ -1002,18 +1022,243 @@ class _PickerMapState extends State<PickerMap>
   }
 
   String _driverTypeFromData(Map<String, dynamic>? data) {
-    dynamic raw = (data?['users'] is Map) ? data?['users']?['plataform'] : null;
-    raw ??= data?['plataform'];
-    raw ??= data?['platform'];
-    raw ??= data?['type'];
-    final List<String> items = (raw is List)
-        ? raw.map((e) => (e?.toString() ?? '')).toList()
-        : (raw is String)
-            ? <String>[raw]
-            : <String>[];
-    final bool isTaxi = items.any((s) => s.toLowerCase().contains('taxi'));
-    final bool isDriver = items.any((s) => s.toLowerCase().contains('driver'));
-    return isTaxi ? 'taxi' : (isDriver ? 'driver' : 'driver');
+    final _PlatformInfo info = _platformInfoFromData(data);
+    if (info.isRideTaxi || info.hasTaxiKeyword) return 'taxi';
+    return 'driver';
+  }
+
+  _DriverVisualChoice _resolveDriverVisual(Map<String, dynamic>? data) {
+    final _PlatformInfo info = _platformInfoFromData(data);
+    final Map<String, String> markerUrls = _markerUrlsFromData(data);
+    final Map<String, dynamic>? usersMap =
+        (data?['users'] is Map<String, dynamic>)
+            ? (data?['users'] as Map<String, dynamic>?)
+            : null;
+
+    final String? driverFallback = _cleanUrl(widget.driverDriverIconUrl);
+    final String? taxiFallback =
+        _cleanUrl(widget.driverTaxiIconUrl) ?? driverFallback;
+
+    if (info.isRideDriver) {
+      return _DriverVisualChoice(
+        url: driverFallback,
+        fallback: driverFallback ?? taxiFallback,
+        isTaxi: false,
+      );
+    }
+
+    if (info.isRideTaxi || info.hasTaxiKeyword) {
+      String? url = _markerUrlForKeys(markerUrls, const <String>[
+        'ride taxi',
+        'ride_taxi',
+        'taxi',
+        'car',
+        'vehicle',
+      ]);
+      url ??= _firstNonEmpty(<dynamic>[
+        data?['markerUrl'],
+        data?['marker_url'],
+        usersMap?['markerUrl'],
+        usersMap?['marker_url'],
+        data?['vehiclePhoto'],
+        data?['vehicle_photo'],
+        data?['carPhoto'],
+        data?['car_photo'],
+        data?['photoVehicle'],
+        data?['photo_vehicle'],
+        data?['photoCar'],
+        data?['photo_car'],
+        data?['vehicleImage'],
+        data?['vehicle_image'],
+        data?['carImage'],
+        data?['car_image'],
+        usersMap?['vehiclePhoto'],
+        usersMap?['carPhoto'],
+      ]);
+      return _DriverVisualChoice(
+        url: url,
+        fallback: taxiFallback ?? driverFallback,
+        isTaxi: true,
+      );
+    }
+
+    String? url = _markerUrlForKeys(markerUrls, const <String>[
+      'ride driver',
+      'driver',
+      'default',
+      'principal',
+      'main',
+      'primary',
+    ]);
+    url ??= _firstNonEmpty(<dynamic>[
+      data?['markerUrl'],
+      data?['marker_url'],
+      usersMap?['markerUrl'],
+      usersMap?['marker_url'],
+    ]);
+
+    return _DriverVisualChoice(
+      url: url,
+      fallback: driverFallback ?? taxiFallback,
+      isTaxi: false,
+    );
+  }
+
+  _PlatformInfo _platformInfoFromData(Map<String, dynamic>? data) {
+    final Set<String> values = <String>{};
+    void add(dynamic source) {
+      if (source == null) return;
+      if (source is String) {
+        final String trimmed = source.trim();
+        if (trimmed.isNotEmpty) values.add(trimmed);
+      } else if (source is Iterable) {
+        for (final dynamic item in source) {
+          add(item);
+        }
+      }
+    }
+
+    if (data?['users'] is Map) {
+      final Map users = data?['users'] as Map;
+      add(users['plataform']);
+      add(users['plataforms']);
+      add(users['platform']);
+      add(users['platforms']);
+      add(users['type']);
+    }
+    add(data?['plataform']);
+    add(data?['plataforms']);
+    add(data?['platform']);
+    add(data?['platforms']);
+    add(data?['type']);
+
+    return _PlatformInfo(values.toList());
+  }
+
+  Map<String, String> _markerUrlsFromData(Map<String, dynamic>? data) {
+    final Map<String, String> result = <String, String>{};
+
+    void absorb(String? key, dynamic value) {
+      if (value == null) return;
+      if (value is String) {
+        final String trimmed = value.trim();
+        if (trimmed.isEmpty) return;
+        result[key ?? 'default'] = trimmed;
+        return;
+      }
+      if (value is Iterable) {
+        for (final dynamic item in value) {
+          if (item is Map) {
+            final dynamic innerKey =
+                item['key'] ?? item['name'] ?? key;
+            final dynamic innerValue =
+                item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString() ?? key, innerValue);
+            } else {
+              absorb(key, item);
+            }
+          } else {
+            absorb(key, item);
+          }
+        }
+        return;
+      }
+      if (value is Map) {
+        if (value.containsKey('url') || value.containsKey('value')) {
+          final dynamic innerKey = value['key'] ?? value['name'] ?? key;
+          final dynamic innerValue = value['url'] ?? value['value'];
+          absorb(innerKey?.toString() ?? key, innerValue);
+          return;
+        }
+        value.forEach((dynamic k, dynamic v) {
+          absorb(k?.toString(), v);
+        });
+      }
+    }
+
+    void readField(dynamic source) {
+      if (source == null) return;
+      if (source is Map) {
+        source.forEach((dynamic k, dynamic v) {
+          absorb(k?.toString(), v);
+        });
+      } else if (source is Iterable) {
+        for (final dynamic item in source) {
+          if (item is Map) {
+            final dynamic innerKey = item['key'] ?? item['name'];
+            final dynamic innerValue =
+                item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString(), innerValue);
+            } else {
+              absorb(null, item);
+            }
+          } else {
+            absorb(null, item);
+          }
+        }
+      } else if (source is String) {
+        absorb(null, source);
+      }
+    }
+
+    readField(data?['markersUrls']);
+    readField(data?['markerUrls']);
+    readField(data?['markers_url']);
+    readField(data?['marker_url']);
+    readField(data?['markers']);
+
+    final dynamic users = data?['users'];
+    if (users is Map<String, dynamic>) {
+      readField(users['markersUrls']);
+      readField(users['markerUrls']);
+      readField(users['markers_url']);
+      readField(users['marker_url']);
+    }
+
+    return result;
+  }
+
+  String? _markerUrlForKeys(Map<String, String> map, List<String> keys) {
+    if (map.isEmpty) return null;
+    String normalize(String value) =>
+        value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
+    final Map<String, String> normalized = <String, String>{};
+    map.forEach((String key, String value) {
+      final String norm = normalize(key);
+      if (norm.isNotEmpty && value.trim().isNotEmpty) {
+        normalized[norm] = value.trim();
+      }
+    });
+    for (final String key in keys) {
+      final String normKey = normalize(key);
+      final String? candidate = normalized[normKey];
+      if (candidate != null && candidate.isNotEmpty) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  String? _cleanUrl(String? url) {
+    if (url == null) return null;
+    final String trimmed = url.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  String? _firstNonEmpty(Iterable<dynamic> values) {
+    for (final dynamic value in values) {
+      if (value == null) continue;
+      if (value is String) {
+        final String trimmed = value.trim();
+        if (trimmed.isNotEmpty) return trimmed;
+      } else if (value is num) {
+        final String s = value.toString();
+        if (s.isNotEmpty) return s;
+      }
+    }
+    return null;
   }
 
   // ================= ROTA / LINHA =================
@@ -1136,17 +1381,28 @@ class _PickerMapState extends State<PickerMap>
     final nmap.LatLng end = _route.last;
     final double br = _bearing(_route[_route.length - 2], end);
     try {
-      await _fitRouteBounds(padding: _kSnakeFitPadding);
+      await _fitRouteBounds(padding: _kSnakeFitPadding * 0.88);
     } catch (_) {}
-    await Future<void>.delayed(const Duration(milliseconds: 180));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     try {
       final dynamic dc = _controller;
+      final double baseZoom = _zoomForDistance(_totalDist);
+      final double zoomOut = math.max(12.2, baseZoom - 0.6);
+      final double zoomIn = math.min(18.2, baseZoom + 0.45);
       await dc.animateCameraTo(
         target: end,
-        zoom: _zoomForDistance(_totalDist),
+        zoom: zoomOut,
         bearing: br,
-        tilt: 56.0,
-        durationMs: 800,
+        tilt: 38.0,
+        durationMs: 640,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 160));
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomIn,
+        bearing: br,
+        tilt: 64.0,
+        durationMs: 720,
       );
     } catch (_) {
       try {
@@ -1682,6 +1938,41 @@ class _PickerMapState extends State<PickerMap>
     final double diff = ((b - a + 540.0) % 360.0) - 180.0;
     return (a + diff * t + 360.0) % 360.0;
   }
+}
+
+class _DriverVisualChoice {
+  const _DriverVisualChoice({
+    required this.url,
+    required this.fallback,
+    required this.isTaxi,
+  });
+
+  final String? url;
+  final String? fallback;
+  final bool isTaxi;
+}
+
+class _PlatformInfo {
+  _PlatformInfo(this._rawValues);
+
+  final List<String> _rawValues;
+
+  late final List<String> _normalized = _rawValues
+      .map((String value) => value.trim().toLowerCase())
+      .where((String value) => value.isNotEmpty)
+      .toList();
+
+  bool get isRideDriver =>
+      _normalized.any((value) => value == 'ride driver' || value == 'ridedriver');
+
+  bool get isRideTaxi =>
+      _normalized.any((value) => value == 'ride taxi' || value == 'ridetaxi');
+
+  bool get hasTaxiKeyword =>
+      _normalized.any((value) => value.contains('taxi'));
+
+  bool get hasDriverKeyword =>
+      _normalized.any((value) => value.contains('driver'));
 }
 
 // ===== Tween helper =====

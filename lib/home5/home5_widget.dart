@@ -12,6 +12,7 @@ import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:characters/characters.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -426,56 +427,51 @@ class _Home5WidgetState extends State<Home5Widget>
                                         ],
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Stack(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: AuthUserStreamWidget(
-                                              builder: (context) => Container(
-                                                width: 200.0,
-                                                height: 200.0,
-                                                clipBehavior: Clip.antiAlias,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: Image.network(
-                                                  currentUserPhoto,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          if (currentUserPhoto == '')
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
-                                              child: AuthUserStreamWidget(
-                                                builder: (context) => Text(
-                                                  functions.partesDoName(
-                                                      currentUserDisplayName),
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        font:
-                                                            GoogleFonts.poppins(
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
-                                                        ),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .alternate,
-                                                        fontSize: 18.0,
-                                                        letterSpacing: 3.0,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: AuthUserStreamWidget(
+                                          builder: (context) {
+                                            final photo = currentUserPhoto.trim();
+                                            final displayName =
+                                                currentUserDisplayName;
+
+                                            String computeInitials(String name) {
+                                              final parts = name
+                                                  .trim()
+                                                  .split(RegExp(r'\s+'))
+                                                  .where((p) => p.isNotEmpty)
+                                                  .toList();
+                                              if (parts.isEmpty) {
+                                                return 'U';
+                                              }
+                                              if (parts.length == 1) {
+                                                final Characters chars =
+                                                    parts.first.characters;
+                                                final String take = chars
+                                                    .take(2)
+                                                    .toString();
+                                                return take.toUpperCase();
+                                              }
+                                              final String first = parts.first
+                                                  .characters
+                                                  .take(1)
+                                                  .toString();
+                                              final String last = parts.last
+                                                  .characters
+                                                  .take(1)
+                                                  .toString();
+                                              return (first + last)
+                                                  .toUpperCase();
+                                            }
+
+                                            final String initials =
+                                                computeInitials(displayName);
+                                            final TextStyle initialsStyle =
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .override(
+                                                      font:
+                                                          GoogleFonts.poppins(
                                                         fontWeight:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -487,10 +483,45 @@ class _Home5WidgetState extends State<Home5Widget>
                                                                 .bodyMedium
                                                                 .fontStyle,
                                                       ),
-                                                ),
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .alternate,
+                                                      fontSize: 18.0,
+                                                      letterSpacing: 3.0,
+                                                      fontWeight:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontWeight,
+                                                      fontStyle:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .bodyMedium
+                                                              .fontStyle,
+                                                    );
+                                            final Widget fallback = Center(
+                                              child: Text(
+                                                initials,
+                                                style: initialsStyle,
                                               ),
-                                            ),
-                                        ],
+                                            );
+
+                                            if (photo.isNotEmpty) {
+                                              return ClipOval(
+                                                child: Image.network(
+                                                  photo,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (context, error, stack) {
+                                                    return fallback;
+                                                  },
+                                                ),
+                                              );
+                                            }
+                                            return fallback;
+                                          },
+                                        ),
                                       ),
                                     ),
                                     Column(
