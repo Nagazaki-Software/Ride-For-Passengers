@@ -603,6 +603,51 @@ class _PickerMapState extends State<PickerMap>
     return bytes!.buffer.asUint8List();
   }
 
+  Future<Uint8List> _drawCirclePinPng({
+    int size = 96,
+    Color? color,
+    double stroke = 4.0,
+    Color? strokeColor,
+  }) async {
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final ui.Canvas canvas = ui.Canvas(recorder);
+
+    final double s = size.toDouble();
+    final ui.Offset center = ui.Offset(s / 2, s / 2);
+    final Color fill = (color ?? widget.routeColor).withOpacity(1.0);
+    final Color border = stroke > 0
+        ? (strokeColor ?? Colors.white.withOpacity(0.95))
+        : Colors.transparent;
+
+    // soft shadow to match existing markers
+    canvas.drawCircle(
+      center,
+      s / 2.4,
+      ui.Paint()
+        ..color = Colors.black.withOpacity(0.20)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 12.0),
+    );
+
+    // filled circle pin
+    canvas.drawCircle(center, s / 2.6, ui.Paint()..color = fill);
+
+    if (stroke > 0) {
+      canvas.drawCircle(
+        center,
+        s / 2.6 - stroke / 2,
+        ui.Paint()
+          ..style = ui.PaintingStyle.stroke
+          ..strokeWidth = stroke
+          ..color = border,
+      );
+    }
+
+    final ui.Image image = await recorder.endRecording().toImage(size, size);
+    final ByteData? data =
+        await image.toByteData(format: ui.ImageByteFormat.png);
+    return data!.buffer.asUint8List();
+  }
+
   // ================= MARKERS (sem pin vermelho) =================
 
   Future<void> _placeCoreMarkers() async {
@@ -671,7 +716,7 @@ class _PickerMapState extends State<PickerMap>
 
         bytes ??= await _drawCirclePinPng(
             size: 96, color: widget.routeColor, stroke: 4.0);
-        iconUrl ??= _bytesToDataUrl(bytes);
+        iconUrl ??= _bytesToDataUrl(bytes!);
 
         await _addOrUpdateMarker(
           id: 'dest',
