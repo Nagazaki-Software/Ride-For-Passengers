@@ -58,8 +58,8 @@ class PickerMap extends StatefulWidget {
     this.routeWidth = 8,
     this.liveTraceColor = const Color(0xFF00E5FF),
     this.liveTraceWidth = 4,
-    this.userMarkerSize = 64,
-    this.driverIconWidth = 72,
+    this.userMarkerSize = 96,
+    this.driverIconWidth = 108,
 
     // Ãcones
     this.driverDriverIconUrl =
@@ -145,6 +145,8 @@ class _PickerMapState extends State<PickerMap>
 
   final Map<String, Future<Uint8List?>> _iconInFlight = {};
   static final Map<String, Uint8List> _iconMemCache = {};
+  static final Uint8List _transparentPixel = base64Decode(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=');
 
   final Map<String, List<nmap.LatLng>> _driverTrace = {};
   final Map<String, int> _lastTraceUpdateMs = {};
@@ -759,6 +761,13 @@ class _PickerMapState extends State<PickerMap>
     final String? effectiveIconUrl =
         iconUrl ?? (bytesIcon != null ? _bytesToDataUrl(bytesIcon) : null);
 
+    Uint8List? resolvedBytes = bytesIcon;
+    String? resolvedIconUrl = effectiveIconUrl;
+    if (resolvedBytes == null && (resolvedIconUrl == null || resolvedIconUrl.isEmpty)) {
+      resolvedBytes = _transparentPixel;
+      resolvedIconUrl = _bytesToDataUrl(_transparentPixel);
+    }
+
     if (_markerIds.contains(id)) {
       try {
         await _controller!.updateMarker(id, position: position);
@@ -769,7 +778,7 @@ class _PickerMapState extends State<PickerMap>
           id: id,
           position: position,
           title: title,
-          iconUrl: effectiveIconUrl,
+          iconUrl: resolvedIconUrl,
           anchorU: anchorU,
           anchorV: anchorV,
           zIndex: zIndex,
@@ -783,12 +792,12 @@ class _PickerMapState extends State<PickerMap>
     _markerPos[id] = position;
     _markerTitle[id] = title;
 
-    if (bytesIcon != null) {
+    if (resolvedBytes != null) {
       try {
         final dynamic dc = _controller;
         await dc.setMarkerIconBytes(
           id: id,
-          bytes: bytesIcon,
+          bytes: resolvedBytes,
           anchorU: anchorU,
           anchorV: anchorV,
         );
@@ -859,13 +868,16 @@ class _PickerMapState extends State<PickerMap>
 
         final _DriverVisualChoice visual = _resolveDriverVisual(data);
         String? rawUrl = _cleanUrl(visual.url);
-        rawUrl ??= _firstNonEmpty([
-          data?['photoUrl'],
-          data?['photo_url'],
-          data?['avatar'],
-          data?['avatar_url'],
-          data?['image'],
-        ]);
+        final bool forceBrandIcon = visual.forceBrandIcon;
+        if (!forceBrandIcon) {
+          rawUrl ??= _firstNonEmpty([
+            data?['photoUrl'],
+            data?['photo_url'],
+            data?['avatar'],
+            data?['avatar_url'],
+            data?['image'],
+          ]);
+        }
         if (rawUrl == null || _looksSvg(rawUrl)) {
           rawUrl = _cleanUrl(visual.fallback);
         }
@@ -901,9 +913,39 @@ class _PickerMapState extends State<PickerMap>
             iconUrl ??= _normalizeIconUrl(rawUrl);
           }
 
-          bytes ??= await _initialsAvatarPng(
-              name: title, size: widget.driverIconWidth);
-          iconUrl ??= _bytesToDataUrl(bytes);
+          if (forceBrandIcon) {
+            if (bytes == null) {
+              final String? fallbackUrl =
+                  _cleanUrl(visual.fallback) ?? rawUrl;
+              if ((fallbackUrl ?? '').trim().isNotEmpty &&
+                  fallbackUrl != rawUrl) {
+                final String? assetPath =
+                    _assetPathFromUrlOrName(fallbackUrl);
+                if (assetPath != null) {
+                  bytes = await _tryLoadAssetPng(fallbackUrl, iconSize);
+                  if (bytes != null) {
+                    iconUrl = _bytesToDataUrl(bytes);
+                  } else {
+                    iconUrl = 'asset://$assetPath';
+                  }
+                }
+                if (bytes == null && !_looksSvg(fallbackUrl)) {
+                  final Uint8List? fetched = await _downloadAndResize(
+                      _massageUrl(fallbackUrl!), iconSize);
+                  if (fetched != null) {
+                    bytes = fetched;
+                    iconUrl = _bytesToDataUrl(fetched);
+                  }
+                }
+                iconUrl ??= _normalizeIconUrl(fallbackUrl);
+              }
+            }
+            iconUrl ??= _normalizeIconUrl(rawUrl);
+          } else {
+            bytes ??= await _initialsAvatarPng(
+                name: title, size: widget.driverIconWidth);
+            iconUrl ??= _bytesToDataUrl(bytes);
+          }
 
           await _addOrUpdateMarker(
             id: 'driver_$id',
@@ -991,6 +1033,7 @@ class _PickerMapState extends State<PickerMap>
         url: driverFallback,
         fallback: driverFallback ?? taxiFallback,
         isTaxi: false,
+        forceBrandIcon: true,
       );
     }
 
@@ -1026,6 +1069,7 @@ class _PickerMapState extends State<PickerMap>
         url: url,
         fallback: taxiFallback ?? driverFallback,
         isTaxi: true,
+        forceBrandIcon: info.isRideTaxi,
       );
     }
 
@@ -1048,6 +1092,7 @@ class _PickerMapState extends State<PickerMap>
       url: url,
       fallback: driverFallback ?? taxiFallback,
       isTaxi: false,
+      forceBrandIcon: false,
     );
   }
 
@@ -1708,9 +1753,32 @@ class _PickerMapState extends State<PickerMap>
     }
     final ne = nmap.LatLng(maxLat, maxLng);
     final sw = nmap.LatLng(minLat, minLng);
+    bool moved = false;
     try {
       await _controller!.animateToBounds(ne, sw, padding: padding);
+      moved = true;
     } catch (_) {}
+    if (!moved) {
+      final double midLat = (minLat + maxLat) / 2.0;
+      final double midLng = (minLng + maxLng) / 2.0;
+      final nmap.LatLng center = nmap.LatLng(midLat, midLng);
+      final double boundsDistance = _meters(sw, ne);
+      final double zoom = _zoomForDistance(boundsDistance * 1.2);
+      try {
+        final dynamic dc = _controller;
+        await dc.animateCameraTo(
+          target: center,
+          zoom: zoom,
+          bearing: 0.0,
+          tilt: 52.0,
+          durationMs: 520,
+        );
+      } catch (_) {
+        try {
+          await _controller!.moveCamera(center, zoom: zoom);
+        } catch (_) {}
+      }
+    }
   }
 
   Future<void> _removePolyline(String id) async {
@@ -1910,11 +1978,13 @@ class _DriverVisualChoice {
     required this.url,
     required this.fallback,
     required this.isTaxi,
+    this.forceBrandIcon = false,
   });
 
   final String? url;
   final String? fallback;
   final bool isTaxi;
+  final bool forceBrandIcon;
 }
 
 class _PlatformInfo {
