@@ -11,18 +11,6 @@ import 'package:flutter/material.dart';
 // Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'index.dart'; // Imports other custom widgets
-
-import 'index.dart'; // Imports other custom widgets
-
-import 'index.dart'; // Imports other custom widgets
-
-import 'index.dart'; // Imports other custom widgets
-
-import 'index.dart'; // Imports other custom widgets
-
-import 'index.dart'; // Imports other custom widgets
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -38,6 +26,43 @@ import 'package:firebase_auth/firebase_auth.dart' as fa;
 import '/flutter_flow/lat_lng.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_native_sdk/google_maps_native_sdk.dart' as nmap;
+
+const Map<String, String> _kDiacriticFold = <String, String>{
+  'á': 'a',
+  'à': 'a',
+  'â': 'a',
+  'ã': 'a',
+  'ä': 'a',
+  'é': 'e',
+  'ê': 'e',
+  'è': 'e',
+  'ë': 'e',
+  'í': 'i',
+  'ì': 'i',
+  'î': 'i',
+  'ï': 'i',
+  'ó': 'o',
+  'ò': 'o',
+  'ô': 'o',
+  'õ': 'o',
+  'ö': 'o',
+  'ú': 'u',
+  'ù': 'u',
+  'û': 'u',
+  'ü': 'u',
+  'ç': 'c',
+};
+
+String _foldToAsciiLower(String input) {
+  final String lower = input.toLowerCase();
+  if (lower.isEmpty) return lower;
+  final StringBuffer buffer = StringBuffer();
+  for (final int rune in lower.runes) {
+    final String ch = String.fromCharCode(rune);
+    buffer.write(_kDiacriticFold[ch] ?? ch);
+  }
+  return buffer.toString();
+}
 
 class PickerMap extends StatefulWidget {
   const PickerMap({
@@ -142,6 +167,7 @@ class _PickerMapState extends State<PickerMap>
   final Map<String, nmap.LatLng> _driverPos = {};
   final Map<String, _TweenRunner> _driverTween = {};
   final Map<String, double> _driverRot = {};
+  final Map<String, String> _driverIconSignature = {};
 
   final Map<String, Future<Uint8List?>> _iconInFlight = {};
   static final Map<String, Uint8List> _iconMemCache = {};
@@ -461,13 +487,6 @@ class _PickerMapState extends State<PickerMap>
     for (final id in [_kBaseOutline, _kBaseMain, _kSnakeOutline, _kSnakeMain]) {
       await _removePolyline(id);
     }
-    // ForÃ§a um "redraw" do mapa com micro-nudge para garantir remoÃ§Ã£o visual
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraBy(dx: 0.1, dy: 0.0);
-      await Future<void>.delayed(const Duration(milliseconds: 24));
-      await dc.animateCameraBy(dx: -0.1, dy: 0.0);
-    } catch (_) {}
   }
 
   Future<void> _removeDestMarker() async {
@@ -492,6 +511,33 @@ class _PickerMapState extends State<PickerMap>
       try {
         final dynamic dc = _controller;
         final double baseZoom = hadRoute
+            ? math.max(13.4, _zoomForDistance(_totalDist) - 1.4)
+            : 15.0;
+        final double midZoom = hadRoute ? baseZoom + 1.1 : baseZoom + 0.6;
+        final double firstTilt = hadRoute ? 50.0 : 42.0;
+        final double midTilt = hadRoute ? 56.0 : 48.0;
+        await dc.animateCameraTo(
+          target: user,
+          zoom: baseZoom,
+          bearing: (_idleBearing + 72) % 360,
+          tilt: firstTilt,
+          durationMs: hadRoute ? 680 : 520,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+        await dc.animateCameraTo(
+          target: user,
+          zoom: midZoom,
+          bearing: (_idleBearing + 28) % 360,
+          tilt: midTilt,
+          durationMs: hadRoute ? 560 : 440,
+        );
+      } catch (_) {}
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 60));
+    await _clearRoute();
+    if (hadDest) {
+      await Future<void>.delayed(const Duration(milliseconds: 60));
             ? math.max(13.6, _zoomForDistance(_totalDist) - 1.2)
             : 15.2;
         await dc.animateCameraTo(
@@ -517,6 +563,11 @@ class _PickerMapState extends State<PickerMap>
         await dc.animateCameraTo(
           target: user,
           zoom: 16.2,
+          bearing: 6.0,
+          tilt: 52.0,
+          durationMs: 540,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 120));
           bearing: 4.0,
           tilt: 52.0,
           durationMs: 520,
@@ -714,6 +765,15 @@ class _PickerMapState extends State<PickerMap>
           iconUrl ??= _normalizeIconUrl(prefUrl);
         }
 
+        final Uint8List resolvedBytes = bytes ??
+            await _drawCirclePinPng(
+              size: math.max(88, iconSize + 28).toInt(),
+              color: widget.routeColor,
+              stroke: 4.0,
+            );
+        bytes = resolvedBytes;
+        final String resolvedIconUrl =
+            iconUrl ?? _bytesToDataUrl(resolvedBytes);
         bytes ??= await _drawCirclePinPng(
             size: 96, color: widget.routeColor, stroke: 4.0);
         iconUrl ??= _bytesToDataUrl(bytes!);
@@ -725,6 +785,8 @@ class _PickerMapState extends State<PickerMap>
           anchorU: 0.5,
           anchorV: 0.5,
           zIndex: 25.0,
+          bytesIcon: resolvedBytes,
+          iconUrl: resolvedIconUrl,
           bytesIcon: bytes,
           iconUrl: iconUrl,
         );
@@ -833,12 +895,17 @@ class _PickerMapState extends State<PickerMap>
           _driverPos.remove(id);
           _driverRot.remove(id);
           _driverTween.remove(id)?.dispose();
+          _driverIconSignature.remove(id);
           _markerPos.remove('driver_$id');
           _markerTitle.remove('driver_$id');
           return;
         }
 
         final data = snap.data() as Map<String, dynamic>?;
+        final Map<String, dynamic>? usersMap =
+            (data?['users'] is Map<String, dynamic>)
+                ? (data?['users'] as Map<String, dynamic>?)
+                : null;
 
         nmap.LatLng? p;
         final loc = data?['location'];
@@ -865,6 +932,15 @@ class _PickerMapState extends State<PickerMap>
           data?['avatar'],
           data?['avatar_url'],
           data?['image'],
+          data?['image_url'],
+          data?['imageUrl'],
+          usersMap?['photoUrl'],
+          usersMap?['photo_url'],
+          usersMap?['avatar'],
+          usersMap?['avatar_url'],
+          usersMap?['image'],
+          usersMap?['image_url'],
+          usersMap?['imageUrl'],
         ]);
         if (rawUrl == null || _looksSvg(rawUrl)) {
           rawUrl = _cleanUrl(visual.fallback);
@@ -872,7 +948,21 @@ class _PickerMapState extends State<PickerMap>
         rawUrl ??= _cleanUrl(visual.isTaxi
             ? widget.driverTaxiIconUrl
             : widget.driverDriverIconUrl);
+        final String fallbackSignature =
+            'initials:${_foldToAsciiLower(title).replaceAll(RegExp(r'\s+'), '')}:${visual.isTaxi ? 'taxi' : 'driver'}';
+        final String iconSignature = rawUrl != null
+            ? (_normalizeIconUrl(rawUrl) ?? _massageUrl(rawUrl))
+            : fallbackSignature;
 
+        final bool markerExists = _markerIds.contains('driver_$id');
+        final bool needsIconUpdate =
+            !markerExists || _driverIconSignature[id] != iconSignature;
+        final nmap.LatLng? last = _driverPos[id];
+
+        if (needsIconUpdate) {
+          final int iconSize = widget.driverIconWidth.clamp(36, 128);
+          Uint8List? bytes;
+          String? iconUrl;
         final last = _driverPos[id];
         if (last == null) {
           Uint8List? bytes;
@@ -901,6 +991,11 @@ class _PickerMapState extends State<PickerMap>
             iconUrl ??= _normalizeIconUrl(rawUrl);
           }
 
+          final Uint8List resolvedBytes = bytes ??
+              await _initialsAvatarPng(
+                  name: title, size: widget.driverIconWidth);
+          final String resolvedIconUrl =
+              iconUrl ?? _bytesToDataUrl(resolvedBytes);
           bytes ??= await _initialsAvatarPng(
               name: title, size: widget.driverIconWidth);
           iconUrl ??= _bytesToDataUrl(bytes);
@@ -912,14 +1007,19 @@ class _PickerMapState extends State<PickerMap>
             anchorU: 0.5,
             anchorV: 0.62,
             zIndex: 22.0,
+            bytesIcon: resolvedBytes,
+            iconUrl: resolvedIconUrl,
             bytesIcon: bytes,
             iconUrl: iconUrl,
           );
 
+          _driverIconSignature[id] = iconSignature;
+        }
+
+        if (last == null) {
           _driverPos[id] = p;
           _markerPos['driver_$id'] = p;
           _markerTitle['driver_$id'] = title;
-
           await _updateDriverTrace(id, p, force: true);
           return;
         }
@@ -986,6 +1086,14 @@ class _PickerMapState extends State<PickerMap>
     final String? taxiFallback =
         _cleanUrl(widget.driverTaxiIconUrl) ?? driverFallback;
 
+    String? pickFromMarkers(List<String> keys) =>
+        _markerUrlForKeys(markerUrls, keys);
+
+    if (info.isRideTaxi || info.hasTaxiKeyword) {
+      String? url = pickFromMarkers(const <String>[
+        'ride taxi',
+        'ride_taxi',
+        'Ride Taxi',
     if (info.isRideDriver) {
       return _DriverVisualChoice(
         url: driverFallback,
@@ -998,7 +1106,7 @@ class _PickerMapState extends State<PickerMap>
       String? url = _markerUrlForKeys(markerUrls, const <String>[
         'ride taxi',
         'ride_taxi',
-        'taxi',
+        'Ride Taxi',
         'car',
         'vehicle',
       ]);
@@ -1019,6 +1127,22 @@ class _PickerMapState extends State<PickerMap>
         data?['vehicle_image'],
         data?['carImage'],
         data?['car_image'],
+        data?['photo'],
+        data?['photo_url'],
+        data?['photoUrl'],
+        usersMap?['vehiclePhoto'],
+        usersMap?['vehicle_photo'],
+        usersMap?['carPhoto'],
+        usersMap?['car_photo'],
+        usersMap?['photoVehicle'],
+        usersMap?['photo_vehicle'],
+        usersMap?['photoCar'],
+        usersMap?['photo_car'],
+        usersMap?['photoUrl'],
+        usersMap?['photo_url'],
+        usersMap?['image'],
+        usersMap?['image_url'],
+        usersMap?['imageUrl'],
         usersMap?['vehiclePhoto'],
         usersMap?['carPhoto'],
       ]);
@@ -1029,6 +1153,10 @@ class _PickerMapState extends State<PickerMap>
       );
     }
 
+    String? url = pickFromMarkers(const <String>[
+      'ride driver',
+      'ride_driver',
+      'Ride Driver',
     String? url = _markerUrlForKeys(markerUrls, const <String>[
       'ride driver',
       'driver',
@@ -1042,6 +1170,11 @@ class _PickerMapState extends State<PickerMap>
       data?['marker_url'],
       usersMap?['markerUrl'],
       usersMap?['marker_url'],
+      driverFallback,
+    ]);
+
+    return _DriverVisualChoice(
+      url: url ?? driverFallback,
     ]);
 
     return _DriverVisualChoice(
@@ -1170,6 +1303,7 @@ class _PickerMapState extends State<PickerMap>
   String? _markerUrlForKeys(Map<String, String> map, List<String> keys) {
     if (map.isEmpty) return null;
     String normalize(String value) =>
+        _foldToAsciiLower(value).replaceAll(RegExp(r'[^a-z0-9]+'), '');
         value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
     final Map<String, String> normalized = <String, String>{};
     map.forEach((String key, String value) {
@@ -1330,6 +1464,34 @@ class _PickerMapState extends State<PickerMap>
     try {
       await _fitRouteBounds(padding: _kSnakeFitPadding * 0.88);
     } catch (_) {}
+    await Future<void>.delayed(const Duration(milliseconds: 220));
+    try {
+      final dynamic dc = _controller;
+      final double baseZoom = _zoomForDistance(_totalDist);
+      final double zoomOut = math.max(12.6, baseZoom - 0.8);
+      final double zoomMid = math.min(17.8, baseZoom + 0.6);
+      final double zoomIn = math.min(18.4, zoomMid + 0.45);
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomOut,
+        bearing: br,
+        tilt: 40.0,
+        durationMs: 720,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 160));
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomMid,
+        bearing: (br + 18.0) % 360,
+        tilt: 58.0,
+        durationMs: 680,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 140));
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomIn,
+        bearing: (br + 6.0) % 360,
+        tilt: 68.0,
     await Future<void>.delayed(const Duration(milliseconds: 200));
     try {
       final dynamic dc = _controller;
@@ -1434,6 +1596,67 @@ class _PickerMapState extends State<PickerMap>
       return 'asset://$assetPath';
     }
     return null;
+  }
+
+  Future<Uint8List> _drawCirclePinPng({
+    int size = 96,
+    Color? color,
+    double stroke = 4.0,
+  }) async {
+    final int clamped = size.clamp(48, 160);
+    final double s = clamped.toDouble();
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final ui.Canvas canvas = ui.Canvas(recorder);
+    final ui.Offset center = ui.Offset(s / 2, s / 2);
+    final double radius = s * 0.36;
+    final Color fillColor = (color ?? widget.routeColor).withOpacity(0.98);
+
+    // glow
+    canvas.drawCircle(
+      center.translate(0.0, s * 0.06),
+      radius * 1.45,
+      ui.Paint()
+        ..color = Colors.black.withOpacity(0.35)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 18),
+    );
+
+    // gradient body
+    canvas.drawCircle(
+      center,
+      radius * 1.18,
+      ui.Paint()
+        ..shader = ui.Gradient.radial(
+          center,
+          radius * 1.18,
+          <Color>[
+            fillColor.withOpacity(0.98),
+            fillColor.withOpacity(0.78),
+          ],
+        ),
+    );
+
+    if (stroke > 0) {
+      canvas.drawCircle(
+        center,
+        radius * 1.02,
+        ui.Paint()
+          ..style = ui.PaintingStyle.stroke
+          ..strokeWidth = stroke
+          ..color = Colors.white.withOpacity(0.94),
+      );
+    }
+
+    // inner sparkle
+    canvas.drawCircle(
+      center,
+      radius * 0.28,
+      ui.Paint()..color = Colors.white.withOpacity(0.9),
+    );
+
+    final ui.Image image = await recorder.endRecording().toImage(clamped, clamped);
+    final ByteData? data =
+        await image.toByteData(format: ui.ImageByteFormat.png);
+    return data!.buffer.asUint8List();
   }
 
   // Tenta mapear uma URL ou nome para um asset local em assets/images/<basename>.png
@@ -1923,6 +2146,20 @@ class _PlatformInfo {
   final List<String> _rawValues;
 
   late final List<String> _normalized = _rawValues
+      .map((String value) =>
+          _foldToAsciiLower(value).replaceAll(RegExp(r'\s+'), ' ').trim())
+      .where((String value) => value.isNotEmpty)
+      .toList();
+
+  bool get isRideDriver => _normalized.any((value) {
+        final String collapsed = value.replaceAll(' ', '');
+        return value == 'ride driver' || collapsed == 'ridedriver';
+      });
+
+  bool get isRideTaxi => _normalized.any((value) {
+        final String collapsed = value.replaceAll(' ', '');
+        return value == 'ride taxi' || collapsed == 'ridetaxi';
+      });
       .map((String value) => value.trim().toLowerCase())
       .where((String value) => value.isNotEmpty)
       .toList();
