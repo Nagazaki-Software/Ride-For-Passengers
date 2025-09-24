@@ -58,8 +58,8 @@ class PickerMap extends StatefulWidget {
     this.routeWidth = 8,
     this.liveTraceColor = const Color(0xFF00E5FF),
     this.liveTraceWidth = 4,
-    this.userMarkerSize = 96,
-    this.driverIconWidth = 108,
+    this.userMarkerSize = 128,
+    this.driverIconWidth = 136,
 
     // Ãcones
     this.driverDriverIconUrl =
@@ -180,7 +180,7 @@ class _PickerMapState extends State<PickerMap>
   nmap.LatLng _gm(LatLng p) => nmap.LatLng(p.latitude, p.longitude);
 
   // Enquadramento mais aberto quando a linha entra
-  static const double _kSnakeFitPadding = 1300.0;
+  static const double _kSnakeFitPadding = 2000.0;
 
   @override
   void initState() {
@@ -438,16 +438,24 @@ class _PickerMapState extends State<PickerMap>
 
   Future<void> _snapToUser() async {
     if (!_mapReady || _controller == null) return;
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 16.8,
-        bearing: 0,
-        tilt: 58,
+    final nmap.LatLng user = _gm(widget.userLocation);
+    await _playCameraSequence(<_CameraMove>[
+      _CameraMove(
+        target: user,
+        zoom: 16.0,
+        bearing: 14.0,
+        tilt: 50.0,
         durationMs: 420,
-      );
-    } catch (_) {}
+        pauseAfterMs: 90,
+      ),
+      _CameraMove(
+        target: user,
+        zoom: 17.3,
+        bearing: 0.0,
+        tilt: 64.0,
+        durationMs: 640,
+      ),
+    ]);
   }
 
   // Limpa rota e polylines
@@ -491,20 +499,26 @@ class _PickerMapState extends State<PickerMap>
     final nmap.LatLng user = _gm(widget.userLocation);
 
     if (_mapReady && _controller != null && (hadRoute || hadDest)) {
-      try {
-        final dynamic dc = _controller;
-        final double baseZoom = hadRoute
-            ? math.max(13.6, _zoomForDistance(_totalDist) - 1.2)
-            : 15.2;
-        await dc.animateCameraTo(
+      final double baseZoom = hadRoute
+          ? math.max(13.8, _zoomForDistance(_totalDist) - 0.9)
+          : 15.4;
+      await _playCameraSequence(<_CameraMove>[
+        _CameraMove(
           target: user,
           zoom: baseZoom,
           bearing: (_idleBearing + 96) % 360,
-          tilt: hadRoute ? 52.0 : 46.0,
-          durationMs: hadRoute ? 560 : 420,
-        );
-        await Future<void>.delayed(const Duration(milliseconds: 140));
-      } catch (_) {}
+          tilt: hadRoute ? 50.0 : 46.0,
+          durationMs: hadRoute ? 620 : 520,
+          pauseAfterMs: 140,
+        ),
+        _CameraMove(
+          target: user,
+          zoom: math.min(18.3, baseZoom + 1.4),
+          bearing: (_idleBearing + 12) % 360,
+          tilt: 64.0,
+          durationMs: 720,
+        ),
+      ]);
     }
 
     await _clearRoute();
@@ -514,28 +528,27 @@ class _PickerMapState extends State<PickerMap>
     if (mounted) setState(() {});
 
     if (_mapReady && _controller != null) {
-      try {
-        final dynamic dc = _controller;
-        await dc.animateCameraTo(
+      await _playCameraSequence(<_CameraMove>[
+        _CameraMove(
           target: user,
-          zoom: 16.2,
-          bearing: 4.0,
-          tilt: 52.0,
+          zoom: 16.1,
+          bearing: 6.0,
+          tilt: 50.0,
           durationMs: 520,
-        );
-        await Future<void>.delayed(const Duration(milliseconds: 140));
-        await dc.animateCameraTo(
+          pauseAfterMs: 120,
+        ),
+        _CameraMove(
           target: user,
-          zoom: 16.9,
+          zoom: 17.2,
           bearing: 0.0,
-          tilt: 58.0,
-          durationMs: 640,
-        );
-      } catch (_) {
-        try {
-          await _controller!.moveCamera(user, zoom: 16.8);
-        } catch (_) {}
-      }
+          tilt: 64.0,
+          durationMs: 680,
+        ),
+      ]);
+    } else {
+      try {
+        await _controller?.moveCamera(user, zoom: 17.0);
+      } catch (_) {}
     }
 
     await _pulseUserOnce();
@@ -544,7 +557,7 @@ class _PickerMapState extends State<PickerMap>
 
   Future<void> _pulseUserOnce() async {
     try {
-      final int size = widget.userMarkerSize.clamp(36, 128);
+      final int size = widget.userMarkerSize.clamp(48, 168);
       final Uint8List pulse = await _makeUserAvatarBytes(
         name: widget.userName ?? 'VocÃª',
         photoUrl: widget.userPhotoUrl,
@@ -660,7 +673,7 @@ class _PickerMapState extends State<PickerMap>
       final Uint8List userBytes = await _makeUserAvatarBytes(
         name: widget.userName ?? 'VocÃª',
         photoUrl: widget.userPhotoUrl,
-        diameter: widget.userMarkerSize.clamp(36, 128),
+        diameter: widget.userMarkerSize.clamp(48, 168),
       );
       await _addOrUpdateMarker(
         id: 'user',
@@ -682,7 +695,7 @@ class _PickerMapState extends State<PickerMap>
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
-        final int iconSize = widget.driverIconWidth.clamp(36, 128);
+        final int iconSize = widget.driverIconWidth.clamp(64, 192);
         final String? prefUrl =
             ((widget.markerDestinationIconUrl ?? '').trim().isNotEmpty)
                 ? widget.markerDestinationIconUrl
@@ -717,7 +730,9 @@ class _PickerMapState extends State<PickerMap>
         }
 
         bytes ??= await _drawCirclePinPng(
-            size: 96, color: widget.routeColor, stroke: 4.0);
+            size: widget.driverIconWidth.clamp(72, 192),
+            color: widget.routeColor,
+            stroke: 4.0);
         iconUrl ??= _bytesToDataUrl(bytes!);
 
         await _addOrUpdateMarker(
@@ -889,7 +904,7 @@ class _PickerMapState extends State<PickerMap>
         if (last == null) {
           Uint8List? bytes;
           String? iconUrl;
-          final int iconSize = widget.driverIconWidth.clamp(36, 128);
+          final int iconSize = widget.driverIconWidth.clamp(64, 192);
           if ((rawUrl ?? '').trim().isNotEmpty) {
             final String? assetPath = _assetPathFromUrlOrName(rawUrl);
             if (assetPath != null) {
@@ -1370,37 +1385,47 @@ class _PickerMapState extends State<PickerMap>
 
   Future<void> _animateFinal3DView() async {
     if (_controller == null || _route.length < 2) return;
+    final nmap.LatLng start = _route.first;
     final nmap.LatLng end = _route.last;
-    final double br = _bearing(_route[_route.length - 2], end);
+    final nmap.LatLng midOne = _posAt(_totalDist * 0.45);
+    final nmap.LatLng midTwo = _posAt(_totalDist * 0.78);
+    final double baseZoom = _zoomForDistance(_totalDist);
+    final double brStart = _bearing(start, midOne);
+    final double brMid = _bearing(midOne, midTwo);
+    final double brEnd = _bearing(_route[_route.length - 2], end);
     try {
-      await _fitRouteBounds(padding: _kSnakeFitPadding * 0.88);
+      await _fitRouteBounds(padding: _kSnakeFitPadding * 0.92);
     } catch (_) {}
     await Future<void>.delayed(const Duration(milliseconds: 200));
-    try {
-      final dynamic dc = _controller;
-      final double baseZoom = _zoomForDistance(_totalDist);
-      final double zoomOut = math.max(12.2, baseZoom - 0.6);
-      final double zoomIn = math.min(18.2, baseZoom + 0.45);
-      await dc.animateCameraTo(
-        target: end,
-        zoom: zoomOut,
-        bearing: br,
-        tilt: 38.0,
+    if (_controller == null) return;
+
+    final List<_CameraMove> moves = <_CameraMove>[
+      _CameraMove(
+        target: midOne,
+        zoom: math.max(11.8, baseZoom - 1.4),
+        bearing: brStart,
+        tilt: 44.0,
+        durationMs: 560,
+        pauseAfterMs: 140,
+      ),
+      _CameraMove(
+        target: midTwo,
+        zoom: math.min(18.0, baseZoom + 0.1),
+        bearing: brMid,
+        tilt: 58.0,
         durationMs: 640,
-      );
-      await Future<void>.delayed(const Duration(milliseconds: 160));
-      await dc.animateCameraTo(
+        pauseAfterMs: 140,
+      ),
+      _CameraMove(
         target: end,
-        zoom: zoomIn,
-        bearing: br,
-        tilt: 64.0,
-        durationMs: 720,
-      );
-    } catch (_) {
-      try {
-        await _controller!.moveCamera(end, zoom: _zoomForDistance(_totalDist));
-      } catch (_) {}
-    }
+        zoom: math.min(18.5, baseZoom + 0.7),
+        bearing: brEnd,
+        tilt: 66.0,
+        durationMs: 780,
+      ),
+    ];
+
+    await _playCameraSequence(moves);
   }
 
   // ================= ÃCONES / BYTES =================
@@ -1739,6 +1764,30 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
+  Future<void> _playCameraSequence(List<_CameraMove> moves) async {
+    if (_controller == null || moves.isEmpty) return;
+    final dynamic dc = _controller;
+    for (final _CameraMove move in moves) {
+      try {
+        await dc.animateCameraTo(
+          target: move.target,
+          zoom: move.zoom,
+          bearing: move.bearing,
+          tilt: move.tilt,
+          durationMs: move.durationMs,
+        );
+      } catch (_) {
+        try {
+          await _controller?.moveCamera(move.target, zoom: move.zoom);
+        } catch (_) {}
+        break;
+      }
+      if (move.pauseAfterMs > 0) {
+        await Future<void>.delayed(Duration(milliseconds: move.pauseAfterMs));
+      }
+    }
+  }
+
   // ================= HELPERS & MATH =================
 
   Future<void> _fitRouteBounds({double padding = 64.0}) async {
@@ -1985,6 +2034,24 @@ class _DriverVisualChoice {
   final String? fallback;
   final bool isTaxi;
   final bool forceBrandIcon;
+}
+
+class _CameraMove {
+  const _CameraMove({
+    required this.target,
+    required this.zoom,
+    required this.bearing,
+    required this.tilt,
+    required this.durationMs,
+    this.pauseAfterMs = 0,
+  });
+
+  final nmap.LatLng target;
+  final double zoom;
+  final double bearing;
+  final double tilt;
+  final int durationMs;
+  final int pauseAfterMs;
 }
 
 class _PlatformInfo {
