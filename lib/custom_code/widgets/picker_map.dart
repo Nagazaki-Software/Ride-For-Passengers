@@ -25,7 +25,6 @@ import 'index.dart'; // Imports other custom widgets
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -34,7 +33,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:characters/characters.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fa;
 
 import '/flutter_flow/lat_lng.dart';
@@ -295,10 +293,6 @@ class _PickerMapState extends State<PickerMap>
       // went to no-destination -> clear immediately, then cinematic return
       _snaking = false;
       _stopIdleCam();
-      // limpa rota e destino jÃ¡ (sem depender de animaÃ§Ã£o)
-      unawaited(_clearRoute());
-      unawaited(_removeDestMarker());
-      if (mounted) setState(() {});
       _returnToUserCinematic();
     } else if (oldWidget.destination != null &&
         widget.destination != null &&
@@ -490,39 +484,59 @@ class _PickerMapState extends State<PickerMap>
   // ===== Volta cinematogrÃ¡fica quando destination == null =====
   Future<void> _returnToUserCinematic() async {
     _stopIdleCam();
-    // limpa imediatamente para refletir no mapa sem precisar tocar na tela
+    final bool hadRoute = _route.length >= 2;
+    final bool hadDest = _markerIds.contains('dest');
+    final nmap.LatLng user = _gm(widget.userLocation);
+
+    if (_mapReady && _controller != null && (hadRoute || hadDest)) {
+      try {
+        final dynamic dc = _controller;
+        final double baseZoom = hadRoute
+            ? math.max(13.6, _zoomForDistance(_totalDist) - 1.2)
+            : 15.2;
+        await dc.animateCameraTo(
+          target: user,
+          zoom: baseZoom,
+          bearing: (_idleBearing + 96) % 360,
+          tilt: hadRoute ? 52.0 : 46.0,
+          durationMs: hadRoute ? 560 : 420,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+      } catch (_) {}
+    }
+
     await _clearRoute();
-    await _removeDestMarker();
+    if (hadDest) {
+      await _removeDestMarker();
+    }
     if (mounted) setState(() {});
 
-    // 1) zoom-out leve + giro
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 14.4,
-        bearing: (_idleBearing + 120) % 360,
-        tilt: 48.0,
-        durationMs: 560,
-      );
-    } catch (_) {}
+    if (_mapReady && _controller != null) {
+      try {
+        final dynamic dc = _controller;
+        await dc.animateCameraTo(
+          target: user,
+          zoom: 16.2,
+          bearing: 4.0,
+          tilt: 52.0,
+          durationMs: 520,
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+        await dc.animateCameraTo(
+          target: user,
+          zoom: 16.9,
+          bearing: 0.0,
+          tilt: 58.0,
+          durationMs: 640,
+        );
+      } catch (_) {
+        try {
+          await _controller!.moveCamera(user, zoom: 16.8);
+        } catch (_) {}
+      }
+    }
 
-    // 2) zoom-in suave + 3D nice
-    try {
-      final dynamic dc = _controller;
-      await dc.animateCameraTo(
-        target: _gm(widget.userLocation),
-        zoom: 16.9,
-        bearing: 0.0,
-        tilt: 58.0,
-        durationMs: 640,
-      );
-    } catch (_) {}
-
-    // 3) pulso no marcador do usuÃ¡rio
     await _pulseUserOnce();
-
-    // Inicia idle cam
     _startIdleCam();
   }
 
@@ -621,7 +635,8 @@ class _PickerMapState extends State<PickerMap>
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
-        String? prefUrl =
+        final int iconSize = widget.driverIconWidth.clamp(36, 128);
+        final String? prefUrl =
             ((widget.markerDestinationIconUrl ?? '').trim().isNotEmpty)
                 ? widget.markerDestinationIconUrl
                 : ((widget.driverTaxiIconUrl ?? '').trim().isNotEmpty)
@@ -631,20 +646,32 @@ class _PickerMapState extends State<PickerMap>
                         : null;
 
         Uint8List? bytes;
-        String? assetPath;
+        String? iconUrl;
+
         if (prefUrl != null) {
-          // 1) tenta asset local com o mesmo nome do arquivo
-          bytes = await _tryLoadAssetPng(
-              prefUrl, widget.driverIconWidth.clamp(36, 128));
-          if (bytes != null) assetPath = _assetPathFromUrlOrName(prefUrl);
+          final String? assetPath = _assetPathFromUrlOrName(prefUrl);
+          if (assetPath != null) {
+            bytes = await _tryLoadAssetPng(prefUrl, iconSize);
+            if (bytes != null) {
+              iconUrl = _bytesToDataUrl(bytes);
+            } else {
+              iconUrl = 'asset://$assetPath';
+            }
+          }
+
+          if (bytes == null && !_looksSvg(prefUrl)) {
+            bytes = await _downloadAndResize(_massageUrl(prefUrl), iconSize);
+            if (bytes != null) {
+              iconUrl = _bytesToDataUrl(bytes);
+            }
+          }
+
+          iconUrl ??= _normalizeIconUrl(prefUrl);
         }
-        // 2) fallback: baixar
-        if (bytes == null && prefUrl != null && !_looksSvg(prefUrl)) {
-          bytes = await _downloadAndResize(
-              _massageUrl(prefUrl), widget.driverIconWidth.clamp(36, 128));
-        }
+
         bytes ??= await _drawCirclePinPng(
             size: 96, color: widget.routeColor, stroke: 4.0);
+        iconUrl ??= _bytesToDataUrl(bytes);
 
         await _addOrUpdateMarker(
           id: 'dest',
@@ -654,7 +681,7 @@ class _PickerMapState extends State<PickerMap>
           anchorV: 0.5,
           zIndex: 25.0,
           bytesIcon: bytes,
-          assetIconPath: assetPath,
+          iconUrl: iconUrl,
         );
       } else {
         try {
@@ -668,107 +695,7 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
-  // Adiciona COM Ã­cone de arquivo local e reforÃ§a com bytes (sem flicker)
-  Future<void> _addMarkerWithIconPrepared_legacy({
-    required String id,
-    required nmap.LatLng position,
-    String? title,
-    required double anchorU,
-    required double anchorV,
-    required double zIndex,
-    required Uint8List bytesIcon,
-  }) async {
-    if (_controller == null) return;
-
-    // Prepara um arquivo temporÃ¡rio para evitar qualquer flash de pin vermelho.
-    final String? tmpPath = await _writeTempPng(bytesIcon);
-
-    if (_markerIds.contains(id)) {
-      try {
-        await _controller!.updateMarker(id, position: position);
-      } catch (_) {}
-    } else {
-      try {
-        await _controller!.addMarker(nmap.MarkerOptions(
-          id: id,
-          position: position,
-          title: title,
-          iconUrl: tmpPath != null ? 'file://$tmpPath' : null,
-          anchorU: anchorU,
-          anchorV: anchorV,
-          zIndex: zIndex,
-        ));
-        _markerIds.add(id);
-      } catch (_) {
-        return;
-      }
-    }
-
-    _markerPos[id] = position;
-    _markerTitle[id] = title;
-
-    // ReforÃ§a com bytes (se possÃ­vel) para mÃ¡xima nitidez e evitar depender de arquivo.
-    try {
-      final dynamic dc = _controller;
-      await dc.setMarkerIconBytes(
-        id: id,
-        bytes: bytesIcon,
-        anchorU: anchorU,
-        anchorV: anchorV,
-      );
-    } catch (_) {
-      // Se falhar e o marcador nÃ£o foi criado com Ã­cone, tente reâ€‘criar com o arquivo.
-      if (tmpPath != null && _markerIds.contains(id)) {
-        try {
-          await _controller!.removeMarker(id);
-          _markerIds.remove(id);
-        } catch (_) {}
-        try {
-          await _controller!.addMarker(nmap.MarkerOptions(
-            id: id,
-            position: position,
-            title: title,
-            iconUrl: 'file://$tmpPath',
-            anchorU: anchorU,
-            anchorV: anchorV,
-            zIndex: zIndex,
-          ));
-          _markerIds.add(id);
-          _markerPos[id] = position;
-          _markerTitle[id] = title;
-        } catch (_) {}
-      }
-    }
-  }
-
-  Future<Uint8List> _drawCirclePinPng({
-    int size = 96,
-    Color color = const Color(0xFFFFC107),
-    double stroke = 4.0,
-  }) async {
-    final rec = ui.PictureRecorder();
-    final c = ui.Canvas(rec);
-    final s = size.toDouble();
-    final center = ui.Offset(s / 2, s / 2);
-    c.drawCircle(
-        center,
-        s * 0.32,
-        ui.Paint()
-          ..color = Colors.black.withOpacity(.28)
-          ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 8));
-    c.drawCircle(
-        center,
-        s * 0.30,
-        ui.Paint()
-          ..style = ui.PaintingStyle.stroke
-          ..strokeWidth = stroke
-          ..color = const Color(0xFF000000));
-    c.drawCircle(center, s * 0.28, ui.Paint()..color = color);
-    final img = await rec.endRecording().toImage(size, size);
-    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-    return bytes!.buffer.asUint8List();
-  }
-
+  
   // ================= DRIVERS =================
 
   // Nova versÃ£o: adiciona marcador usando asset (se houver) e reforÃ§a com bytes para nitidez.
@@ -779,13 +706,13 @@ class _PickerMapState extends State<PickerMap>
     required double anchorU,
     required double anchorV,
     required double zIndex,
-    required Uint8List bytesIcon,
-    String? assetIconPath,
+    Uint8List? bytesIcon,
+    String? iconUrl,
   }) async {
     if (_controller == null) return;
 
-    // Sempre tenta gerar um arquivo temporário a partir dos bytes para usar como ícone inicial.
-    final String? tmpPath = await _writeTempPng(bytesIcon);
+    final String? effectiveIconUrl =
+        iconUrl ?? (bytesIcon != null ? _bytesToDataUrl(bytesIcon) : null);
 
     if (_markerIds.contains(id)) {
       try {
@@ -797,7 +724,7 @@ class _PickerMapState extends State<PickerMap>
           id: id,
           position: position,
           title: title,
-          iconUrl: (tmpPath != null ? 'file://$tmpPath' : assetIconPath),
+          iconUrl: effectiveIconUrl,
           anchorU: anchorU,
           anchorV: anchorV,
           zIndex: zIndex,
@@ -811,37 +738,16 @@ class _PickerMapState extends State<PickerMap>
     _markerPos[id] = position;
     _markerTitle[id] = title;
 
-    try {
-      final dynamic dc = _controller;
-      await dc.setMarkerIconBytes(
-        id: id,
-        bytes: bytesIcon,
-        anchorU: anchorU,
-        anchorV: anchorV,
-      );
-    } catch (_) {
-      final String? fallbackUrl =
-          (tmpPath != null ? 'file://$tmpPath' : assetIconPath);
-      if (fallbackUrl != null && _markerIds.contains(id)) {
-        try {
-          await _controller!.removeMarker(id);
-          _markerIds.remove(id);
-        } catch (_) {}
-        try {
-          await _controller!.addMarker(nmap.MarkerOptions(
-            id: id,
-            position: position,
-            title: title,
-            iconUrl: fallbackUrl,
-            anchorU: anchorU,
-            anchorV: anchorV,
-            zIndex: zIndex,
-          ));
-          _markerIds.add(id);
-          _markerPos[id] = position;
-          _markerTitle[id] = title;
-        } catch (_) {}
-      }
+    if (bytesIcon != null) {
+      try {
+        final dynamic dc = _controller;
+        await dc.setMarkerIconBytes(
+          id: id,
+          bytes: bytesIcon,
+          anchorU: anchorU,
+          anchorV: anchorV,
+        );
+      } catch (_) {}
     }
   }
 
@@ -906,37 +812,53 @@ class _PickerMapState extends State<PickerMap>
                 'Motorista')
             .toString();
 
-        String? rawUrl = (data?['photoUrl'] ??
-                data?['avatar'] ??
-                data?['avatar_url'] ??
-                data?['image'])
-            ?.toString();
-        if (rawUrl == null || rawUrl.trim().isEmpty || _looksSvg(rawUrl)) {
-          final type = _driverTypeFromData(data);
-          rawUrl = type == 'taxi'
-              ? widget.driverTaxiIconUrl
-              : widget.driverDriverIconUrl;
+        final _DriverVisualChoice visual = _resolveDriverVisual(data);
+        String? rawUrl = _cleanUrl(visual.url);
+        rawUrl ??= _firstNonEmpty([
+          data?['photoUrl'],
+          data?['photo_url'],
+          data?['avatar'],
+          data?['avatar_url'],
+          data?['image'],
+        ]);
+        if (rawUrl == null || _looksSvg(rawUrl)) {
+          rawUrl = _cleanUrl(visual.fallback);
         }
+        rawUrl ??= _cleanUrl(visual.isTaxi
+            ? widget.driverTaxiIconUrl
+            : widget.driverDriverIconUrl);
 
         final last = _driverPos[id];
         if (last == null) {
           Uint8List? bytes;
-          String? assetPath;
+          String? iconUrl;
+          final int iconSize = widget.driverIconWidth.clamp(36, 128);
           if ((rawUrl ?? '').trim().isNotEmpty) {
-            // 1) tenta asset local por nome do arquivo
-            bytes = await _tryLoadAssetPng(
-                rawUrl, widget.driverIconWidth.clamp(36, 128));
-            if (bytes != null) assetPath = _assetPathFromUrlOrName(rawUrl);
+            final String? assetPath = _assetPathFromUrlOrName(rawUrl);
+            if (assetPath != null) {
+              bytes = await _tryLoadAssetPng(rawUrl, iconSize);
+              if (bytes != null) {
+                iconUrl = _bytesToDataUrl(bytes);
+              } else {
+                iconUrl = 'asset://$assetPath';
+              }
+            }
+
+            if (bytes == null && !_looksSvg(rawUrl)) {
+              final Uint8List? fetched =
+                  await _downloadAndResize(_massageUrl(rawUrl!), iconSize);
+              if (fetched != null) {
+                bytes = fetched;
+                iconUrl = _bytesToDataUrl(fetched);
+              }
+            }
+
+            iconUrl ??= _normalizeIconUrl(rawUrl);
           }
-          // 2) fallback: baixar
-          if (bytes == null &&
-              (rawUrl ?? '').trim().isNotEmpty &&
-              !_looksSvg(rawUrl)) {
-            bytes = await _downloadAndResize(
-                _massageUrl(rawUrl!), widget.driverIconWidth.clamp(36, 128));
-          }
+
           bytes ??= await _initialsAvatarPng(
               name: title, size: widget.driverIconWidth);
+          iconUrl ??= _bytesToDataUrl(bytes);
 
           await _addOrUpdateMarker(
             id: 'driver_$id',
@@ -946,7 +868,7 @@ class _PickerMapState extends State<PickerMap>
             anchorV: 0.62,
             zIndex: 22.0,
             bytesIcon: bytes,
-            assetIconPath: assetPath,
+            iconUrl: iconUrl,
           );
 
           _driverPos[id] = p;
@@ -1002,18 +924,243 @@ class _PickerMapState extends State<PickerMap>
   }
 
   String _driverTypeFromData(Map<String, dynamic>? data) {
-    dynamic raw = (data?['users'] is Map) ? data?['users']?['plataform'] : null;
-    raw ??= data?['plataform'];
-    raw ??= data?['platform'];
-    raw ??= data?['type'];
-    final List<String> items = (raw is List)
-        ? raw.map((e) => (e?.toString() ?? '')).toList()
-        : (raw is String)
-            ? <String>[raw]
-            : <String>[];
-    final bool isTaxi = items.any((s) => s.toLowerCase().contains('taxi'));
-    final bool isDriver = items.any((s) => s.toLowerCase().contains('driver'));
-    return isTaxi ? 'taxi' : (isDriver ? 'driver' : 'driver');
+    final _PlatformInfo info = _platformInfoFromData(data);
+    if (info.isRideTaxi || info.hasTaxiKeyword) return 'taxi';
+    return 'driver';
+  }
+
+  _DriverVisualChoice _resolveDriverVisual(Map<String, dynamic>? data) {
+    final _PlatformInfo info = _platformInfoFromData(data);
+    final Map<String, String> markerUrls = _markerUrlsFromData(data);
+    final Map<String, dynamic>? usersMap =
+        (data?['users'] is Map<String, dynamic>)
+            ? (data?['users'] as Map<String, dynamic>?)
+            : null;
+
+    final String? driverFallback = _cleanUrl(widget.driverDriverIconUrl);
+    final String? taxiFallback =
+        _cleanUrl(widget.driverTaxiIconUrl) ?? driverFallback;
+
+    if (info.isRideDriver) {
+      return _DriverVisualChoice(
+        url: driverFallback,
+        fallback: driverFallback ?? taxiFallback,
+        isTaxi: false,
+      );
+    }
+
+    if (info.isRideTaxi || info.hasTaxiKeyword) {
+      String? url = _markerUrlForKeys(markerUrls, const <String>[
+        'ride taxi',
+        'ride_taxi',
+        'taxi',
+        'car',
+        'vehicle',
+      ]);
+      url ??= _firstNonEmpty(<dynamic>[
+        data?['markerUrl'],
+        data?['marker_url'],
+        usersMap?['markerUrl'],
+        usersMap?['marker_url'],
+        data?['vehiclePhoto'],
+        data?['vehicle_photo'],
+        data?['carPhoto'],
+        data?['car_photo'],
+        data?['photoVehicle'],
+        data?['photo_vehicle'],
+        data?['photoCar'],
+        data?['photo_car'],
+        data?['vehicleImage'],
+        data?['vehicle_image'],
+        data?['carImage'],
+        data?['car_image'],
+        usersMap?['vehiclePhoto'],
+        usersMap?['carPhoto'],
+      ]);
+      return _DriverVisualChoice(
+        url: url,
+        fallback: taxiFallback ?? driverFallback,
+        isTaxi: true,
+      );
+    }
+
+    String? url = _markerUrlForKeys(markerUrls, const <String>[
+      'ride driver',
+      'driver',
+      'default',
+      'principal',
+      'main',
+      'primary',
+    ]);
+    url ??= _firstNonEmpty(<dynamic>[
+      data?['markerUrl'],
+      data?['marker_url'],
+      usersMap?['markerUrl'],
+      usersMap?['marker_url'],
+    ]);
+
+    return _DriverVisualChoice(
+      url: url,
+      fallback: driverFallback ?? taxiFallback,
+      isTaxi: false,
+    );
+  }
+
+  _PlatformInfo _platformInfoFromData(Map<String, dynamic>? data) {
+    final Set<String> values = <String>{};
+    void add(dynamic source) {
+      if (source == null) return;
+      if (source is String) {
+        final String trimmed = source.trim();
+        if (trimmed.isNotEmpty) values.add(trimmed);
+      } else if (source is Iterable) {
+        for (final dynamic item in source) {
+          add(item);
+        }
+      }
+    }
+
+    if (data?['users'] is Map) {
+      final Map users = data?['users'] as Map;
+      add(users['plataform']);
+      add(users['plataforms']);
+      add(users['platform']);
+      add(users['platforms']);
+      add(users['type']);
+    }
+    add(data?['plataform']);
+    add(data?['plataforms']);
+    add(data?['platform']);
+    add(data?['platforms']);
+    add(data?['type']);
+
+    return _PlatformInfo(values.toList());
+  }
+
+  Map<String, String> _markerUrlsFromData(Map<String, dynamic>? data) {
+    final Map<String, String> result = <String, String>{};
+
+    void absorb(String? key, dynamic value) {
+      if (value == null) return;
+      if (value is String) {
+        final String trimmed = value.trim();
+        if (trimmed.isEmpty) return;
+        result[key ?? 'default'] = trimmed;
+        return;
+      }
+      if (value is Iterable) {
+        for (final dynamic item in value) {
+          if (item is Map) {
+            final dynamic innerKey =
+                item['key'] ?? item['name'] ?? key;
+            final dynamic innerValue =
+                item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString() ?? key, innerValue);
+            } else {
+              absorb(key, item);
+            }
+          } else {
+            absorb(key, item);
+          }
+        }
+        return;
+      }
+      if (value is Map) {
+        if (value.containsKey('url') || value.containsKey('value')) {
+          final dynamic innerKey = value['key'] ?? value['name'] ?? key;
+          final dynamic innerValue = value['url'] ?? value['value'];
+          absorb(innerKey?.toString() ?? key, innerValue);
+          return;
+        }
+        value.forEach((dynamic k, dynamic v) {
+          absorb(k?.toString(), v);
+        });
+      }
+    }
+
+    void readField(dynamic source) {
+      if (source == null) return;
+      if (source is Map) {
+        source.forEach((dynamic k, dynamic v) {
+          absorb(k?.toString(), v);
+        });
+      } else if (source is Iterable) {
+        for (final dynamic item in source) {
+          if (item is Map) {
+            final dynamic innerKey = item['key'] ?? item['name'];
+            final dynamic innerValue =
+                item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString(), innerValue);
+            } else {
+              absorb(null, item);
+            }
+          } else {
+            absorb(null, item);
+          }
+        }
+      } else if (source is String) {
+        absorb(null, source);
+      }
+    }
+
+    readField(data?['markersUrls']);
+    readField(data?['markerUrls']);
+    readField(data?['markers_url']);
+    readField(data?['marker_url']);
+    readField(data?['markers']);
+
+    final dynamic users = data?['users'];
+    if (users is Map<String, dynamic>) {
+      readField(users['markersUrls']);
+      readField(users['markerUrls']);
+      readField(users['markers_url']);
+      readField(users['marker_url']);
+    }
+
+    return result;
+  }
+
+  String? _markerUrlForKeys(Map<String, String> map, List<String> keys) {
+    if (map.isEmpty) return null;
+    String normalize(String value) =>
+        value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
+    final Map<String, String> normalized = <String, String>{};
+    map.forEach((String key, String value) {
+      final String norm = normalize(key);
+      if (norm.isNotEmpty && value.trim().isNotEmpty) {
+        normalized[norm] = value.trim();
+      }
+    });
+    for (final String key in keys) {
+      final String normKey = normalize(key);
+      final String? candidate = normalized[normKey];
+      if (candidate != null && candidate.isNotEmpty) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  String? _cleanUrl(String? url) {
+    if (url == null) return null;
+    final String trimmed = url.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  String? _firstNonEmpty(Iterable<dynamic> values) {
+    for (final dynamic value in values) {
+      if (value == null) continue;
+      if (value is String) {
+        final String trimmed = value.trim();
+        if (trimmed.isNotEmpty) return trimmed;
+      } else if (value is num) {
+        final String s = value.toString();
+        if (s.isNotEmpty) return s;
+      }
+    }
+    return null;
   }
 
   // ================= ROTA / LINHA =================
@@ -1136,17 +1283,28 @@ class _PickerMapState extends State<PickerMap>
     final nmap.LatLng end = _route.last;
     final double br = _bearing(_route[_route.length - 2], end);
     try {
-      await _fitRouteBounds(padding: _kSnakeFitPadding);
+      await _fitRouteBounds(padding: _kSnakeFitPadding * 0.88);
     } catch (_) {}
-    await Future<void>.delayed(const Duration(milliseconds: 180));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     try {
       final dynamic dc = _controller;
+      final double baseZoom = _zoomForDistance(_totalDist);
+      final double zoomOut = math.max(12.2, baseZoom - 0.6);
+      final double zoomIn = math.min(18.2, baseZoom + 0.45);
       await dc.animateCameraTo(
         target: end,
-        zoom: _zoomForDistance(_totalDist),
+        zoom: zoomOut,
         bearing: br,
-        tilt: 56.0,
-        durationMs: 800,
+        tilt: 38.0,
+        durationMs: 640,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 160));
+      await dc.animateCameraTo(
+        target: end,
+        zoom: zoomIn,
+        bearing: br,
+        tilt: 64.0,
+        durationMs: 720,
       );
     } catch (_) {
       try {
@@ -1203,6 +1361,36 @@ class _PickerMapState extends State<PickerMap>
     return s;
   }
 
+  String _bytesToDataUrl(Uint8List bytes) {
+    final String b64 = base64Encode(bytes);
+    return 'data:image/png;base64,$b64';
+  }
+
+  String? _normalizeIconUrl(String? raw) {
+    final String? cleaned = _cleanUrl(raw);
+    if (cleaned == null) return null;
+    final String lower = cleaned.toLowerCase();
+    if (lower.startsWith('data:') || lower.startsWith('asset://')) {
+      return cleaned;
+    }
+    if (lower.startsWith('file://')) {
+      return cleaned;
+    }
+    if (lower.startsWith('http://') ||
+        lower.startsWith('https://') ||
+        lower.startsWith('gs://')) {
+      return _massageUrl(cleaned);
+    }
+    if (cleaned.contains('://')) {
+      return _massageUrl(cleaned);
+    }
+    final String? assetPath = _assetPathFromUrlOrName(cleaned);
+    if (assetPath != null) {
+      return 'asset://$assetPath';
+    }
+    return null;
+  }
+
   // Tenta mapear uma URL ou nome para um asset local em assets/images/<basename>.png
   String? _assetPathFromUrlOrName(String? urlOrName) {
     final s = (urlOrName ?? '').trim();
@@ -1234,18 +1422,6 @@ class _PickerMapState extends State<PickerMap>
       final ByteData? out =
           await img.toByteData(format: ui.ImageByteFormat.png);
       return out?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<String?> _writeTempPng(Uint8List bytes) async {
-    try {
-      final dir = await getTemporaryDirectory();
-      final file = File(
-          '${dir.path}/marker_${DateTime.now().microsecondsSinceEpoch}.png');
-      await file.writeAsBytes(bytes, flush: true);
-      return file.path;
     } catch (_) {
       return null;
     }
@@ -1682,6 +1858,41 @@ class _PickerMapState extends State<PickerMap>
     final double diff = ((b - a + 540.0) % 360.0) - 180.0;
     return (a + diff * t + 360.0) % 360.0;
   }
+}
+
+class _DriverVisualChoice {
+  const _DriverVisualChoice({
+    required this.url,
+    required this.fallback,
+    required this.isTaxi,
+  });
+
+  final String? url;
+  final String? fallback;
+  final bool isTaxi;
+}
+
+class _PlatformInfo {
+  _PlatformInfo(this._rawValues);
+
+  final List<String> _rawValues;
+
+  late final List<String> _normalized = _rawValues
+      .map((String value) => value.trim().toLowerCase())
+      .where((String value) => value.isNotEmpty)
+      .toList();
+
+  bool get isRideDriver =>
+      _normalized.any((value) => value == 'ride driver' || value == 'ridedriver');
+
+  bool get isRideTaxi =>
+      _normalized.any((value) => value == 'ride taxi' || value == 'ridetaxi');
+
+  bool get hasTaxiKeyword =>
+      _normalized.any((value) => value.contains('taxi'));
+
+  bool get hasDriverKeyword =>
+      _normalized.any((value) => value.contains('driver'));
 }
 
 // ===== Tween helper =====
