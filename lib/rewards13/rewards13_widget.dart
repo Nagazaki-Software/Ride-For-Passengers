@@ -279,41 +279,25 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                                   currentUserDocument
                                                       ?.ridePoints,
                                                   0) <=
-                                              1000) {
+                                              10000) {
                                             return 'Bronze';
                                           } else if ((valueOrDefault(
                                                       currentUserDocument
                                                           ?.ridePoints,
                                                       0) <=
-                                                  2300) &&
+                                                  20000) &&
                                               (valueOrDefault(
                                                       currentUserDocument
                                                           ?.ridePoints,
                                                       0) >
-                                                  1000)) {
+                                                  10000)) {
                                             return 'Silver';
-                                          } else if ((valueOrDefault(
-                                                      currentUserDocument
-                                                          ?.ridePoints,
-                                                      0) <=
-                                                  3400) &&
-                                              (valueOrDefault(
-                                                      currentUserDocument
-                                                          ?.ridePoints,
-                                                      0) >
-                                                  2300)) {
+                                          } else if (valueOrDefault(
+                                                  currentUserDocument
+                                                      ?.ridePoints,
+                                                  0) >
+                                              20000) {
                                             return 'Gold';
-                                          } else if ((valueOrDefault(
-                                                      currentUserDocument
-                                                          ?.ridePoints,
-                                                      0) <=
-                                                  4500) &&
-                                              (valueOrDefault(
-                                                      currentUserDocument
-                                                          ?.ridePoints,
-                                                      0) >
-                                                  3400)) {
-                                            return 'Platinum';
                                           } else {
                                             return '';
                                           }
@@ -474,32 +458,21 @@ class _Rewards13WidgetState extends State<Rewards13Widget>
                                       if (valueOrDefault(
                                               currentUserDocument?.ridePoints,
                                               0) <=
-                                          1000) {
+                                          10000) {
                                         return 'Silver';
                                       } else if ((valueOrDefault(
                                                   currentUserDocument
                                                       ?.ridePoints,
                                                   0) >
-                                              1000) &&
+                                              10000) &&
                                           (valueOrDefault(
                                                   currentUserDocument
                                                       ?.ridePoints,
                                                   0) <=
-                                              2300)) {
+                                              20000)) {
                                         return 'Gold';
-                                      } else if ((valueOrDefault(
-                                                  currentUserDocument
-                                                      ?.ridePoints,
-                                                  0) >
-                                              2300) &&
-                                          (valueOrDefault(
-                                                  currentUserDocument
-                                                      ?.ridePoints,
-                                                  0) <=
-                                              3400)) {
-                                        return 'Platinum';
                                       } else {
-                                        return '';
+                                        return 'Max level';
                                       }
                                     }()}',
                                     style: FlutterFlowTheme.of(context)

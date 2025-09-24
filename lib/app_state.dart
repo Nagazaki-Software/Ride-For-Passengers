@@ -80,6 +80,22 @@ class FFAppState extends ChangeNotifier {
         }
       }
     });
+    _safeInit(() {
+      _paymentMethods = prefs
+              .getStringList('ff_paymentMethods')
+              ?.map((x) {
+                try {
+                  return PaymentMethodSaveStruct.fromSerializableMap(
+                      jsonDecode(x));
+                } catch (e) {
+                  print("Can't decode persisted data type. Error: $e.");
+                  return null;
+                }
+              })
+              .withoutNulls
+              .toList() ??
+          _paymentMethods;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -288,6 +304,47 @@ class FFAppState extends ChangeNotifier {
   set defaultCard(dynamic value) {
     _defaultCard = value;
     prefs.setString('ff_defaultCard', jsonEncode(value));
+  }
+
+  List<PaymentMethodSaveStruct> _paymentMethods = [];
+  List<PaymentMethodSaveStruct> get paymentMethods => _paymentMethods;
+  set paymentMethods(List<PaymentMethodSaveStruct> value) {
+    _paymentMethods = value;
+    prefs.setStringList(
+        'ff_paymentMethods', value.map((x) => x.serialize()).toList());
+  }
+
+  void addToPaymentMethods(PaymentMethodSaveStruct value) {
+    paymentMethods.add(value);
+    prefs.setStringList('ff_paymentMethods',
+        _paymentMethods.map((x) => x.serialize()).toList());
+  }
+
+  void removeFromPaymentMethods(PaymentMethodSaveStruct value) {
+    paymentMethods.remove(value);
+    prefs.setStringList('ff_paymentMethods',
+        _paymentMethods.map((x) => x.serialize()).toList());
+  }
+
+  void removeAtIndexFromPaymentMethods(int index) {
+    paymentMethods.removeAt(index);
+    prefs.setStringList('ff_paymentMethods',
+        _paymentMethods.map((x) => x.serialize()).toList());
+  }
+
+  void updatePaymentMethodsAtIndex(
+    int index,
+    PaymentMethodSaveStruct Function(PaymentMethodSaveStruct) updateFn,
+  ) {
+    paymentMethods[index] = updateFn(_paymentMethods[index]);
+    prefs.setStringList('ff_paymentMethods',
+        _paymentMethods.map((x) => x.serialize()).toList());
+  }
+
+  void insertAtIndexInPaymentMethods(int index, PaymentMethodSaveStruct value) {
+    paymentMethods.insert(index, value);
+    prefs.setStringList('ff_paymentMethods',
+        _paymentMethods.map((x) => x.serialize()).toList());
   }
 
   final _recentTripsManager = StreamRequestManager<List<RideOrdersRecord>>();

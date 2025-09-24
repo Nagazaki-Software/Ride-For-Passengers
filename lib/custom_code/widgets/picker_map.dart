@@ -23,6 +23,8 @@ import 'index.dart'; // Imports other custom widgets
 
 import 'index.dart'; // Imports other custom widgets
 
+import 'index.dart'; // Imports other custom widgets
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -499,9 +501,8 @@ class _PickerMapState extends State<PickerMap>
     final nmap.LatLng user = _gm(widget.userLocation);
 
     if (_mapReady && _controller != null && (hadRoute || hadDest)) {
-      final double baseZoom = hadRoute
-          ? math.max(13.8, _zoomForDistance(_totalDist) - 0.9)
-          : 15.4;
+      final double baseZoom =
+          hadRoute ? math.max(13.8, _zoomForDistance(_totalDist) - 0.9) : 15.4;
       await _playCameraSequence(<_CameraMove>[
         _CameraMove(
           target: user,
@@ -757,7 +758,6 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
-  
   // ================= DRIVERS =================
 
   // Nova versÃ£o: adiciona marcador usando asset (se houver) e reforÃ§a com bytes para nitidez.
@@ -778,7 +778,8 @@ class _PickerMapState extends State<PickerMap>
 
     Uint8List? resolvedBytes = bytesIcon;
     String? resolvedIconUrl = effectiveIconUrl;
-    if (resolvedBytes == null && (resolvedIconUrl == null || resolvedIconUrl.isEmpty)) {
+    if (resolvedBytes == null &&
+        (resolvedIconUrl == null || resolvedIconUrl.isEmpty)) {
       resolvedBytes = _transparentPixel;
       resolvedIconUrl = _bytesToDataUrl(_transparentPixel);
     }
@@ -930,12 +931,10 @@ class _PickerMapState extends State<PickerMap>
 
           if (forceBrandIcon) {
             if (bytes == null) {
-              final String? fallbackUrl =
-                  _cleanUrl(visual.fallback) ?? rawUrl;
+              final String? fallbackUrl = _cleanUrl(visual.fallback) ?? rawUrl;
               if ((fallbackUrl ?? '').trim().isNotEmpty &&
                   fallbackUrl != rawUrl) {
-                final String? assetPath =
-                    _assetPathFromUrlOrName(fallbackUrl);
+                final String? assetPath = _assetPathFromUrlOrName(fallbackUrl);
                 if (assetPath != null) {
                   bytes = await _tryLoadAssetPng(fallbackUrl, iconSize);
                   if (bytes != null) {
@@ -1156,8 +1155,7 @@ class _PickerMapState extends State<PickerMap>
       if (value is Iterable) {
         for (final dynamic item in value) {
           if (item is Map) {
-            final dynamic innerKey =
-                item['key'] ?? item['name'] ?? key;
+            final dynamic innerKey = item['key'] ?? item['name'] ?? key;
             final dynamic innerValue =
                 item['url'] ?? item['value'] ?? item['src'];
             if (innerKey != null || innerValue != null) {
@@ -2064,14 +2062,13 @@ class _PlatformInfo {
       .where((String value) => value.isNotEmpty)
       .toList();
 
-  bool get isRideDriver =>
-      _normalized.any((value) => value == 'ride driver' || value == 'ridedriver');
+  bool get isRideDriver => _normalized
+      .any((value) => value == 'ride driver' || value == 'ridedriver');
 
   bool get isRideTaxi =>
       _normalized.any((value) => value == 'ride taxi' || value == 'ridetaxi');
 
-  bool get hasTaxiKeyword =>
-      _normalized.any((value) => value.contains('taxi'));
+  bool get hasTaxiKeyword => _normalized.any((value) => value.contains('taxi'));
 
   bool get hasDriverKeyword =>
       _normalized.any((value) => value.contains('driver'));

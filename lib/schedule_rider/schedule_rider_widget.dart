@@ -1,7 +1,11 @@
+import '/backend/backend.dart';
+import '/components/component_schedule_action_widget.dart';
 import '/components/navbar_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/custom_code/widgets/index.dart' as custom_widgets;
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'schedule_rider_model.dart';
 export 'schedule_rider_model.dart';
 
@@ -55,6 +59,48 @@ class _ScheduleRiderWidgetState extends State<ScheduleRiderWidget> {
                 updateCallback: () => safeSetState(() {}),
                 child: NavbarWidget(),
               ),
+            ),
+            StreamBuilder<List<RideOrdersRecord>>(
+              stream: queryRideOrdersRecord(),
+              builder: (context, snapshot) {
+                // Customize what your widget looks like when it's loading.
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: SizedBox(
+                      width: 50.0,
+                      height: 50.0,
+                      child: SpinKitDoubleBounce(
+                        color: FlutterFlowTheme.of(context).accent1,
+                        size: 50.0,
+                      ),
+                    ),
+                  );
+                }
+                List<RideOrdersRecord>
+                    scheduleCalendarRideRideOrdersRecordList = snapshot.data!;
+
+                return Container(
+                  width: double.infinity,
+                  height: MediaQuery.sizeOf(context).height * 0.9,
+                  child: custom_widgets.ScheduleCalendarRide(
+                    width: double.infinity,
+                    height: MediaQuery.sizeOf(context).height * 0.9,
+                    disableBookedSlots: false,
+                    use24hFormat: false,
+                    dateLocale: 'us',
+                    initialDate: getCurrentTimestamp,
+                    orders: scheduleCalendarRideRideOrdersRecordList,
+                    order: scheduleCalendarRideRideOrdersRecordList,
+                    onSelected: (date) async {},
+                    openPage: (orderRef) async {},
+                    abrirPage: (orderRef) async {},
+                    widgetAbaixo: (DateTime? date) =>
+                        ComponentScheduleActionWidget(
+                      parameter3: date,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),

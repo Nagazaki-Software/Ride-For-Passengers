@@ -487,13 +487,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
   },
   // Home5
   {
-    'v2jubsa7': {
-      'en': '3 min',
-      'de': '3 Minuten',
-      'es': '3 minutos',
-      'fr': '3 minutes',
-      'pt': '3 minutos',
-    },
     'xvxg7iay': {
       'en': 'Bahamar',
       'de': 'Bahamas',
@@ -992,6 +985,13 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'Payer directement le chauffeur',
       'pt': 'Pague o motorista diretamente',
     },
+    'je5nvpjw': {
+      'en': 'Notes for drive (optional)',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
     'vse9hbic': {
       'en': 'e.g., meet at Hotel lobby',
       'de': 'Treffen Sie sich beispielsweise in der Hotellobby',
@@ -1015,7 +1015,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     'gd3kce3k': {
       'en': '\$1',
-      'de': '1 US-Dollar',
+      'de': '\$1',
       'es': '\$1',
       'fr': '1 \$',
       'pt': '\$ 1',
@@ -2279,13 +2279,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Pasar este mes',
       'fr': 'Dépensez ce mois-ci',
       'pt': 'Passe este mês',
-    },
-    'uykp8in3': {
-      'en': '\$ 214',
-      'de': '214 \$',
-      'es': '\$214',
-      'fr': '214 \$',
-      'pt': '\$ 214',
     },
     '6n062rjg': {
       'en': 'All',

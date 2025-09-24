@@ -1,6 +1,7 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/components/share_q_r_code_widget.dart';
+import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
@@ -8,6 +9,8 @@ import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
@@ -35,10 +38,14 @@ class RideShare6Widget extends StatefulWidget {
   State<RideShare6Widget> createState() => _RideShare6WidgetState();
 }
 
-class _RideShare6WidgetState extends State<RideShare6Widget> {
+class _RideShare6WidgetState extends State<RideShare6Widget>
+    with TickerProviderStateMixin {
   late RideShare6Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  var hasContainerTriggered1 = false;
+  var hasContainerTriggered2 = false;
+  final animationsMap = <String, AnimationInfo>{};
 
   @override
   void initState() {
@@ -46,6 +53,56 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
     _model = createModel(context, () => RideShare6Model());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'RideShare6'});
+    animationsMap.addAll({
+      'containerOnActionTriggerAnimation1': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 250.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation2': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 250.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+    });
+    setupAnimations(
+      animationsMap.values.where((anim) =>
+          anim.trigger == AnimationTrigger.onActionTrigger ||
+          !anim.applyInitialState),
+      this,
+    );
   }
 
   @override
@@ -1453,40 +1510,6 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 320.0,
-                        height: 38.0,
-                        decoration: BoxDecoration(
-                          color: FlutterFlowTheme.of(context).alternate,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(18.0),
-                            bottomRight: Radius.circular(18.0),
-                            topLeft: Radius.circular(18.0),
-                            topRight: Radius.circular(18.0),
-                          ),
-                        ),
-                        alignment: AlignmentDirectional(0.0, 0.0),
-                        child: Text(
-                          FFLocalizations.of(context).getText(
-                            'ntglhxb6' /* Confirm Ride Share */,
-                          ),
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                        ),
-                      ),
                       InkWell(
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
@@ -1494,8 +1517,78 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                         highlightColor: Colors.transparent,
                         onTap: () async {
                           logFirebaseEvent(
-                              'RIDE_SHARE6_Container_21iw93zs_ON_TAP');
-                          logFirebaseEvent('Container_navigate_to');
+                              'RIDE_SHARE6_ContainerRideShare_ON_TAP');
+                          logFirebaseEvent(
+                              'ContainerRideShare_widget_animation');
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation1'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered1 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation1']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                        },
+                        child: Container(
+                          width: 320.0,
+                          height: 38.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).alternate,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(18.0),
+                              bottomRight: Radius.circular(18.0),
+                              topLeft: Radius.circular(18.0),
+                              topRight: Radius.circular(18.0),
+                            ),
+                          ),
+                          alignment: AlignmentDirectional(0.0, 0.0),
+                          child: Text(
+                            FFLocalizations.of(context).getText(
+                              'ntglhxb6' /* Confirm Ride Share */,
+                            ),
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                          ),
+                        ),
+                      ).animateOnActionTrigger(
+                          animationsMap['containerOnActionTriggerAnimation1']!,
+                          hasBeenTriggered: hasContainerTriggered1),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          logFirebaseEvent(
+                              'RIDE_SHARE6_PAGE_ContainerSkipNow_ON_TAP');
+                          logFirebaseEvent('ContainerSkipNow_widget_animation');
+                          if (animationsMap[
+                                  'containerOnActionTriggerAnimation2'] !=
+                              null) {
+                            safeSetState(() => hasContainerTriggered2 = true);
+                            SchedulerBinding.instance.addPostFrameCallback(
+                                (_) async => await animationsMap[
+                                        'containerOnActionTriggerAnimation2']!
+                                    .controller
+                                    .forward(from: 0.0));
+                          }
+                          logFirebaseEvent('ContainerSkipNow_navigate_to');
 
                           context.pushNamed(
                             PaymentRide7Widget.routeName,
@@ -1559,7 +1652,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget> {
                                 ),
                           ),
                         ),
-                      ),
+                      ).animateOnActionTrigger(
+                          animationsMap['containerOnActionTriggerAnimation2']!,
+                          hasBeenTriggered: hasContainerTriggered2),
                       Padding(
                         padding:
                             EdgeInsetsDirectional.fromSTEB(2.0, 0.0, 0.0, 0.0),

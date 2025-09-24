@@ -342,10 +342,9 @@ int quantasRidesNesteMes(
 
 double progressBarRidePoints(int ridePoints) {
   // Defina os limites para cada fase
-  const int bronzeLimit = 1000;
-  const int silverLimit = 2300;
-  const int goldLimit = 3400;
-  const int platinumLimit = 4500;
+  const int bronzeLimit = 10000;
+  const int silverLimit = 20000;
+  const int goldLimit = 30000;
 
   // Cálculo progressivo para cada fase
   if (ridePoints <= bronzeLimit) {
@@ -354,8 +353,6 @@ double progressBarRidePoints(int ridePoints) {
     return (ridePoints - bronzeLimit) / (silverLimit - bronzeLimit); // Silver
   } else if (ridePoints <= goldLimit) {
     return (ridePoints - silverLimit) / (goldLimit - silverLimit); // Gold
-  } else if (ridePoints <= platinumLimit) {
-    return (ridePoints - goldLimit) / (platinumLimit - goldLimit); // Platinum
   } else {
     return 1.0; // Após Platinum, o progresso chega a 1
   }
@@ -484,6 +481,57 @@ double mediaCorridaNesseKm(
 
   // Sem histórico útil? Cai no fallback GLOBAL (nunca 0.0)
   return basePadrao + ppkPadrao * kmCobrados;
+}
+
+String minCar(
+  List<UsersRecord> drivers,
+  LatLng userLocation,
+) {
+  // Velocidade média urbana (ajuste conforme sua cidade)
+  const double avgSpeedKmh = 30.0;
+
+  // Helpers locais
+  double _deg2rad(double deg) => deg * (math.pi / 180.0);
+
+  // Distância Haversine em km
+  double _haversineKm(LatLng a, LatLng b) {
+    const double R = 6371.0;
+    final double dLat = _deg2rad(b.latitude - a.latitude);
+    final double dLon = _deg2rad(b.longitude - a.longitude);
+    final double lat1 = _deg2rad(a.latitude);
+    final double lat2 = _deg2rad(b.latitude);
+
+    final double h = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1) *
+            math.cos(lat2) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final double c = 2 * math.atan2(math.sqrt(h), math.sqrt(1.0 - h));
+    return R * c;
+  }
+
+  // Lista vazia? Sem como estimar
+  if (drivers.isEmpty) return '—';
+
+  // Encontra a menor distância válida até um motorista
+  double? closestKm;
+  for (final d in drivers) {
+    final dLoc = d.location; // UsersRecord.location deve ser LatLng
+    if (dLoc == null) continue;
+    final km = _haversineKm(userLocation, dLoc);
+    if (closestKm == null || km < closestKm) closestKm = km;
+  }
+
+  // Ninguém com localização válida
+  if (closestKm == null) return '—';
+
+  // Estimativa de minutos
+  final double rawMinutes = (closestKm / avgSpeedKmh) * 60.0;
+
+  // Formatação amigável
+  if (rawMinutes > 120.0) return '120+ min';
+  final int minutes = rawMinutes.ceil().clamp(1, 120);
+  return '$minutes min';
 }
 
 List<String> nassauList() {
@@ -620,4 +668,31 @@ String estimativeTime(
       return '$h $hUnit $m $mUnit';
     }
   }
+}
+
+double gastosMensal(
+  List<RideOrdersRecord> orders,
+  DateTime atualDay,
+) {
+  if (orders.isEmpty) return 0.0;
+
+  double total = 0.0;
+  final int targetYear = atualDay.year;
+  final int targetMonth = atualDay.month;
+
+  for (final o in orders) {
+    final DateTime? dia = o.dia; // data do pedido
+    final double? valor = o.rideValue; // valor do pedido
+    if (dia == null || valor == null) continue;
+
+    // soma somente pedidos do mesmo mês/ano de atualDay
+    if (dia.year == targetYear && dia.month == targetMonth) {
+      total += valor;
+    }
+  }
+
+  // Se quiser arredondar para 2 casas, descomente a linha abaixo:
+  // total = (total * 100).roundToDouble() / 100.0;
+
+  return total;
 }

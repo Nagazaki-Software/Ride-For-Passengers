@@ -8,7 +8,10 @@ import 'package:flutter/material.dart';
 class PaymentRide7Model extends FlutterFlowModel<PaymentRide7Widget> {
   ///  Local state fields for this page.
 
-  dynamic selectCard;
+  PaymentMethodSaveStruct? selectCard;
+  void updateSelectCardStruct(Function(PaymentMethodSaveStruct) updateFn) {
+    updateFn(selectCard ??= PaymentMethodSaveStruct());
+  }
 
   int? selectTip;
 

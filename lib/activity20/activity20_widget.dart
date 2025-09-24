@@ -370,36 +370,81 @@ class _Activity20WidgetState extends State<Activity20Widget>
                                                             .fontStyle,
                                                   ),
                                             ),
-                                            Text(
-                                              FFLocalizations.of(context)
-                                                  .getText(
-                                                'uykp8in3' /* $ 214 */,
+                                            StreamBuilder<
+                                                List<RideOrdersRecord>>(
+                                              stream: queryRideOrdersRecord(
+                                                queryBuilder:
+                                                    (rideOrdersRecord) =>
+                                                        rideOrdersRecord.where(
+                                                  'user',
+                                                  isEqualTo:
+                                                      currentUserReference,
+                                                ),
                                               ),
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  .bodyMedium
-                                                  .override(
-                                                    font: GoogleFonts.poppins(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
+                                              builder: (context, snapshot) {
+                                                // Customize what your widget looks like when it's loading.
+                                                if (!snapshot.hasData) {
+                                                  return Center(
+                                                    child: SizedBox(
+                                                      width: 50.0,
+                                                      height: 50.0,
+                                                      child:
+                                                          SpinKitDoubleBounce(
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .accent1,
+                                                        size: 50.0,
+                                                      ),
                                                     ),
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .alternate,
-                                                    fontSize: 22.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
+                                                  );
+                                                }
+                                                List<RideOrdersRecord>
+                                                    textRideOrdersRecordList =
+                                                    snapshot.data!;
+
+                                                return Text(
+                                                  formatNumber(
+                                                    functions.gastosMensal(
+                                                        textRideOrdersRecordList
+                                                            .toList(),
+                                                        getCurrentTimestamp),
+                                                    formatType:
+                                                        FormatType.decimal,
+                                                    decimalType: DecimalType
+                                                        .periodDecimal,
+                                                    currency: '\$ ',
                                                   ),
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        font:
+                                                            GoogleFonts.poppins(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .alternate,
+                                                        fontSize: 22.0,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontStyle,
+                                                      ),
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),
@@ -954,7 +999,10 @@ class _Activity20WidgetState extends State<Activity20Widget>
                                                       .fromSTEB(
                                                           6.0, 0.0, 0.0, 0.0),
                                                   child: Text(
-                                                    'ETA ${functions.estimativeTime(columnRideOrdersRecord.latlngAtual!, columnRideOrdersRecord.latlng!)}',
+                                                    'ETA ${functions.estimativeTime(columnRideOrdersRecord.latlngAtual!, columnRideOrdersRecord.latlng!)}'
+                                                        .maybeHandleOverflow(
+                                                      maxChars: 11,
+                                                    ),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium
