@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+﻿import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
@@ -8,6 +8,7 @@ import '/flutter_flow/instant_timer.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
+import '/notifications/ride_step_notifications2.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -50,6 +51,8 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
 
     logFirebaseEvent('screen_view',
         parameters: {'screen_name': 'FindingDrive8'});
+    // Show persistent notification while searching for driver
+    RideStepNotifications.showFinding();
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       logFirebaseEvent('FINDING_DRIVE8_FindingDrive8_ON_INIT_STA');
@@ -62,6 +65,8 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
               await RideOrdersRecord.getDocumentOnce(widget.rideOrder!);
           if (_model.order?.driver != null) {
             logFirebaseEvent('FindingDrive8_navigate_to');
+            // Update notification to "picking you" when driver is assigned
+            await RideStepNotifications.showPickingYou();
 
             context.goNamed(
               PickingYou9Widget.routeName,
@@ -224,30 +229,37 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                     }
                     List<UsersRecord> polyMapUsersRecordList = snapshot.data!;
 
+                    final int onlineDrivers = polyMapUsersRecordList.length;
+
                     return Container(
                       width: double.infinity,
                       height: double.infinity,
                       child: custom_widgets.PolyMap(
                         width: double.infinity,
                         height: double.infinity,
-                        refreshMs: 60000,
+                        // Atualiza posicoes com mais frequencia para o efeito de busca
+                        refreshMs: 8000,
                         userLocation: currentUserLocationValue!,
                         driversRefs: polyMapUsersRecordList
                             .map((e) => e.reference)
                             .toList(),
                         userName: currentUserDisplayName,
                         userPhotoUrl: currentUserPhoto,
-                        userMarkerSize: 48,
-                        driverIconWidth: 56,
+                        // Tamanhos maiores para destacar o pulso e os carros
+                        userMarkerSize: 96,
+                        driverIconWidth: 96,
                         driverDriverIconUrl:
                             'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
                         driverTaxiIconUrl:
                             'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
-                        searchMessage: '0',
+                        // HUD desligado para focar nos ícones/anim.
+                        searchMessage: '',
                         showSearchHud: false,
                         focusIntervalMs: 4000,
                         focusHoldMs: 3500,
                         enableDriverFocus: true,
+                        showPulseHalo: true,
+                        showViewingBubble: true,
                       ),
                     );
                   },

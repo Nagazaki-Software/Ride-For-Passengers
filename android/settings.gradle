@@ -24,4 +24,16 @@ plugins {
     
 }
 
+// Resolve runtime dependencies here (AGP 8+)
+dependencyResolutionManagement {
+    // Allow plugins (like Flutter) to add project repositories without failing.
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Flutter engine artifacts
+        maven { url 'https://storage.googleapis.com/download.flutter.io' }
+    }
+}
+
 include ":app"

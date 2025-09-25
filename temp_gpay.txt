@@ -1,0 +1,101 @@
+                children: [
+                  Stack(
+                    children: [
+                      if (widget.pagamento && isAndroid)
+                        FFButtonWidget(
+                          onPressed: () async {
+                            logFirebaseEvent(
+                                'CARD_PAYMENT_PAY_WITH_GOOGLE_PAY_BTN_ON_');
+                            logFirebaseEvent('Button_braintree_payment');
+                            final transacAmount = widget.value!;
+                            final transacDisplayName =
+                                'RIDE-${random_data.randomInteger(0, 6).toString()}';
+                            if (kIsWeb) {
+                              showSnackbar(context,
+                                  'Payments not yet supported on web.');
+                              return;
+                            }
+
+                            final dropInRequest = BraintreeDropInRequest(
+                              cardEnabled: false,
+                              clientToken: braintreeClientToken(),
+                              collectDeviceData: true,
+                              googlePaymentRequest:
+                                  BraintreeGooglePaymentRequest(
+                                totalPrice: transacAmount.toString(),
+                                currencyCode: 'USD',
+                                billingAddressRequired: false,
+                                googleMerchantID: googleMerchantId(),
+                              ),
+                            );
+                            try {
+                              final dropInResult =
+                                  await BraintreeDropIn.start(dropInRequest);
+                              if (dropInResult == null) {
+                                return;
+                              }
+                              showSnackbar(
+                                context,
+                                'Processing payment...',
+                                duration: 10,
+                                loading: true,
+                              );
+                              final paymentResponse =
+                                  await processBraintreePayment(
+                                transacAmount,
+                                dropInResult.paymentMethodNonce.nonce,
+                                dropInResult.deviceData,
+                              );
+                              if (paymentResponse.errorMessage != null) {
+                                showSnackbar(context,
+                                    'Error: ${paymentResponse.errorMessage}');
+                                return;
+                              }
+                              showSnackbar(context, 'Success!');
+                              _model.transactionId =
+                                  paymentResponse.transactionId!;
+
+                              safeSetState(() {});
+                            } catch (e) {
+                              showSnackbar(
+                                context,
+                                'Google Pay not available or failed: $e',
+                              );
+                            }
+                          },
+                          text: FFLocalizations.of(context).getText(
+                            '0skbwu9o' /* Pay with Google Pay */,
+                          ),
+                          icon: FaIcon(
+                            FontAwesomeIcons.googlePay,
+                            size: 30.0,
+                          ),
+                          options: FFButtonOptions(
+                            width: double.infinity,
+                            height: 50.0,
+                            padding: EdgeInsets.all(8.0),
+                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 0.0, 0.0, 0.0),
+                            iconColor: FlutterFlowTheme.of(context).primaryText,
+                            color: FlutterFlowTheme.of(context).alternate,
+                            textStyle: FlutterFlowTheme.of(context)
+                                .titleMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .titleMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .titleMedium
+                                        .fontStyle,
+                                  ),
+                                  color:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontStyle,
+                                ),

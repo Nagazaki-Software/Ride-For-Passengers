@@ -1,0 +1,45 @@
+{
+    "name":  "braintree_native_ui",
+    "description":  "Plugin nativo para tokenizar cartão, rodar 3DS2 e coletar device data com Braintree usando UI própria.",
+    "version":  "0.4.0",
+    "repository":  "https://github.com/lucascelopes/braintree_native_ui",
+    "issue_tracker":  "https://github.com/lucascelopes/braintree_native_ui/issues",
+    "homepage":  "https://github.com/lucascelopes/braintree_native_ui",
+    "topics":  [
+                   "braintree",
+                   "payments",
+                   "three-d-secure",
+                   "card",
+                   "native"
+               ],
+    "environment":  {
+                        "sdk":  "\u003e=3.3.0 \u003c4.0.0",
+                        "flutter":  "\u003e=3.19.0"
+                    },
+    "dependencies":  {
+                         "flutter":  {
+                                         "sdk":  "flutter"
+                                     },
+                         "plugin_platform_interface":  "^2.1.8",
+                         "http":  "^1.2.2"
+                     },
+    "dev_dependencies":  {
+                             "flutter_lints":  "^4.0.0",
+                             "flutter_test":  {
+                                                  "sdk":  "flutter"
+                                              }
+                         },
+    "flutter":  {
+                    "plugin":  {
+                                   "platforms":  {
+                                                     "android":  {
+                                                                     "package":  "com.nagazakisoftware.braintree_native_ui",
+                                                                     "pluginClass":  "BraintreeNativeUiPlugin"
+                                                                 },
+                                                     "ios":  {
+                                                                 "pluginClass":  "BraintreeNativeUiPlugin"
+                                                             }
+                                                 }
+                               }
+                }
+}

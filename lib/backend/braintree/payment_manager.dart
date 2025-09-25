@@ -1,7 +1,5 @@
 import '../cloud_functions/cloud_functions.dart';
-
-export 'package:flutter/foundation.dart';
-export 'package:flutter_braintree/flutter_braintree.dart';
+import 'package:flutter/foundation.dart';
 
 final isProdPayments = false;
 
@@ -34,28 +32,70 @@ Future<PaymentResponse> processBraintreePayment(
   String paymentNonce, [
   String? deviceData,
 ]) async {
-  final callName = isProdPayments
-      ? 'processBraintreePayment'
-      : 'processBraintreeTestPayment';
+  // Align with Firebase Functions names in firebase/functions/index.js
   final response = await makeCloudCall(
-    callName,
+    'payAndReturnPaymentMethod',
     {
       'amount': amount,
       'paymentNonce': paymentNonce,
       if (deviceData != null) 'deviceData': deviceData,
+      'isProd': isProdPayments,
     },
   );
-  if (response.containsKey('transactionId')) {
+  final ok = response['success'] == true || response['ok'] == true;
+  if (ok && response['transactionId'] != null) {
     return PaymentResponse(transactionId: response['transactionId']);
   }
-  if (response.containsKey('error')) {
-    return PaymentResponse(errorMessage: response['error']);
+  if (response['error'] != null) {
+    return PaymentResponse(errorMessage: response['error'].toString());
   }
-  return PaymentResponse(errorMessage: 'Unknown error occured');
+  return const PaymentResponse(errorMessage: 'Unknown error occured');
 }
 
 double computeTotal(double baseTotal,
     {double taxRate = 0.0, double shippingCost = 0.0}) {
   final total = baseTotal * (1 + taxRate / 100) + shippingCost;
   return (total * 100).roundToDouble() / 100;
+}
+
+/// Vault a card in Braintree using a payment nonce and return details.
+/// Returns a map with keys: 'token', 'brand', 'last4', 'isDefault' or 'error'.
+Future<Map<String, dynamic>> saveBraintreePaymentMethod(
+  String paymentNonce, {
+  bool makeDefault = false,
+}) async {
+  final response = await makeCloudCall(
+    'saveCardPayment',
+    {
+      'paymentNonce': paymentNonce,
+      'isProd': isProdPayments,
+      'makeDefault': makeDefault,
+    },
+  );
+  return response;
+}
+
+/// Charge using a vaulted payment method token (for saved cards)
+Future<PaymentResponse> payWithSavedPaymentMethod(
+  double amount,
+  String paymentMethodToken, {
+  String? deviceData,
+}) async {
+  final response = await makeCloudCall(
+    'payWithSavedPaymentMethod',
+    {
+      'amount': amount,
+      'paymentMethodToken': paymentMethodToken,
+      if (deviceData != null) 'deviceData': deviceData,
+      'isProd': isProdPayments,
+    },
+  );
+  final ok = response['success'] == true || response['ok'] == true;
+  if (ok && response['transactionId'] != null) {
+    return PaymentResponse(transactionId: response['transactionId']);
+  }
+  if (response['error'] != null) {
+    return PaymentResponse(errorMessage: response['error'].toString());
+  }
+  return const PaymentResponse(errorMessage: 'Unknown error occured');
 }

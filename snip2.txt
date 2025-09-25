@@ -1,0 +1,121 @@
+// Automatic FlutterFlow imports
+import '/backend/backend.dart';
+import '/backend/schema/structs/index.dart';
+import '/actions/actions.dart' as action_blocks;
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'index.dart'; // Imports other custom actions
+import '/flutter_flow/custom_functions.dart'; // Imports custom functions
+import 'package:flutter/material.dart';
+// Begin custom action code
+// DO NOT REMOVE OR MODIFY THE CODE ABOVE!
+
+// ===== IMPORTS EXTRAS =====
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_braintree/flutter_braintree.dart';
+
+/// Action única controlada por `charge`:
+/// - charge == false  -> apenas SALVA o JSON no Firestore (sem cobrar)
+/// - charge == true   -> apenas COBRA via Cloud Functions (sem salvar)
+///
+/// Parâmetros:
+/// - creditCard: PaymentMethodSaveStruct (ou Map/String JSON – lidamos com todos)
+/// - charge: bool?  (true = charge, qualquer outra coisa = save)
+/// - tokenizationKey: String? ("sandbox_..." / "production_...")
+/// - amount: double (valor)
+///
+/// Retorno:
+/// { ok: bool, mode: "save"|"charge", transactionId?: string, error?: string }
+Future<dynamic> processCardPayload(
+  BuildContext context,
+  PaymentMethodSaveStruct creditCard,
+  bool? charge,
+  String? tokenizationKey,
+  double amount,
+) async {
+  final result = <String, dynamic>{
+    'ok': false,
+    'mode': (charge == true) ? 'charge' : 'save',
+  };
+
+  // ---------- Helpers ----------
+  Future<Map<String, dynamic>> _callCharge({
+    required String tokenizationKey,
+    required double amount,
+    String? paymentNonce,
+    String? paymentMethodToken,
+  }) async {
+    final isSandbox = tokenizationKey.startsWith('sandbox_');
+    final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
+
+    if (paymentMethodToken != null && paymentMethodToken.isNotEmpty) {
+      final callable = functions.httpsCallable('payWithSavedPaymentMethod');
+      final resp = await callable.call({
+        'amount': amount,
+        'paymentMethodToken': paymentMethodToken,
+        'isProd': !isSandbox,
+      });
+      return Map<String, dynamic>.from(resp.data as Map);
+    }
+
+    // Otherwise, charge by nonce (and vault internally if your CF does)
+    final callable = functions.httpsCallable('payAndReturnPaymentMethod');
+    final resp = await callable.call({
+      'amount': amount,
+      'paymentNonce': paymentNonce,
+      'isProd': !isSandbox,
+    });
+    return Map<String, dynamic>.from(resp.data as Map);
+  }
+
+  Map<String, dynamic> _normalizeToMap(dynamic src) {
+    try {
+      if (src is PaymentMethodSaveStruct) {
+        return Map<String, dynamic>.from(src.toMap());
+      }
+    } catch (_) {}
+    if (src is Map) return Map<String, dynamic>.from(src);
+    if (src is String && src.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(src);
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      } catch (_) {}
+    }
+    return <String, dynamic>{};
+  }
+
+  String? _str(Map m, String k) {
+    final v = m[k];
+    if (v == null) return null;
+    final s = v.toString().trim();
+    return s.isEmpty ? null : s;
+  }
+
+  bool _isApplePay(String? t) {
+    final x = (t ?? '').toLowerCase();
+    return x == 'applepay' || x == 'apple_pay' || x == 'apple';
+  }
+
+  bool _isGooglePay(String? t) {
+    final x = (t ?? '').toLowerCase();
+    return x == 'googlepay' ||
+        x == 'google_pay' ||
+        x == 'gpay' ||
+        x == 'google';
+  }
+
+  /// Abre o Drop-In só com ApplePay ou só com GooglePay para obter NONCE.
+  Future<String?> _getNonceViaDropIn({
+    required String tokenizationKey,
+    required double amount,
+    required bool apple,
+    required bool google,
+    String? merchantIdentifier, // Apple Pay
+    String displayName = 'Sua Loja',
+    String currencyCode = 'BRL',
+    String countryCode = 'BR',

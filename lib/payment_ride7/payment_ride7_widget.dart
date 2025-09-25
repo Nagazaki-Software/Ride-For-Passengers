@@ -11,6 +11,7 @@ import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/flutter_flow/random_data_util.dart' as random_data;
 import '/index.dart';
+import '/backend/braintree/payment_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -1662,19 +1663,61 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                 }
                                 logFirebaseEvent(
                                     'ContainerConfirmPay_custom_action');
-                                _model.processPayment =
-                                    await actions.processCardPayload(
-                                  context,
-                                  _model.selectCard!,
-                                  true,
-                                  'sandbox_ck9vkcgg_brg8dhjg5tqpw496',
-                                  widget.value!,
-                                );
-                                if (getJsonField(
-                                      _model.processPayment,
-                                      r'''$.cardRaw''',
-                                    ) !=
-                                    null) {
+                                try {
+                                  if (_model.selectCard == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Selecione um cartão para pagar.'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  final amt = (widget.value ?? 0).toDouble();
+                                  if (amt <= 0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Valor inválido para pagamento.'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  _model.processPayment =
+                                      await actions.processCardPayload(
+                                    context,
+                                    _model.selectCard!,
+                                    true,
+                                    braintreeClientToken(),
+                                    amt,
+                                  );
+                                } catch (e) {
+                                  await showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    enableDrag: false,
+                                    context: context,
+                                    builder: (context) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          FocusScope.of(context).unfocus();
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+                                        },
+                                        child: Padding(
+                                          padding:
+                                              MediaQuery.viewInsetsOf(context),
+                                          child: ErronopagamentoWidget(),
+                                        ),
+                                      );
+                                    },
+                                  ).then((value) => safeSetState(() {}));
+                                  return;
+                                }
+                                if (_model.processPayment != null &&
+                                    getJsonField(
+                                          _model.processPayment,
+                                          r'$.ok',
+                                        ) ==
+                                        true) {
                                   logFirebaseEvent(
                                       'ContainerConfirmPay_backend_call');
                                   _model.latlngOrigem =

@@ -309,7 +309,7 @@ class _ComponentLanguageWidgetState extends State<ComponentLanguageWidget> {
                       width: double.infinity,
                       height: 50.0,
                       decoration: BoxDecoration(
-                        color: FFLocalizations.of(context).languageCode == 'ge'
+                        color: FFLocalizations.of(context).languageCode == 'de'
                             ? FlutterFlowTheme.of(context).secondary
                             : FlutterFlowTheme.of(context).primary,
                         boxShadow: [
@@ -420,7 +420,7 @@ class _ComponentLanguageWidgetState extends State<ComponentLanguageWidget> {
                                     ),
                                     color: FFLocalizations.of(context)
                                                 .languageCode ==
-                                            'fr'
+                                            'es'
                                         ? FlutterFlowTheme.of(context).primary
                                         : FlutterFlowTheme.of(context)
                                             .alternate,

@@ -37,12 +37,12 @@ android {
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -90,4 +90,13 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
     implementation 'io.card:android-sdk:5.5.1'
+
+    // Braintree Android SDK (use v4.+ to ensure availability on Maven Central)
+    implementation 'com.braintreepayments.api:core:4+'
+    implementation 'com.braintreepayments.api:card:4+'
+    implementation 'com.braintreepayments.api:paypal:4+'
+    implementation 'com.braintreepayments.api:google-pay:4+'
+
+    // Google Pay dependency
+    implementation 'com.google.android.gms:play-services-wallet:19.4.0'
 }

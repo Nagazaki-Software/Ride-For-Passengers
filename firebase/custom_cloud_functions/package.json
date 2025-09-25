@@ -2,7 +2,7 @@
   "name": "functions",
   "main": "index.js",
   "private": true,
-  "engines": { "node": "20" },
+  "engines": { "node": "22" },
   "type": "commonjs",
   "scripts": {
     "build": "echo \"no build step\"",
@@ -10,7 +10,7 @@
     "lint": "echo \"no lint\""
   },
   "dependencies": {
-     "openai": "^4.0.0",
+    "openai": "^4.0.0",
     "firebase-admin": "^12.5.0",
     "firebase-functions": "^5.0.1"
   }

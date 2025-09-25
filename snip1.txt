@@ -1,0 +1,79 @@
+  Future<String?> _getNonceViaDropIn({
+    required String tokenizationKey,
+    required double amount,
+    required bool apple,
+    required bool google,
+    String? merchantIdentifier, // Apple Pay
+    String displayName = 'Sua Loja',
+    String currencyCode = 'BRL',
+    String countryCode = 'BR',
+  }) async {
+    // Apple Pay: supportedNetworks + paymentSummaryItems com "type".
+    BraintreeApplePayRequest? appleReq;
+    if (apple) {
+      appleReq = BraintreeApplePayRequest(
+        currencyCode: currencyCode,
+        countryCode: countryCode,
+        merchantIdentifier:
+            merchantIdentifier ?? 'merchant.com.seu.bundle', // TODO
+        displayName: displayName,
+        supportedNetworks: const [
+          ApplePaySupportedNetworks.visa,
+          ApplePaySupportedNetworks
+              .masterCard, // ajuste p/ seu fork se necessário
+          ApplePaySupportedNetworks.amex,
+          ApplePaySupportedNetworks.discover,
+        ],
+        paymentSummaryItems: [
+          ApplePaySummaryItem(
+            label: displayName,
+            amount: amount, // <— double, não String
+            // Se seu fork tiver `finalPrice` (ou `final`), troque aqui:
+            type: ApplePaySummaryItemType.pending,
+          ),
+        ],
+      );
+    }
+
+    BraintreeGooglePaymentRequest? googleReq;
+    if (google) {
+      googleReq = BraintreeGooglePaymentRequest(
+        totalPrice: amount.toStringAsFixed(2),
+        currencyCode: currencyCode,
+        billingAddressRequired: false,
+      );
+    }
+
+    final dropInReq = BraintreeDropInRequest(
+      tokenizationKey: tokenizationKey,
+      cardEnabled: false,
+      paypalRequest: null,
+      applePayRequest: appleReq,
+      googlePaymentRequest: googleReq,
+      collectDeviceData: false,
+    );
+
+    final dropInRes = await BraintreeDropIn.start(dropInReq);
+    if (dropInRes == null) return null; // cancelou
+    final pm = dropInRes.paymentMethodNonce;
+    return (pm == null || pm.nonce.isEmpty) ? null : pm.nonce;
+  }
+
+  try {
+    // -------- Normalização inicial --------
+    final bool doCharge = charge == true;
+    final String tk = (tokenizationKey ?? '').trim();
+    final double amt = amount;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      result['error'] = 'You must be signed in.';
+      return result;
+    }
+    if (doCharge && (amt <= 0)) {
+      result['error'] = 'Invalid amount.';
+      return result;
+    }
+    if (doCharge && tk.isEmpty) {
+      result['error'] = 'Missing tokenizationKey.';
+      return result;

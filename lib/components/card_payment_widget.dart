@@ -5,6 +5,9 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/random_data_util.dart' as random_data;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+// Using native platform channel bridge (Android: Kotlin, iOS: Swift)
+import '/backend/braintree/native_bridge.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'card_payment_model.dart';
@@ -176,45 +179,40 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                               return;
                             }
 
-                            final dropInRequest = BraintreeDropInRequest(
-                              cardEnabled: false,
-                              clientToken: braintreeClientToken(),
-                              collectDeviceData: true,
-                              googlePaymentRequest:
-                                  BraintreeGooglePaymentRequest(
-                                totalPrice: transacAmount.toString(),
+                            // Using native Google Pay flow via braintree_native_ui
+                            try {
+                              final nonce = await BraintreeNativeBridge.googlePay(
+                                authorization: braintreeClientToken(),
+                                amount: transacAmount.toStringAsFixed(2),
                                 currencyCode: 'USD',
-                                billingAddressRequired: false,
-                                googleMerchantID: googleMerchantId(),
-                              ),
-                            );
-                            final dropInResult =
-                                await BraintreeDropIn.start(dropInRequest);
-                            if (dropInResult == null) {
-                              return;
-                            }
-                            showSnackbar(
-                              context,
-                              'Processing payment...',
-                              duration: 10,
-                              loading: true,
-                            );
-                            final paymentResponse =
-                                await processBraintreePayment(
-                              transacAmount,
-                              dropInResult.paymentMethodNonce.nonce,
-                              dropInResult.deviceData,
-                            );
-                            if (paymentResponse.errorMessage != null) {
-                              showSnackbar(context,
-                                  'Error: ${paymentResponse.errorMessage}');
-                              return;
-                            }
-                            showSnackbar(context, 'Success!');
-                            _model.transactionId =
-                                paymentResponse.transactionId!;
+                              );
+                              if (nonce == null || nonce.isEmpty) return;
+                              showSnackbar(
+                                context,
+                                'Processing payment...',
+                                duration: 10,
+                                loading: true,
+                              );
+                              final paymentResponse = await processBraintreePayment(
+                                transacAmount,
+                                nonce,
+                              );
+                              if (paymentResponse.errorMessage != null) {
+                                showSnackbar(context,
+                                    'Error: ${paymentResponse.errorMessage}');
+                                return;
+                              }
+                              showSnackbar(context, 'Success!');
+                              _model.transactionId =
+                                  paymentResponse.transactionId!;
 
-                            safeSetState(() {});
+                              safeSetState(() {});
+                            } catch (e) {
+                              showSnackbar(
+                                context,
+                                'Google Pay not available or failed: $e',
+                              );
+                            }
                           },
                           text: FFLocalizations.of(context).getText(
                             '0skbwu9o' /* Pay with Google Pay */,
@@ -234,23 +232,10 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                             textStyle: FlutterFlowTheme.of(context)
                                 .titleMedium
                                 .override(
-                                  font: GoogleFonts.poppins(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontStyle,
-                                  ),
+                                  fontFamily: 'Poppins',
                                   color:
                                       FlutterFlowTheme.of(context).primaryText,
                                   letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .titleMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .titleMedium
-                                      .fontStyle,
                                 ),
                             elevation: 0.0,
                             borderSide: BorderSide(
@@ -411,43 +396,39 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                             return;
                           }
 
-                          final cardRequest = BraintreeCreditCardRequest(
-                            cardNumber: _model.creditCardInfo.cardNumber,
-                            expirationMonth: _model.creditCardInfo.expiryDate
-                                .split('/')
-                                .first,
-                            expirationYear: _model.creditCardInfo.expiryDate
-                                .split('/')
-                                .last,
-                            cvv: _model.creditCardInfo.cvvCode,
-                          );
-                          final cardResult = await Braintree.tokenizeCreditCard(
-                            braintreeClientToken(),
-                            cardRequest,
-                          );
-                          if (cardResult == null) {
-                            return;
-                          }
-                          showSnackbar(
-                            context,
-                            'Processing payment...',
-                            duration: 10,
-                            loading: true,
-                          );
-                          final paymentResponse = await processBraintreePayment(
-                            transacAmount,
-                            cardResult.nonce,
-                          );
-                          if (paymentResponse.errorMessage != null) {
-                            showSnackbar(context,
-                                'Error: ${paymentResponse.errorMessage}');
-                            return;
-                          }
-                          showSnackbar(context, 'Success!');
-                          _model.transactionId3 =
-                              paymentResponse.transactionId!;
+                          // Tokenize the card directly via native UI helper
+                          try {
+                            final nonce = await BraintreeNativeBridge.tokenizeCard(
+                              authorization: braintreeClientToken(),
+                              number: _model.creditCardInfo.cardNumber,
+                              expirationMonth: _model.creditCardInfo.expiryDate.split('/').first,
+                              expirationYear: _model.creditCardInfo.expiryDate.split('/').last,
+                              cvv: _model.creditCardInfo.cvvCode,
+                            );
+                            if (nonce == null || nonce.isEmpty) return;
+                            showSnackbar(
+                              context,
+                              'Processing payment...',
+                              duration: 10,
+                              loading: true,
+                            );
+                            final paymentResponse = await processBraintreePayment(
+                              transacAmount,
+                              nonce,
+                            );
+                            if (paymentResponse.errorMessage != null) {
+                              showSnackbar(context,
+                                  'Error: ${paymentResponse.errorMessage}');
+                              return;
+                            }
+                            showSnackbar(context, 'Success!');
+                            _model.transactionId3 =
+                                paymentResponse.transactionId!;
 
-                          safeSetState(() {});
+                            safeSetState(() {});
+                          } catch (e) {
+                            showSnackbar(context, 'Card payment failed: $e');
+                          }
                         },
                         text: FFLocalizations.of(context).getText(
                           'hxpv6ouk' /* Confirm */,

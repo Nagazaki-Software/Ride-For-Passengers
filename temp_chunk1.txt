@@ -1,0 +1,81 @@
+                                        .override(
+                                          font: GoogleFonts.poppins(
+                                            fontWeight:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontWeight,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+                                          ),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primary,
+                                          letterSpacing: 0.0,
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                    cursorColor: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    enableInteractiveSelection: true,
+                                    validator: _model.textControllerValidator
+                                        .asValidator(context),
+                                  ),
+                                ),
+                              ),
+                            ].divide(SizedBox(height: 6.0)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Builder(
+                      builder: (context) {
+                        final creditCards =
+                            FFAppState().paymentMethods.toList();
+                        if (creditCards.isEmpty) {
+                          return AddPaymentMethodWidget();
+                        }
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: List.generate(creditCards.length,
+                              (creditCardsIndex) {
+                            final creditCardsItem =
+                                creditCards[creditCardsIndex];
+                            return InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                logFirebaseEvent(
+                                    'PAYMENT_RIDE7_Container_jdcd9urd_ON_TAP');
+                                if (_model.selectCard == creditCardsItem) {
+                                  logFirebaseEvent(
+                                      'Container_update_page_state');
+                                  _model.selectCard = null;
+                                  safeSetState(() {});
+                                } else {
+                                  logFirebaseEvent(
+                                      'Container_update_page_state');
+                                  _model.selectCard = creditCardsItem;
+                                  safeSetState(() {});
+                                }
+                              },
+                              child: Container(
+                                width: MediaQuery.sizeOf(context).width * 0.7,
+                                decoration: BoxDecoration(
+                                  color: creditCardsItem.isDefault
+                                      ? FlutterFlowTheme.of(context)
+                                          .secondaryBackground
+                                      : FlutterFlowTheme.of(context).primary,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 1.0,
+                                      color: Color(0x33000000),

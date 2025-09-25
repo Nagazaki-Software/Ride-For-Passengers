@@ -17,7 +17,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_braintree/flutter_braintree.dart';
+-mport '/backend/braintree/native_bridge.dart';
 
 /// Action única controlada por `charge`:
 /// - charge == false  -> apenas SALVA o JSON no Firestore (sem cobrar)
@@ -43,7 +43,6 @@ Future<dynamic> processCardPayload(
     'mode': (charge == true) ? 'charge' : 'save',
   };
 
-  // ---------- Helpers ----------
   Future<Map<String, dynamic>> _callCharge({
     required String tokenizationKey,
     required double amount,
@@ -51,30 +50,26 @@ Future<dynamic> processCardPayload(
     String? paymentMethodToken,
   }) async {
     final isSandbox = tokenizationKey.startsWith('sandbox_');
-    final fnName =
-        isSandbox ? 'processBraintreeTestPayment' : 'processBraintreePayment';
     final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
-    final callable = functions.httpsCallable(fnName);
-
-    final req = <String, dynamic>{
-      'amount': amount.toStringAsFixed(2),
-    };
-    if (paymentNonce != null && paymentNonce.isNotEmpty) {
-      req['paymentNonce'] = paymentNonce;
-    }
     if (paymentMethodToken != null && paymentMethodToken.isNotEmpty) {
-      req['paymentMethodToken'] = paymentMethodToken;
+      final resp = await functions.httpsCallable('payWithSavedPaymentMethod').call({
+        'amount': amount,
+        'paymentMethodToken': paymentMethodToken,
+        'isProd': !isSandbox,
+      });
+      return Map<String, dynamic>.from(resp.data as Map);
     }
-
-    final resp = await callable.call(req);
+    final resp = await functions.httpsCallable('payAndReturnPaymentMethod').call({
+      'amount': amount,
+      'paymentNonce': paymentNonce,
+      'isProd': !isSandbox,
+    });
     return Map<String, dynamic>.from(resp.data as Map);
   }
 
   Map<String, dynamic> _normalizeToMap(dynamic src) {
     try {
-      if (src is PaymentMethodSaveStruct) {
-        return Map<String, dynamic>.from(src.toMap());
-      }
+      if (src is PaymentMethodSaveStruct) return Map<String, dynamic>.from(src.toMap());
     } catch (_) {}
     if (src is Map) return Map<String, dynamic>.from(src);
     if (src is String && src.trim().isNotEmpty) {
@@ -92,88 +87,40 @@ Future<dynamic> processCardPayload(
     final s = v.toString().trim();
     return s.isEmpty ? null : s;
   }
-
   bool _isApplePay(String? t) {
     final x = (t ?? '').toLowerCase();
     return x == 'applepay' || x == 'apple_pay' || x == 'apple';
   }
-
   bool _isGooglePay(String? t) {
     final x = (t ?? '').toLowerCase();
-    return x == 'googlepay' ||
-        x == 'google_pay' ||
-        x == 'gpay' ||
-        x == 'google';
+    return x == 'googlepay' || x == 'google_pay' || x == 'gpay' || x == 'google';
   }
-
-  /// Abre o Drop-In só com ApplePay ou só com GooglePay para obter NONCE.
-  Future<String?> _getNonceViaDropIn({
+  Future<String?> _getNonceViaNative({
     required String tokenizationKey,
     required double amount,
     required bool apple,
     required bool google,
-    String? merchantIdentifier, // Apple Pay
-    String displayName = 'Sua Loja',
+    String? merchantIdentifier,
     String currencyCode = 'BRL',
-    String countryCode = 'BR',
   }) async {
-    // Apple Pay: supportedNetworks + paymentSummaryItems com "type".
-    BraintreeApplePayRequest? appleReq;
-    if (apple) {
-      appleReq = BraintreeApplePayRequest(
-        currencyCode: currencyCode,
-        countryCode: countryCode,
-        merchantIdentifier:
-            merchantIdentifier ?? 'merchant.com.seu.bundle', // TODO
-        displayName: displayName,
-        supportedNetworks: const [
-          ApplePaySupportedNetworks.visa,
-          ApplePaySupportedNetworks
-              .masterCard, // ajuste p/ seu fork se necessário
-          ApplePaySupportedNetworks.amex,
-          ApplePaySupportedNetworks.discover,
-        ],
-        paymentSummaryItems: [
-          ApplePaySummaryItem(
-            label: displayName,
-            amount: amount, // <— double, não String
-            // Se seu fork tiver `finalPrice` (ou `final`), troque aqui:
-            type: ApplePaySummaryItemType.pending,
-          ),
-        ],
-      );
-    }
-
-    BraintreeGooglePaymentRequest? googleReq;
     if (google) {
-      googleReq = BraintreeGooglePaymentRequest(
-        totalPrice: amount.toStringAsFixed(2),
+      return await BraintreeNativeBridge.googlePay(
+        authorization: tokenizationKey,
+        amount: amount.toStringAsFixed(2),
         currencyCode: currencyCode,
-        billingAddressRequired: false,
       );
     }
-
-    final dropInReq = BraintreeDropInRequest(
-      tokenizationKey: tokenizationKey,
-      cardEnabled: false,
-      paypalRequest: null,
-      applePayRequest: appleReq,
-      googlePaymentRequest: googleReq,
-      collectDeviceData: false,
-    );
-
-    final dropInRes = await BraintreeDropIn.start(dropInReq);
-    if (dropInRes == null) return null; // cancelou
-    final pm = dropInRes.paymentMethodNonce;
-    return (pm == null || pm.nonce.isEmpty) ? null : pm.nonce;
+    if (apple) {
+      // Not implemented in this project yet; return null to indicate unsupported
+      return null;
+    }
+    return null;
   }
 
   try {
-    // -------- Normalização inicial --------
     final bool doCharge = charge == true;
     final String tk = (tokenizationKey ?? '').trim();
     final double amt = amount;
-
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       result['error'] = 'You must be signed in.';
@@ -195,16 +142,11 @@ Future<dynamic> processCardPayload(
     final Map<String, dynamic> payload = _normalizeToMap(creditCard);
 
     if (doCharge) {
-      // ================= CHARGE =================
-      final pmToken =
-          _str(payload, 'paymentMethodToken') ?? _str(payload, 'token');
-      final pmType =
-          _str(payload, 'paymentMethodType') ?? _str(payload, 'type');
+      final pmToken = _str(payload, 'paymentMethodToken') ?? _str(payload, 'token');
+      final pmType = _str(payload, 'paymentMethodType') ?? _str(payload, 'type');
       String? nonce = _str(payload, 'nonce');
 
-      // 1) Se houver TOKEN (vaulted), cobra por token
-      if ((pmToken != null && pmToken.isNotEmpty) &&
-          (nonce == null || nonce.isEmpty)) {
+      if ((pmToken != null && pmToken.isNotEmpty) && (nonce == null || nonce.isEmpty)) {
         try {
           final data = await _callCharge(
             tokenizationKey: tk,
@@ -212,7 +154,8 @@ Future<dynamic> processCardPayload(
             paymentMethodToken: pmToken,
           );
           final txId = _str(data, 'transactionId');
-          if (txId == null) {
+          final ok = data['success'] == true || data['ok'] == true;
+          if (!ok || txId == null || txId.isEmpty) {
             result['error'] = 'Charge failed: missing transactionId.';
           } else {
             result['ok'] = true;
@@ -220,42 +163,30 @@ Future<dynamic> processCardPayload(
           }
         } on FirebaseFunctionsException catch (e) {
           final parts = <String>[];
-          if (e.message != null && e.message!.trim().isNotEmpty) {
-            parts.add(e.message!.trim());
-          }
-          if (e.details != null && e.details.toString().trim().isNotEmpty) {
-            parts.add(e.details.toString().trim());
-          }
+          if (e.message != null && e.message!.trim().isNotEmpty) parts.add(e.message!.trim());
+          if (e.details != null && e.details.toString().trim().isNotEmpty) parts.add(e.details.toString().trim());
           parts.add('CODE: ${e.code.toUpperCase()}');
-          result['error'] = parts.join(' · ');
+          result['error'] = parts.join(' – ');
         } catch (e) {
           result['error'] = e.toString();
         }
         return result;
       }
 
-      // 2) Apple Pay / Google Pay → Drop-In para gerar NONCE
-      if ((nonce == null || nonce.isEmpty) &&
-          (pmType != null) &&
-          (_isApplePay(pmType) || _isGooglePay(pmType))) {
+      if ((nonce == null || nonce.isEmpty) && (pmType != null) && (_isApplePay(pmType) || _isGooglePay(pmType))) {
         try {
           final isApple = _isApplePay(pmType);
           final isGoogle = _isGooglePay(pmType);
-
-          nonce = await _getNonceViaDropIn(
+          nonce = await _getNonceViaNative(
             tokenizationKey: tk,
             amount: amt,
             apple: isApple,
             google: isGoogle,
             merchantIdentifier: _str(payload, 'merchantIdentifier'),
-            displayName: _str(payload, 'displayName') ?? 'Sua Loja',
             currencyCode: _str(payload, 'currencyCode') ?? 'BRL',
-            countryCode: _str(payload, 'countryCode') ?? 'BR',
           );
-
           if (nonce == null || nonce.isEmpty) {
-            result['error'] =
-                '${isApple ? 'Apple Pay' : 'Google Pay'} canceled or failed.';
+            result['error'] = '${isApple ? 'Apple Pay' : 'Google Pay'} canceled or failed.';
             return result;
           }
         } on PlatformException catch (pe) {
@@ -267,45 +198,34 @@ Future<dynamic> processCardPayload(
         }
       }
 
-      // 3) Sem nonce? Tokeniza cartão (cardRaw)
       if (nonce == null || nonce.isEmpty) {
-        final cardRaw = payload['cardRaw'] is Map
-            ? Map<String, dynamic>.from(payload['cardRaw'])
-            : null;
-
+        final cardRaw = payload['cardRaw'] is Map ? Map<String, dynamic>.from(payload['cardRaw']) : null;
         if (cardRaw == null) {
-          result['error'] =
-              'Missing nonce or cardRaw. Provide a nonce, a paymentMethodToken, '
-              'or cardRaw {number, expiryMonth, expiryYear, cvv}.';
+          result['error'] = 'Missing nonce or cardRaw. Provide a nonce, a paymentMethodToken, or cardRaw {number, expiryMonth, expiryYear, cvv}.';
           return result;
         }
-
-        final number =
-            (cardRaw['number'] ?? '').toString().replaceAll(RegExp(r'\D'), '');
+        final number = (cardRaw['number'] ?? '').toString().replaceAll(RegExp(r'\D'), '');
         final mm = (cardRaw['expiryMonth'] ?? '').toString().padLeft(2, '0');
         var yy = (cardRaw['expiryYear'] ?? '').toString().trim();
         if (yy.length == 2) yy = '20$yy';
         final cvv = (cardRaw['cvv'] ?? '').toString();
-
         if (number.isEmpty || mm.isEmpty || yy.isEmpty || cvv.isEmpty) {
-          result['error'] =
-              'Incomplete cardRaw: number/expiry/cvv are required.';
+          result['error'] = 'Incomplete cardRaw: number/expiry/cvv are required.';
           return result;
         }
-
         try {
-          final req = BraintreeCreditCardRequest(
-            cardNumber: number,
+          final tokenized = await BraintreeNativeBridge.tokenizeCard(
+            authorization: tk,
+            number: number,
             expirationMonth: mm,
             expirationYear: yy,
             cvv: cvv,
           );
-          final tokenized = await Braintree.tokenizeCreditCard(tk, req);
-          if (tokenized == null || tokenized.nonce.isEmpty) {
+          if (tokenized == null || tokenized.isEmpty) {
             result['error'] = 'Tokenization failed.';
             return result;
           }
-          nonce = tokenized.nonce;
+          nonce = tokenized;
         } on PlatformException catch (pe) {
           result['error'] = pe.message ?? pe.code;
           return result;
@@ -315,7 +235,6 @@ Future<dynamic> processCardPayload(
         }
       }
 
-      // 4) Tendo NONCE → cobra
       if (nonce != null && nonce.isNotEmpty) {
         try {
           final data = await _callCharge(
@@ -324,7 +243,8 @@ Future<dynamic> processCardPayload(
             paymentNonce: nonce,
           );
           final txId = _str(data, 'transactionId');
-          if (txId == null || txId.isEmpty) {
+          final ok = data['success'] == true || data['ok'] == true;
+          if (!ok || txId == null || txId.isEmpty) {
             result['error'] = 'Charge failed: missing transactionId.';
           } else {
             result['ok'] = true;
@@ -332,26 +252,19 @@ Future<dynamic> processCardPayload(
           }
         } on FirebaseFunctionsException catch (e) {
           final parts = <String>[];
-          if (e.message != null && e.message!.trim().isNotEmpty) {
-            parts.add(e.message!.trim());
-          }
-          if (e.details != null && e.details.toString().trim().isNotEmpty) {
-            parts.add(e.details.toString().trim());
-          }
+          if (e.message != null && e.message!.trim().isNotEmpty) parts.add(e.message!.trim());
+          if (e.details != null && e.details.toString().trim().isNotEmpty) parts.add(e.details.toString().trim());
           parts.add('CODE: ${e.code.toUpperCase()}');
-          result['error'] = parts.join(' · ');
+          result['error'] = parts.join(' – ');
         } catch (e) {
           result['error'] = e.toString();
         }
       }
-      // ============================================================
     } else {
-      // ================= SAVE (somente salvar) ====================
       final payloadToStore = Map<String, dynamic>.from(payload)
         ..remove('nonce')
         ..remove('cardRaw')
-        ..remove('cvv'); // nunca guarde CVV
-
+        ..remove('cvv');
       try {
         await FirebaseFirestore.instance
             .collection('users')
@@ -370,6 +283,5 @@ Future<dynamic> processCardPayload(
   } catch (e) {
     result['error'] = e.toString();
   }
-
-  return result; // ÚNICO return
+  return result;
 }

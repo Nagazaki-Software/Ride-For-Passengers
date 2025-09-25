@@ -1,0 +1,161 @@
+                                    builder: (context) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          FocusScope.of(context).unfocus();
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+                                        },
+                                        child: Padding(
+                                          padding:
+                                              MediaQuery.viewInsetsOf(context),
+                                          child: ErronopagamentoWidget(),
+                                        ),
+                                      );
+                                    },
+                                  ).then((value) => safeSetState(() {}));
+                                }
+
+                                safeSetState(() {});
+                              },
+                              child: Container(
+                                width: 318.0,
+                                height: 38.0,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(18.0),
+                                    bottomRight: Radius.circular(18.0),
+                                    topLeft: Radius.circular(18.0),
+                                    topRight: Radius.circular(18.0),
+                                  ),
+                                ),
+                                alignment: AlignmentDirectional(0.0, 0.0),
+                                child: Text(
+                                  FFLocalizations.of(context).getText(
+                                    '6r67s6mb' /* Confirm & Pay */,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
+                                      ),
+                                ),
+                              ),
+                            ).animateOnActionTrigger(
+                                animationsMap[
+                                    'containerOnActionTriggerAnimation5']!,
+                                hasBeenTriggered: hasContainerTriggered5),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              FFLocalizations.of(context).getText(
+                                'n1vblhdo' /* You´ll be charged after ride */,
+                              ),
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryText,
+                                    fontSize: 10.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ].divide(SizedBox(height: 6.0)),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(14.0, 0.0, 0.0, 0.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              logFirebaseEvent(
+                                  'PAYMENT_RIDE7_PAGE_Text_osgwus7k_ON_TAP');
+                              logFirebaseEvent('Text_backend_call');
+                              _model.latlngOrigemcop =
+                                  await LatlngToStringCall.call(
+                                latlng: widget.latlngAtual?.toString(),
+                              );
+
+                              logFirebaseEvent('Text_backend_call');
+                              _model.latlngDestinocop =
+                                  await LatlngToStringCall.call(
+                                latlng: widget.latlngWhereTo?.toString(),
+                              );
+
+                              logFirebaseEvent('Text_backend_call');
+
+                              var rideOrdersRecordReference =
+                                  RideOrdersRecord.collection.doc();
+                              await rideOrdersRecordReference
+                                  .set(createRideOrdersRecordData(
+                                user: currentUserReference,
+                                latlng: widget.latlngWhereTo,
+                                dia: getCurrentTimestamp,
+                                option: widget.estilo,
+                                latlngAtual: widget.latlngAtual,
+                                nomeOrigem: LatlngToStringCall.shrotName(
+                                  (_model.latlngOrigemcop?.jsonBody ?? ''),
+                                )?.firstOrNull,
+                                nomeDestino: LatlngToStringCall.shrotName(
+                                  (_model.latlngDestinocop?.jsonBody ?? ''),
+                                )?.firstOrNull,
+                                rideValue: widget.value,
+                              ));
+                              _model.ordertest =
+                                  RideOrdersRecord.getDocumentFromData(
+                                      createRideOrdersRecordData(
+                                        user: currentUserReference,
+                                        latlng: widget.latlngWhereTo,
+                                        dia: getCurrentTimestamp,
+                                        option: widget.estilo,
+                                        latlngAtual: widget.latlngAtual,
+                                        nomeOrigem:
+                                            LatlngToStringCall.shrotName(
+                                          (_model.latlngOrigemcop?.jsonBody ??
+                                              ''),
+                                        )?.firstOrNull,
+                                        nomeDestino:
+                                            LatlngToStringCall.shrotName(
+                                          (_model.latlngDestinocop?.jsonBody ??
+                                              ''),
+                                        )?.firstOrNull,

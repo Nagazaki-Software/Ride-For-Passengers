@@ -1,0 +1,75 @@
+            cvv: cvv,
+          );
+          final tokenized = await Braintree.tokenizeCreditCard(tk, req);
+          if (tokenized == null || tokenized.nonce.isEmpty) {
+            result['error'] = 'Tokenization failed.';
+            return result;
+          }
+          nonce = tokenized.nonce;
+        } on PlatformException catch (pe) {
+          result['error'] = pe.message ?? pe.code;
+          return result;
+        } catch (e) {
+          result['error'] = e.toString();
+          return result;
+        }
+      }
+
+      // 4) Tendo NONCE → cobra
+      if (nonce != null && nonce.isNotEmpty) {
+        try {
+          final data = await _callCharge(
+            tokenizationKey: tk,
+            amount: amt,
+            paymentNonce: nonce,
+          );
+          final txId = _str(data, 'transactionId');
+          if (txId == null || txId.isEmpty) {
+            result['error'] = 'Charge failed: missing transactionId.';
+          } else {
+            result['ok'] = true;
+            result['transactionId'] = txId;
+          }
+        } on FirebaseFunctionsException catch (e) {
+          final parts = <String>[];
+          if (e.message != null && e.message!.trim().isNotEmpty) {
+            parts.add(e.message!.trim());
+          }
+          if (e.details != null && e.details.toString().trim().isNotEmpty) {
+            parts.add(e.details.toString().trim());
+          }
+          parts.add('CODE: ${e.code.toUpperCase()}');
+          result['error'] = parts.join(' · ');
+        } catch (e) {
+          result['error'] = e.toString();
+        }
+      }
+      // ============================================================
+    } else {
+      // ================= SAVE (somente salvar) ====================
+      final payloadToStore = Map<String, dynamic>.from(payload)
+        ..remove('nonce')
+        ..remove('cardRaw')
+        ..remove('cvv'); // nunca guarde CVV
+
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('payments')
+            .add({
+          ...payloadToStore,
+          'amount': amt,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        result['ok'] = true;
+      } catch (e) {
+        result['error'] = e.toString();
+      }
+    }
+  } catch (e) {
+    result['error'] = e.toString();
+  }
+
+  return result; // ÚNICO return
+}

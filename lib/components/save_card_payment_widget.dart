@@ -1,8 +1,13 @@
+import '/backend/braintree/payment_manager.dart';
 import '/flutter_flow/flutter_flow_credit_card_form.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/backend/schema/structs/payment_method_save_struct.dart';
+import '/app_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '/backend/braintree/native_bridge.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'save_card_payment_model.dart';
@@ -113,6 +118,7 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                               ),
                     ),
                   ),
+                  // Google Pay button intentionally not included here to keep this sheet compact.
                   Align(
                     alignment: AlignmentDirectional(0.0, -1.0),
                     child: Text(
@@ -331,8 +337,76 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                         ),
                       ),
                       FFButtonWidget(
-                        onPressed: () {
-                          print('Button pressed ...');
+                        onPressed: () async {
+                          if (!(_model.creditCardFormKey.currentState?.validate() ?? false)) {
+                            return;
+                          }
+                          if (kIsWeb) {
+                            showSnackbar(context, 'Saving cards on web is not supported.');
+                            return;
+                          }
+
+                          // Tokenize card to get a nonce
+                          final cc = _model.creditCardInfo;
+                          final expParts = cc.expiryDate.split('/');
+                          final tokenizationKey = braintreeClientToken();
+                          try {
+                            final tokenized = await BraintreeNativeBridge.tokenizeCard(
+                              authorization: tokenizationKey,
+                              number: cc.cardNumber,
+                              expirationMonth: expParts.isNotEmpty ? expParts.first : '',
+                              expirationYear: expParts.length > 1 ? expParts.last : '',
+                              cvv: cc.cvvCode,
+                            );
+                            if (tokenized == null || tokenized.isEmpty) {
+                              showSnackbar(context, 'Failed to tokenize card.');
+                              return;
+                            }
+
+                            showSnackbar(context, 'Saving card...', duration: 10, loading: true);
+                            final shouldMakeDefault = FFAppState().paymentMethods.isEmpty ||
+                                !FFAppState().paymentMethods.any((e) => e.isDefault);
+                            final resp = await saveBraintreePaymentMethod(
+                              tokenized,
+                              makeDefault: shouldMakeDefault,
+                            );
+                            final ok = (resp['success'] == true) || (resp['ok'] == true);
+                            if (!ok) {
+                              final err = resp['error'] ?? 'Failed to save payment method.';
+                              showSnackbar(context, 'Error: $err');
+                              return;
+                            }
+
+                            final pm = (resp['paymentMethod'] ?? {}) as Map;
+                            final brand = (pm['brand'] ?? '') as String;
+                            final last4 = (pm['last4Numbers'] ?? pm['last4'] ?? '') as String;
+                            final token = (pm['paymentMethodToken'] ?? pm['token'] ?? '') as String;
+                            final isDefault = (pm['isDefault'] ?? pm['default'] ?? false) as bool;
+
+                            if (token.isEmpty) {
+                              showSnackbar(context, 'Error: Missing payment method token.');
+                              return;
+                            }
+
+                            // Save locally in app state
+                            FFAppState().addToPaymentMethods(
+                              createPaymentMethodSaveStruct(
+                                brand: brand.isNotEmpty ? brand : 'Card',
+                                last4Numbers: last4.isNotEmpty
+                                    ? last4
+                                    : (cc.cardNumber.length >= 4
+                                        ? cc.cardNumber.substring(cc.cardNumber.length - 4)
+                                        : ''),
+                                paymentMethodToken: token,
+                                isDefault: isDefault,
+                              ),
+                            );
+
+                            showSnackbar(context, 'Card saved.');
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            showSnackbar(context, 'Failed to save card: $e');
+                          }
                         },
                         text: FFLocalizations.of(context).getText(
                           '88csuyfb' /* Save Credit Card */,

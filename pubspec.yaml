@@ -65,10 +65,7 @@ dependencies:
   firebase_storage_platform_interface: 5.2.7
   firebase_storage_web: 3.10.14
   flutter_animate: 4.5.0
-  flutter_braintree: 
-    git:
-      url: https://github.com/adlyyy4/flutter-braintree.git
-      ref: e7a543415b100be98b4ac19c964e6d29b69e5464
+  flutter_local_notifications: ^17.2.1
   flutter_cache_manager: 3.4.1
   flutter_credit_card: 
     git:

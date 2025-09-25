@@ -347,7 +347,7 @@ class FFAppState extends ChangeNotifier {
         _paymentMethods.map((x) => x.serialize()).toList());
   }
 
-  String _pickingPage = '';
+  String _pickingPage = 'pickingyou';
   String get pickingPage => _pickingPage;
   set pickingPage(String value) {
     _pickingPage = value;

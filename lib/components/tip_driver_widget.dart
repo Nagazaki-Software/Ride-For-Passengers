@@ -6,6 +6,8 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '/backend/braintree/native_bridge.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'tip_driver_model.dart';
@@ -495,39 +497,38 @@ class _TipDriverWidgetState extends State<TipDriverWidget> {
                             return;
                           }
 
-                          final payPalRequest = BraintreePayPalRequest(
-                            amount: transacAmount.toString(),
-                            currencyCode: 'USD',
-                            displayName: transacDisplayName,
-                          );
-                          final payPalResult =
-                              await Braintree.requestPaypalNonce(
-                            braintreeClientToken(),
-                            payPalRequest,
-                          );
-                          if (payPalResult == null) {
-                            return;
+                          try {
+                            final nonce = await BraintreeNativeBridge.paypalCheckout(
+                              authorization: braintreeClientToken(),
+                              amount: transacAmount.toStringAsFixed(2),
+                              currencyCode: 'USD',
+                            );
+                            if (nonce == null || nonce.isEmpty) {
+                              return;
+                            }
+                            showSnackbar(
+                              context,
+                              'Processing payment...',
+                              duration: 10,
+                              loading: true,
+                            );
+                            final paymentResponse = await processBraintreePayment(
+                              transacAmount,
+                              nonce,
+                            );
+                            if (paymentResponse.errorMessage != null) {
+                              showSnackbar(context,
+                                  'Error: ${paymentResponse.errorMessage}');
+                              return;
+                            }
+                            showSnackbar(context, 'Success!');
+                            _model.transactionId3 =
+                                paymentResponse.transactionId!;
+                            safeSetState(() {});
+                          } catch (e) {
+                            showSnackbar(context, 'PayPal payment failed: $e');
                           }
-                          showSnackbar(
-                            context,
-                            'Processing payment...',
-                            duration: 10,
-                            loading: true,
-                          );
-                          final paymentResponse = await processBraintreePayment(
-                            transacAmount,
-                            payPalResult.nonce,
-                          );
-                          if (paymentResponse.errorMessage != null) {
-                            showSnackbar(context,
-                                'Error: ${paymentResponse.errorMessage}');
-                            return;
-                          }
-                          showSnackbar(context, 'Success!');
-                          _model.transactionId3 =
-                              paymentResponse.transactionId!;
-
-                          safeSetState(() {});
+                          
                         },
                         text: FFLocalizations.of(context).getText(
                           'a0bzzeke' /* Confirm */,
@@ -543,22 +544,9 @@ class _TipDriverWidgetState extends State<TipDriverWidget> {
                               FlutterFlowTheme.of(context).secondaryBackground,
                           textStyle:
                               FlutterFlowTheme.of(context).titleSmall.override(
-                                    font: GoogleFonts.poppins(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontStyle,
-                                    ),
+                                    fontFamily: 'Poppins',
                                     color: FlutterFlowTheme.of(context).primary,
                                     letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontStyle,
                                   ),
                           elevation: 0.0,
                           borderRadius: BorderRadius.circular(8.0),

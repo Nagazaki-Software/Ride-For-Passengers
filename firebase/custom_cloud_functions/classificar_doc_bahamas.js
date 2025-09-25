@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const functions = require("firebase-functions");
+const { onRequest } = require("firebase-functions/v2/https");
 const { OpenAI } = require("openai");
 
 // =====================
@@ -129,7 +129,12 @@ async function classifySingleImage(imgRef, model) {
   return json;
 }
 
-exports.classificarDocBahamas = functions.https.onRequest(async (req, res) => {
+// Gen 2: HTTP onRequest
+exports.classificarDocBahamas = onRequest({
+  region: "us-central1",
+  timeoutSeconds: 60,
+  memory: "256MiB",
+}, async (req, res) => {
   if (applyCors(req, res)) return;
 
   if (req.method === "GET") {

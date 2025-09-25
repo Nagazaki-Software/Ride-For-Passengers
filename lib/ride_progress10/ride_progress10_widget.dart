@@ -5,6 +5,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'ride_progress10_model.dart';
+import '/notifications/ride_step_notifications2.dart';
 export 'ride_progress10_model.dart';
 
 class RideProgress10Widget extends StatefulWidget {
@@ -29,6 +30,8 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
 
     logFirebaseEvent('screen_view',
         parameters: {'screen_name': 'RideProgress10'});
+    // Persistently show that the ride is in progress
+    RideStepNotifications.showInProgress();
   }
 
   @override
@@ -377,10 +380,14 @@ class _RideProgress10WidgetState extends State<RideProgress10Widget> {
                                                       SizedBox(width: 8.0)),
                                                 ),
                                                 RatingBar.builder(
-                                                  onRatingUpdate: (newValue) =>
-                                                      safeSetState(() => _model
-                                                              .ratingBarValue =
-                                                          newValue),
+                                                  onRatingUpdate: (newValue) {
+                                                    safeSetState(() => _model
+                                                        .ratingBarValue =
+                                                        newValue);
+                                                    // When the user rates, consider the ride finished
+                                                    RideStepNotifications
+                                                        .showFinished();
+                                                  },
                                                   itemBuilder:
                                                       (context, index) => Icon(
                                                     Icons.star_rounded,

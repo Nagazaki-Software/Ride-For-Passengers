@@ -1,0 +1,197 @@
+                                      .titleMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontStyle,
+                                ),
+                            elevation: 0.0,
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                        ),
+                    ],
+                  ),
+                ].divide(SizedBox(height: 12.0)),
+              ),
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).alternate,
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    FFLocalizations.of(context).getText(
+                      '9j9a154z' /* Credit Card Information */,
+                    ),
+                    style: FlutterFlowTheme.of(context).titleMedium.override(
+                          font: GoogleFonts.poppins(
+                            fontWeight: FlutterFlowTheme.of(context)
+                                .titleMedium
+                                .fontWeight,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          color: FlutterFlowTheme.of(context).alternate,
+                          letterSpacing: 0.0,
+                          fontWeight: FlutterFlowTheme.of(context)
+                              .titleMedium
+                              .fontWeight,
+                          fontStyle: FontStyle.italic,
+                        ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FlutterFlowCreditCardForm(
+                        formKey: _model.creditCardFormKey,
+                        creditCardModel: _model.creditCardInfo,
+                        obscureNumber: false,
+                        obscureCvv: true,
+                        spacing: 12.0,
+                        textStyle:
+                            FlutterFlowTheme.of(context).bodyMedium.override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  color: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                        inputDecoration: InputDecoration(
+                          filled: true,
+                          fillColor: FlutterFlowTheme.of(context).primary,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0x00000000),
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0x00000000),
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                      FFButtonWidget(
+                        onPressed: () async {
+                          logFirebaseEvent(
+                              'CARD_PAYMENT_COMP_CONFIRM_BTN_ON_TAP');
+                          logFirebaseEvent('Button_braintree_payment');
+                          final transacAmount = widget.value!;
+                          if (!(_model.creditCardFormKey.currentState
+                                  ?.validate() ??
+                              false)) {
+                            return;
+                          }
+                          if (kIsWeb) {
+                            showSnackbar(
+                                context, 'Payments not yet supported on web.');
+                            return;
+                          }
+
+                          final cardRequest = BraintreeCreditCardRequest(
+                            cardNumber: _model.creditCardInfo.cardNumber,
+                            expirationMonth: _model.creditCardInfo.expiryDate
+                                .split('/')
+                                .first,
+                            expirationYear: _model.creditCardInfo.expiryDate
+                                .split('/')
+                                .last,
+                            cvv: _model.creditCardInfo.cvvCode,
+                          );
+                          final cardResult = await Braintree.tokenizeCreditCard(
+                            braintreeClientToken(),
+                            cardRequest,
+                          );
+                          if (cardResult == null) {
+                            return;
+                          }
+                          showSnackbar(
+                            context,
+                            'Processing payment...',
+                            duration: 10,
+                            loading: true,
+                          );
+                          final paymentResponse = await processBraintreePayment(
+                            transacAmount,
+                            cardResult.nonce,
+                          );
+                          if (paymentResponse.errorMessage != null) {
+                            showSnackbar(context,
+                                'Error: ${paymentResponse.errorMessage}');
+                            return;
+                          }
+                          showSnackbar(context, 'Success!');
+                          _model.transactionId3 =
+                              paymentResponse.transactionId!;
+
+                          safeSetState(() {});
+                        },
+                        text: FFLocalizations.of(context).getText(
+                          'hxpv6ouk' /* Confirm */,
+                        ),
+                        options: FFButtonOptions(
+                          width: 120.0,
+                          height: 40.0,
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              16.0, 0.0, 16.0, 0.0),
+                          iconPadding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 0.0, 0.0),
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
+                          textStyle:
+                              FlutterFlowTheme.of(context).titleSmall.override(
+                                    font: GoogleFonts.poppins(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .titleSmall
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .titleSmall
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .fontStyle,
+                                  ),
+                          elevation: 0.0,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ].divide(SizedBox(height: 12.0)),
+                  ),
+                ].divide(SizedBox(height: 16.0)),
+              ),
+            ].divide(SizedBox(height: 20.0)),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -35,6 +35,8 @@ class _Home5WidgetState extends State<Home5Widget>
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   LatLng? currentUserLocationValue;
+  int? _pressedPertoIndex;
+  bool _pressedWhereTo = false;
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
   var hasContainerTriggered3 = false;
@@ -107,22 +109,28 @@ class _Home5WidgetState extends State<Home5Widget>
           ),
         ],
       ),
-      'containerOnPageLoadAnimation': AnimationInfo(
+      // Replace container appear effect with text-only blur effects
+      'minCarTextOnPageLoad': AnimationInfo(
         trigger: AnimationTrigger.onPageLoad,
         effectsBuilder: () => [
-          MoveEffect(
-            curve: Curves.easeInOut,
+          BlurEffect(
+            curve: Curves.easeOut,
             delay: 0.0.ms,
-            duration: 980.0.ms,
-            begin: Offset(0.0, -30.0),
-            end: Offset(0.0, 0.0),
+            duration: 300.0.ms,
+            begin: Offset(6.0, 6.0),
+            end: Offset.zero,
           ),
-          FadeEffect(
-            curve: Curves.easeInOut,
+        ],
+      ),
+      'rideTitleOnPageLoad': AnimationInfo(
+        trigger: AnimationTrigger.onPageLoad,
+        effectsBuilder: () => [
+          BlurEffect(
+            curve: Curves.easeOut,
             delay: 0.0.ms,
-            duration: 450.0.ms,
-            begin: 0.0,
-            end: 1.0,
+            duration: 300.0.ms,
+            begin: Offset(6.0, 6.0),
+            end: Offset.zero,
           ),
         ],
       ),
@@ -616,60 +624,55 @@ class _Home5WidgetState extends State<Home5Widget>
                                         );
                                       },
                                     ).then((value) => safeSetState(() {}));
+                                    _pressedWhereTo = false;
+                                    safeSetState(() {});
                                   },
-                                  child: Container(
-                                    width:
-                                        MediaQuery.sizeOf(context).width * 0.9,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Flexible(
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    10.0, 8.0, 0.0, 8.0),
-                                            child: Text(
-                                              FFAppState().locationWhereTo,
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  .bodyMedium
-                                                  .override(
-                                                    font: GoogleFonts.poppins(
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .secondaryText,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontWeight,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
+                                  onTapDown: (_) {
+                                    _pressedWhereTo = true;
+                                    safeSetState(() {});
+                                  },
+                                  onTapCancel: () {
+                                    _pressedWhereTo = false;
+                                    safeSetState(() {});
+                                  },
+                                  child: AnimatedScale(
+                                    scale: _pressedWhereTo ? 0.98 : 1.0,
+                                    duration: const Duration(milliseconds: 120),
+                                    curve: Curves.easeOut,
+                                    child: Container(
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.9,
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Flexible(
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      10.0, 8.0, 0.0, 8.0),
+                                              child: Text(
+                                                FFAppState().locationWhereTo,
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily: 'Poppins',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .secondaryText,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -721,7 +724,7 @@ class _Home5WidgetState extends State<Home5Widget>
                                                 functions.minCar(
                                                     textUsersRecordList
                                                         .toList(),
-                                                    currentUserLocationValue!),
+                                                    FFAppState().latlngAtual!),
                                                 style: FlutterFlowTheme.of(
                                                         context)
                                                     .bodyMedium
@@ -749,7 +752,8 @@ class _Home5WidgetState extends State<Home5Widget>
                                                               .bodyMedium
                                                               .fontStyle,
                                                     ),
-                                              );
+                                              ).animateOnPageLoad(animationsMap[
+                                                  'minCarTextOnPageLoad']!);
                                             },
                                           ),
                                         ),
@@ -825,71 +829,92 @@ class _Home5WidgetState extends State<Home5Widget>
                                                   pertosItem;
                                               safeSetState(() {});
                                             }
-
+                                            _pressedPertoIndex = null;
                                             safeSetState(() {});
                                           },
+                                          onTapDown: (_) => setState(() =>
+                                              _pressedPertoIndex = pertosIndex),
+                                          onTapCancel: () => setState(
+                                              () => _pressedPertoIndex = null),
                                           child: Container(
-                                            height: 26.0,
-                                            decoration: BoxDecoration(
-                                              color: valueOrDefault<Color>(
-                                                FFAppState().listPerto ==
-                                                        pertosItem
-                                                    ? FlutterFlowTheme.of(
-                                                            context)
-                                                        .accent1
-                                                    : FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary,
-                                                FlutterFlowTheme.of(context)
-                                                    .accent1,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(16.0),
-                                            ),
-                                            alignment:
-                                                AlignmentDirectional(0.0, 0.0),
-                                            child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(6.0, 0.0, 6.0, 0.0),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    pertosItem,
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FlutterFlowTheme.of(
+                                            child: AnimatedScale(
+                                              scale: _pressedPertoIndex ==
+                                                      pertosIndex
+                                                  ? 0.95
+                                                  : 1.0,
+                                              duration: const Duration(
+                                                  milliseconds: 120),
+                                              child: Container(
+                                                height: 26.0,
+                                                decoration: BoxDecoration(
+                                                  color: valueOrDefault<Color>(
+                                                    FFAppState()
+                                                                .listPerto ==
+                                                            pertosItem
+                                                        ? FlutterFlowTheme.of(
+                                                                context)
+                                                            .accent1
+                                                        : FlutterFlowTheme.of(
+                                                                context)
+                                                            .primary,
+                                                    FlutterFlowTheme.of(context)
+                                                        .accent1,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          16.0),
+                                                ),
+                                                alignment: AlignmentDirectional(
+                                                    0.0, 0.0),
+                                                child: Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          6.0, 0.0, 6.0, 0.0),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(
+                                                        pertosItem,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .poppins(
+                                                                fontWeight: FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyMedium
                                                                     .fontWeight,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
+                                                                fontStyle: FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyMedium
                                                                     .fontStyle,
-                                                          ),
-                                                          color:
-                                                              Color(0xFF585858),
-                                                          fontSize: 10.0,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
-                                                        ),
+                                                              ),
+                                                              color: FFAppState()
+                                                                          .listPerto ==
+                                                                      pertosItem
+                                                                  ? Colors.black
+                                                                  : Color(
+                                                                      0xFF585858),
+                                                              fontSize: 10.0,
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              fontWeight:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontWeight,
+                                                              fontStyle:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                            ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -972,7 +997,8 @@ class _Home5WidgetState extends State<Home5Widget>
                                                     fontWeight: FontWeight.w300,
                                                     fontStyle: FontStyle.italic,
                                                   ),
-                                            ),
+                                            ).animateOnPageLoad(animationsMap[
+                                                'rideTitleOnPageLoad']!),
                                           ],
                                         ),
                                         Row(
@@ -2343,8 +2369,7 @@ class _Home5WidgetState extends State<Home5Widget>
                                 ),
                               ),
                             ),
-                          ).animateOnPageLoad(
-                              animationsMap['containerOnPageLoadAnimation']!),
+                          ),
                         ),
                     ],
                   ),

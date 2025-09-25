@@ -1,298 +1,327 @@
-const functions = require("firebase-functions");
+/* eslint-disable no-console */
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
 const braintree = require("braintree");
 
-// Test credentials
-const kTestMerchantId = "‎brg8dhjg5tqpw496";
-const kTestPublicKey = "syt9g3c79t58wk82";
-const kTestPrivateKey = "0f7de713fa2bbb810f183f628f51d86d";
-
-// Prod credentials
-const kProdMerchantId = "";
-const kProdPublicKey = "";
-const kProdPrivateKey = "";
-
-const merchantId = (isProd) => (isProd ? kProdMerchantId : kTestMerchantId);
-const publicKey = (isProd) => (isProd ? kProdPublicKey : kTestPublicKey);
-const privateKey = (isProd) => (isProd ? kProdPrivateKey : kTestPrivateKey);
-
 /**
- *
+ * 🔐 Credenciais
+ * Para produção, prefira setar via: 
+ *   firebase functions:config:set braintree.prod_merchant_id="..." braintree.prod_public_key="..." braintree.prod_private_key="..."
+ * e depois redeploy.
  */
-exports.processBraintreePayment = functions.https.onCall(
-  async (data, context) => {
-    if (!context.auth) {
-      return "Unauthenticated calls are not allowed.";
-    }
-    const amount = data.amount;
-    const paymentNonce = data.paymentNonce;
-    const deviceData = data.deviceData;
-    return await processTransaction(amount, paymentNonce, deviceData, true);
-  },
-);
 
-/**
- *
- */
-exports.processBraintreeTestPayment = functions.https.onCall(
-  async (data, context) => {
-    if (!context.auth) {
-      return "Unauthenticated calls are not allowed.";
-    }
-    const amount = data.amount;
-    const paymentNonce = data.paymentNonce;
-    const deviceData = data.deviceData;
-    return await processTransaction(amount, paymentNonce, deviceData, false);
-  },
-);
+// Sandbox (teste)
+const K_TEST_MERCHANT_ID = "brg8dhjg5tqpw496";
+const K_TEST_PUBLIC_KEY  = "syt9g3c79t58wk82";
+const K_TEST_PRIVATE_KEY = "0f7de713fa2bbb810f183f628f51d86d";
 
-async function processTransaction(amount, paymentNonce, deviceData, isProd) {
-  const gateway = new braintree.BraintreeGateway({
-    environment: isProd
-      ? braintree.Environment.Production
-      : braintree.Environment.Sandbox,
-    merchantId: merchantId(isProd),
-    publicKey: publicKey(isProd),
-    privateKey: privateKey(isProd),
+// Produção (lidas do functions:config, ou vazias por padrão)
+const functions = require("firebase-functions");
+const CFG = (functions.config && functions.config().braintree) || {};
+const K_PROD_MERCHANT_ID = CFG.prod_merchant_id || "";
+const K_PROD_PUBLIC_KEY  = CFG.prod_public_key  || "";
+const K_PROD_PRIVATE_KEY = CFG.prod_private_key || "";
+
+/** Gateway por ambiente */
+function getGateway(isProd) {
+  return new braintree.BraintreeGateway({
+    environment: isProd ? braintree.Environment.Production : braintree.Environment.Sandbox,
+    merchantId: isProd ? K_PROD_MERCHANT_ID : K_TEST_MERCHANT_ID,
+    publicKey:  isProd ? K_PROD_PUBLIC_KEY  : K_TEST_PUBLIC_KEY,
+    privateKey: isProd ? K_PROD_PRIVATE_KEY : K_TEST_PRIVATE_KEY,
   });
-  return await gateway.transaction
-    .sale({
-      amount,
-      paymentMethodNonce: paymentNonce,
-      deviceData,
-      options: {
-        submitForSettlement: true,
-      },
-    })
-    .then(
-      (result) => {
-        return result.success
-          ? { transactionId: result.transaction.id }
-          : { error: "Error processing payment." };
-      },
-      async (error) => {
-        console.log(`Error: ${error}`);
-        return { error: userFacingMessage(error) };
-      },
-    );
+}
+
+/** Garante que o customer exista no Braintree (usa uid como id) */
+async function ensureCustomer(gateway, customerId, email) {
+  try {
+    return await gateway.customer.find(customerId);
+  } catch (_) {
+    const res = await gateway.customer.create({ id: customerId, email });
+    if (!res.success) throw new Error(res.message || "Falha ao criar customer");
+    return res.customer;
+  }
+}
+
+/** Metadados seguros para retornar ao app */
+function methodMeta(method) {
+  // Cartão
+  if (method && method.cardType && method.last4) {
+    return {
+      token: method.token,
+      brand: method.cardType,
+      last4: method.last4,
+      type: "card",
+      default: !!method.default,
+    };
+  }
+  // PayPal (se usar)
+  if (method && method.email) {
+    return {
+      token: method.token,
+      brand: "PayPal",
+      last4: method.email,
+      type: "paypal",
+      default: !!method.default,
+    };
+  }
+  return { token: method?.token, brand: "PaymentMethod", last4: "****", type: "unknown", default: !!method?.default };
+}
+
+// Helpers extras para metadados no FFAppState
+function isPassInstrument(method) {
+  const instr = (method && method.paymentInstrumentType ? method.paymentInstrumentType : "").toLowerCase();
+  const ctype = (method && method.cardType ? method.cardType : "").toLowerCase();
+  return (
+    instr.indexOf("apple_pay") >= 0 ||
+    instr.indexOf("android_pay") >= 0 ||
+    instr.indexOf("google_pay") >= 0 ||
+    ctype.indexOf("apple pay") >= 0 ||
+    ctype.indexOf("android pay") >= 0 ||
+    ctype.indexOf("google pay") >= 0
+  );
+}
+
+function methodMetaFF(method) {
+  if (method && method.cardType && method.last4) {
+    return {
+      token: method.token,
+      paymentMethodToken: method.token,
+      brand: method.cardType,
+      last4: method.last4,
+      last4Numbers: method.last4,
+      type: "card",
+      default: !!method.default,
+      isDefault: !!method.default,
+      pass: isPassInstrument(method),
+    };
+  }
+  if (method && method.email) {
+    return {
+      token: method.token,
+      paymentMethodToken: method.token,
+      brand: "PayPal",
+      last4: method.email,
+      last4Numbers: method.email,
+      type: "paypal",
+      default: !!method.default,
+      isDefault: !!method.default,
+      pass: false,
+    };
+  }
+  return {
+    token: method && method.token,
+    paymentMethodToken: method && method.token,
+    brand: "PaymentMethod",
+    last4: "****",
+    last4Numbers: "****",
+    type: "unknown",
+    default: !!(method && method.default),
+    isDefault: !!(method && method.default),
+    pass: false,
+  };
 }
 
 /**
- * Sanitize the error message for the user.
+ * ✅ ÚNICA FUNCTION: paga e retorna o paymentMethod
+ * data: { amount: string|number, paymentNonce: string, deviceData?: string, isProd?: boolean, makeDefault?: boolean }
+ * retorna: { success, transactionId?, paymentMethod?, error? }
  */
-function userFacingMessage(error) {
-  return error.type
-    ? error.message
-    : "An error occurred, developers have been alerted";
-}
-const kFcmTokensCollection = "fcm_tokens";
-const kPushNotificationsCollection = "ff_push_notifications";
-const firestore = admin.firestore();
-
-const kPushNotificationRuntimeOpts = {
-  timeoutSeconds: 540,
-  memory: "2GB",
-};
-
-exports.addFcmToken = functions.https.onCall(async (data, context) => {
+exports.payAndReturnPaymentMethod = onCall({ region: "us-central1", timeoutSeconds: 60, memory: "256MiB" }, async (request) => {
+  const data = request.data || {};
+  const context = request;
   if (!context.auth) {
-    return "Failed: Unauthenticated calls are not allowed.";
+    throw new functions.https.HttpsError("unauthenticated", "Faça login primeiro.");
   }
-  const userDocPath = data.userDocPath;
-  const fcmToken = data.fcmToken;
-  const deviceType = data.deviceType;
-  if (
-    typeof userDocPath === "undefined" ||
-    typeof fcmToken === "undefined" ||
-    typeof deviceType === "undefined" ||
-    userDocPath.split("/").length <= 1 ||
-    fcmToken.length === 0 ||
-    deviceType.length === 0
-  ) {
-    return "Invalid arguments encoutered when adding FCM token.";
+  const { amount, paymentNonce, deviceData, isProd = false, makeDefault } = data || {};
+  if (amount == null || paymentNonce == null) {
+    throw new functions.https.HttpsError("invalid-argument", "amount e paymentNonce são obrigatórios.");
   }
-  if (context.auth.uid != userDocPath.split("/")[1]) {
-    return "Failed: Authenticated user doesn't match user provided.";
-  }
-  const existingTokens = await firestore
-    .collectionGroup(kFcmTokensCollection)
-    .where("fcm_token", "==", fcmToken)
-    .get();
-  var userAlreadyHasToken = false;
-  for (var doc of existingTokens.docs) {
-    const user = doc.ref.parent.parent;
-    if (user.path != userDocPath) {
-      // Should never have the same FCM token associated with multiple users.
-      await doc.ref.delete();
-    } else {
-      userAlreadyHasToken = true;
-    }
-  }
-  if (userAlreadyHasToken) {
-    return "FCM token already exists for this user. Ignoring...";
-  }
-  await getUserFcmTokensCollection(userDocPath).doc().set({
-    fcm_token: fcmToken,
-    device_type: deviceType,
-    created_at: admin.firestore.FieldValue.serverTimestamp(),
+
+  // Braintree pede amount como string com 2 casas
+  const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
+
+  const uid = context.auth.uid;
+  const email = context.auth.token?.email;
+  const gateway = getGateway(isProd);
+
+  // 1) garante o customer (id = uid) e calcula se ja existe metodo salvo
+  const customer = await ensureCustomer(gateway, uid, email);
+  let existingCount = 0;
+  try {
+    const found = await gateway.customer.find(uid);
+    existingCount = Array.isArray(found && found.paymentMethods) ? found.paymentMethods.length : 0;
+  } catch (_) {}
+
+  // 2) VAULT: cria método a partir do NONCE (gera token persistente)
+  const pmRes = await gateway.paymentMethod.create({
+    customerId: uid,
+    paymentMethodNonce: paymentNonce,
+    deviceData,
+    options: {
+      verifyCard: true,    // validação no ato
+      makeDefault: (makeDefault !== undefined) ? !!makeDefault : (existingCount === 0),
+    },
   });
-  return "Successfully added FCM token!";
+
+  if (!pmRes.success) {
+    throw new functions.https.HttpsError("failed-precondition", pmRes.message || "Falha ao vaultar método de pagamento.");
+  }
+
+  const pm = pmRes.paymentMethod;
+  const meta = methodMetaFF(pm); // inclui campos FFAppState
+
+  // 3) COBRA usando o token vaultado
+  const saleRes = await gateway.transaction.sale({
+    amount: amtStr,
+    paymentMethodToken: pm.token,
+    deviceData,
+    options: {
+      submitForSettlement: true, // captura automática
+      // storeInVaultOnSuccess: true, // desnecessário pois já vaultamos acima
+    },
+  });
+
+  if (!saleRes.success) {
+    // Opcional: você poderia remover o PM recém-criado se quiser reverter o vault
+    // await gateway.paymentMethod.delete(pm.token).catch(()=>{});
+    return {
+      success: false,
+      error: saleRes.message || "Erro ao processar pagamento.",
+      paymentMethod: meta,
+    };
+  }
+
+  return {
+    success: true,
+    transactionId: saleRes.transaction.id,
+    paymentMethod: meta,
+  };
 });
 
-exports.sendPushNotificationsTrigger = functions
-  .runWith(kPushNotificationRuntimeOpts)
-  .firestore.document(`${kPushNotificationsCollection}/{id}`)
-  .onCreate(async (snapshot, _) => {
-    try {
-      // Ignore scheduled push notifications on create
-      const scheduledTime = snapshot.data().scheduled_time || "";
-      if (scheduledTime) {
-        return;
-      }
+/**
+ * Salva um cartao (saveCardPayment) a partir de um paymentNonce, sem cobrar.
+ * data: { paymentNonce: string, deviceData?: string, isProd?: boolean }
+ * retorna: { success, paymentMethod?, error? }
+ */
+exports.saveCardPayment = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { paymentNonce, deviceData, isProd = false } = data || {};
+  if (!paymentNonce) {
+    throw new functions.https.HttpsError("invalid-argument", "paymentNonce e obrigatorio.");
+  }
 
-      await sendPushNotifications(snapshot);
-    } catch (e) {
-      console.log(`Error: ${e}`);
-      await snapshot.ref.update({ status: "failed", error: `${e}` });
-    }
+  const uid = context.auth.uid;
+  const email = context.auth.token?.email;
+  const gateway = getGateway(isProd);
+
+  // garante customer e verifica se ja possui metodos
+  await ensureCustomer(gateway, uid, email);
+  let existingCount = 0;
+  try {
+    const found = await gateway.customer.find(uid);
+    existingCount = Array.isArray(found && found.paymentMethods) ? found.paymentMethods.length : 0;
+  } catch (_) {}
+
+  const res = await gateway.paymentMethod.create({
+    customerId: uid,
+    paymentMethodNonce: paymentNonce,
+    deviceData,
+    options: {
+      verifyCard: true,
+      makeDefault: existingCount === 0,
+    },
   });
 
-async function sendPushNotifications(snapshot) {
-  const notificationData = snapshot.data();
-  const title = notificationData.notification_title || "";
-  const body = notificationData.notification_text || "";
-  const imageUrl = notificationData.notification_image_url || "";
-  const sound = notificationData.notification_sound || "";
-  const parameterData = notificationData.parameter_data || "";
-  const targetAudience = notificationData.target_audience || "";
-  const initialPageName = notificationData.initial_page_name || "";
-  const userRefsStr = notificationData.user_refs || "";
-  const batchIndex = notificationData.batch_index || 0;
-  const numBatches = notificationData.num_batches || 0;
-  const status = notificationData.status || "";
-
-  if (status !== "" && status !== "started") {
-    console.log(`Already processed ${snapshot.ref.path}. Skipping...`);
-    return;
+  if (!res.success) {
+    return { success: false, error: res.message || "Falha ao salvar metodo." };
   }
 
-  if (title === "" || body === "") {
-    await snapshot.ref.update({ status: "failed" });
-    return;
+  const meta = methodMetaFF(res.paymentMethod);
+  return { success: true, paymentMethod: meta };
+});
+
+/**
+ * Cobra usando um metodo ja salvo (paymentRide7)
+ * data: { amount: string|number, paymentMethodToken: string, deviceData?: string, isProd?: boolean }
+ * retorna: { success, transactionId?, error? }
+ */
+exports.payWithSavedPaymentMethod = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { amount, paymentMethodToken, deviceData, isProd = false } = data || {};
+  if (amount == null || !paymentMethodToken) {
+    throw new functions.https.HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
   }
 
-  const userRefs = userRefsStr === "" ? [] : userRefsStr.trim().split(",");
-  var tokens = new Set();
-  if (userRefsStr) {
-    for (var userRef of userRefs) {
-      const userTokens = await firestore
-        .doc(userRef)
-        .collection(kFcmTokensCollection)
-        .get();
-      userTokens.docs.forEach((token) => {
-        if (typeof token.data().fcm_token !== undefined) {
-          tokens.add(token.data().fcm_token);
-        }
+  const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
+  const gateway = getGateway(isProd);
+
+  const saleRes = await gateway.transaction.sale({
+    amount: amtStr,
+    paymentMethodToken,
+    deviceData,
+    options: { submitForSettlement: true },
+  });
+
+  if (!saleRes.success) {
+    return { success: false, error: saleRes.message || "Erro ao processar pagamento." };
+  }
+
+  return { success: true, transactionId: saleRes.transaction.id };
+});
+
+/**
+ * Envia gorjeta (tipDriver)
+ * data: { amount: string|number, paymentMethodToken: string, deviceData?: string, isProd?: boolean, rideId?: string, driverId?: string }
+ * retorna: { success, transactionId?, error? }
+ */
+exports.tipDriver = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { amount, paymentMethodToken, deviceData, isProd = false, rideId, driverId } = data || {};
+  if (amount == null || !paymentMethodToken) {
+    throw new functions.https.HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
+  }
+
+  const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
+  const gateway = getGateway(isProd);
+
+  const saleRes = await gateway.transaction.sale({
+    amount: amtStr,
+    paymentMethodToken,
+    deviceData,
+    options: { submitForSettlement: true },
+    ...(rideId ? { orderId: `ride_${rideId}_tip` } : {}),
+  });
+
+  if (!saleRes.success) {
+    return { success: false, error: saleRes.message || "Erro ao processar gorjeta." };
+  }
+
+  const txId = saleRes.transaction.id;
+
+  // Registro simples opcional no Firestore (nao falha a resposta em caso de erro)
+  try {
+    if (rideId || driverId) {
+      await admin.firestore().collection("tips").add({
+        riderId: context.auth.uid,
+        rideId: rideId || null,
+        driverId: driverId || null,
+        transactionId: txId,
+        amount: Number(amtStr),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
-  } else {
-    var userTokensQuery = firestore.collectionGroup(kFcmTokensCollection);
-    // Handle batched push notifications by splitting tokens up by document
-    // id.
-    if (numBatches > 0) {
-      userTokensQuery = userTokensQuery
-        .orderBy(admin.firestore.FieldPath.documentId())
-        .startAt(getDocIdBound(batchIndex, numBatches))
-        .endBefore(getDocIdBound(batchIndex + 1, numBatches));
-    }
-    const userTokens = await userTokensQuery.get();
-    userTokens.docs.forEach((token) => {
-      const data = token.data();
-      const audienceMatches =
-        targetAudience === "All" || data.device_type === targetAudience;
-      if (audienceMatches && typeof data.fcm_token !== undefined) {
-        tokens.add(data.fcm_token);
-      }
-    });
+  } catch (e) {
+    console.warn("Falha ao registrar tip:", (e && e.message) || e);
   }
 
-  const tokensArr = Array.from(tokens);
-  var messageBatches = [];
-  for (let i = 0; i < tokensArr.length; i += 500) {
-    const tokensBatch = tokensArr.slice(i, Math.min(i + 500, tokensArr.length));
-    const messages = {
-      notification: {
-        title,
-        body,
-        ...(imageUrl && { imageUrl: imageUrl }),
-      },
-      data: {
-        initialPageName,
-        parameterData,
-      },
-      android: {
-        notification: {
-          ...(sound && { sound: sound }),
-        },
-      },
-      apns: {
-        payload: {
-          aps: {
-            ...(sound && { sound: sound }),
-          },
-        },
-      },
-      tokens: tokensBatch,
-    };
-    messageBatches.push(messages);
-  }
-
-  var numSent = 0;
-  await Promise.all(
-    messageBatches.map(async (messages) => {
-      const response = await admin.messaging().sendEachForMulticast(messages);
-      numSent += response.successCount;
-    }),
-  );
-
-  await snapshot.ref.update({ status: "succeeded", num_sent: numSent });
-}
-
-function getUserFcmTokensCollection(userDocPath) {
-  return firestore.doc(userDocPath).collection(kFcmTokensCollection);
-}
-
-function getDocIdBound(index, numBatches) {
-  if (index <= 0) {
-    return "users/(";
-  }
-  if (index >= numBatches) {
-    return "users/}";
-  }
-  const numUidChars = 62;
-  const twoCharOptions = Math.pow(numUidChars, 2);
-
-  var twoCharIdx = (index * twoCharOptions) / numBatches;
-  var firstCharIdx = Math.floor(twoCharIdx / numUidChars);
-  var secondCharIdx = Math.floor(twoCharIdx % numUidChars);
-  const firstChar = getCharForIndex(firstCharIdx);
-  const secondChar = getCharForIndex(secondCharIdx);
-  return "users/" + firstChar + secondChar;
-}
-
-function getCharForIndex(charIdx) {
-  if (charIdx < 10) {
-    return String.fromCharCode(charIdx + "0".charCodeAt(0));
-  } else if (charIdx < 36) {
-    return String.fromCharCode("A".charCodeAt(0) + charIdx - 10);
-  } else {
-    return String.fromCharCode("a".charCodeAt(0) + charIdx - 36);
-  }
-}
-exports.onUserDeleted = functions.auth.user().onDelete(async (user) => {
-  let firestore = admin.firestore();
-  let userRef = firestore.doc("users/" + user.uid);
-  await firestore.collection("users").doc(user.uid).delete();
+  return { success: true, transactionId: txId };
 });

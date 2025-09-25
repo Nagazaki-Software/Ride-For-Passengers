@@ -87,7 +87,8 @@ class _ScheduleRiderWidgetState extends State<ScheduleRiderWidget> {
                     height: MediaQuery.sizeOf(context).height * 0.9,
                     disableBookedSlots: false,
                     use24hFormat: false,
-                    dateLocale: 'us',
+                    // Use a valid intl locale (language + country)
+                    dateLocale: 'en_US',
                     initialDate: getCurrentTimestamp,
                     orders: scheduleCalendarRideRideOrdersRecordList,
                     order: scheduleCalendarRideRideOrdersRecordList,

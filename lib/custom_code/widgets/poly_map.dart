@@ -1,4 +1,4 @@
-// Automatic FlutterFlow imports
+﻿// Automatic FlutterFlow imports
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/actions/actions.dart' as action_blocks;
@@ -46,6 +46,8 @@ class PolyMap extends StatefulWidget {
     this.focusIntervalMs = 6400,
     this.focusHoldMs = 1800,
     this.enableDriverFocus = true,
+    this.showPulseHalo = true,
+    this.showViewingBubble = true,
   });
 
   final double? width;
@@ -64,6 +66,8 @@ class PolyMap extends StatefulWidget {
   final int focusIntervalMs;
   final int focusHoldMs;
   final bool enableDriverFocus;
+  final bool showPulseHalo; // aneis de pulso grandes em volta do usuario
+  final bool showViewingBubble; // balÃ£o "..." acima do usuÃ¡rio
 
   @override
   State<PolyMap> createState() => _PolyMapState();
@@ -92,6 +96,13 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   bool _focusInFlight = false;
   final Map<String, Uint8List> _iconCache = {};
   DateTime? _autoFitResumeAt;
+
+  // Pixel transparente para evitar o pin vermelho enquanto carrega ícone real
+  static final Uint8List _transparentPixel = base64Decode(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=');
+
+  String _bytesToDataUrl(Uint8List bytes) =>
+      'data:image/png;base64,' + base64Encode(bytes);
 
   static const _darkMapStyle =
       '[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#2b2b2b"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#2f2f2f"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]}]';
@@ -265,14 +276,14 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
       await _controller!.addMarker(nmap.MarkerOptions(
         id: id,
         position: pos,
-        title: 'Você',
+        title: 'VocÃª',
         anchorU: 0.5,
         anchorV: 0.5,
         zIndex: 30.0,
       ));
       _markerIds.add(id);
       _markerPos[id] = pos;
-      _markerTitle[id] = 'Você';
+      _markerTitle[id] = 'VocÃª';
     } else {
       await _controller!.updateMarker(id, position: pos);
       _markerPos[id] = pos;
@@ -354,6 +365,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         id: mid,
         position: position,
         title: name,
+        iconUrl:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=',
         anchorU: 0.5,
         anchorV: 0.62,
         zIndex: 22.0,
@@ -480,7 +493,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   Future<void> _ensureUserAvatar() async {
     final String name =
         (widget.userName == null || widget.userName!.trim().isEmpty)
-            ? 'Você'
+            ? 'VocÃª'
             : widget.userName!.trim();
     final String? photo =
         (widget.userPhotoUrl == null || widget.userPhotoUrl!.trim().isEmpty)
@@ -629,29 +642,59 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     final double progress = _pulseController?.value ?? 0;
     final ui.Image base = _userAvatarImage!;
     final double baseSize = _userAvatarSize.toDouble();
-    final double expand = baseSize * 0.55 * progress;
+    final double expand = baseSize * 0.65 * progress;
     final double stroke = baseSize * (0.2 - 0.12 * progress).clamp(0.08, 0.22);
     final double opacity = (1.0 - progress).clamp(0.0, 1.0);
-    final double canvasSize = baseSize + expand * 2 + stroke * 2;
+
+    // EspaÃ§o extra para aneis e balÃ£o
+    final double bubbleHeight = widget.showViewingBubble ? baseSize * 0.7 : 0.0;
+    final double canvasSize = baseSize + expand * 2 + stroke * 2 + bubbleHeight;
 
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     final ui.Canvas canvas = ui.Canvas(recorder);
-    final ui.Offset center = ui.Offset(canvasSize / 2.0, canvasSize / 2.0);
+    // centro levemente deslocado para deixar espaÃ§o para o balÃ£o
+    final ui.Offset center = ui.Offset(
+      canvasSize / 2.0,
+      (canvasSize - bubbleHeight) / 2.0 + bubbleHeight * 0.06,
+    );
 
-    if (opacity > 0.01) {
+    if (widget.showPulseHalo && opacity > 0.01) {
+      // preenchidos (discos) + aneis para parecer pulsar
+      final Color halo = const Color(0xFFFFC107);
+      final double r0 = baseSize / 2 + expand * 0.35;
+      final double r1 = baseSize / 2 + expand * 0.65;
+      final double r2 = baseSize / 2 + expand;
+
+      // Discos suaves
+      final ui.Paint p0 = ui.Paint()
+        ..style = ui.PaintingStyle.fill
+        ..color = halo.withOpacity(0.08 * opacity)
+        ..isAntiAlias = true;
+      final ui.Paint p1 = ui.Paint()
+        ..style = ui.PaintingStyle.fill
+        ..color = halo.withOpacity(0.06 * opacity)
+        ..isAntiAlias = true;
+      final ui.Paint p2 = ui.Paint()
+        ..style = ui.PaintingStyle.fill
+        ..color = halo.withOpacity(0.04 * opacity)
+        ..isAntiAlias = true;
+      canvas.drawCircle(center, r0, p0);
+      canvas.drawCircle(center, r1, p1);
+      canvas.drawCircle(center, r2, p2);
+
+      // Contornos finos
       final ui.Paint ring = ui.Paint()
         ..style = ui.PaintingStyle.stroke
         ..strokeWidth = stroke
-        ..color = const Color(0xFFFFC107).withOpacity(0.36 * opacity)
+        ..color = halo.withOpacity(0.32 * opacity)
         ..isAntiAlias = true;
-      canvas.drawCircle(center, baseSize / 2 + expand, ring);
-
+      canvas.drawCircle(center, r2, ring);
       final ui.Paint inner = ui.Paint()
         ..style = ui.PaintingStyle.stroke
         ..strokeWidth = stroke * 0.6
-        ..color = const Color(0xFFFFC107).withOpacity(0.22 * opacity)
+        ..color = halo.withOpacity(0.20 * opacity)
         ..isAntiAlias = true;
-      canvas.drawCircle(center, baseSize / 2 + expand * 0.58, inner);
+      canvas.drawCircle(center, r1, inner);
     }
 
     final ui.Rect dst = ui.Rect.fromCenter(
@@ -665,6 +708,54 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
       dst,
       ui.Paint()..isAntiAlias = true,
     );
+
+    // BalÃ£o de "..." indicando motoristas visualizando
+    final bool anyDriver = _markerIds.any((id) => id.startsWith('driver_'));
+    if (widget.showViewingBubble && anyDriver) {
+      final double bob = math.sin(progress * 2 * math.pi) * (baseSize * 0.04);
+      final double bw = baseSize * 0.9;
+      final double bh = baseSize * 0.42;
+      final double tail = baseSize * 0.14;
+      final ui.Offset bCenter = center.translate(0, -baseSize / 2 - bh / 2 - 10 - tail + bob);
+      final ui.Rect bRect = ui.Rect.fromCenter(
+        center: bCenter,
+        width: bw,
+        height: bh,
+      );
+
+      final ui.RRect rrect = ui.RRect.fromRectAndRadius(bRect, ui.Radius.circular(bh * 0.5));
+      final ui.Paint bubblePaint = ui.Paint()
+        ..color = const Color(0xFF1F1F1F).withOpacity(0.88)
+        ..isAntiAlias = true;
+      final ui.Paint border = ui.Paint()
+        ..style = ui.PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..color = Colors.white.withOpacity(0.08)
+        ..isAntiAlias = true;
+      canvas.drawRRect(rrect, bubblePaint);
+      canvas.drawRRect(rrect, border);
+
+      // rabinho do balÃ£o
+      final ui.Path tailPath = ui.Path()
+        ..moveTo(bRect.center.dx, bRect.bottom)
+        ..relativeLineTo(-tail * 0.35, tail * 0.55)
+        ..relativeLineTo(tail * 0.7, 0)
+        ..close();
+      canvas.drawPath(tailPath, bubblePaint);
+
+      // Dots
+      final int dots = _ellipsisDots.clamp(1, 3); // 1..3
+      final double dotR = bh * 0.08;
+      final double spacing = dotR * 3.2;
+      final double startX = bRect.center.dx - spacing;
+      final double y = bRect.center.dy + 0.5;
+      final ui.Paint dotPaint = ui.Paint()
+        ..color = Colors.white.withOpacity(0.92)
+        ..isAntiAlias = true;
+      for (int i = 0; i < dots; i++) {
+        canvas.drawCircle(ui.Offset(startX + i * spacing, y), dotR, dotPaint);
+      }
+    }
 
     final ui.Image composed = await recorder
         .endRecording()

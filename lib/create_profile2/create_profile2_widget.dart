@@ -1117,7 +1117,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget>
                                             .fontStyle,
                                       ),
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          FlutterFlowTheme.of(context).primaryText,
                                       fontSize: 16.0,
                                       letterSpacing: 0.0,
                                       fontWeight: FontWeight.w500,
@@ -1130,13 +1130,15 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget>
                                 ),
                                 icon: Icon(
                                   Icons.keyboard_arrow_down_rounded,
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: FlutterFlowTheme.of(context).primaryText,
                                   size: 24.0,
                                 ),
-                                fillColor: Color(0x73FB9000),
+                                fillColor:
+                                    FlutterFlowTheme.of(context).secondaryBackground,
                                 elevation: 2.0,
-                                borderColor: Colors.transparent,
-                                borderWidth: 0.0,
+                                borderColor:
+                                    FlutterFlowTheme.of(context).secondary,
+                                borderWidth: 1.0,
                                 borderRadius: 8.0,
                                 margin: EdgeInsetsDirectional.fromSTEB(
                                     12.0, 0.0, 12.0, 0.0),
@@ -1229,7 +1231,7 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget>
                                                     .fontStyle,
                                           ),
                                           color: FlutterFlowTheme.of(context)
-                                              .primary,
+                                              .primaryText,
                                           fontSize: 16.0,
                                           letterSpacing: 0.0,
                                           fontWeight: FontWeight.w500,
@@ -1245,12 +1247,16 @@ class _CreateProfile2WidgetState extends State<CreateProfile2Widget>
                                     icon: Icon(
                                       Icons.keyboard_arrow_down_rounded,
                                       color:
-                                          FlutterFlowTheme.of(context).primary,
+                                          FlutterFlowTheme.of(context).primaryText,
                                       size: 24.0,
                                     ),
+                                    fillColor:
+                                        FlutterFlowTheme.of(context)
+                                            .secondaryBackground,
                                     elevation: 2.0,
-                                    borderColor: Colors.transparent,
-                                    borderWidth: 0.0,
+                                    borderColor:
+                                        FlutterFlowTheme.of(context).secondary,
+                                    borderWidth: 1.0,
                                     borderRadius: 8.0,
                                     margin: EdgeInsetsDirectional.fromSTEB(
                                         12.0, 0.0, 12.0, 0.0),

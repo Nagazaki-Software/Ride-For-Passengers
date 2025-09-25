@@ -316,28 +316,26 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                           logFirebaseEvent(
                               'PAYMENT_MOTHODS16_Container_oerumlpm_ON_');
                           logFirebaseEvent('Container_update_app_state');
-                          FFAppState().updatePaymentMethodsAtIndex(
-                            FFAppState()
-                                .paymentMethods
-                                .where((e) => e.isDefault)
-                                .toList()
-                                .firstOrNull!
-                                .toMap(),
-                            (e) => e..isDefault = false,
-                          );
+                          final _currentDefaultIndex = FFAppState()
+                              .paymentMethods
+                              .indexWhere((e) => e.isDefault);
+                          if (_currentDefaultIndex != -1) {
+                            FFAppState().updatePaymentMethodsAtIndex(
+                              _currentDefaultIndex,
+                              (e) => e..isDefault = false,
+                            );
+                          }
                           safeSetState(() {});
                           logFirebaseEvent('Container_update_app_state');
-                          FFAppState().updatePaymentMethodsAtIndex(
-                            FFAppState()
-                                .paymentMethods
-                                .where((e) => FFAppState()
-                                    .paymentMethods
-                                    .contains(_model.cardClick))
-                                .toList()
-                                .firstOrNull!
-                                .toMap(),
-                            (e) => e..isDefault = true,
-                          );
+                          final _selectedIndex = FFAppState()
+                              .paymentMethods
+                              .indexWhere((e) => e == _model.cardClick);
+                          if (_selectedIndex != -1) {
+                            FFAppState().updatePaymentMethodsAtIndex(
+                              _selectedIndex,
+                              (e) => e..isDefault = true,
+                            );
+                          }
                           safeSetState(() {});
                           logFirebaseEvent('Container_navigate_back');
                           context.safePop();

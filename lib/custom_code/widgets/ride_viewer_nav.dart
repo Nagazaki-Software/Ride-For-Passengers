@@ -57,7 +57,10 @@ class RideViewerNav extends StatefulWidget {
 
 enum _CameraMode { topDown, follow }
 
-class _RideViewerNavState extends State<RideViewerNav> {
+class _RideViewerNavState extends State<RideViewerNav>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   nmap.GoogleMapController? _map;
 
   final Set<String> _markerIds = <String>{};
@@ -128,6 +131,7 @@ class _RideViewerNavState extends State<RideViewerNav> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SizedBox(
       width: widget.width,
       height: widget.height,

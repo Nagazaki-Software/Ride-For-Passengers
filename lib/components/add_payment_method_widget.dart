@@ -90,26 +90,30 @@ class _AddPaymentMethodWidgetState extends State<AddPaymentMethodWidget> {
                       size: 24.0,
                     ),
                   ),
-                  Text(
-                    FFLocalizations.of(context).getText(
-                      '31sjcapr' /* Add Payment Method */,
-                    ),
-                    style: FlutterFlowTheme.of(context).bodyLarge.override(
-                          font: GoogleFonts.poppins(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyLarge
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyLarge
-                                .fontStyle,
+                  Expanded(
+                    child: Text(
+                      FFLocalizations.of(context).getText(
+                        '31sjcapr' /* Add Payment Method */,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: FlutterFlowTheme.of(context).bodyLarge.override(
+                            font: GoogleFonts.poppins(
+                              fontWeight: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .fontWeight,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .fontStyle,
+                            ),
+                            color: FlutterFlowTheme.of(context).alternate,
+                            letterSpacing: 0.0,
+                            fontWeight:
+                                FlutterFlowTheme.of(context).bodyLarge.fontWeight,
+                            fontStyle:
+                                FlutterFlowTheme.of(context).bodyLarge.fontStyle,
                           ),
-                          color: FlutterFlowTheme.of(context).alternate,
-                          letterSpacing: 0.0,
-                          fontWeight:
-                              FlutterFlowTheme.of(context).bodyLarge.fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyLarge.fontStyle,
-                        ),
+                    ),
                   ),
                 ].divide(SizedBox(width: 12.0)),
               ),

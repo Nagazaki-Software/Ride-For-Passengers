@@ -1,0 +1,43 @@
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                      FFButtonWidget(
+                        onPressed: () async {
+                          if (!(_model.creditCardFormKey.currentState?.validate() ?? false)) {
+                            return;
+                          }
+                          if (kIsWeb) {
+                            showSnackbar(context, 'Saving cards on web is not supported.');
+                            return;
+                          }
+
+                          // Tokenize card to get a nonce
+                          final cc = _model.creditCardInfo;
+                          final expParts = cc.expiryDate.split('/');
+                          final req = BraintreeCreditCardRequest(
+                            cardNumber: cc.cardNumber,
+                            expirationMonth: expParts.isNotEmpty ? expParts.first : '',
+                            expirationYear: expParts.length > 1 ? expParts.last : '',
+                            cvv: cc.cvvCode,
+                          );
+                          final tokenizationKey = braintreeClientToken();
+                          try {
+                            final tokenized = await Braintree.tokenizeCreditCard(tokenizationKey, req);
+                            if (tokenized == null || tokenized.nonce.isEmpty) {
+                              showSnackbar(context, 'Failed to tokenize card.');
+                              return;
+                            }
+
+                            showSnackbar(context, 'Saving card...', duration: 10, loading: true);
+                            final shouldMakeDefault = FFAppState().paymentMethods.isEmpty ||
+                                !FFAppState().paymentMethods.any((e) => e.isDefault);
+                            final resp = await saveBraintreePaymentMethod(
+                              tokenized.nonce,
+                              makeDefault: shouldMakeDefault,
+                            );
+                            final ok = (resp['success'] == true) || (resp['ok'] == true);
+                            if (!ok) {
+                              final err = resp['error'] ?? 'Failed to save payment method.';
+                              showSnackbar(context, 'Error: $err');

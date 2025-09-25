@@ -42,6 +42,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fa;
 import '/flutter_flow/lat_lng.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_native_sdk/google_maps_native_sdk.dart' as nmap;
+import 'icon_global_cache.dart';
 
 class PickerMap extends StatefulWidget {
   const PickerMap({
@@ -155,6 +156,9 @@ class _PickerMapState extends State<PickerMap>
   final Map<String, List<nmap.LatLng>> _driverTrace = {};
   final Map<String, int> _lastTraceUpdateMs = {};
 
+  // Cache de rotas simples (origem|destino) para evitar recomputo frequente.
+  static final Map<String, List<nmap.LatLng>> _routeCache = <String, List<nmap.LatLng>>{};
+
   List<nmap.LatLng> _route = <nmap.LatLng>[];
   List<double> _cumDist = <double>[];
   double _totalDist = 0.0;
@@ -186,21 +190,21 @@ class _PickerMapState extends State<PickerMap>
   double get _adaptiveSnakePadding {
     final double dist = _totalDist;
     if (dist <= 0) {
-      return 320.0;
+      return 80.0;
     }
     if (dist < 800) {
-      return 340.0;
+      return 90.0;
     }
     if (dist < 2500) {
-      return 360.0;
+      return 100.0;
     }
     if (dist < 8000) {
-      return 420.0;
+      return 120.0;
     }
     if (dist < 16000) {
-      return 470.0;
+      return 140.0;
     }
-    return 520.0;
+    return 160.0;
   }
 
   int _boostedDriverIconSize({bool forDestination = false}) {
@@ -260,7 +264,7 @@ class _PickerMapState extends State<PickerMap>
 
       // Follow de cÃ¢mera mais amplo
       final int now = DateTime.now().millisecondsSinceEpoch;
-      if (now - _lastCamUpdateMs > 140) {
+      if (false) {
         _lastCamUpdateMs = now;
         final nmap.LatLng ref = _posAt((headDist - 120).clamp(0.0, _totalDist));
         final double br = _bearing(ref, headPos);
@@ -296,8 +300,6 @@ class _PickerMapState extends State<PickerMap>
           geodesic: true,
         );
         await _fadeOutPolylines(base: false, snake: true);
-
-        await _animateFinal3DView();
       }
     });
   }
@@ -392,12 +394,10 @@ class _PickerMapState extends State<PickerMap>
                 } catch (_) {}
                 _mapReady = true;
 
-                // micro-nudge
+                // micro-nudge removido para evitar cortes visuais
                 try {
                   final dynamic dc = _controller;
-                  await dc.animateCameraBy(dx: 0.1, dy: 0.0);
-                  await Future<void>.delayed(const Duration(milliseconds: 24));
-                  await dc.animateCameraBy(dx: -0.1, dy: 0.0);
+                  await dc.animateCameraBy(dx: 0.0, dy: 0.0);
                 } catch (_) {}
 
                 SchedulerBinding.instance.addPostFrameCallback((_) async {
@@ -409,7 +409,6 @@ class _PickerMapState extends State<PickerMap>
                     _startSnake();
                   } else {
                     _snapToUser();
-                    _startIdleCam();
                   }
                   if (mounted) setState(() => _veilVisible = false);
                 });
@@ -468,23 +467,20 @@ class _PickerMapState extends State<PickerMap>
   Future<void> _snapToUser() async {
     if (!_mapReady || _controller == null) return;
     final nmap.LatLng user = _gm(widget.userLocation);
-    await _playCameraSequence(<_CameraMove>[
-      _CameraMove(
+    try {
+      final dynamic dc = _controller;
+      await dc.animateCameraTo(
         target: user,
-        zoom: 16.0,
-        bearing: 14.0,
-        tilt: 50.0,
-        durationMs: 420,
-        pauseAfterMs: 90,
-      ),
-      _CameraMove(
-        target: user,
-        zoom: 17.3,
+        zoom: 17.2,
         bearing: 0.0,
-        tilt: 64.0,
-        durationMs: 640,
-      ),
-    ]);
+        tilt: 58.0,
+        durationMs: 420,
+      );
+    } catch (_) {
+      try {
+        await _controller?.moveCamera(user, zoom: 17.2);
+      } catch (_) {}
+    }
   }
 
   // Limpa rota e polylines
@@ -503,9 +499,9 @@ class _PickerMapState extends State<PickerMap>
     // ForÃ§a um "redraw" do mapa com micro-nudge para garantir remoÃ§Ã£o visual
     try {
       final dynamic dc = _controller;
-      await dc.animateCameraBy(dx: 0.1, dy: 0.0);
+                  await dc.animateCameraBy(dx: 0.0, dy: 0.0);
       await Future<void>.delayed(const Duration(milliseconds: 24));
-      await dc.animateCameraBy(dx: -0.1, dy: 0.0);
+                  await dc.animateCameraBy(dx: 0.0, dy: 0.0);
     } catch (_) {}
   }
 
@@ -553,7 +549,7 @@ class _PickerMapState extends State<PickerMap>
     }
 
     final List<nmap.LatLng> pts = List<nmap.LatLng>.from(_route);
-    const int steps = 7;
+    const int steps = 5;
     for (int i = 1; i <= steps; i++) {
       final double t = i / steps;
       final double fade = math.pow(1.0 - t, 1.2).toDouble();
@@ -602,7 +598,7 @@ class _PickerMapState extends State<PickerMap>
         );
       }
 
-      await Future<void>.delayed(const Duration(milliseconds: 48));
+      await Future<void>.delayed(const Duration(milliseconds: 36));
     }
 
     if (hasBaseMain) {
@@ -630,7 +626,7 @@ class _PickerMapState extends State<PickerMap>
     final bool hadDest = _markerIds.contains('dest');
     final nmap.LatLng user = _gm(widget.userLocation);
 
-    if (_mapReady && _controller != null && (hadRoute || hadDest)) {
+    if (false) {
       final double baseZoom =
           hadRoute ? math.max(13.8, _zoomForDistance(_totalDist) - 0.9) : 15.4;
       await _playCameraSequence(<_CameraMove>[
@@ -683,8 +679,7 @@ class _PickerMapState extends State<PickerMap>
       } catch (_) {}
     }
 
-    await _pulseUserOnce();
-    _startIdleCam();
+    // (sem pulso/idle) mantemos apenas o retorno animado
   }
 
   Future<void> _pulseUserOnce() async {
@@ -1413,8 +1408,17 @@ class _PickerMapState extends State<PickerMap>
 
     final a = _gm(widget.userLocation);
     final b = _gm(widget.destination!);
+    final String cacheKey =
+        '${a.latitude.toStringAsFixed(6)},${a.longitude.toStringAsFixed(6)}|${b.latitude.toStringAsFixed(6)},${b.longitude.toStringAsFixed(6)}';
     final String apiKey = (widget.googleApiKey ?? '').trim();
     bool routed = false;
+
+    // Tenta cache primeiro
+    final cached = _routeCache[cacheKey];
+    if (cached != null && cached.length >= 2) {
+      _route = List<nmap.LatLng>.from(cached);
+      routed = true;
+    }
 
     if (apiKey.isNotEmpty) {
       try {
@@ -1425,7 +1429,7 @@ class _PickerMapState extends State<PickerMap>
           languageCode: 'pt-BR',
           alternatives: false,
         );
-        if (res.routes.isNotEmpty) {
+        if (!routed && res.routes.isNotEmpty) {
           _route = res.routes.first.points
               .map((p) => nmap.LatLng(p.latitude, p.longitude))
               .toList();
@@ -1478,6 +1482,15 @@ class _PickerMapState extends State<PickerMap>
     }
     _totalDist = acc;
 
+    // Armazena no cache (LRU simples: limita 16 entradas)
+    if (_route.length >= 2) {
+      _routeCache[cacheKey] = List<nmap.LatLng>.from(_route);
+      if (_routeCache.length > 16) {
+        // Remove a primeira chave arbitrária (não estritamente LRU, mas suficiente)
+        _routeCache.remove(_routeCache.keys.first);
+      }
+    }
+
     // Inicializa as camadas do snake
     final List<nmap.LatLng> start = <nmap.LatLng>[_route.first, _route.first];
 
@@ -1522,10 +1535,7 @@ class _PickerMapState extends State<PickerMap>
     final double brStart = _bearing(start, midOne);
     final double brMid = _bearing(midOne, midTwo);
     final double brEnd = _bearing(_route[_route.length - 2], end);
-    try {
-      await _fitRouteBounds(padding: _adaptiveSnakePadding * 0.9);
-    } catch (_) {}
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+    // Evita um "corte" brusco de enquadramento antes da sequência final.
     if (_controller == null) return;
 
     final List<_CameraMove> moves = <_CameraMove>[
@@ -1679,6 +1689,9 @@ class _PickerMapState extends State<PickerMap>
   Future<Uint8List?> _downloadAndResize(String? url, int targetWidthPx) async {
     final String clean = (url ?? '').trim();
     if (clean.isEmpty || _looksSvg(clean)) return null;
+    // Global warmup cache first (url+size)
+    final gHit = IconGlobalCache.get(clean, targetWidthPx);
+    if (gHit != null) return gHit;
     final hit = _iconMemCache[clean];
     if (hit != null) return hit;
     if (_iconInFlight.containsKey(clean)) return await _iconInFlight[clean]!;
@@ -1717,6 +1730,7 @@ class _PickerMapState extends State<PickerMap>
             await img.toByteData(format: ui.ImageByteFormat.png);
         if (out == null) return null;
         final result = out.buffer.asUint8List();
+        IconGlobalCache.put(clean, targetWidthPx, result);
         _iconMemCache[clean] = result;
         return result;
       } catch (_) {

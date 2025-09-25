@@ -1,0 +1,33 @@
+                                'CARD_PAYMENT_PAY_WITH_GOOGLE_PAY_BTN_ON_');
+                            logFirebaseEvent('Button_braintree_payment');
+                            final transacAmount = widget.value!;
+                            final transacDisplayName =
+                                'RIDE-${random_data.randomInteger(0, 6).toString()}';
+                            if (kIsWeb) {
+                              showSnackbar(context,
+                                  'Payments not yet supported on web.');
+                              return;
+                            }
+
+                            final googleReq = BraintreeGooglePaymentRequest(
+                              totalPrice: transacAmount.toString(),
+                              currencyCode: 'USD',
+                              billingAddressRequired: false,
+                              // In sandbox, omit merchantId to avoid Play validations
+                              googleMerchantID: isProdPayments ? googleMerchantId() : null,
+                            );
+                            final dropInRequest = BraintreeDropInRequest(
+                              cardEnabled: false,
+                              tokenizationKey: braintreeClientToken(),
+                              collectDeviceData: true,
+                              googlePaymentRequest: googleReq,
+                            );
+                            try {
+                              final bnui = BraintreeNativeUi();
+                              final nonce = await bnui.requestGooglePayPayment(
+                                authorization: braintreeClientToken(),
+                                amount: transacAmount.toStringAsFixed(2),
+                                currencyCode: 'USD',
+                              );
+                              if (nonce == null || nonce.isEmpty) return;
+                              showSnackbar(

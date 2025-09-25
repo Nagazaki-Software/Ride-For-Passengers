@@ -179,7 +179,7 @@ class _ComponentLanguageXXXWidgetState
                             child: CheckboxListTile(
                               value: _model.checkboxListTileValue1 ??=
                                   FFLocalizations.of(context).languageCode ==
-                                      'English',
+                                      'en',
                               onChanged: (newValue) async {
                                 safeSetState(() =>
                                     _model.checkboxListTileValue1 = newValue!);
@@ -258,7 +258,7 @@ class _ComponentLanguageXXXWidgetState
                             child: CheckboxListTile(
                               value: _model.checkboxListTileValue2 ??=
                                   FFLocalizations.of(context).languageCode ==
-                                      'Portuguese',
+                                      'pt',
                               onChanged: (newValue) async {
                                 safeSetState(() =>
                                     _model.checkboxListTileValue2 = newValue!);
@@ -337,7 +337,7 @@ class _ComponentLanguageXXXWidgetState
                             child: CheckboxListTile(
                               value: _model.checkboxListTileValue3 ??=
                                   FFLocalizations.of(context).languageCode ==
-                                      'French',
+                                      'fr',
                               onChanged: (newValue) async {
                                 safeSetState(() =>
                                     _model.checkboxListTileValue3 = newValue!);
@@ -416,7 +416,7 @@ class _ComponentLanguageXXXWidgetState
                             child: CheckboxListTile(
                               value: _model.checkboxListTileValue4 ??=
                                   FFLocalizations.of(context).languageCode ==
-                                      'Spanish',
+                                      'es',
                               onChanged: (newValue) async {
                                 safeSetState(() =>
                                     _model.checkboxListTileValue4 = newValue!);
@@ -495,7 +495,7 @@ class _ComponentLanguageXXXWidgetState
                             child: CheckboxListTile(
                               value: _model.checkboxListTileValue5 ??=
                                   FFLocalizations.of(context).languageCode ==
-                                      'German',
+                                      'de',
                               onChanged: (newValue) async {
                                 safeSetState(() =>
                                     _model.checkboxListTileValue5 = newValue!);

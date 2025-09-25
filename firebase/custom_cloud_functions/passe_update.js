@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 // Se o seu projeto não inicializa o Admin automaticamente, descomente a linha abaixo UMA única vez no entrypoint:
 // admin.initializeApp();

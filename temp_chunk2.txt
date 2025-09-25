@@ -1,0 +1,141 @@
+                                        ),
+                                  ),
+                                ),
+                              ).animateOnActionTrigger(
+                                  animationsMap[
+                                      'containerOnActionTriggerAnimation4']!,
+                                  hasBeenTriggered: hasContainerTriggered4),
+                            ].divide(SizedBox(width: 10.0)),
+                          ),
+                        ].divide(SizedBox(height: 8.0)),
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                logFirebaseEvent(
+                                    'PAYMENT_RIDE7_ContainerConfirmPay_ON_TAP');
+                                logFirebaseEvent(
+                                    'ContainerConfirmPay_widget_animation');
+                                if (animationsMap[
+                                        'containerOnActionTriggerAnimation5'] !=
+                                    null) {
+                                  safeSetState(
+                                      () => hasContainerTriggered5 = true);
+                                  SchedulerBinding.instance.addPostFrameCallback(
+                                      (_) async => await animationsMap[
+                                              'containerOnActionTriggerAnimation5']!
+                                          .controller
+                                          .forward(from: 0.0));
+                                }
+                                logFirebaseEvent(
+                                    'ContainerConfirmPay_custom_action');
+                                _model.processPayment =
+                                    await actions.processCardPayload(
+                                  context,
+                                  _model.selectCard!,
+                                  true,
+                                  'sandbox_ck9vkcgg_brg8dhjg5tqpw496',
+                                  widget.value!,
+                                );
+                                if (getJsonField(
+                                      _model.processPayment,
+                                      r'''$.cardRaw''',
+                                    ) !=
+                                    null) {
+                                  logFirebaseEvent(
+                                      'ContainerConfirmPay_backend_call');
+                                  _model.latlngOrigem =
+                                      await LatlngToStringCall.call(
+                                    latlng: widget.latlngAtual?.toString(),
+                                  );
+
+                                  logFirebaseEvent(
+                                      'ContainerConfirmPay_backend_call');
+                                  _model.latlngDestino =
+                                      await LatlngToStringCall.call(
+                                    latlng: widget.latlngWhereTo?.toString(),
+                                  );
+
+                                  logFirebaseEvent(
+                                      'ContainerConfirmPay_backend_call');
+
+                                  var rideOrdersRecordReference =
+                                      RideOrdersRecord.collection.doc();
+                                  await rideOrdersRecordReference
+                                      .set(createRideOrdersRecordData(
+                                    user: currentUserReference,
+                                    latlng: widget.latlngWhereTo,
+                                    dia: getCurrentTimestamp,
+                                    option: widget.estilo,
+                                    latlngAtual: widget.latlngAtual,
+                                    nomeOrigem: LatlngToStringCall.shrotName(
+                                      (_model.latlngOrigem?.jsonBody ?? ''),
+                                    )?.firstOrNull,
+                                    nomeDestino: LatlngToStringCall.shrotName(
+                                      (_model.latlngDestino?.jsonBody ?? ''),
+                                    )?.firstOrNull,
+                                    rideValue:
+                                        random_data.randomDouble(5.0, 100.0),
+                                    paid: true,
+                                    status: 'Paid',
+                                    id: _model.rideID,
+                                  ));
+                                  _model.order =
+                                      RideOrdersRecord.getDocumentFromData(
+                                          createRideOrdersRecordData(
+                                            user: currentUserReference,
+                                            latlng: widget.latlngWhereTo,
+                                            dia: getCurrentTimestamp,
+                                            option: widget.estilo,
+                                            latlngAtual: widget.latlngAtual,
+                                            nomeOrigem:
+                                                LatlngToStringCall.shrotName(
+                                              (_model.latlngOrigem?.jsonBody ??
+                                                  ''),
+                                            )?.firstOrNull,
+                                            nomeDestino:
+                                                LatlngToStringCall.shrotName(
+                                              (_model.latlngDestino?.jsonBody ??
+                                                  ''),
+                                            )?.firstOrNull,
+                                            rideValue: random_data.randomDouble(
+                                                5.0, 100.0),
+                                            paid: true,
+                                            status: 'Paid',
+                                            id: _model.rideID,
+                                          ),
+                                          rideOrdersRecordReference);
+                                  logFirebaseEvent(
+                                      'ContainerConfirmPay_navigate_to');
+
+                                  context.goNamed(
+                                    FindingDrive8Widget.routeName,
+                                    queryParameters: {
+                                      'rideOrder': serializeParam(
+                                        _model.order?.reference,
+                                        ParamType.DocumentReference,
+                                      ),
+                                    }.withoutNulls,
+                                  );
+                                } else {
+                                  logFirebaseEvent(
+                                      'ContainerConfirmPay_bottom_sheet');
+                                  await showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    enableDrag: false,
+                                    context: context,
+                                    builder: (context) {
