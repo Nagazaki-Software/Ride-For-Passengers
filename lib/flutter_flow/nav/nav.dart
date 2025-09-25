@@ -356,9 +356,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => Licenses31Widget(),
         ),
         FFRoute(
-          name: A1Widget.routeName,
-          path: A1Widget.routePath,
-          builder: (context, params) => A1Widget(),
+          name: Receipts33Widget.routeName,
+          path: Receipts33Widget.routePath,
+          builder: (context, params) => Receipts33Widget(),
         ),
         FFRoute(
           name: DriverReviews32Widget.routeName,
@@ -371,6 +371,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               collectionNamePath: ['users'],
             ),
           ),
+        ),
+        FFRoute(
+          name: PrivacyPolicy29CopyWidget.routeName,
+          path: PrivacyPolicy29CopyWidget.routePath,
+          builder: (context, params) => PrivacyPolicy29CopyWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

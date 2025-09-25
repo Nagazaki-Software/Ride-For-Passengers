@@ -191,12 +191,13 @@ final parametersBuilderMap =
   'PrivacyPolicy29': ParameterData.none(),
   'TermsofService30': ParameterData.none(),
   'Licenses31': ParameterData.none(),
-  'a1': ParameterData.none(),
+  'Receipts33': ParameterData.none(),
   'DriverReviews32': (data) async => ParameterData(
         allParams: {
           'user': getParameter<DocumentReference>(data, 'user'),
         },
       ),
+  'PrivacyPolicy29Copy': ParameterData.none(),
 };
 
 Map<String, dynamic> getInitialParameterData(Map<String, dynamic> data) {

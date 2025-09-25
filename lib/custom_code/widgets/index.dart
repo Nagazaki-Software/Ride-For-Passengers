@@ -10,3 +10,4 @@ export 'route_list_item.dart' show RouteListItem;
 export 'picker_view_more.dart' show PickerViewMore;
 export 'address_picker.dart' show AddressPicker;
 export 'ride_viewer_nav.dart' show RideViewerNav;
+export 'picking_you_map.dart' show PickingYouMap;

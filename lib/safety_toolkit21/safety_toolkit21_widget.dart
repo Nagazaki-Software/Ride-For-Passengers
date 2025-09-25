@@ -172,7 +172,7 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: Color(0xFF1B1B1C),
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -717,7 +717,7 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                           height: 166.0,
                           decoration: BoxDecoration(
                             color: Color(0xFF1B1B1C),
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -1371,6 +1371,7 @@ class _SafetyToolkit21WidgetState extends State<SafetyToolkit21Widget>
                             12.0, 0.0, 12.0, 8.0),
                         child: Container(
                           width: double.infinity,
+                          height: 184.0,
                           decoration: BoxDecoration(
                             color: Color(0xFF1B1B1C),
                             borderRadius: BorderRadius.circular(10.0),

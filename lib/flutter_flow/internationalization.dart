@@ -1173,6 +1173,20 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'fr': 'voir la photo exacte de la voiture',
       'pt': 'veja a foto exata do carro',
     },
+    '184e8z8s': {
+      'en': 'Ride in Progress',
+      'de': 'Fahrt läuft',
+      'es': 'Paseo en progreso',
+      'fr': 'Balade en cours',
+      'pt': 'Passeio em andamento',
+    },
+    'qdvp4vi5': {
+      'en': 'You Arrived at',
+      'de': 'Sie sind angekommen bei',
+      'es': 'Llegaste a',
+      'fr': 'Vous êtes arrivé à',
+      'pt': 'Você chegou em',
+    },
     '2fe69r0j': {
       'en': 'Price:',
       'de': 'Preis:',
@@ -1270,13 +1284,6 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': 'Cancelar viaje',
       'fr': 'Annuler le trajet',
       'pt': 'Cancelar viagem',
-    },
-    '184e8z8s': {
-      'en': 'Ride in Progress',
-      'de': 'Fahrt läuft',
-      'es': 'Paseo en progreso',
-      'fr': 'Balade en cours',
-      'pt': 'Passeio em andamento',
     },
     'nqvdlzvo': {
       'en': 'Home',
@@ -4332,101 +4339,115 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'pt': 'Licença BSD de 3 cláusulas',
     },
   },
-  // a1
+  // Receipts33
   {
     '77apgdkx': {
-      'en': 'Recibos',
+      'en': 'Receipts',
       'de': 'Rezepte',
       'es': 'Recibos',
       'fr': 'Recettes',
       'pt': 'Receitas',
     },
-    'ytv19n2u': {
-      'en': 'Valor da corrida',
-      'de': 'Valor da corrida',
-      'es': 'Valor da corrida',
-      'fr': 'Valor da corrida',
-      'pt': 'Valor da corrida',
-    },
-    '065212ul': {
-      'en': 'Pago',
-      'de': 'Pago',
-      'es': 'Pago',
-      'fr': 'Paiement',
-      'pt': 'Pago',
-    },
-    'prdsa145': {
-      'en': '\$ 12',
-      'de': '12 \$',
-      'es': '\$12',
-      'fr': '12 \$',
-      'pt': '\$ 12',
-    },
-    'tac7rzoo': {
-      'en': 'Hello World',
-      'de': 'Hallo Welt',
-      'es': 'Hola Mundo',
-      'fr': 'Bonjour le monde',
-      'pt': 'Olá Mundo',
-    },
-    'h3i3fp80': {
-      'en': 'Apartamento Centro - Janeiro 2024',
-      'de': 'Apartment Centro - Janeiro 2024',
-      'es': 'Apartamento Centro - Janeiro 2024',
-      'fr': 'Appartement Centro - Janvier 2024',
-      'pt': 'Apartamento Centro - Janeiro 2024',
-    },
-    '3ppcipw3': {
-      'en': '15 Jan 2024 • 14:30',
-      'de': '15. Januar 2024 • 14:30',
-      'es': '15 de enero de 2024 • 14:30',
-      'fr': '15 janv. 2024 • 14:30',
-      'pt': '15 de janeiro de 2024 • 14:30',
-    },
-    'nmtlwhwx': {
-      'en': 'Visualizar',
-      'de': 'Visualisieren',
-      'es': 'Visualizar',
-      'fr': 'Visualiser',
-      'pt': 'Visualizar',
-    },
-    '9dfawdqr': {
-      'en': 'Baixar PDF',
-      'de': 'Baixar PDF',
-      'es': 'Descargar PDF',
-      'fr': 'Télécharger le PDF',
-      'pt': 'Baixar PDF',
-    },
-    'qgfy51z0': {
+    '8uwu1sho': {
       'en': '30 ago.,',
       'de': '',
       'es': '',
       'fr': '',
       'pt': '',
     },
-    '9ewve1y7': {
+    '0k56bfe2': {
       'en': '15:23',
       'de': '',
       'es': '',
       'fr': '',
       'pt': '',
     },
-    'c0smk2ag': {
+    'ingwp2zi': {
       'en': 'R\$8,90',
       'de': '',
       'es': '',
       'fr': '',
       'pt': '',
     },
-    'qy7a1z7o': {
-      'en': 'Hello World',
+    'rlnmczjk': {
+      'en': 'Nina Rodrigues 71',
       'de': '',
       'es': '',
       'fr': '',
       'pt': '',
     },
-    'e9nm3r7q': {
-      'en': 'Hello World',
+    '4e27rbog': {
+      'en': 'Papelaria Lurdes',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'jn4ae1b7': {
+      'en': '30 ago.,',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'thwtmfxm': {
+      'en': '15:23',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    '96xpuopk': {
+      'en': 'R\$8,90',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'hsw2e1o2': {
+      'en': 'Nina Rodrigues 71',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'xpb0vuwh': {
+      'en': 'Papelaria Lurdes',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'tk25rrh0': {
+      'en': '30 ago.,',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'ge7193mr': {
+      'en': '15:23',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'ta2vlp75': {
+      'en': 'R\$8,90',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'uj0jduwy': {
+      'en': 'Nina Rodrigues 71',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+    'l7ot2k5h': {
+      'en': 'Papelaria Lurdes',
       'de': '',
       'es': '',
       'fr': '',
@@ -4483,6 +4504,360 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'es': '',
       'fr': '',
       'pt': '',
+    },
+    '6s3l058x': {
+      'en': 'This driver does not have any reviews yet.',
+      'de': '',
+      'es': '',
+      'fr': '',
+      'pt': '',
+    },
+  },
+  // PrivacyPolicy29Copy
+  {
+    'x4bfwtre': {
+      'en': 'Data sharing',
+      'de': 'Datenschutzrichtlinie',
+      'es': 'política de privacidad',
+      'fr': 'politique de confidentialité',
+      'pt': 'política de Privacidade',
+    },
+    'pytvfl7d': {
+      'en': '',
+      'de': 'Ihre Privatsphäre steht an erster Stelle',
+      'es': 'Tu privacidad es lo primero',
+      'fr': 'Votre vie privée est notre priorité',
+      'pt': 'Sua privacidade vem em primeiro lugar',
+    },
+    'k071i73v': {
+      'en': '',
+      'de':
+          'Wir verpflichten uns, Ihre Daten zu schützen. Im Folgenden erklären wir, welche Daten wir erfassen, wie wir sie verwenden und welche Wahlmöglichkeiten Sie haben.',
+      'es':
+          'Nos comprometemos a proteger su información. A continuación, le explicamos qué recopilamos, cómo la usamos y sus opciones.',
+      'fr':
+          'Nous nous engageons à protéger vos informations. Vous trouverez ci-dessous des explications sur ce que nous collectons, comment nous les utilisons et vos choix.',
+      'pt':
+          'Estamos comprometidos em proteger suas informações. Abaixo, explicamos o que coletamos, como usamos e suas escolhas.',
+    },
+    'darsw18d': {
+      'en': 'Who we share with',
+      'de': 'Von uns erfasste Daten',
+      'es': 'Información que recopilamos',
+      'fr': 'Informations que nous collectons',
+      'pt': 'Informações que coletamos',
+    },
+    '4yp4sg8m': {
+      'en': '• Drivers/Passengers:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'pkogk3os': {
+      'en': 'to complete the ride safely.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'pqa4orl3': {
+      'en': '• Payments – Braintree:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    '80bb68uu': {
+      'en': 'no full card numbers.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'cjov90un': {
+      'en': '• Service providers:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'twj4yzsf': {
+      'en': 'hosting, analytics, and notifications.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'svu16fbc': {
+      'en': '• Support & security:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'dr2lcxh0': {
+      'en': 'fraud prevention & support.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'ks1rewa6': {
+      'en': '• Authorities:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    '9l26uh72': {
+      'en': 'only if required by law or in emergencies.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'd1wtx5le': {
+      'en': 'What can be shared',
+      'de': 'Von uns erfasste Daten',
+      'es': 'Información que recopilamos',
+      'fr': 'Informations que nous collectons',
+      'pt': 'Informações que coletamos',
+    },
+    '6qaaxq1p': {
+      'en': '• Basic identification',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'dweqxsmy': {
+      'en': '(e.g., name, photo) between driver and rider.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'e9ml7uf7': {
+      'en': '• Ride data:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'l2dtjgm0': {
+      'en': 'pickup/drop-off, times, price, and rating.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'cy58nis0': {
+      'en': '• Real-time location',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'vr0oodsr': {
+      'en': 'during the ride (with your permission).',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'p2zfpiy2': {
+      'en': '• App technical data:',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'yafeykt9': {
+      'en': 'device model, language, version to improve the service.',
+      'de':
+          '• Kontodaten: Name, E-Mail-Adresse, Telefonnummer.\n\n• App-Nutzung: verwendete Bildschirme/Funktionen und Leistung.\n\n• Geräteinformationen: Modell, Betriebssystem, Sprache.\n\n• Standortdaten (nur mit Ihrer Zustimmung).\n\n• Kommunikationsaufzeichnungen (Support und Feedback).\n\n• Zahlungen: werden von Braintree verarbeitet; wir speichern nicht Ihre vollständige Kartennummer.',
+      'es':
+          '• Datos de la cuenta: nombre, correo electrónico, número de teléfono.\n\n• Uso de la aplicación: pantallas/funciones utilizadas y rendimiento.\n\n• Información del dispositivo: modelo, sistema operativo, idioma.\n\n• Datos de ubicación (solo con su permiso).\n\n• Registros de comunicación (soporte y comentarios).\n\n• Pagos: procesados por Braintree; no almacenamos el número completo de su tarjeta.',
+      'fr':
+          '• Informations du compte : nom, adresse e-mail, numéro de téléphone.\n\n• Utilisation de l\'application : écrans/fonctionnalités utilisés et performances.\n\n• Informations sur l\'appareil : modèle, système d\'exploitation, langue.\n\n• Données de localisation (uniquement avec votre autorisation).\n\n• Historique des communications (assistance et commentaires).\n\n• Paiements : traités par Braintree ; nous ne conservons pas votre numéro de carte complet.',
+      'pt':
+          '• Dados da conta: nome, e-mail, número de telefone.\n\n• Uso do aplicativo: telas/recursos utilizados e desempenho.\n\n• Informações do dispositivo: modelo, sistema operacional, idioma.\n\n• Dados de localização (somente com a sua permissão).\n\n• Registros de comunicação (suporte e feedback).\n\n• Pagamentos: processados pela Braintree; não armazenamos o número completo do seu cartão.',
+    },
+    'i86k5sqn': {
+      'en': 'How We Use Your Information',
+      'de': 'Wie wir Ihre Daten verwenden',
+      'es': 'Cómo usamos su información',
+      'fr': 'Comment nous utilisons vos informations',
+      'pt': 'Como usamos suas informações',
+    },
+    'zpgspv9j': {
+      'en':
+          '• To operate and improve the app and features.\n\n• To personalize experience and prevent fraud/abuse.\n\n• To send important notices (e.g., confirmations and updates).\n\n• Customer support and safety.\n\n• Aggregated analytics to understand usage.',
+      'de':
+          '• Zur Bedienung und Verbesserung der App und ihrer Funktionen.\n\n• Zur Personalisierung des Erlebnisses und zur Verhinderung von Betrug/Missbrauch.\n\n• Zum Senden wichtiger Mitteilungen (z. B. Bestätigungen und Aktualisierungen).\n\n• Kundensupport und Sicherheit.\n\n• Aggregierte Analysen zum Verständnis der Nutzung.',
+      'es':
+          '• Para operar y mejorar la aplicación y sus funciones.\n\n• Para personalizar la experiencia y prevenir fraudes y abusos.\n\n• Para enviar avisos importantes (por ejemplo, confirmaciones y actualizaciones).\n\n• Atención al cliente y seguridad.\n\n• Análisis agregados para comprender el uso.',
+      'fr':
+          '• Pour exploiter et améliorer l\'application et ses fonctionnalités.\n\n• Pour personnaliser l\'expérience et prévenir la fraude et les abus.\n\n• Pour envoyer des notifications importantes (par exemple, des confirmations et des mises à jour).\n\n• Assistance et sécurité client.\n\n• Analyses agrégées pour comprendre l\'utilisation.',
+      'pt':
+          '• Para operar e aprimorar o aplicativo e seus recursos.\n\n• Para personalizar a experiência e prevenir fraudes/abuso.\n\n• Para enviar avisos importantes (por exemplo, confirmações e atualizações).\n\n• Suporte e segurança ao cliente.\n\n• Análises agregadas para entender o uso.',
+    },
+    'su10wuh7': {
+      'en': 'Data Security',
+      'de': 'Datensicherheit',
+      'es': 'Seguridad de datos',
+      'fr': 'Sécurité des données',
+      'pt': 'Segurança de dados',
+    },
+    'q0g8l5s3': {
+      'en':
+          '• Only authorized people can access your data.\n\n• We monitor and improve security all the time.\n\n• If something goes wrong, we notify you and act fast.\n\n• We keep data only as long as needed.',
+      'de':
+          '• Nur autorisierte Personen haben Zugriff auf Ihre Daten.\n\n• Wir überwachen und verbessern die Sicherheit kontinuierlich.\n\n• Sollte etwas schiefgehen, benachrichtigen wir Sie und reagieren schnell.\n\n• Wir speichern Daten nur so lange wie nötig.',
+      'es':
+          '• Solo las personas autorizadas pueden acceder a sus datos.\n\n• Monitoreamos y mejoramos la seguridad constantemente.\n\n• Si algo sale mal, le notificamos y actuamos con rapidez.\n\n• Conservamos los datos solo el tiempo necesario.',
+      'fr':
+          '• Seules les personnes autorisées peuvent accéder à vos données.\n\n• Nous surveillons et améliorons la sécurité en permanence.\n\n• En cas de problème, nous vous avertissons et intervenons rapidement.\n\n• Nous conservons les données uniquement le temps nécessaire.',
+      'pt':
+          '• Somente pessoas autorizadas podem acessar seus dados.\n\n• Monitoramos e aprimoramos a segurança constantemente.\n\n• Se algo der errado, notificamos você e agimos rapidamente.\n\n• Mantemos os dados apenas pelo tempo necessário.',
+    },
+    'ia67g8oh': {
+      'en': 'Third-Party Services',
+      'de': 'Dienste von Drittanbietern',
+      'es': 'Servicios de terceros',
+      'fr': 'Services tiers',
+      'pt': 'Serviços de terceiros',
+    },
+    'os47jef0': {
+      'en':
+          '• The app may use maps, payments, and other services.\n\n• Each has its own policy — please check it.\n\n• We share data only when needed to run the app or with your permission.',
+      'de':
+          '• Die App kann Karten, Zahlungen und andere Dienste nutzen.\n\n• Jeder Dienst hat seine eigenen Richtlinien – bitte überprüfen Sie diese.\n\n• Wir geben Daten nur weiter, wenn dies zum Ausführen der App erforderlich ist oder wenn Sie uns Ihre Zustimmung dazu geben.',
+      'es':
+          'La aplicación puede usar mapas, pagos y otros servicios.\n\nCada servicio tiene su propia política; consúltela.\n\nCompartimos datos solo cuando es necesario para el funcionamiento de la aplicación o con su permiso.',
+      'fr':
+          '• L\'application peut utiliser des cartes, des paiements et d\'autres services.\n\n• Chaque service possède sa propre politique ; veuillez la consulter.\n\n• Nous partageons les données uniquement lorsque cela est nécessaire au fonctionnement de l\'application ou avec votre autorisation.',
+      'pt':
+          '• O aplicativo pode usar mapas, pagamentos e outros serviços.\n\n• Cada um tem sua própria política — consulte-a.\n\n• Compartilhamos dados apenas quando necessário para executar o aplicativo ou com sua permissão.',
+    },
+    '8k5366tf': {
+      'en': 'Your Rights',
+      'de': 'Ihre Rechte',
+      'es': 'Sus derechos',
+      'fr': 'Vos droits',
+      'pt': 'Seus direitos',
+    },
+    'iwi7t6vo': {
+      'en':
+          '• See and correct your data.\n\n• Delete your data or request a copy.\n\n• Manage device permissions and opt out of marketing.',
+      'de':
+          '• Ihre Daten einsehen und korrigieren.\n\n• Ihre Daten löschen oder eine Kopie anfordern.\n\n• Geräteberechtigungen verwalten und Marketing deaktivieren.',
+      'es':
+          '• Ver y corregir sus datos.\n\n• Eliminar sus datos o solicitar una copia.\n\n• Gestionar los permisos del dispositivo y darse de baja del marketing.',
+      'fr':
+          '• Consultez et corrigez vos données.\n\n• Supprimez vos données ou demandez-en une copie.\n\n• Gérez les autorisations de votre appareil et désactivez les communications marketing.',
+      'pt':
+          '• Visualizar e corrigir seus dados.\n\n• Excluir seus dados ou solicitar uma cópia.\n\n• Gerenciar permissões do dispositivo e cancelar o recebimento de marketing.',
+    },
+    'ih7s2te9': {
+      'en': 'Contact Us',
+      'de': 'Kontaktieren Sie uns',
+      'es': 'Contáctenos',
+      'fr': 'Contactez-nous',
+      'pt': 'Contate-nos',
+    },
+    'rgrs5f2n': {
+      'en':
+          'Questions about privacy?\n\nEmail: info@quickyy.life\nIn-app: Profile → Support\n\nLast updated: December 2024',
+      'de':
+          'Fragen zum Datenschutz?\n\nE-Mail: info@quickyy.life\nIn-App: Profil → Support\n\nLetzte Aktualisierung: Dezember 2024',
+      'es':
+          '¿Preguntas sobre privacidad?\n\nCorreo electrónico: info@quickyy.life\nEn la app: Perfil → Soporte\n\nÚltima actualización: diciembre de 2024',
+      'fr':
+          'Des questions sur la confidentialité ?\n\nE-mail : info@quickyy.life\nDans l\'application : Profil → Assistance\n\nDernière mise à jour : décembre 2024',
+      'pt':
+          'Dúvidas sobre privacidade?\n\nE-mail: info@quickyy.life\nNo aplicativo: Perfil → Suporte\n\nÚltima atualização: dezembro de 2024',
+    },
+    'gwghyron': {
+      'en':
+          'This policy may be updated from time to time. We will notify you of any significant changes.',
+      'de':
+          'Diese Richtlinie kann von Zeit zu Zeit aktualisiert werden. Wir werden Sie über alle wesentlichen Änderungen informieren.',
+      'es':
+          'Esta política puede actualizarse periódicamente. Le notificaremos cualquier cambio significativo.',
+      'fr':
+          'Cette politique peut être mise à jour périodiquement. Nous vous informerons de tout changement important.',
+      'pt':
+          'Esta política pode ser atualizada periodicamente. Notificaremos você sobre quaisquer alterações significativas.',
     },
   },
   // continuecom

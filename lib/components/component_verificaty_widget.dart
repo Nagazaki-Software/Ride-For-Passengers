@@ -42,7 +42,7 @@ class _ComponentVerificatyWidgetState extends State<ComponentVerificatyWidget> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: double.infinity,
+      height: 470.0,
       decoration: BoxDecoration(
         color: Colors.transparent,
       ),
@@ -55,7 +55,7 @@ class _ComponentVerificatyWidgetState extends State<ComponentVerificatyWidget> {
           ),
         ),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+          padding: EdgeInsetsDirectional.fromSTEB(16.0, 18.0, 16.0, 16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -99,8 +99,11 @@ class _ComponentVerificatyWidgetState extends State<ComponentVerificatyWidget> {
                         color: FlutterFlowTheme.of(context).info,
                         size: 16.0,
                       ),
-                      onPressed: () {
-                        print('IconButton pressed ...');
+                      onPressed: () async {
+                        logFirebaseEvent(
+                            'COMPONENT_VERIFICATY_close_ICN_ON_TAP');
+                        logFirebaseEvent('IconButton_navigate_back');
+                        context.safePop();
                       },
                     ),
                   ],

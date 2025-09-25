@@ -1,5 +1,6 @@
 import '/backend/backend.dart';
 import '/components/component_verificaty_widget.dart';
+import '/components/list_empty_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
@@ -534,6 +535,13 @@ class _DriverReviews32WidgetState extends State<DriverReviews32Widget> {
                           builder: (context) {
                             final raties =
                                 driverReviews32UsersRecord.rating.toList();
+                            if (raties.isEmpty) {
+                              return ListEmptyWidget(
+                                txt: FFLocalizations.of(context).getText(
+                                  '6s3l058x' /* This driver does not have any ... */,
+                                ),
+                              );
+                            }
 
                             return Column(
                               mainAxisSize: MainAxisSize.max,

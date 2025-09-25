@@ -129,7 +129,7 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
                                         .fontStyle,
                                   ),
                                   color: FlutterFlowTheme.of(context).alternate,
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.normal,
                                   fontStyle: FlutterFlowTheme.of(context)
@@ -246,7 +246,7 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
                                         .fontStyle,
                                   ),
                                   color: FlutterFlowTheme.of(context).alternate,
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.normal,
                                   fontStyle: FlutterFlowTheme.of(context)
@@ -375,7 +375,7 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
                                         .fontStyle,
                                   ),
                                   color: FlutterFlowTheme.of(context).alternate,
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.normal,
                                   fontStyle: FlutterFlowTheme.of(context)
@@ -543,7 +543,7 @@ class _Reportaproblem28WidgetState extends State<Reportaproblem28Widget> {
                                         .fontStyle,
                                   ),
                                   color: FlutterFlowTheme.of(context).alternate,
-                                  fontSize: 16.0,
+                                  fontSize: 14.0,
                                   letterSpacing: 0.0,
                                   fontWeight: FontWeight.normal,
                                   fontStyle: FlutterFlowTheme.of(context)

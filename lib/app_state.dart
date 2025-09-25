@@ -347,6 +347,12 @@ class FFAppState extends ChangeNotifier {
         _paymentMethods.map((x) => x.serialize()).toList());
   }
 
+  String _pickingPage = '';
+  String get pickingPage => _pickingPage;
+  set pickingPage(String value) {
+    _pickingPage = value;
+  }
+
   final _recentTripsManager = StreamRequestManager<List<RideOrdersRecord>>();
   Stream<List<RideOrdersRecord>> recentTrips({
     String? uniqueQueryKey,

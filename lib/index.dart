@@ -46,6 +46,8 @@ export '/privacy_policy29/privacy_policy29_widget.dart'
 export '/termsof_service30/termsof_service30_widget.dart'
     show TermsofService30Widget;
 export '/licenses31/licenses31_widget.dart' show Licenses31Widget;
-export '/a1/a1_widget.dart' show A1Widget;
+export '/receipts33/receipts33_widget.dart' show Receipts33Widget;
 export '/driver_reviews32/driver_reviews32_widget.dart'
     show DriverReviews32Widget;
+export '/privacy_policy29_copy/privacy_policy29_copy_widget.dart'
+    show PrivacyPolicy29CopyWidget;
