@@ -397,10 +397,8 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
             key: scaffoldKey,
             backgroundColor: FlutterFlowTheme.of(context).tertiary,
             body: Stack(
-                                                          children: [
-                                                          Visibility(
-                                                            visible: _stage == 'finish',
-                                                            child: Stack(
+              children: [
+                Stack(
                   children: [
                     Builder(
                       builder: (context) {
