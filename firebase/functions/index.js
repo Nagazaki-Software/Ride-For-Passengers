@@ -1,0 +1,324 @@
+/* eslint-disable no-console */
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+admin.initializeApp();
+
+const braintree = require("braintree");
+
+/**
+ * 🔐 Credenciais
+ * Para produção, prefira setar via: 
+ *   firebase functions:config:set braintree.prod_merchant_id="..." braintree.prod_public_key="..." braintree.prod_private_key="..."
+ * e depois redeploy.
+ */
+
+// Sandbox (teste)
+const K_TEST_MERCHANT_ID = "brg8dhjg5tqpw496";
+const K_TEST_PUBLIC_KEY  = "syt9g3c79t58wk82";
+const K_TEST_PRIVATE_KEY = "0f7de713fa2bbb810f183f628f51d86d";
+
+// Produção (lidas do functions:config, ou vazias por padrão)
+const CFG = (functions.config && functions.config().braintree) || {};
+const K_PROD_MERCHANT_ID = CFG.prod_merchant_id || "";
+const K_PROD_PUBLIC_KEY  = CFG.prod_public_key  || "";
+const K_PROD_PRIVATE_KEY = CFG.prod_private_key || "";
+
+/** Gateway por ambiente */
+function getGateway(isProd) {
+  return new braintree.BraintreeGateway({
+    environment: isProd ? braintree.Environment.Production : braintree.Environment.Sandbox,
+    merchantId: isProd ? K_PROD_MERCHANT_ID : K_TEST_MERCHANT_ID,
+    publicKey:  isProd ? K_PROD_PUBLIC_KEY  : K_TEST_PUBLIC_KEY,
+    privateKey: isProd ? K_PROD_PRIVATE_KEY : K_TEST_PRIVATE_KEY,
+  });
+}
+
+/** Garante que o customer exista no Braintree (usa uid como id) */
+async function ensureCustomer(gateway, customerId, email) {
+  try {
+    return await gateway.customer.find(customerId);
+  } catch (_) {
+    const res = await gateway.customer.create({ id: customerId, email });
+    if (!res.success) throw new Error(res.message || "Falha ao criar customer");
+    return res.customer;
+  }
+}
+
+/** Metadados seguros para retornar ao app */
+function methodMeta(method) {
+  // Cartão
+  if (method && method.cardType && method.last4) {
+    return {
+      token: method.token,
+      brand: method.cardType,
+      last4: method.last4,
+      type: "card",
+      default: !!method.default,
+    };
+  }
+  // PayPal (se usar)
+  if (method && method.email) {
+    return {
+      token: method.token,
+      brand: "PayPal",
+      last4: method.email,
+      type: "paypal",
+      default: !!method.default,
+    };
+  }
+  return { token: method?.token, brand: "PaymentMethod", last4: "****", type: "unknown", default: !!method?.default };
+}
+
+// Helpers extras para metadados no FFAppState
+function isPassInstrument(method) {
+  const instr = (method && method.paymentInstrumentType ? method.paymentInstrumentType : "").toLowerCase();
+  const ctype = (method && method.cardType ? method.cardType : "").toLowerCase();
+  return (
+    instr.indexOf("apple_pay") >= 0 ||
+    instr.indexOf("android_pay") >= 0 ||
+    instr.indexOf("google_pay") >= 0 ||
+    ctype.indexOf("apple pay") >= 0 ||
+    ctype.indexOf("android pay") >= 0 ||
+    ctype.indexOf("google pay") >= 0
+  );
+}
+
+function methodMetaFF(method) {
+  if (method && method.cardType && method.last4) {
+    return {
+      token: method.token,
+      paymentMethodToken: method.token,
+      brand: method.cardType,
+      last4: method.last4,
+      last4Numbers: method.last4,
+      type: "card",
+      default: !!method.default,
+      isDefault: !!method.default,
+      pass: isPassInstrument(method),
+    };
+  }
+  if (method && method.email) {
+    return {
+      token: method.token,
+      paymentMethodToken: method.token,
+      brand: "PayPal",
+      last4: method.email,
+      last4Numbers: method.email,
+      type: "paypal",
+      default: !!method.default,
+      isDefault: !!method.default,
+      pass: false,
+    };
+  }
+  return {
+    token: method && method.token,
+    paymentMethodToken: method && method.token,
+    brand: "PaymentMethod",
+    last4: "****",
+    last4Numbers: "****",
+    type: "unknown",
+    default: !!(method && method.default),
+    isDefault: !!(method && method.default),
+    pass: false,
+  };
+}
+
+/**
+ * ✅ ÚNICA FUNCTION: paga e retorna o paymentMethod
+ * data: { amount: string|number, paymentNonce: string, deviceData?: string, isProd?: boolean, makeDefault?: boolean }
+ * retorna: { success, transactionId?, paymentMethod?, error? }
+ */
+exports.payAndReturnPaymentMethod = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faça login primeiro.");
+  }
+  const { amount, paymentNonce, deviceData, isProd = false, makeDefault } = data || {};
+  if (amount == null || paymentNonce == null) {
+    throw new functions.https.HttpsError("invalid-argument", "amount e paymentNonce são obrigatórios.");
+  }
+
+  // Braintree pede amount como string com 2 casas
+  const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
+
+  const uid = context.auth.uid;
+  const email = context.auth.token?.email;
+  const gateway = getGateway(isProd);
+
+  // 1) garante o customer (id = uid) e calcula se ja existe metodo salvo
+  const customer = await ensureCustomer(gateway, uid, email);
+  let existingCount = 0;
+  try {
+    const found = await gateway.customer.find(uid);
+    existingCount = Array.isArray(found && found.paymentMethods) ? found.paymentMethods.length : 0;
+  } catch (_) {}
+
+  // 2) VAULT: cria método a partir do NONCE (gera token persistente)
+  const pmRes = await gateway.paymentMethod.create({
+    customerId: uid,
+    paymentMethodNonce: paymentNonce,
+    deviceData,
+    options: {
+      verifyCard: true,    // validação no ato
+      makeDefault: (makeDefault !== undefined) ? !!makeDefault : (existingCount === 0),
+    },
+  });
+
+  if (!pmRes.success) {
+    throw new functions.https.HttpsError("failed-precondition", pmRes.message || "Falha ao vaultar método de pagamento.");
+  }
+
+  const pm = pmRes.paymentMethod;
+  const meta = methodMetaFF(pm); // inclui campos FFAppState
+
+  // 3) COBRA usando o token vaultado
+  const saleRes = await gateway.transaction.sale({
+    amount: amtStr,
+    paymentMethodToken: pm.token,
+    deviceData,
+    options: {
+      submitForSettlement: true, // captura automática
+      // storeInVaultOnSuccess: true, // desnecessário pois já vaultamos acima
+    },
+  });
+
+  if (!saleRes.success) {
+    // Opcional: você poderia remover o PM recém-criado se quiser reverter o vault
+    // await gateway.paymentMethod.delete(pm.token).catch(()=>{});
+    return {
+      success: false,
+      error: saleRes.message || "Erro ao processar pagamento.",
+      paymentMethod: meta,
+    };
+  }
+
+  return {
+    success: true,
+    transactionId: saleRes.transaction.id,
+    paymentMethod: meta,
+  };
+});
+
+/**
+ * Salva um cartao (saveCardPayment) a partir de um paymentNonce, sem cobrar.
+ * data: { paymentNonce: string, deviceData?: string, isProd?: boolean }
+ * retorna: { success, paymentMethod?, error? }
+ */
+exports.saveCardPayment = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { paymentNonce, deviceData, isProd = false } = data || {};
+  if (!paymentNonce) {
+    throw new functions.https.HttpsError("invalid-argument", "paymentNonce e obrigatorio.");
+  }
+
+  const uid = context.auth.uid;
+  const email = context.auth.token?.email;
+  const gateway = getGateway(isProd);
+
+  // garante customer e verifica se ja possui metodos
+  await ensureCustomer(gateway, uid, email);
+  let existingCount = 0;
+  try {
+    const found = await gateway.customer.find(uid);
+    existingCount = Array.isArray(found && found.paymentMethods) ? found.paymentMethods.length : 0;
+  } catch (_) {}
+
+  const res = await gateway.paymentMethod.create({
+    customerId: uid,
+    paymentMethodNonce: paymentNonce,
+    deviceData,
+    options: {
+      verifyCard: true,
+      makeDefault: existingCount === 0,
+    },
+  });
+
+  if (!res.success) {
+    return { success: false, error: res.message || "Falha ao salvar metodo." };
+  }
+
+  const meta = methodMetaFF(res.paymentMethod);
+  return { success: true, paymentMethod: meta };
+});
+
+/**
+ * Cobra usando um metodo ja salvo (paymentRide7)
+ * data: { amount: string|number, paymentMethodToken: string, deviceData?: string, isProd?: boolean }
+ * retorna: { success, transactionId?, error? }
+ */
+exports.payWithSavedPaymentMethod = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { amount, paymentMethodToken, deviceData, isProd = false } = data || {};
+  if (amount == null || !paymentMethodToken) {
+    throw new functions.https.HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
+  }
+
+  const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
+  const gateway = getGateway(isProd);
+
+  const saleRes = await gateway.transaction.sale({
+    amount: amtStr,
+    paymentMethodToken,
+    deviceData,
+    options: { submitForSettlement: true },
+  });
+
+  if (!saleRes.success) {
+    return { success: false, error: saleRes.message || "Erro ao processar pagamento." };
+  }
+
+  return { success: true, transactionId: saleRes.transaction.id };
+});
+
+/**
+ * Envia gorjeta (tipDriver)
+ * data: { amount: string|number, paymentMethodToken: string, deviceData?: string, isProd?: boolean, rideId?: string, driverId?: string }
+ * retorna: { success, transactionId?, error? }
+ */
+exports.tipDriver = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { amount, paymentMethodToken, deviceData, isProd = false, rideId, driverId } = data || {};
+  if (amount == null || !paymentMethodToken) {
+    throw new functions.https.HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
+  }
+
+  const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
+  const gateway = getGateway(isProd);
+
+  const saleRes = await gateway.transaction.sale({
+    amount: amtStr,
+    paymentMethodToken,
+    deviceData,
+    options: { submitForSettlement: true },
+    ...(rideId ? { orderId: `ride_${rideId}_tip` } : {}),
+  });
+
+  if (!saleRes.success) {
+    return { success: false, error: saleRes.message || "Erro ao processar gorjeta." };
+  }
+
+  const txId = saleRes.transaction.id;
+
+  // Registro simples opcional no Firestore (nao falha a resposta em caso de erro)
+  try {
+    if (rideId || driverId) {
+      await admin.firestore().collection("tips").add({
+        riderId: context.auth.uid,
+        rideId: rideId || null,
+        driverId: driverId || null,
+        transactionId: txId,
+        amount: Number(amtStr),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+  } catch (e) {
+    console.warn("Falha ao registrar tip:", (e && e.message) || e);
+  }
+
+  return { success: true, transactionId: txId };
+});
