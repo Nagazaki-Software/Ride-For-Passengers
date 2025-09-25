@@ -11,6 +11,7 @@ import com.braintreepayments.api.BraintreeClient
 import com.braintreepayments.api.Card
 import com.braintreepayments.api.CardClient
 import com.braintreepayments.api.CardNonce
+import com.braintreepayments.api.CardTokenizeCallback
 // v4 API uses Card object tokenization
 import com.braintreepayments.api.PayPalClient
 import com.braintreepayments.api.PayPalCheckoutRequest
@@ -49,20 +50,22 @@ class MainActivity: FlutterFragmentActivity() {
         val client = braintreeClient(auth)
         val cardClient = CardClient(client)
         val card = Card()
-            .number(number)
-            .expirationMonth(expirationMonth)
-            .expirationYear(expirationYear)
-        if (!cvv.isNullOrBlank()) card.cvv(cvv)
+        card.number = number
+        card.expirationMonth = expirationMonth
+        card.expirationYear = expirationYear
+        if (!cvv.isNullOrBlank()) card.cvv = cvv
 
-        cardClient.tokenize(card) { cardNonce: CardNonce?, error: java.lang.Exception? ->
-            if (error != null) {
-                result.error("bt", error.message, null)
-            } else if (cardNonce != null) {
-                result.success(cardNonce.string)
-            } else {
-                result.success(null)
+        cardClient.tokenize(card, object : CardTokenizeCallback {
+            override fun onResult(cardNonce: CardNonce?, error: java.lang.Exception?) {
+                if (error != null) {
+                    result.error("bt", error.message, null)
+                } else if (cardNonce != null) {
+                    result.success(cardNonce.string)
+                } else {
+                    result.success(null)
+                }
             }
-        }
+        })
     }
 
     private fun handlePayPalCheckout(call: MethodCall, result: MethodChannel.Result) {
@@ -72,9 +75,8 @@ class MainActivity: FlutterFragmentActivity() {
 
         val client = braintreeClient(auth)
         val payPalClient = PayPalClient(this, client)
-        val request = PayPalCheckoutRequest(amount).apply {
-            this.currencyCode = currencyCode
-        }
+        val request = PayPalCheckoutRequest(amount)
+        request.currencyCode = currencyCode
         payPalClient.tokenizePayPalAccount(this, request) { nonce, error ->
             if (error != null) {
                 result.error("bt", error.message, null)
@@ -93,10 +95,9 @@ class MainActivity: FlutterFragmentActivity() {
 
         val client = braintreeClient(auth)
         val googlePayClient = GooglePayClient(this, client)
-        val request = GooglePayRequest().apply {
-            this.amount = amount
-            this.currencyCode = currencyCode
-        }
+        val request = GooglePayRequest()
+        request.amount = amount
+        request.currencyCode = currencyCode
         googlePayClient.requestPayment(this, request) { nonce, error ->
             if (error != null) {
                 result.error("bt", error.message, null)
