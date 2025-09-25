@@ -54,6 +54,11 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
   var hasContainerTriggered6 = false;
   var hasContainerTriggered7 = false;
   final animationsMap = <String, AnimationInfo>{};
+  // Driver live state → unified stage
+  StreamSubscription<DocumentSnapshot>? _driverSub;
+  DocumentReference? _driverListeningRef;
+  LatLng? _driverLocCache;
+  String _stage = 'pickingyou';
 
   @override
   void initState() {
@@ -258,8 +263,82 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
     return R * c;
   }
 
+  void _setStageFrom({LatLng? driverLoc, required RideOrdersRecord order}) {
+    if (!mounted) return;
+    final LatLng userLoc = currentUserLocationValue ??
+        order.latlngAtual ??
+        driverLoc ??
+        LatLng(0.0, 0.0);
+    final LatLng? destLoc = order.latlng;
+    const double pickupThresholdM = 80.0;
+    const double finishThresholdM = 60.0;
+    String next = 'pickingyou';
+    if (driverLoc != null) {
+      if (destLoc != null) {
+        final double dToDest = _metersBetween(driverLoc, destLoc);
+        if (dToDest <= finishThresholdM) {
+          next = 'finish';
+        } else {
+          final double dToUser = _metersBetween(driverLoc, userLoc);
+          next = (dToUser <= pickupThresholdM) ? 'progress' : 'pickingyou';
+        }
+      } else {
+        final double dToUser = _metersBetween(driverLoc, userLoc);
+        next = (dToUser <= pickupThresholdM) ? 'progress' : 'pickingyou';
+      }
+    }
+    if (next != _stage) {
+      setState(() => _stage = next);
+    }
+  }
+
+  void _ensureDriverSubscription(RideOrdersRecord order) {
+    final DocumentReference? ref = order.hasDriver() ? order.driver : null;
+    if (ref == null) {
+      if (_driverSub != null) {
+        _driverSub!.cancel();
+        _driverSub = null;
+        _driverListeningRef = null;
+      }
+      _setStageFrom(driverLoc: null, order: order);
+      return;
+    }
+    if (_driverListeningRef?.path == ref.path) {
+      // already listening; still update stage using latest cache
+      _setStageFrom(driverLoc: _driverLocCache, order: order);
+      return;
+    }
+    // switch listener
+    _driverSub?.cancel();
+    _driverListeningRef = ref;
+    _driverSub = ref.snapshots().listen((snap) {
+      if (!mounted) return;
+      LatLng? dloc;
+      try {
+        final data = snap.data() as Map<String, dynamic>?;
+        final dynamic loc = data?['location'];
+        if (loc is GeoPoint) {
+          dloc = LatLng(loc.latitude, loc.longitude);
+        } else {
+          final num? lat = data?['lat'] as num?;
+          final num? lng = data?['lng'] as num?;
+          if (lat != null && lng != null) {
+            dloc = LatLng(lat.toDouble(), lng.toDouble());
+          }
+        }
+      } catch (_) {}
+      _driverLocCache = dloc;
+      _setStageFrom(driverLoc: _driverLocCache, order: order);
+    });
+    // Initial stage refresh with latest cache
+    _setStageFrom(driverLoc: _driverLocCache, order: order);
+  }
+
   @override
   void dispose() {
+    try {
+      _driverSub?.cancel();
+    } catch (_) {}
     _model.dispose();
 
     super.dispose();
@@ -304,6 +383,10 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
         }
 
         final pickingYou9RideOrdersRecord = snapshot.data!;
+        // Ensure single driver subscription → keeps _stage unified
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          _ensureDriverSubscription(pickingYou9RideOrdersRecord);
+        });
 
         return GestureDetector(
           onTap: () {
@@ -317,70 +400,20 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
               children: [
                 Stack(
                   children: [
-                    // Live map switching between PickingYou / Progress / Finish
-                    StreamBuilder<UsersRecord>(
-                      stream: pickingYou9RideOrdersRecord.hasDriver()
-                          ? UsersRecord.getDocument(
-                              pickingYou9RideOrdersRecord.driver!,
-                            )
-                          : null,
-                      builder: (context, driverSnap) {
-                        if (!driverSnap.hasData ||
-                            currentUserLocationValue == null) {
-                          return Center(
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: SpinKitDoubleBounce(
-                                color:
-                                    FlutterFlowTheme.of(context).accent1,
-                                size: 50,
-                              ),
-                            ),
-                          );
-                        }
-
-                        final driver = driverSnap.data!;
-                        final LatLng? driverLoc = driver.hasLocation()
-                            ? driver.location
-                            : pickingYou9RideOrdersRecord.hasLatlngAtual()
+                    Builder(
+                      builder: (context) {
+                        final String stage = _stage;
+                        final LatLng? driverLoc = _driverLocCache ??
+                            (pickingYou9RideOrdersRecord.hasLatlngAtual()
                                 ? pickingYou9RideOrdersRecord.latlngAtual
-                                : currentUserLocationValue;
+                                : currentUserLocationValue);
                         final LatLng userLoc = currentUserLocationValue ??
                             pickingYou9RideOrdersRecord.latlngAtual ??
                             driverLoc ??
-                            LatLng(0.0, 0.0);
+                            const LatLng(0.0, 0.0);
                         final LatLng? destLoc =
                             pickingYou9RideOrdersRecord.latlng;
-
-                        // Determine stage
-                        const double pickupThresholdM = 80.0;
-                        const double finishThresholdM = 60.0;
-                        String stage = 'pickingyou';
-                        if (driverLoc != null) {
-                          if (destLoc != null) {
-                            final double dToDest =
-                                _metersBetween(driverLoc, destLoc);
-                            if (dToDest <= finishThresholdM) {
-                              stage = 'finish';
-                            } else {
-                              final double dToUser =
-                                  _metersBetween(driverLoc, userLoc);
-                              stage = (dToUser <= pickupThresholdM)
-                                  ? 'progress'
-                                  : 'pickingyou';
-                            }
-                          } else {
-                            final double dToUser =
-                                _metersBetween(driverLoc, userLoc);
-                            stage = (dToUser <= pickupThresholdM)
-                                ? 'progress'
-                                : 'pickingyou';
-                          }
-                        }
-
-                        final driverRef =
-                            pickingYou9RideOrdersRecord.driver!;
+                        final driverRef = pickingYou9RideOrdersRecord.driver!;
 
                         Widget mapChild;
                         if (stage == 'finish') {
@@ -504,7 +537,6 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                             ),
                           );
                         }
-
                         return mapChild;
                       },
                     ),
@@ -561,39 +593,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                 17,
                                                 0,
                                               ),
-                                          child: StreamBuilder<UsersRecord>(
-                                            stream: pickingYou9RideOrdersRecord.hasDriver()
-                                                ? UsersRecord.getDocument(
-                                                    pickingYou9RideOrdersRecord.driver!,
-                                                  )
-                                                : null,
-                                            builder: (context, dsnap) {
-                                              bool _isPick = false;
-                                              if (dsnap.hasData) {
-                                                final d = dsnap.data!;
-                                                final LatLng? driverLoc = d.hasLocation()
-                                                    ? d.location
-                                                    : pickingYou9RideOrdersRecord.hasLatlngAtual()
-                                                        ? pickingYou9RideOrdersRecord.latlngAtual
-                                                        : currentUserLocationValue;
-                                                final LatLng userLoc =
-                                                    currentUserLocationValue ??
-                                                        pickingYou9RideOrdersRecord.latlngAtual ??
-                                                        driverLoc ??
-                                                        LatLng(0.0, 0.0);
-                                                const double pickupThresholdM = 80.0;
-                                                if (driverLoc != null) {
-                                                  final double dToUser = _metersBetween(driverLoc, userLoc);
-                                                  _isPick = dToUser > pickupThresholdM;
-                                                } else {
-                                                  _isPick = true;
-                                                }
-                                              } else {
-                                                _isPick = true;
-                                              }
-                                              return Visibility(
-                                                visible: _isPick,
-                                                child: Row(
+                                          child: Visibility(
+                                            visible: _stage == 'pickingyou',
+                                            child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
@@ -665,9 +667,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                     ),
                                               ),
                                             ].divide(SizedBox(width: 8)),
-                                              ),
-                                              );
-                                            },
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -871,52 +871,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                   );
                                 },
                               ),
-                              StreamBuilder<UsersRecord>(
-                                stream: pickingYou9RideOrdersRecord.hasDriver()
-                                    ? UsersRecord.getDocument(
-                                        pickingYou9RideOrdersRecord.driver!,
-                                      )
-                                    : null,
-                                builder: (context, dsnap) {
-                                  bool _isProg = false;
-                                  if (dsnap.hasData) {
-                                    final d = dsnap.data!;
-                                    final LatLng? driverLoc = d.hasLocation()
-                                        ? d.location
-                                        : pickingYou9RideOrdersRecord
-                                                .hasLatlngAtual()
-                                            ? pickingYou9RideOrdersRecord
-                                                .latlngAtual
-                                            : currentUserLocationValue;
-                                    final LatLng userLoc =
-                                        currentUserLocationValue ??
-                                            pickingYou9RideOrdersRecord
-                                                .latlngAtual ??
-                                            driverLoc ??
-                                            LatLng(0.0, 0.0);
-                                    const double pickupThresholdM = 80.0;
-                                    const double finishThresholdM = 60.0;
-                                    if (driverLoc != null) {
-                                      final LatLng? destLoc =
-                                          pickingYou9RideOrdersRecord.latlng;
-                                      if (destLoc != null) {
-                                        final double dToDest = _metersBetween(
-                                            driverLoc, destLoc);
-                                        if (dToDest > finishThresholdM) {
-                                          final double dToUser = _metersBetween(
-                                              driverLoc, userLoc);
-                                          _isProg = dToUser <= pickupThresholdM;
-                                        }
-                                      } else {
-                                        final double dToUser = _metersBetween(
-                                            driverLoc, userLoc);
-                                        _isProg = dToUser <= pickupThresholdM;
-                                      }
-                                    }
-                                  }
-                                  return Visibility(
-                                    visible: _isProg,
-                                    child: Padding(
+                              Visibility(
+                                visible: _stage == 'progress',
+                                child: Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                         17,
                                         20,
@@ -969,8 +926,6 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                         ].divide(SizedBox(width: 8)),
                                       ),
                                     ),
-                                  );
-                                },
                               ),
                               StreamBuilder<UsersRecord>(
                                 stream: pickingYou9RideOrdersRecord.hasDriver()
@@ -999,7 +954,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                     }
                                   }
                                   return Visibility(
-                                    visible: _isFinish,
+                                    visible: _stage == 'finish',
                                     child: Column(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
