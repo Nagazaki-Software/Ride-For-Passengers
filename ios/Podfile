@@ -40,7 +40,7 @@ target 'Runner' do
   pod 'Braintree/Card'
   pod 'Braintree/PayPal'
   # Pin Google Maps iOS SDK to a version compatible with google_maps_native_sdk
-  pod 'GoogleMaps', '8.4.0'
+  pod 'GoogleMaps', '9.0.0'
 end
 
 post_install do |installer|
