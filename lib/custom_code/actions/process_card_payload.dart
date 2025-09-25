@@ -17,7 +17,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/services.dart';
--mport '/backend/braintree/native_bridge.dart';
+import '/backend/braintree/native_bridge.dart';
 
 /// Action única controlada por `charge`:
 /// - charge == false  -> apenas SALVA o JSON no Firestore (sem cobrar)
