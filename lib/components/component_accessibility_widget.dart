@@ -4,6 +4,9 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'component_accessibility_model.dart';
+import 'package:provider/provider.dart';
+import '/app_state.dart';
+import '/services/tts_service.dart';
 export 'component_accessibility_model.dart';
 
 /// Create a component acessibility
@@ -30,10 +33,11 @@ class _ComponentAccessibilityWidgetState
     super.initState();
     _model = createModel(context, () => ComponentAccessibilityModel());
 
-    _model.switchValue1 = false;
-    _model.switchValue2 = false;
-    _model.switchValue3 = false;
-    _model.switchValue4 = false;
+    // Initialize from persisted app state
+    _model.switchValue1 = FFAppState().lowStimulationMode;
+    _model.switchValue2 = FFAppState().audioStreetNames;
+    _model.switchValue3 = FFAppState().hapticSoundFeedback;
+    _model.switchValue4 = FFAppState().voiceRequestEnabled;
   }
 
   @override
@@ -45,6 +49,7 @@ class _ComponentAccessibilityWidgetState
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
     return Container(
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -161,6 +166,7 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue1!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue1 = newValue);
+                          FFAppState().lowStimulationMode = newValue;
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -240,6 +246,13 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue2!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue2 = newValue);
+                          FFAppState().audioStreetNames = newValue;
+                          if (newValue) {
+                            // Provide immediate audible confirmation.
+                            await TtsService.speak('Audio guidance enabled');
+                          } else {
+                            await TtsService.stop();
+                          }
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -319,6 +332,7 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue3!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue3 = newValue);
+                          FFAppState().hapticSoundFeedback = newValue;
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -398,6 +412,7 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue4!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue4 = newValue);
+                          FFAppState().voiceRequestEnabled = newValue;
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -412,8 +427,16 @@ class _ComponentAccessibilityWidgetState
                 ].divide(SizedBox(height: 12.0)),
               ),
               FFButtonWidget(
-                onPressed: () {
-                  print('Button pressed ...');
+                onPressed: () async {
+                  // Sync local switches from current FFAppState (already set in onChanged)
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(FFLocalizations.of(context).getText(
+                        'a11ySavedMsg' /* Accessibility preferences saved. */,
+                      )),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 },
                 text: FFLocalizations.of(context).getText(
                   '0vrkyi4m' /* Confirm */,

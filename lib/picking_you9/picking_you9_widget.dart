@@ -732,7 +732,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                                   FontStyle
                                                                       .italic,
                                                             ),
-                                                          )),
+                                                          ),
                                                         ],
                                                       ),
                                                       Flexible(

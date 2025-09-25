@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../app_state.dart';
 
 enum AnimationTrigger {
   onPageLoad,
@@ -45,6 +46,10 @@ extension AnimatedWidgetExtension on Widget {
     AnimationInfo animationInfo, {
     List<Effect>? effects,
   }) {
+    // Respect global reduce motion preference.
+    if (FFAppState().lowStimulationMode) {
+      return this;
+    }
     animationInfo.maybeUpdateEffects(effects);
     return Animate(
       effects: animationInfo.effects,
@@ -63,6 +68,9 @@ extension AnimatedWidgetExtension on Widget {
     List<Effect>? effects,
     bool hasBeenTriggered = false,
   }) {
+    if (FFAppState().lowStimulationMode) {
+      return this;
+    }
     animationInfo.maybeUpdateEffects(effects);
     return hasBeenTriggered || animationInfo.applyInitialState
         ? Animate(

@@ -1,6 +1,8 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/services.dart';
+import '../app_state.dart';
 
 class FFButtonOptions {
   const FFButtonOptions({
@@ -119,6 +121,12 @@ class _FFButtonWidgetState extends State<FFButtonWidget> {
                 }
                 setState(() => loading = true);
                 try {
+                  if (FFAppState().hapticSoundFeedback) {
+                    try {
+                      HapticFeedback.selectionClick();
+                      SystemSound.play(SystemSoundType.click);
+                    } catch (_) {}
+                  }
                   await widget.onPressed!();
                 } finally {
                   if (mounted) {

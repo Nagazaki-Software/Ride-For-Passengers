@@ -21,6 +21,8 @@ import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import '/flutter_flow/lat_lng.dart' show LatLng;
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import '/app_state.dart';
+import '/services/tts_service.dart';
 
 /// ------------------------------------------------------------ AddressPicker
 /// v4.5 - Quick Picks preenchem DESTINO por padrão antes de digitar/falar -
@@ -566,7 +568,7 @@ class _AddressPickerState extends State<AddressPicker> {
               // Botão de VOZ por TOQUE (fica sempre visível)
               voiceTrailing: _VoiceTapButton(
                 isListening: _isListening,
-                enabled: _speechReady,
+                enabled: _speechReady && FFAppState().voiceRequestEnabled,
                 onTap: _toggleVoiceDestination,
               ),
             ),

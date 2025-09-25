@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import '/flutter_flow/lat_lng.dart';
 
@@ -29,6 +30,110 @@ Future<String> latlngToString(
   try {
     final key = (apiKey).trim(); // String já é non-nullable no FF
     if (key.isEmpty) return _coordsFallback();
+
+    // Primeiro, tenta identificar um lugar importante próximo e retornar o nome
+    try {
+      final nearbyUri = Uri.https(
+        'maps.googleapis.com',
+        '/maps/api/place/nearbysearch/json',
+        {
+          'location': '${latlng.latitude},${latlng.longitude}',
+          'radius': '120', // raio curto para captar o local exato
+          'language': 'en-US',
+          'key': key,
+        },
+      );
+
+      final nearbyResp =
+          await http.get(nearbyUri).timeout(const Duration(seconds: 8));
+      if (nearbyResp.statusCode == 200) {
+        final nearby = json.decode(nearbyResp.body) as Map<String, dynamic>;
+        final status = (nearby['status'] ?? '').toString();
+        if (status == 'OK') {
+          final results = (nearby['results'] as List?)
+                  ?.cast<Map<String, dynamic>>() ??
+              const [];
+
+          const important = <String>{
+            'airport',
+            'hospital',
+            'police',
+            'fire_station',
+            'pharmacy',
+            'supermarket',
+            'shopping_mall',
+            'bank',
+            'atm',
+            'train_station',
+            'subway_station',
+            'bus_station',
+            'university',
+            'school',
+            'museum',
+            'tourist_attraction',
+            'park',
+            'stadium',
+            'city_hall',
+            'embassy',
+          };
+
+          double distanceMeters(
+            double lat1,
+            double lon1,
+            double lat2,
+            double lon2,
+          ) {
+            const R = 6371000.0;
+            final dLat = (lat2 - lat1) * math.pi / 180.0;
+            final dLon = (lon2 - lon1) * math.pi / 180.0;
+            final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+                math.cos(lat1 * math.pi / 180.0) *
+                    math.cos(lat2 * math.pi / 180.0) *
+                    math.sin(dLon / 2) *
+                    math.sin(dLon / 2);
+            final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+            return R * c;
+          }
+
+          Map<String, dynamic>? pick;
+          double best = double.infinity;
+          for (final m in results) {
+            final types =
+                ((m['types'] as List?)?.map((e) => e.toString()).toList()) ??
+                    const <String>[];
+            final isImportant = types.any(important.contains);
+            if (!isImportant) continue;
+
+            final loc =
+                (((m['geometry'] ?? {}) as Map)['location'] ?? {})
+                    as Map<String, dynamic>;
+            final pLat = (loc['lat'] is num) ? (loc['lat'] as num).toDouble() : null;
+            final pLng = (loc['lng'] is num) ? (loc['lng'] as num).toDouble() : null;
+            if (pLat == null || pLng == null) continue;
+
+            final d = distanceMeters(
+              latlng.latitude,
+              latlng.longitude,
+              pLat,
+              pLng,
+            );
+            if (d < best) {
+              best = d;
+              pick = m;
+            }
+          }
+
+          if (pick != null) {
+            final name = (pick['name'] ?? '').toString().trim();
+            if (name.isNotEmpty) {
+              return name; // Preferir o nome do local importante
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Ignora e segue para o geocode normal
+    }
 
     final uri = Uri.parse(
       'https://maps.googleapis.com/maps/api/geocode/json'

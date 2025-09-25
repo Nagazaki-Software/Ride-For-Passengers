@@ -96,6 +96,22 @@ class FFAppState extends ChangeNotifier {
               .toList() ??
           _paymentMethods;
     });
+    _safeInit(() {
+      _lowStimulationMode =
+          prefs.getBool('ff_lowStimulationMode') ?? _lowStimulationMode;
+    });
+    _safeInit(() {
+      _audioStreetNames =
+          prefs.getBool('ff_audioStreetNames') ?? _audioStreetNames;
+    });
+    _safeInit(() {
+      _hapticSoundFeedback =
+          prefs.getBool('ff_hapticSoundFeedback') ?? _hapticSoundFeedback;
+    });
+    _safeInit(() {
+      _voiceRequestEnabled =
+          prefs.getBool('ff_voiceRequestEnabled') ?? _voiceRequestEnabled;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -345,6 +361,39 @@ class FFAppState extends ChangeNotifier {
     paymentMethods.insert(index, value);
     prefs.setStringList('ff_paymentMethods',
         _paymentMethods.map((x) => x.serialize()).toList());
+  }
+
+  // ===== Accessibility settings (persisted) =====
+  bool _lowStimulationMode = false;
+  bool get lowStimulationMode => _lowStimulationMode;
+  set lowStimulationMode(bool value) {
+    _lowStimulationMode = value;
+    prefs.setBool('ff_lowStimulationMode', value);
+    notifyListeners();
+  }
+
+  bool _audioStreetNames = false;
+  bool get audioStreetNames => _audioStreetNames;
+  set audioStreetNames(bool value) {
+    _audioStreetNames = value;
+    prefs.setBool('ff_audioStreetNames', value);
+    notifyListeners();
+  }
+
+  bool _hapticSoundFeedback = false;
+  bool get hapticSoundFeedback => _hapticSoundFeedback;
+  set hapticSoundFeedback(bool value) {
+    _hapticSoundFeedback = value;
+    prefs.setBool('ff_hapticSoundFeedback', value);
+    notifyListeners();
+  }
+
+  bool _voiceRequestEnabled = false;
+  bool get voiceRequestEnabled => _voiceRequestEnabled;
+  set voiceRequestEnabled(bool value) {
+    _voiceRequestEnabled = value;
+    prefs.setBool('ff_voiceRequestEnabled', value);
+    notifyListeners();
   }
 
   final _recentTripsManager = StreamRequestManager<List<RideOrdersRecord>>();

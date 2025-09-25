@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'select_location_model.dart';
 export 'select_location_model.dart';
+import '/app_state.dart';
+import '/services/tts_service.dart';
 
 class SelectLocationWidget extends StatefulWidget {
   const SelectLocationWidget({
@@ -116,6 +118,14 @@ class _SelectLocationWidgetState extends State<SelectLocationWidget> {
               result,
               r'''$.destinationMainText''',
             ).toString();
+            // Speak selection if enabled
+            if (FFAppState().audioStreetNames) {
+              final pickup = getJsonField(result, r'''$.pickupFormattedAddress''').toString();
+              final dest = getJsonField(result, r'''$.destinationFormattedAddress''').toString();
+              final summary = 'Pickup: ' + (pickup.isEmpty ? 'current location' : pickup) +
+                  '. Destination: ' + (dest.isEmpty ? FFAppState().locationWhereTo : dest) + '.';
+              await TtsService.speak(summary);
+            }
             safeSetState(() {});
             logFirebaseEvent('AddressPicker_bottom_sheet');
             Navigator.pop(context);

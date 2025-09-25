@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../app_state.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FlutterFlowIconButton extends StatefulWidget {
@@ -178,6 +180,12 @@ class _FlutterFlowIconButtonState extends State<FlutterFlowIconButton> {
                     }
                     setState(() => loading = true);
                     try {
+                      if (FFAppState().hapticSoundFeedback) {
+                        try {
+                          HapticFeedback.selectionClick();
+                          SystemSound.play(SystemSoundType.click);
+                        } catch (_) {}
+                      }
                       await widget.onPressed!();
                     } finally {
                       if (mounted) {
