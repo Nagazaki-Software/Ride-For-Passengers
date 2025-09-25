@@ -1,9 +1,8 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'ride_progress_copy11_widget.dart' show RideProgressCopy11Widget;
+import 'raceemergency_widget.dart' show RaceemergencyWidget;
 import 'package:flutter/material.dart';
 
-class RideProgressCopy11Model
-    extends FlutterFlowModel<RideProgressCopy11Widget> {
+class RaceemergencyModel extends FlutterFlowModel<RaceemergencyWidget> {
   @override
   void initState(BuildContext context) {}
 

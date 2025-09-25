@@ -1711,6 +1711,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                         random_data.randomDouble(5.0, 100.0),
                                     paid: true,
                                     status: 'Paid',
+                                    id: _model.rideID,
                                   ));
                                   _model.order =
                                       RideOrdersRecord.getDocumentFromData(
@@ -1734,6 +1735,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                 5.0, 100.0),
                                             paid: true,
                                             status: 'Paid',
+                                            id: _model.rideID,
                                           ),
                                           rideOrdersRecordReference);
                                   logFirebaseEvent(

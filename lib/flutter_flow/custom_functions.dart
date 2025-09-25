@@ -260,7 +260,7 @@ String partesDoName(String name) {
   if (nameParts.length == 1) {
     return nameParts[0].substring(0, 2);
   } else {
-    return nameParts[0].substring(0, 2) + nameParts[1].substring(0, 2);
+    return nameParts[0].substring(0, 1) + nameParts[1].substring(0, 1);
   }
 }
 
@@ -695,4 +695,190 @@ double gastosMensal(
   // total = (total * 100).roundToDouble() / 100.0;
 
   return total;
+}
+
+String tempoCancelamento(
+  LatLng latlngAtual,
+  LatLng latlngDestino,
+) {
+  // Política usada:
+  // - Cancelamento permitido até 2 minutos antes da chegada do carro.
+  // - Interpretação: latlngAtual = posição do carro; latlngDestino = ponto de encontro (usuário).
+
+  const double avgSpeedKmh = 30.0; // ajuste conforme a cidade
+  const int cancelBufferMin = 2; // margem antes da chegada
+
+  double _deg2rad(double deg) => deg * (math.pi / 180.0);
+
+  // Distância Haversine (km)
+  double _haversineKm(LatLng a, LatLng b) {
+    const double R = 6371.0;
+    final double dLat = _deg2rad(b.latitude - a.latitude);
+    final double dLon = _deg2rad(b.longitude - a.longitude);
+    final double lat1 = _deg2rad(a.latitude);
+    final double lat2 = _deg2rad(b.latitude);
+
+    final double h = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1) *
+            math.cos(lat2) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final double c = 2 * math.atan2(math.sqrt(h), math.sqrt(1.0 - h));
+    return R * c;
+  }
+
+  // 1) Calcula ETA (minutos) do carro até o ponto de encontro
+  final double km = _haversineKm(latlngAtual, latlngDestino);
+  final double etaMin = (km / avgSpeedKmh) * 60.0;
+
+  // 2) Tempo restante para poder cancelar (em minutos)
+  final double restante = etaMin - cancelBufferMin;
+
+  if (restante <= 0) return '0 min'; // já não pode cancelar
+  if (restante > 120)
+    return '120+ min'; // pra não assustar com números gigantes
+
+  return '${restante.ceil()} min';
+}
+
+String escolherPartesName(
+  String name,
+  int partes,
+) {
+  // Retorna a "parte" (palavra) do texto `name` indicada por `partes`.
+  // Regras:
+  // - partes > 0: índice 1-based a partir do início (1 = primeira)
+  // - partes < 0: índice 1-based a partir do fim (-1 = última)
+  // - partes == 0 ou fora do intervalo: retorna ''
+  final String s = name.trim();
+  if (s.isEmpty) return '';
+
+  // Divide por um ou mais espaços (ignora múltiplos)
+  final List<String> tokens =
+      s.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+
+  if (tokens.isEmpty || partes == 0) return '';
+
+  int idx;
+  if (partes > 0) {
+    idx = partes - 1;
+  } else {
+    idx = tokens.length + partes; // partes negativo: -1 = última
+  }
+
+  if (idx < 0 || idx >= tokens.length) return '';
+
+  return tokens[idx];
+}
+
+String horariodechegada(
+  LatLng latlngOrigem,
+  LatLng latlngDestino,
+  DateTime horarioAtual,
+) {
+  // Velocidade média urbana em km/h (ajuste conforme sua realidade)
+  const double avgSpeedKmh = 30.0;
+
+  double _deg2rad(double deg) => deg * (math.pi / 180.0);
+
+  // Distância Haversine em km
+  double _haversineKm(LatLng a, LatLng b) {
+    const double R = 6371.0;
+    final double dLat = _deg2rad(b.latitude - a.latitude);
+    final double dLon = _deg2rad(b.longitude - a.longitude);
+    final double lat1 = _deg2rad(a.latitude);
+    final double lat2 = _deg2rad(b.latitude);
+
+    final double h = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1) *
+            math.cos(lat2) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final double c = 2 * math.atan2(math.sqrt(h), math.sqrt(1.0 - h));
+    return R * c;
+  }
+
+  // 1) calcula distância e ETA em minutos (arredondado pra cima)
+  final double km = _haversineKm(latlngOrigem, latlngDestino);
+  final double etaMin = (km / avgSpeedKmh) * 60.0;
+  final int travelSeconds = etaMin > 0 ? (etaMin.ceil() * 60) : 0;
+
+  // 2) soma ao horário atual
+  final DateTime chegada = horarioAtual.add(Duration(seconds: travelSeconds));
+
+  // 3) formata: se mudar de dia, mostra data + hora; senão só hora
+  final bool mesmoDia = chegada.year == horarioAtual.year &&
+      chegada.month == horarioAtual.month &&
+      chegada.day == horarioAtual.day;
+
+  return mesmoDia
+      ? DateFormat('HH:mm').format(chegada)
+      : DateFormat('dd/MM HH:mm').format(chegada);
+}
+
+double ratingMedia(List<RatingsStruct>? ratings) {
+  // Média dos ratings (0..5).
+  // Robusta: aceita value como double/int/string (até "4,3"), clamp 0..5.
+  // Sem avaliações válidas -> 5.0 (default).
+
+  if (ratings == null || ratings.isEmpty) return 5.0;
+
+  // Converte qualquer coisa razoável para double
+  double? _asDouble(dynamic x) {
+    if (x == null) return null;
+    if (x is double) return x;
+    if (x is int) return x.toDouble();
+    if (x is num) return x.toDouble();
+    if (x is String) {
+      // aceita vírgula decimal
+      final s = x.trim().replaceAll(',', '.');
+      return double.tryParse(s);
+    }
+    return null;
+  }
+
+  double soma = 0.0;
+  int n = 0;
+
+  for (final r in ratings) {
+    if (r == null) continue;
+
+    dynamic vDyn;
+
+    // Tentativa 1: acessar como propriedade tipada (RatingsStruct.value)
+    try {
+      // ignore: avoid_dynamic_calls
+      vDyn = (r as dynamic).value;
+    } catch (_) {
+      vDyn = null;
+    }
+
+    // Tentativa 2: acessar via mapa do struct
+    if (vDyn == null) {
+      try {
+        final m = r.toMap(); // FlutterFlow Structs costumam ter toMap()
+        vDyn = m['value'];
+      } catch (_) {
+        vDyn = null;
+      }
+    }
+
+    final v = _asDouble(vDyn);
+    if (v == null) continue;
+
+    // Garante faixa 0..5 sem depender de clamp (evita 'num' vs 'double')
+    final vv = v < 0.0 ? 0.0 : (v > 5.0 ? 5.0 : v);
+
+    soma += vv;
+    n++;
+  }
+
+  if (n == 0) return 5.0;
+
+  final media = soma / n;
+
+  // Opcional: arredondar para 1 casa (passos de 0.1)
+  // return (media * 10).roundToDouble() / 10.0;
+
+  return media;
 }

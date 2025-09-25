@@ -25,6 +25,8 @@ import 'index.dart'; // Imports other custom widgets
 
 import 'index.dart'; // Imports other custom widgets
 
+import 'index.dart'; // Imports other custom widgets
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
@@ -518,7 +520,8 @@ class _PickerMapState extends State<PickerMap>
     }
   }
 
-  Future<void> _fadeOutPolylines({bool base = false, bool snake = false}) async {
+  Future<void> _fadeOutPolylines(
+      {bool base = false, bool snake = false}) async {
     if (_controller == null) return;
     final bool hasBaseMain =
         base && _polylineIds.contains(_kBaseMain) && _route.length >= 2;

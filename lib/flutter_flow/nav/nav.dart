@@ -359,6 +359,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: A1Widget.routeName,
           path: A1Widget.routePath,
           builder: (context, params) => A1Widget(),
+        ),
+        FFRoute(
+          name: DriverReviews32Widget.routeName,
+          path: DriverReviews32Widget.routePath,
+          builder: (context, params) => DriverReviews32Widget(
+            user: params.getParam(
+              'user',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+          ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

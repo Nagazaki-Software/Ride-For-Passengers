@@ -1,14 +1,17 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/instant_timer.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
+import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -30,11 +33,15 @@ class FindingDrive8Widget extends StatefulWidget {
   State<FindingDrive8Widget> createState() => _FindingDrive8WidgetState();
 }
 
-class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
+class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
+    with TickerProviderStateMixin {
   late FindingDrive8Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   LatLng? currentUserLocationValue;
+  var hasContainerTriggered1 = false;
+  var hasContainerTriggered2 = false;
+  final animationsMap = <String, AnimationInfo>{};
 
   @override
   void initState() {
@@ -76,6 +83,56 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
 
     getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0), cached: true)
         .then((loc) => safeSetState(() => currentUserLocationValue = loc));
+    animationsMap.addAll({
+      'containerOnActionTriggerAnimation1': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+      'containerOnActionTriggerAnimation2': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: false,
+        effectsBuilder: () => [
+          SaturateEffect(
+            curve: Curves.linear,
+            delay: 0.0.ms,
+            duration: 280.0.ms,
+            begin: 0.77,
+            end: 2.0,
+          ),
+          TintEffect(
+            curve: Curves.easeInOut,
+            delay: 90.0.ms,
+            duration: 360.0.ms,
+            color: Color(0xC4BAB5B5),
+            begin: 1.0,
+            end: 0.0,
+          ),
+        ],
+      ),
+    });
+    setupAnimations(
+      animationsMap.values.where((anim) =>
+          anim.trigger == AnimationTrigger.onActionTrigger ||
+          !anim.applyInitialState),
+      this,
+    );
   }
 
   @override
@@ -138,48 +195,63 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
             ),
             PointerInterceptor(
               intercepting: isWeb,
-              child: StreamBuilder<List<UsersRecord>>(
-                stream: queryUsersRecord(
-                  queryBuilder: (usersRecord) => usersRecord
-                      .where(
-                        'driverOnline',
-                        isEqualTo: true,
-                      )
-                      .where(
-                        'driver',
-                        isEqualTo: true,
-                      ),
-                ),
-                builder: (context, snapshot) {
-                  // Customize what your widget looks like when it's loading.
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: SizedBox(
-                        width: 50.0,
-                        height: 50.0,
-                        child: SpinKitDoubleBounce(
-                          color: FlutterFlowTheme.of(context).accent1,
-                          size: 50.0,
+              child: AuthUserStreamWidget(
+                builder: (context) => StreamBuilder<List<UsersRecord>>(
+                  stream: queryUsersRecord(
+                    queryBuilder: (usersRecord) => usersRecord
+                        .where(
+                          'driverOnline',
+                          isEqualTo: true,
+                        )
+                        .where(
+                          'driver',
+                          isEqualTo: true,
                         ),
-                      ),
-                    );
-                  }
-                  List<UsersRecord> polyMapUsersRecordList = snapshot.data!;
+                  ),
+                  builder: (context, snapshot) {
+                    // Customize what your widget looks like when it's loading.
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: SizedBox(
+                          width: 50.0,
+                          height: 50.0,
+                          child: SpinKitDoubleBounce(
+                            color: FlutterFlowTheme.of(context).accent1,
+                            size: 50.0,
+                          ),
+                        ),
+                      );
+                    }
+                    List<UsersRecord> polyMapUsersRecordList = snapshot.data!;
 
-                  return Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: custom_widgets.PolyMap(
+                    return Container(
                       width: double.infinity,
                       height: double.infinity,
-                      refreshMs: 60000,
-                      userLocation: currentUserLocationValue!,
-                      driversRefs: polyMapUsersRecordList
-                          .map((e) => e.reference)
-                          .toList(),
-                    ),
-                  );
-                },
+                      child: custom_widgets.PolyMap(
+                        width: double.infinity,
+                        height: double.infinity,
+                        refreshMs: 60000,
+                        userLocation: currentUserLocationValue!,
+                        driversRefs: polyMapUsersRecordList
+                            .map((e) => e.reference)
+                            .toList(),
+                        userName: currentUserDisplayName,
+                        userPhotoUrl: currentUserPhoto,
+                        userMarkerSize: 48,
+                        driverIconWidth: 56,
+                        driverDriverIconUrl:
+                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+                        driverTaxiIconUrl:
+                            'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                        searchMessage: '0',
+                        showSearchHud: false,
+                        focusIntervalMs: 4000,
+                        focusHoldMs: 3500,
+                        enableDriverFocus: true,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             PointerInterceptor(
@@ -214,17 +286,47 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text(
-                                        FFLocalizations.of(context).getText(
-                                          '6t1vj4fp' /* ? */,
-                                        ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.poppins(
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      logFirebaseEvent(
+                                          'FINDING_DRIVE8_PAGE_Row_a7q256qw_ON_TAP');
+                                      logFirebaseEvent('Row_navigate_to');
+
+                                      context.pushNamed(
+                                          FrequentlyAskedQuestions25Widget
+                                              .routeName);
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Text(
+                                          FFLocalizations.of(context).getText(
+                                            '6t1vj4fp' /* ? */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -234,29 +336,31 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                         .bodyMedium
                                                         .fontStyle,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
-                                              fontSize: 12.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                      ),
-                                      Text(
-                                        FFLocalizations.of(context).getText(
-                                          'fvekpq8i' /* Help */,
                                         ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.poppins(
+                                        Text(
+                                          FFLocalizations.of(context).getText(
+                                            'fvekpq8i' /* Help */,
+                                          ),
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.poppins(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .alternate,
+                                                fontSize: 10.0,
+                                                letterSpacing: 0.0,
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -266,22 +370,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                         .bodyMedium
                                                         .fontStyle,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .alternate,
-                                              fontSize: 10.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                      ),
-                                    ].divide(SizedBox(width: 10.0)),
+                                        ),
+                                      ].divide(SizedBox(width: 10.0)),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
@@ -514,37 +605,74 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                           ),
                                         ],
                                       ),
-                                      Text(
-                                        FFLocalizations.of(context).getText(
-                                          'l549hc6p' /* Approx time 4 min */,
+                                      StreamBuilder<List<UsersRecord>>(
+                                        stream: queryUsersRecord(
+                                          queryBuilder: (usersRecord) =>
+                                              usersRecord
+                                                  .where(
+                                                    'driver',
+                                                    isEqualTo: true,
+                                                  )
+                                                  .where(
+                                                    'driverOnline',
+                                                    isEqualTo: true,
+                                                  ),
                                         ),
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.poppins(
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                        builder: (context, snapshot) {
+                                          // Customize what your widget looks like when it's loading.
+                                          if (!snapshot.hasData) {
+                                            return Center(
+                                              child: SizedBox(
+                                                width: 50.0,
+                                                height: 50.0,
+                                                child: SpinKitDoubleBounce(
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .accent1,
+                                                  size: 50.0,
+                                                ),
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
+                                            );
+                                          }
+                                          List<UsersRecord>
+                                              textUsersRecordList =
+                                              snapshot.data!;
+
+                                          return Text(
+                                            'Approx time ${functions.minCar(textUsersRecordList.toList(), _model.order!.latlngAtual!)}',
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.poppins(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
                                                       .alternate,
-                                              fontSize: 11.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
+                                                  fontSize: 11.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
@@ -609,34 +737,89 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           0.0, 5.0, 8.0, 5.0),
-                                      child: Container(
-                                        width: 83.31,
-                                        height: 50.0,
-                                        decoration: BoxDecoration(
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                        ),
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  8.0, 4.0, 0.0, 0.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  'ylwofv54' /* + $10 */,
-                                                ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () async {
+                                          logFirebaseEvent(
+                                              'FINDING_DRIVE8_Container_fyhk1sno_ON_TAP');
+                                          logFirebaseEvent(
+                                              'Container_widget_animation');
+                                          if (animationsMap[
+                                                  'containerOnActionTriggerAnimation1'] !=
+                                              null) {
+                                            safeSetState(() =>
+                                                hasContainerTriggered1 = true);
+                                            SchedulerBinding.instance
+                                                .addPostFrameCallback((_) async =>
+                                                    await animationsMap[
+                                                            'containerOnActionTriggerAnimation1']!
+                                                        .controller
+                                                        .forward(from: 0.0));
+                                          }
+                                          logFirebaseEvent(
+                                              'Container_backend_call');
+
+                                          await widget.rideOrder!.update({
+                                            ...createRideOrdersRecordData(
+                                              faster: true,
+                                            ),
+                                            ...mapToFirestore(
+                                              {
+                                                'rideValue':
+                                                    FieldValue.increment(10.0),
+                                              },
+                                            ),
+                                          });
+                                        },
+                                        child: Container(
+                                          width: 83.31,
+                                          height: 50.0,
+                                          decoration: BoxDecoration(
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    8.0, 4.0, 0.0, 0.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    'ylwofv54' /* + $10 */,
+                                                  ),
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        font:
+                                                            GoogleFonts.poppins(
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .alternate,
+                                                        fontSize: 12.0,
+                                                        letterSpacing: 0.0,
                                                         fontWeight:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -648,34 +831,32 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                                 .bodyMedium
                                                                 .fontStyle,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .alternate,
-                                                      fontSize: 12.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
-                                              ),
-                                              Text(
-                                                FFLocalizations.of(context)
-                                                    .getText(
-                                                  '554nwd7h' /* in 2 min */,
                                                 ),
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
+                                                Text(
+                                                  FFLocalizations.of(context)
+                                                      .getText(
+                                                    '554nwd7h' /* in 2 min */,
+                                                  ),
+                                                  style: FlutterFlowTheme.of(
+                                                          context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        font:
+                                                            GoogleFonts.poppins(
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .secondaryText,
+                                                        fontSize: 10.0,
+                                                        letterSpacing: 0.0,
                                                         fontWeight:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -684,25 +865,16 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                                                         fontStyle:
                                                             FontStyle.italic,
                                                       ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .secondaryText,
-                                                      fontSize: 10.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ),
-                                              ),
-                                            ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      ).animateOnActionTrigger(
+                                          animationsMap[
+                                              'containerOnActionTriggerAnimation1']!,
+                                          hasBeenTriggered:
+                                              hasContainerTriggered1),
                                     ),
                                   ],
                                 ),
@@ -716,34 +888,45 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                   Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
-                    child: Container(
-                      width: 332.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF313030), Color(0xFF242323)],
-                          stops: [0.2, 1.0],
-                          begin: AlignmentDirectional(0.0, -1.0),
-                          end: AlignmentDirectional(0, 1.0),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        logFirebaseEvent(
+                            'FINDING_DRIVE8_ContainerCancel_ON_TAP');
+                        logFirebaseEvent('ContainerCancel_widget_animation');
+                        if (animationsMap[
+                                'containerOnActionTriggerAnimation2'] !=
+                            null) {
+                          safeSetState(() => hasContainerTriggered2 = true);
+                          SchedulerBinding.instance.addPostFrameCallback(
+                              (_) async => await animationsMap[
+                                      'containerOnActionTriggerAnimation2']!
+                                  .controller
+                                  .forward(from: 0.0));
+                        }
+                        logFirebaseEvent('ContainerCancel_navigate_back');
+                        context.safePop();
+                      },
+                      child: Container(
+                        width: 332.0,
+                        height: 50.0,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF313030), Color(0xFF242323)],
+                            stops: [0.2, 1.0],
+                            begin: AlignmentDirectional(0.0, -1.0),
+                            end: AlignmentDirectional(0, 1.0),
+                          ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(14.0),
+                            bottomRight: Radius.circular(14.0),
+                            topLeft: Radius.circular(14.0),
+                            topRight: Radius.circular(14.0),
+                          ),
                         ),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(14.0),
-                          bottomRight: Radius.circular(14.0),
-                          topLeft: Radius.circular(14.0),
-                          topRight: Radius.circular(14.0),
-                        ),
-                      ),
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          logFirebaseEvent(
-                              'FINDING_DRIVE8_PAGE_Row_mx0qrp4r_ON_TAP');
-                          logFirebaseEvent('Row_navigate_back');
-                          context.safePop();
-                        },
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -777,7 +960,9 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget> {
                           ],
                         ),
                       ),
-                    ),
+                    ).animateOnActionTrigger(
+                        animationsMap['containerOnActionTriggerAnimation2']!,
+                        hasBeenTriggered: hasContainerTriggered2),
                   ),
                 ],
               ),

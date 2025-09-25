@@ -47,3 +47,5 @@ export '/termsof_service30/termsof_service30_widget.dart'
     show TermsofService30Widget;
 export '/licenses31/licenses31_widget.dart' show Licenses31Widget;
 export '/a1/a1_widget.dart' show A1Widget;
+export '/driver_reviews32/driver_reviews32_widget.dart'
+    show DriverReviews32Widget;

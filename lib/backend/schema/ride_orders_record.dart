@@ -105,6 +105,26 @@ class RideOrdersRecord extends FirestoreRecord {
   String get whyCanceled => _whyCanceled ?? '';
   bool hasWhyCanceled() => _whyCanceled != null;
 
+  // "faster" field.
+  bool? _faster;
+  bool get faster => _faster ?? false;
+  bool hasFaster() => _faster != null;
+
+  // "sos" field.
+  bool? _sos;
+  bool get sos => _sos ?? false;
+  bool hasSos() => _sos != null;
+
+  // "passangers" field.
+  String? _passangers;
+  String get passangers => _passangers ?? '';
+  bool hasPassangers() => _passangers != null;
+
+  // "id" field.
+  String? _id;
+  String get id => _id ?? '';
+  bool hasId() => _id != null;
+
   void _initializeFields() {
     _user = snapshotData['user'] as DocumentReference?;
     _latlng = snapshotData['latlng'] as LatLng?;
@@ -124,6 +144,10 @@ class RideOrdersRecord extends FirestoreRecord {
     _rideValue = castToType<double>(snapshotData['rideValue']);
     _status = snapshotData['status'] as String?;
     _whyCanceled = snapshotData['whyCanceled'] as String?;
+    _faster = snapshotData['faster'] as bool?;
+    _sos = snapshotData['sos'] as bool?;
+    _passangers = snapshotData['passangers'] as String?;
+    _id = snapshotData['id'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -178,6 +202,10 @@ Map<String, dynamic> createRideOrdersRecordData({
   double? rideValue,
   String? status,
   String? whyCanceled,
+  bool? faster,
+  bool? sos,
+  String? passangers,
+  String? id,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -198,6 +226,10 @@ Map<String, dynamic> createRideOrdersRecordData({
       'rideValue': rideValue,
       'status': status,
       'whyCanceled': whyCanceled,
+      'faster': faster,
+      'sos': sos,
+      'passangers': passangers,
+      'id': id,
     }.withoutNulls,
   );
 
@@ -227,7 +259,11 @@ class RideOrdersRecordDocumentEquality implements Equality<RideOrdersRecord> {
         listEquality.equals(e1?.participantes, e2?.participantes) &&
         e1?.rideValue == e2?.rideValue &&
         e1?.status == e2?.status &&
-        e1?.whyCanceled == e2?.whyCanceled;
+        e1?.whyCanceled == e2?.whyCanceled &&
+        e1?.faster == e2?.faster &&
+        e1?.sos == e2?.sos &&
+        e1?.passangers == e2?.passangers &&
+        e1?.id == e2?.id;
   }
 
   @override
@@ -249,7 +285,11 @@ class RideOrdersRecordDocumentEquality implements Equality<RideOrdersRecord> {
         e?.participantes,
         e?.rideValue,
         e?.status,
-        e?.whyCanceled
+        e?.whyCanceled,
+        e?.faster,
+        e?.sos,
+        e?.passangers,
+        e?.id
       ]);
 
   @override

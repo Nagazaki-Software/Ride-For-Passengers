@@ -192,6 +192,11 @@ final parametersBuilderMap =
   'TermsofService30': ParameterData.none(),
   'Licenses31': ParameterData.none(),
   'a1': ParameterData.none(),
+  'DriverReviews32': (data) async => ParameterData(
+        allParams: {
+          'user': getParameter<DocumentReference>(data, 'user'),
+        },
+      ),
 };
 
 Map<String, dynamic> getInitialParameterData(Map<String, dynamic> data) {

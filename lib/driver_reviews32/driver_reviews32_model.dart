@@ -1,9 +1,8 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'ride_progress_copy11_widget.dart' show RideProgressCopy11Widget;
+import 'driver_reviews32_widget.dart' show DriverReviews32Widget;
 import 'package:flutter/material.dart';
 
-class RideProgressCopy11Model
-    extends FlutterFlowModel<RideProgressCopy11Widget> {
+class DriverReviews32Model extends FlutterFlowModel<DriverReviews32Widget> {
   @override
   void initState(BuildContext context) {}
 

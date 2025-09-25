@@ -112,6 +112,21 @@ class UsersRecord extends FirestoreRecord {
       _identifyDocument ?? UserIdentifyDocumentStruct();
   bool hasIdentifyDocument() => _identifyDocument != null;
 
+  // "ratings" field.
+  int? _ratings;
+  int get ratings => _ratings ?? 0;
+  bool hasRatings() => _ratings != null;
+
+  // "licences" field.
+  DriversLicensesStruct? _licences;
+  DriversLicensesStruct get licences => _licences ?? DriversLicensesStruct();
+  bool hasLicences() => _licences != null;
+
+  // "rating" field.
+  List<RatingsStruct>? _rating;
+  List<RatingsStruct> get rating => _rating ?? const [];
+  bool hasRating() => _rating != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -142,6 +157,14 @@ class UsersRecord extends FirestoreRecord {
             ? snapshotData['identifyDocument']
             : UserIdentifyDocumentStruct.maybeFromMap(
                 snapshotData['identifyDocument']);
+    _ratings = castToType<int>(snapshotData['ratings']);
+    _licences = snapshotData['licences'] is DriversLicensesStruct
+        ? snapshotData['licences']
+        : DriversLicensesStruct.maybeFromMap(snapshotData['licences']);
+    _rating = getStructList(
+      snapshotData['rating'],
+      RatingsStruct.fromMap,
+    );
   }
 
   static CollectionReference get collection =>
@@ -194,6 +217,8 @@ Map<String, dynamic> createUsersRecordData({
   bool? verifyaccount,
   String? etnia,
   UserIdentifyDocumentStruct? identifyDocument,
+  int? ratings,
+  DriversLicensesStruct? licences,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -213,12 +238,17 @@ Map<String, dynamic> createUsersRecordData({
       'verifyaccount': verifyaccount,
       'etnia': etnia,
       'identifyDocument': UserIdentifyDocumentStruct().toMap(),
+      'ratings': ratings,
+      'licences': DriversLicensesStruct().toMap(),
     }.withoutNulls,
   );
 
   // Handle nested data for "identifyDocument" field.
   addUserIdentifyDocumentStructData(
       firestoreData, identifyDocument, 'identifyDocument');
+
+  // Handle nested data for "licences" field.
+  addDriversLicensesStructData(firestoreData, licences, 'licences');
 
   return firestoreData;
 }
@@ -247,7 +277,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.etnia == e2?.etnia &&
         listEquality.equals(e1?.activitys, e2?.activitys) &&
         listEquality.equals(e1?.emergencyContacts, e2?.emergencyContacts) &&
-        e1?.identifyDocument == e2?.identifyDocument;
+        e1?.identifyDocument == e2?.identifyDocument &&
+        e1?.ratings == e2?.ratings &&
+        e1?.licences == e2?.licences &&
+        listEquality.equals(e1?.rating, e2?.rating);
   }
 
   @override
@@ -270,7 +303,10 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.etnia,
         e?.activitys,
         e?.emergencyContacts,
-        e?.identifyDocument
+        e?.identifyDocument,
+        e?.ratings,
+        e?.licences,
+        e?.rating
       ]);
 
   @override

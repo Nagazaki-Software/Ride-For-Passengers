@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 // Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
+import 'index.dart'; // Imports other custom widgets
+
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -134,8 +136,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.refreshMs != widget.refreshMs) {
       _autoFitTimer?.cancel();
-      _autoFitTimer = Timer.periodic(
-          Duration(milliseconds: widget.refreshMs), (_) async {
+      _autoFitTimer =
+          Timer.periodic(Duration(milliseconds: widget.refreshMs), (_) async {
         await _fitToContent(padding: 60);
       });
     }
@@ -228,8 +230,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
                                 strokeWidth: 2.4,
                                 valueColor: AlwaysStoppedAnimation(
                                     Colors.amber.shade400),
-                                backgroundColor:
-                                    Colors.white.withOpacity(0.12),
+                                backgroundColor: Colors.white.withOpacity(0.12),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -526,8 +527,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         canvas.clipPath(clip);
         canvas.drawImageRect(
           img,
-          ui.Rect.fromLTWH(
-              0, 0, img.width.toDouble(), img.height.toDouble()),
+          ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
           rect,
           ui.Paint()..isAntiAlias = true,
         );
@@ -585,16 +585,14 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   }
 
   String _initialsFromName(String name) {
-    final Characters chars =
-        name.characters.where((c) => c.trim().isNotEmpty);
+    final Characters chars = name.characters.where((c) => c.trim().isNotEmpty);
     if (chars.isEmpty) {
       return 'V';
     }
     final List<String> parts =
         name.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
-    final String first = parts.isNotEmpty
-        ? parts.first.characters.first
-        : chars.first;
+    final String first =
+        parts.isNotEmpty ? parts.first.characters.first : chars.first;
     String second = '';
     if (parts.length > 1) {
       second = parts.last.characters.first;
@@ -638,8 +636,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
 
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     final ui.Canvas canvas = ui.Canvas(recorder);
-    final ui.Offset center =
-        ui.Offset(canvasSize / 2.0, canvasSize / 2.0);
+    final ui.Offset center = ui.Offset(canvasSize / 2.0, canvasSize / 2.0);
 
     if (opacity > 0.01) {
       final ui.Paint ring = ui.Paint()
@@ -698,9 +695,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   }) async {
     final bool isTaxi = _isTaxi(data);
     final String? preferred = _markerUrlFromData(data, isTaxi: isTaxi);
-    final String fallback = isTaxi
-        ? widget.driverTaxiIconUrl
-        : widget.driverDriverIconUrl;
+    final String fallback =
+        isTaxi ? widget.driverTaxiIconUrl : widget.driverDriverIconUrl;
     final int size = widget.driverIconWidth.clamp(48, 220);
 
     final Uint8List? brandBytes =
@@ -730,8 +726,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
       raw = _decodeDataUrl(normalized);
     } else {
       try {
-        final http.Response resp =
-            await http.get(Uri.parse(normalized));
+        final http.Response resp = await http.get(Uri.parse(normalized));
         if (resp.statusCode == 200) {
           raw = resp.bodyBytes;
         }
@@ -749,13 +744,11 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
           ui.Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble());
       canvas.drawImageRect(
         image,
-        ui.Rect.fromLTWH(0, 0, image.width.toDouble(),
-            image.height.toDouble()),
+        ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
         rect,
         ui.Paint()..isAntiAlias = true,
       );
-      final ui.Image out =
-          await recorder.endRecording().toImage(size, size);
+      final ui.Image out = await recorder.endRecording().toImage(size, size);
       final ByteData? data =
           await out.toByteData(format: ui.ImageByteFormat.png);
       if (data == null) return null;
