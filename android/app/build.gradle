@@ -92,7 +92,6 @@ dependencies {
     implementation 'io.card:android-sdk:5.5.1'
 
     // Braintree Android SDK (use v4.+ to ensure availability on Maven Central)
-    implementation 'com.braintreepayments.api:core:4+'
     implementation 'com.braintreepayments.api:card:4+'
     implementation 'com.braintreepayments.api:paypal:4+'
     implementation 'com.braintreepayments.api:google-pay:4+'
