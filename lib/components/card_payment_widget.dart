@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/random_data_util.dart' as random_data;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'card_payment_model.dart';
@@ -180,18 +181,34 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
 
                             final dropInRequest = BraintreeDropInRequest(
                               cardEnabled: false,
-                              clientToken: braintreeClientToken(),
+                              tokenizationKey: braintreeClientToken(),
                               collectDeviceData: true,
                               googlePaymentRequest:
                                   BraintreeGooglePaymentRequest(
                                 totalPrice: transacAmount.toString(),
                                 currencyCode: 'USD',
                                 billingAddressRequired: false,
-                                googleMerchantID: googleMerchantId(),
+                                googleMerchantID:
+                                    isProdPayments ? googleMerchantId() : '',
                               ),
                             );
-                            final dropInResult =
-                                await BraintreeDropIn.start(dropInRequest);
+                            BraintreeDropInResult? dropInResult;
+                            try {
+                              dropInResult = await BraintreeDropIn.start(
+                                  dropInRequest);
+                            } on PlatformException catch (e) {
+                              showSnackbar(
+                                context,
+                                'Erro no Google Pay: \\${e.message ?? e.code}',
+                              );
+                              return;
+                            } catch (e) {
+                              showSnackbar(
+                                context,
+                                'Erro no Google Pay: \\${e.toString()}',
+                              );
+                              return;
+                            }
                             if (dropInResult == null) {
                               return;
                             }
@@ -423,10 +440,25 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                 .last,
                             cvv: _model.creditCardInfo.cvvCode,
                           );
-                          final cardResult = await Braintree.tokenizeCreditCard(
-                            braintreeClientToken(),
-                            cardRequest,
-                          );
+                          BraintreePaymentMethodNonce? cardResult;
+                          try {
+                            cardResult = await Braintree.tokenizeCreditCard(
+                              braintreeClientToken(),
+                              cardRequest,
+                            );
+                          } on PlatformException catch (e) {
+                            showSnackbar(
+                              context,
+                              'Erro ao tokenizar cartão: \\${e.message ?? e.code}',
+                            );
+                            return;
+                          } catch (e) {
+                            showSnackbar(
+                              context,
+                              'Erro ao tokenizar cartão: \\${e.toString()}',
+                            );
+                            return;
+                          }
                           if (cardResult == null) {
                             return;
                           }

@@ -397,8 +397,10 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
             key: scaffoldKey,
             backgroundColor: FlutterFlowTheme.of(context).tertiary,
             body: Stack(
-              children: [
-                Stack(
+                                                          children: [
+                                                          Visibility(
+                                                            visible: _stage == 'finish',
+                                                            child: Stack(
                   children: [
                     Builder(
                       builder: (context) {
@@ -732,7 +734,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                                   FontStyle
                                                                       .italic,
                                                             ),
-                                                          ),
+                                                          )),
                                                         ],
                                                       ),
                                                       Flexible(
@@ -1088,7 +1090,9 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                     12,
                                                     0,
                                                   ),
-                                              child: Container(
+                                              child: Visibility(
+                                                visible: _stage == 'pickingyou',
+                                                child: Container(
                                                 width: double.infinity,
                                                 decoration: BoxDecoration(
                                                   color: Color(0xFF1E1E20),
@@ -1772,7 +1776,7 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                     ],
                                                   ),
                                                 ),
-                                              ),
+                                              )),
                                             ),
                                             Padding(
                                               padding:
@@ -1782,7 +1786,11 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                                                     12,
                                                     0,
                                                   ),
-                                              child: Container(
+                                              child: Visibility(
+                                                visible:
+                                                    _stage == 'progress' ||
+                                                    _stage == 'finish',
+                                                child: Container(
                                                 width: double.infinity,
                                                 decoration: BoxDecoration(
                                                   color: Color(0xFF1E1E20),
@@ -2360,7 +2368,7 @@ for pickup */,
                                                     },
                                                   ),
                                                 ),
-                                              ),
+                                              )),
                                             ),
                                           ],
                                         ),
@@ -2764,7 +2772,9 @@ for pickup */,
                                                             36,
                                                             0,
                                                           ),
-                                                      child: Row(
+                                                      child: Visibility(
+                                                        visible: _stage == 'finish',
+                                                        child: Row(
                                                         mainAxisSize:
                                                             MainAxisSize.max,
                                                         mainAxisAlignment:
@@ -2919,7 +2929,7 @@ for pickup */,
                                                             ),
                                                           ),
                                                         ],
-                                                      ),
+                                                      )),
                                                     ),
                                                     Padding(
                                                       padding:
@@ -3366,14 +3376,16 @@ for pickup */,
                                                             16,
                                                             10,
                                                           ),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Stack(
+                                                      child: Visibility(
+                                                        visible: _stage == 'finish',
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Stack(
                                                             alignment:
                                                                 AlignmentDirectional(
                                                                   0,
@@ -3541,7 +3553,7 @@ for pickup */,
                                                                     ),
                                                               ),
                                                             ],
-                                                          ),
+                                                          )),
                                                         ],
                                                       ),
                                                     ),

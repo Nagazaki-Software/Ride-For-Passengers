@@ -1,0 +1,1058 @@
+     1 // Automatic FlutterFlow imports
+     2 import '/backend/backend.dart';
+     3 import '/backend/schema/structs/index.dart';
+     4 import '/actions/actions.dart' as action_blocks;
+     5 import '/flutter_flow/flutter_flow_theme.dart';
+     6 import '/flutter_flow/flutter_flow_util.dart';
+     7 import 'index.dart'; // Imports other custom widgets
+     8 import '/custom_code/actions/index.dart'; // Imports custom actions
+     9 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
+    10 import 'package:flutter/material.dart';
+    11 // Begin custom widget code
+    12 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
+    13 
+    14 import 'index.dart'; // Imports other custom widgets
+    15 
+    16 import 'dart:async';
+    17 import 'dart:math' as math;
+    18 import 'dart:ui' as ui;
+    19 import 'dart:typed_data';
+    20 import 'dart:convert';
+    21 import 'package:characters/characters.dart';
+    22 import 'package:http/http.dart' as http;
+    23 import 'package:flutter/services.dart' show rootBundle;
+    24 import 'package:firebase_auth/firebase_auth.dart' as fa;
+    25 
+    26 import '/flutter_flow/lat_lng.dart';
+    27 import 'package:cloud_firestore/cloud_firestore.dart';
+    28 import 'package:google_maps_native_sdk/google_maps_native_sdk.dart' as nmap;
+    29 
+    32     super.key,
+    33     this.width,
+    34     this.height,
+    35     required this.userLocation,
+    36     this.userName,
+    37     this.userPhotoUrl,
+    38     this.driversRefs,
+    39     this.refreshMs = 8000,
+    40     this.userMarkerSize = 112,
+    41     this.driverIconWidth = 128,
+    42     this.driverDriverIconUrl =
+    43         'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+    44     this.driverTaxiIconUrl =
+    45         'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+    46     this.searchMessage = 'Procurando motoristas',
+    47     this.showSearchHud = true,
+    48     this.focusIntervalMs = 6400,
+    49     this.focusHoldMs = 1800,
+    50     this.enableDriverFocus = true,
+    52 
+    53   final double? width;
+    54   final double? height;
+    55   final LatLng userLocation;
+    56   final String? userName;
+    57   final String? userPhotoUrl;
+    58   final List<DocumentReference>? driversRefs;
+    59   final int refreshMs;
+    60   final int userMarkerSize;
+    61   final int driverIconWidth;
+    62   final String driverDriverIconUrl;
+    63   final String driverTaxiIconUrl;
+    64   final String searchMessage;
+    65   final bool showSearchHud;
+    66   final int focusIntervalMs;
+    67   final int focusHoldMs;
+    68   final bool enableDriverFocus;
+    69 
+    70   @override
+    71   State<PolyMap> createState() => _PolyMapState();
+    73 
+    75   nmap.GoogleMapController? _controller;
+    76 
+    80 
+    82 
+    83   Timer? _autoFitTimer;
+    84   ui.Image? _userAvatarImage;
+    85   int _userAvatarSize = 112;
+    86   int _lastPulseMs = 0;
+    87   String? _lastUserName;
+    88   String? _lastUserPhoto;
+    89   AnimationController? _pulseController;
+    90   Timer? _ellipsisTimer;
+    91   int _ellipsisDots = 0;
+    92   Timer? _focusTimer;
+    93   int _focusIndex = 0;
+    94   bool _focusInFlight = false;
+    98   DateTime? _autoFitResumeAt;
+    99 
+   100   static const _darkMapStyle =
+   102 
+   103   nmap.LatLng _gm(LatLng p) => nmap.LatLng(p.latitude, p.longitude);
+   104 
+   105   @override
+   107     super.initState();
+   108     _pulseController =
+   109         AnimationController(vsync: this, duration: const Duration(seconds: 2))
+   110           ..addListener(_handlePulseTick)
+   111           ..repeat();
+   113       if (!mounted) return;
+   115         _ellipsisDots = (_ellipsisDots + 1) % 4;
+   118     _autoFitTimer =
+   120       await _fitToContent(padding: 60);
+   123 
+   124   @override
+   126     _pulseController?.removeListener(_handlePulseTick);
+   127     _pulseController?.dispose();
+   128     _ellipsisTimer?.cancel();
+   129     _focusTimer?.cancel();
+   130     _autoFitTimer?.cancel();
+   132       s.cancel();
+   134     _refsSubs.clear();
+   135     super.dispose();
+   137 
+   138   @override
+   140     super.didUpdateWidget(oldWidget);
+   142       _autoFitTimer?.cancel();
+   143       _autoFitTimer =
+   145         await _fitToContent(padding: 60);
+   148     if (oldWidget.userName != widget.userName ||
+   150       _userAvatarImage = null;
+   151       _lastUserName = null;
+   152       _lastUserPhoto = null;
+   153       _placeUserMarker();
+   155       _placeUserMarker();
+   158       _subscribeDriversRefs();
+   161 
+   162   @override
+   164     final w = widget.width ?? double.infinity;
+   165     final h = widget.height ?? 320.0;
+   166 
+   167     final initialCamera = nmap.CameraPosition(
+   168       target: _gm(widget.userLocation),
+   169       zoom: 13.0,
+   170     );
+   171 
+   172     return SizedBox(
+   173       width: w,
+   174       height: h,
+   175       child: ClipRRect(
+   176         borderRadius: BorderRadius.circular(16),
+   177         clipBehavior: Clip.hardEdge,
+   178         child: Stack(
+   179           children: [
+   180             const Positioned.fill(child: ColoredBox(color: Colors.black)),
+   181             nmap.GoogleMapView(
+   182               key: const ValueKey('PolyMapNative'),
+   183               initialCameraPosition: initialCamera,
+   184               myLocationEnabled: false,
+   185               trafficEnabled: false,
+   186               buildingsEnabled: true,
+   187               mapStyleJson: _darkMapStyle,
+   189                 _controller = c;
+   191                   await c.onMapLoaded;
+   193                 await _placeUserMarker();
+   194                 _subscribeDriversRefs();
+   195                 await _fitToContent(padding: 60);
+   197             ),
+   198             if (widget.showSearchHud)
+   199               Positioned(
+   200                 left: 0,
+   201                 right: 0,
+   202                 bottom: 32,
+   203                 child: IgnorePointer(
+   204                   ignoring: true,
+   205                   child: AnimatedOpacity(
+   206                     opacity: 1.0,
+   207                     duration: const Duration(milliseconds: 320),
+   208                     child: Center(
+   209                       child: Container(
+   210                         padding: const EdgeInsets.symmetric(
+   211                             horizontal: 20, vertical: 12),
+   212                         decoration: BoxDecoration(
+   213                           color: Colors.black.withOpacity(0.65),
+   214                           borderRadius: BorderRadius.circular(32),
+   215                           border: Border.all(
+   216                             color: Colors.white.withOpacity(0.12),
+   217                             width: 1.4,
+   218                           ),
+   219                           boxShadow: const [
+   220                             BoxShadow(
+   221                               color: Color(0x33000000),
+   222                               blurRadius: 16,
+   223                               offset: Offset(0, 12),
+   224                             ),
+   225                           ],
+   226                         ),
+   227                         child: Row(
+   228                           mainAxisSize: MainAxisSize.min,
+   229                           children: [
+   230                             SizedBox(
+   231                               width: 14,
+   232                               height: 14,
+   233                               child: CircularProgressIndicator(
+   234                                 strokeWidth: 2.4,
+   235                                 valueColor: AlwaysStoppedAnimation(
+   236                                     Colors.amber.shade400),
+   237                                 backgroundColor: Colors.white.withOpacity(0.12),
+   238                               ),
+   239                             ),
+   240                             const SizedBox(width: 12),
+   241                             Text(
+   243                               style: const TextStyle(
+   244                                 color: Colors.white,
+   245                                 fontSize: 15,
+   246                                 fontWeight: FontWeight.w600,
+   247                                 letterSpacing: 0.2,
+   248                               ),
+   249                             ),
+   250                           ],
+   251                         ),
+   252                       ),
+   253                     ),
+   254                   ),
+   255                 ),
+   256               ),
+   257           ],
+   258         ),
+   259       ),
+   260     );
+   262 
+   264     if (_controller == null) return;
+   265     final id = 'user';
+   266     final pos = _gm(widget.userLocation);
+   267 
+   269       await _controller!.addMarker(nmap.MarkerOptions(
+   270         id: id,
+   271         position: pos,
+   272         title: 'Você',
+   273         anchorU: 0.5,
+   274         anchorV: 0.5,
+   275         zIndex: 30.0,
+   276       ));
+   277       _markerIds.add(id);
+   278       _markerPos[id] = pos;
+   279       _markerTitle[id] = 'Você';
+   281       await _controller!.updateMarker(id, position: pos);
+   282       _markerPos[id] = pos;
+   284 
+   285     await _ensureUserAvatar();
+   286     await _refreshUserMarkerIcon(force: true);
+   288 
+   291       s.cancel();
+   293     _refsSubs.clear();
+   294 
+   295     final refs = widget.driversRefs;
+   297       _onDriverMarkersChanged();
+   298       return;
+   300 
+   302       final id = ref.id;
+   304         if (!mounted) return;
+   308               await _controller?.removeMarker('driver_$id');
+   310             _markerIds.remove('driver_$id');
+   312           _markerPos.remove('driver_$id');
+   313           _markerTitle.remove('driver_$id');
+   314           _onDriverMarkersChanged();
+   315           return;
+   317 
+   318         final data = snap.data() as Map<String, dynamic>?;
+   319         nmap.LatLng? p;
+   320         final loc = data?['location'];
+   322           p = nmap.LatLng(loc.latitude, loc.longitude);
+   324           final lat = (data?['lat'] as num?)?.toDouble();
+   325           final lng = (data?['lng'] as num?)?.toDouble();
+   326           if (lat != null && lng != null) p = nmap.LatLng(lat, lng);
+   328         if (p == null) return;
+   329 
+   330         final String name = (data?['display_name'] ?? 'Driver').toString();
+   331         final String photoUrl = (data?['photo_url'] ?? '').toString();
+   332 
+   333         await _upsertDriverMarker(
+   334           id: id,
+   335           name: name,
+   336           photoUrl: photoUrl,
+   337           position: p,
+   338           data: data,
+   339         );
+   343 
+   345     required String id,
+   346     required String name,
+   347     required String photoUrl,
+   348     required nmap.LatLng position,
+   349     required Map<String, dynamic>? data,
+   351     final mid = 'driver_$id';
+   352 
+   354       await _controller?.updateMarker(mid, position: position);
+   355       _markerPos[mid] = position;
+   357       await _controller?.addMarker(nmap.MarkerOptions(
+   358         id: mid,
+   359         position: position,
+   360         title: name,
+   361         anchorU: 0.5,
+   362         anchorV: 0.62,
+   363         zIndex: 22.0,
+   364       ));
+   365       _markerIds.add(mid);
+   366       _markerPos[mid] = position;
+   367       _markerTitle[mid] = name;
+   369 
+   370     final Uint8List? bytes = await _driverMarkerBytes(
+   371       data: data,
+   372       photoUrl: photoUrl,
+   373     );
+   374 
+   376       final dynamic dc = _controller;
+   378         await dc.setMarkerIconBytes(
+   379           id: mid,
+   380           bytes: bytes,
+   381           anchorU: 0.5,
+   382           anchorV: 0.62,
+   383         );
+   386     _onDriverMarkersChanged();
+   388 
+   390     if (_controller == null) return;
+   391     if (_markerIds.isEmpty) return;
+   392     if (!_isAutoFitAllowed()) return;
+   393 
+   394     double? minLat, maxLat, minLng, maxLng;
+   396       final p = _markerPos[id];
+   397       if (p == null) continue;
+   398       minLat = (minLat == null) ? p.latitude : math.min(minLat, p.latitude);
+   399       maxLat = (maxLat == null) ? p.latitude : math.max(maxLat, p.latitude);
+   400       minLng = (minLng == null) ? p.longitude : math.min(minLng, p.longitude);
+   401       maxLng = (maxLng == null) ? p.longitude : math.max(maxLng, p.longitude);
+   403     if (minLat == null || minLng == null || maxLat == null || maxLng == null)
+   404       return;
+   405 
+   406     final ne = nmap.LatLng(maxLat!, maxLng!);
+   407     final sw = nmap.LatLng(minLat!, minLng!);
+   409       await _controller!.animateToBounds(ne, sw, padding: padding);
+   412 
+   413   Future<Uint8List> _buildDotPng(
+   415       int size = 28,
+   417     final recorder = ui.PictureRecorder();
+   418     final canvas = ui.Canvas(recorder);
+   419     final c = ui.Offset(size / 2, size / 2);
+   420     final r = size / 2.0;
+   421 
+   423       final ringPaint = ui.Paint()
+   424         ..style = ui.PaintingStyle.stroke
+   425         ..strokeWidth = (size * 0.16)
+   426         ..color = color.withOpacity(0.9)
+   427         ..isAntiAlias = true;
+   428       canvas.drawCircle(c, r - ringPaint.strokeWidth / 2, ringPaint);
+   430 
+   431     final dot = ui.Paint()
+   432       ..color = color
+   433       ..isAntiAlias = true;
+   434     canvas.drawCircle(c, r * 0.62, dot);
+   435 
+   436     final img = await recorder.endRecording().toImage(size, size);
+   437     final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+   438     return bytes!.buffer.asUint8List();
+   440 
+   443       final resp = await http.get(Uri.parse(url));
+   444       if (resp.statusCode == 200) return resp.bodyBytes;
+   446     return null;
+   448 
+   450     final raw = await _download(url);
+   451     if (raw == null) return _buildDotPng();
+   452     final codec = await ui.instantiateImageCodec(raw,
+   453         targetWidth: size, targetHeight: size);
+   454     final frame = await codec.getNextFrame();
+   455     final img = frame.image;
+   456 
+   457     final recorder = ui.PictureRecorder();
+   458     final canvas = ui.Canvas(recorder);
+   459     final rect = ui.Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble());
+   460     final r = size / 2.0;
+   461     final clip = ui.Path()
+   462       ..addOval(ui.Rect.fromCircle(center: ui.Offset(r, r), radius: r));
+   463     canvas.clipPath(clip);
+   464 
+   465     final paint = ui.Paint()..isAntiAlias = true;
+   466     canvas.drawImageRect(
+   467       img,
+   468       ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+   469       rect,
+   470       paint,
+   471     );
+   472 
+   473     final border = ui.Paint()
+   474       ..style = ui.PaintingStyle.stroke
+   475       ..strokeWidth = 6
+   476       ..color = const Color(0xFFFFC107);
+   477     canvas.drawCircle(ui.Offset(r, r), r - 3, border);
+   478 
+   479     final outImg = await recorder.endRecording().toImage(size, size);
+   480     final bytes = await outImg.toByteData(format: ui.ImageByteFormat.png);
+   481     return bytes!.buffer.asUint8List();
+   483 
+   485     final String name =
+   486         (widget.userName == null || widget.userName!.trim().isEmpty)
+   487             ? 'Você'
+   488             : widget.userName!.trim();
+   489     final String? photo =
+   490         (widget.userPhotoUrl == null || widget.userPhotoUrl!.trim().isEmpty)
+   491             ? null
+   492             : widget.userPhotoUrl!.trim();
+   493 
+   494     if (_userAvatarImage != null &&
+   495         _lastUserName == name &&
+   497       return;
+   499 
+   500     _userAvatarSize = widget.userMarkerSize.clamp(56, 196);
+   501     _userAvatarImage = await _buildUserAvatarImage(
+   502       name: name,
+   503       photoUrl: photo,
+   504       size: _userAvatarSize,
+   505     );
+   506     _lastUserName = name;
+   507     _lastUserPhoto = photo;
+   509 
+   511     required String name,
+   512     required String? photoUrl,
+   513     required int size,
+   515     // Visual alinhado com PickerMap: fundo escuro, sombra suave e foto/iniciais.
+   516     final ui.PictureRecorder recorder = ui.PictureRecorder();
+   517     final ui.Canvas canvas = ui.Canvas(recorder);
+   518     final double s = size.toDouble();
+   519     final ui.Offset center = ui.Offset(s / 2, s / 2);
+   520 
+   521     // Sombra suave por baixo
+   522     canvas.drawCircle(
+   523       center,
+   524       s * 0.50,
+   525       ui.Paint()
+   526         ..color = Colors.black.withOpacity(0.35)
+   527         ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 8),
+   528     );
+   529 
+   530     // Base escura
+   531     final ui.Paint bg = ui.Paint()..color = const Color(0xFF30343C);
+   532     canvas.drawCircle(center, s * 0.46, bg);
+   533 
+   534     // Foto ou iniciais recortadas no círculo
+   535     Uint8List? photo;
+   538         photo = await _downloadAndResize(_massageUrl(photoUrl!.trim()), size);
+   541 
+   543       final ui.Codec codec =
+   544           await ui.instantiateImageCodec(photo, targetWidth: size, targetHeight: size);
+   545       final ui.FrameInfo frame = await codec.getNextFrame();
+   546       final ui.Image img = frame.image;
+   547       final ui.Rect rect = ui.Rect.fromCircle(center: center, radius: s * 0.46);
+   548       canvas.save();
+   549       canvas.clipPath(ui.Path()..addOval(rect));
+   550       canvas.drawImageRect(
+   551         img,
+   552         ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+   553         rect,
+   554         ui.Paint(),
+   555       );
+   556       canvas.restore();
+   558       final String initials = _initialsFromName(name);
+   559       final ui.ParagraphBuilder builder = ui.ParagraphBuilder(
+   560         ui.ParagraphStyle(textAlign: TextAlign.center),
+   561       )
+   562         ..pushStyle(ui.TextStyle(
+   563           fontSize: s * 0.38,
+   564           color: Colors.white,
+   565           fontWeight: ui.FontWeight.w700,
+   566         ))
+   567         ..addText(initials);
+   568       final ui.Paragraph paragraph = builder.build()
+   569         ..layout(ui.ParagraphConstraints(width: s));
+   570       canvas.drawParagraph(paragraph, ui.Offset(0, center.dy - paragraph.height / 2));
+   572 
+   573     final ui.Image image = await recorder.endRecording().toImage(size, size);
+   574     return image;
+   576 
+   578     final ui.Offset center =
+   579         ui.Offset(rect.width / 2.0 + rect.left, rect.height / 2.0 + rect.top);
+   580     final double radius = rect.width / 2.0;
+   581     final Color base = _colorFromName(name);
+   582     final Color accent = Color.lerp(base, Colors.white, 0.25)!;
+   583 
+   584     final ui.Paint paint = ui.Paint()
+   585       ..shader = ui.Gradient.linear(
+   586         ui.Offset(rect.left, rect.top),
+   587         ui.Offset(rect.right, rect.bottom),
+   588         [base, accent],
+   589       )
+   590       ..isAntiAlias = true;
+   591     canvas.drawCircle(center, radius, paint);
+   592 
+   593     final String initials = _initialsFromName(name);
+   594 
+   595     final ui.ParagraphBuilder builder = ui.ParagraphBuilder(
+   596       ui.ParagraphStyle(
+   597         textAlign: TextAlign.center,
+   598         fontSize: rect.width * 0.42,
+   599         fontWeight: FontWeight.w700,
+   600         fontFamily: 'Roboto',
+   601       ),
+   602     )
+   603       ..pushStyle(ui.TextStyle(color: Colors.white))
+   604       ..addText(initials);
+   605     final ui.Paragraph paragraph = builder.build()
+   606       ..layout(ui.ParagraphConstraints(width: rect.width));
+   607     final double textY = rect.top + (rect.height - paragraph.height) / 2.0;
+   608     canvas.drawParagraph(paragraph, ui.Offset(rect.left, textY));
+   610 
+   612     final Characters chars = name.characters.where((c) => c.trim().isNotEmpty);
+   614       return 'V';
+   616     final List<String> parts =
+   617         name.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+   618     final String first =
+   619         parts.isNotEmpty ? parts.first.characters.first : chars.first;
+   620     String second = '';
+   622       second = parts.last.characters.first;
+   624       second = chars.elementAt(1);
+   626     return (first + second).toUpperCase();
+   628 
+   630     int hash = 0;
+   632       hash = (hash * 37 + codeUnit) & 0xFFFFFF;
+   634     final int r = ((hash >> 16) & 0xFF) ^ 0x55;
+   635     final int g = ((hash >> 8) & 0xFF) ^ 0x88;
+   636     final int b = (hash & 0xFF) ^ 0x33;
+   637     return Color.fromARGB(255, r, g, b);
+   639 
+   641     if (_controller == null) return;
+   643       await _ensureUserAvatar();
+   644       if (_userAvatarImage == null) return;
+   646 
+   647     final int now = DateTime.now().millisecondsSinceEpoch;
+   649       return;
+   651     _lastPulseMs = now;
+   652 
+   653     final double progress = _pulseController?.value ?? 0;
+   654     final ui.Image base = _userAvatarImage!;
+   655     final double baseSize = _userAvatarSize.toDouble();
+   656     final double expand = baseSize * 0.55 * progress;
+   657     final double stroke = baseSize * (0.2 - 0.12 * progress).clamp(0.08, 0.22);
+   658     final double opacity = (1.0 - progress).clamp(0.0, 1.0);
+   659     final double canvasSize = baseSize + expand * 2 + stroke * 2;
+   660 
+   661     final ui.PictureRecorder recorder = ui.PictureRecorder();
+   662     final ui.Canvas canvas = ui.Canvas(recorder);
+   663     final ui.Offset center = ui.Offset(canvasSize / 2.0, canvasSize / 2.0);
+   664 
+   666       final ui.Paint ring = ui.Paint()
+   667         ..style = ui.PaintingStyle.stroke
+   668         ..strokeWidth = stroke
+   669         ..color = const Color(0xFFFFC107).withOpacity(0.36 * opacity)
+   670         ..isAntiAlias = true;
+   671       canvas.drawCircle(center, baseSize / 2 + expand, ring);
+   672 
+   673       final ui.Paint inner = ui.Paint()
+   674         ..style = ui.PaintingStyle.stroke
+   675         ..strokeWidth = stroke * 0.6
+   676         ..color = const Color(0xFFFFC107).withOpacity(0.22 * opacity)
+   677         ..isAntiAlias = true;
+   678       canvas.drawCircle(center, baseSize / 2 + expand * 0.58, inner);
+   680 
+   681     final ui.Rect dst = ui.Rect.fromCenter(
+   682       center: center,
+   683       width: baseSize,
+   684       height: baseSize,
+   685     );
+   686     canvas.drawImageRect(
+   687       base,
+   688       ui.Rect.fromLTWH(0, 0, base.width.toDouble(), base.height.toDouble()),
+   689       dst,
+   690       ui.Paint()..isAntiAlias = true,
+   691     );
+   692 
+   693     final ui.Image composed = await recorder
+   694         .endRecording()
+   695         .toImage(canvasSize.round(), canvasSize.round());
+   696     final ByteData? data =
+   697         await composed.toByteData(format: ui.ImageByteFormat.png);
+   698     if (data == null) return;
+   699     final Uint8List bytes = data.buffer.asUint8List();
+   701       final dynamic dc = _controller;
+   702       await dc.setMarkerIconBytes(
+   703         id: 'user',
+   704         bytes: bytes,
+   705         anchorU: 0.5,
+   706         anchorV: 0.5,
+   707       );
+   710 
+   712     if (!mounted) return;
+   713     _refreshUserMarkerIcon();
+   715 
+   717     required Map<String, dynamic>? data,
+   718     required String photoUrl,
+   720     // Escolha robusta parecida com PickerMap: tenta markersUrls, cai para os
+   721     // icons padroes (driver/taxi), depois foto e por fim um ponto.
+   722     final int size = widget.driverIconWidth.clamp(48, 220);
+   723     final _DriverVisualChoice visual = _resolveDriverVisual(data);
+   724 
+   726       if (url == null) return null;
+   727       // Tenta asset primeiro
+   728       final Uint8List? a = await _tryLoadAssetPng(url, size);
+   729       if (a != null) return a;
+   730       // Depois rede com melhorias
+   731       return await _downloadAndResize(_massageUrl(url), size);
+   733 
+   734     // Preferido
+   735     Uint8List? bytes = await tryLoad(visual.url);
+   736 
+   737     // Fallback brand
+   738     bytes ??= await tryLoad(visual.fallback);
+   739 
+   740     // Foto do motorista
+   742       bytes = await _circleImagePng(photoUrl.trim(), size: size);
+   744 
+   745     // Último recurso
+   746     bytes ??= await _buildDotPng(color: const Color(0xFFFFC107), size: 32);
+   747     return bytes;
+   749 
+   751     if (url == null || url.trim().isEmpty) return null;
+   754       return _iconCache[key];
+   756     final String cleaned = url.trim();
+   757 
+   758     // Data URL
+   760       final Uint8List? raw = _decodeDataUrl(cleaned);
+   761       if (raw == null) return null;
+   763         final ui.Codec codec = await ui.instantiateImageCodec(raw,
+   764             targetWidth: size, targetHeight: size);
+   765         final ui.FrameInfo frame = await codec.getNextFrame();
+   766         final ui.Image image = frame.image;
+   767         final ByteData? data =
+   768             await image.toByteData(format: ui.ImageByteFormat.png);
+   769         if (data == null) return null;
+   770         final Uint8List bytes = data.buffer.asUint8List();
+   771         _iconCache[key] = bytes;
+   772         return bytes;
+   774         return null;
+   777 
+   778     // Asset local (heurística): aceita 'asset://...' ou nomes/paths termina .png
+   779     final String lower = cleaned.toLowerCase();
+   780     if (lower.startsWith('asset://') ||
+   782       final String candidate = lower.startsWith('asset://')
+   783           ? cleaned.substring('asset://'.length)
+   784           : cleaned;
+   785       final Uint8List? assetBytes =
+   786           await _tryLoadAssetPng(candidate, size);
+   788         _iconCache[key] = assetBytes;
+   789         return assetBytes;
+   792 
+   793     // SVG não suportado como bitmap
+   794     if (_looksSvg(cleaned)) return null;
+   795 
+   796     // HTTP/GS com melhorias (alt=media / auth)
+   798       final Uri uri = Uri.parse(_massageUrl(cleaned));
+   801           'accept': 'image/*,*/*;q=0.8',
+   802           'user-agent': 'PolyMap/1.0',
+   804         if (extra != null) headers.addAll(extra);
+   805         return http.get(uri, headers: headers).timeout(const Duration(seconds: 8));
+   807 
+   808       http.Response resp = await doGet();
+   809       if ((resp.statusCode == 401 || resp.statusCode == 403) &&
+   811         final auth = await _authHeadersForFirebaseIfAny();
+   812         if (auth.isNotEmpty) resp = await doGet(auth);
+   814       if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
+   815       final Uint8List raw = resp.bodyBytes;
+   816       final ui.Codec codec = await ui.instantiateImageCodec(raw,
+   817           targetWidth: size, targetHeight: size);
+   818       final ui.FrameInfo frame = await codec.getNextFrame();
+   819       final ui.Image image = frame.image;
+   820       final ByteData? data =
+   821           await image.toByteData(format: ui.ImageByteFormat.png);
+   822       if (data == null) return null;
+   823       final Uint8List bytes = data.buffer.asUint8List();
+   824       _iconCache[key] = bytes;
+   825       return bytes;
+   827       return null;
+   830 
+   832     final String clean = (url ?? '').trim();
+   833     if (clean.isEmpty || _looksSvg(clean)) return null;
+   834     final hit = _iconMemCache[clean];
+   835     if (hit != null) return hit;
+   836     if (_iconInFlight.containsKey(clean)) return await _iconInFlight[clean]!;
+   837 
+   840         final Uri uri = Uri.parse(_massageUrl(clean));
+   843             'accept': 'image/*,*/*;q=0.8',
+   844             'user-agent': 'PolyMap/1.0',
+   846           if (extra != null) headers.addAll(extra);
+   847           return http.get(uri, headers: headers).timeout(const Duration(seconds: 8));
+   849 
+   850         http.Response resp = await doGet();
+   851         if ((resp.statusCode == 401 || resp.statusCode == 403) &&
+   853           final auth = await _authHeadersForFirebaseIfAny();
+   854           if (auth.isNotEmpty) resp = await doGet(auth);
+   856         if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
+   857         final Uint8List bytes = resp.bodyBytes;
+   858         final ui.Codec codec = await ui.instantiateImageCodec(bytes,
+   859             targetWidth: targetWidthPx);
+   860         final ui.FrameInfo frame = await codec.getNextFrame();
+   861         final ui.Image img = frame.image;
+   862         final ByteData? out =
+   863             await img.toByteData(format: ui.ImageByteFormat.png);
+   864         if (out == null) return null;
+   865         final Uint8List result = out.buffer.asUint8List();
+   866         _iconMemCache[clean] = result;
+   867         return result;
+   869         return null;
+   872 
+   873     final fut = task();
+   874     _iconInFlight[clean] = fut;
+   875     final res = await fut;
+   876     _iconInFlight.remove(clean);
+   877     return res;
+   879 
+   881     final int comma = url.indexOf(',');
+   882     if (comma <= 0) return null;
+   883     final String data = url.substring(comma + 1);
+   885       return base64Decode(data);
+   887       return null;
+   890 
+   891   // ---------- URL helpers (compatíveis com PickerMap) ----------
+   893     String s = url.trim();
+   895 
+   897       final noGs = s.substring(5);
+   898       final slash = noGs.indexOf('/');
+   900         final bucket = noGs.substring(0, slash);
+   901         final path = noGs.substring(slash + 1);
+   902         final encodedPath = Uri.encodeComponent(path);
+   903         s =
+   904             'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$encodedPath?alt=media';
+   907 
+   909       s += s.contains('?') ? '&alt=media' : '?alt=media';
+   911 
+   914         final u = Uri.parse(s);
+   915         final fixed = Uri(
+   916           scheme: u.scheme.isEmpty ? 'https' : u.scheme,
+   917           host: u.host,
+   918           port: u.hasPort ? u.port : null,
+   919           pathSegments: u.pathSegments.map(Uri.encodeComponent).toList(),
+   920           query: u.query.isEmpty ? null : u.query,
+   921         );
+   922         s = fixed.toString();
+   924         s = Uri.encodeFull(s);
+   927     return s;
+   929 
+   931     final u = (url ?? '').toLowerCase();
+   932     return u.endsWith('.svg') || u.contains('image/svg');
+   934 
+   936     final u = s.toLowerCase();
+   937     return u.contains('firebasestorage.googleapis.com') ||
+   938         u.contains('storage.googleapis.com');
+   940 
+   943       final user = fa.FirebaseAuth.instance.currentUser;
+   945         final String? token = await user.getIdToken();
+   953 
+   955     final s = (urlOrName ?? '').trim();
+   956     if (s.isEmpty) return null;
+   958       final uri = Uri.parse(s);
+   959       final seg = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : s;
+   960       final decoded = Uri.decodeComponent(seg);
+   961       final name = decoded.endsWith('.png') ? decoded : '$decoded.png';
+   962       return 'assets/images/$name';
+   964       final base = s.endsWith('.png') ? s : '$s.png';
+   965       return 'assets/images/$base';
+   968 
+   970     final String? asset = _assetPathFromUrlOrName(urlOrName);
+   971     if (asset == null) return null;
+   973       final data = await rootBundle.load(asset);
+   974       final ui.Codec codec = await ui.instantiateImageCodec(
+   975         data.buffer.asUint8List(),
+   976         targetWidth: targetWidthPx,
+   977       );
+   978       final ui.FrameInfo frame = await codec.getNextFrame();
+   979       final ui.Image img = frame.image;
+   980       final ByteData? out = await img.toByteData(format: ui.ImageByteFormat.png);
+   981       return out?.buffer.asUint8List();
+   983       return null;
+   986 
+   990       if (source == null) return;
+   992         final String val = source.trim().toLowerCase();
+   993         if (val.isNotEmpty) tokens.add(val);
+   996           add(item);
+  1000 
+  1002       final Map users = data!['users'] as Map;
+  1003       add(users['platform']);
+  1004       add(users['plataform']);
+  1005       add(users['platforms']);
+  1006       add(users['plataforms']);
+  1007       add(users['type']);
+  1009     add(data?['platform']);
+  1010     add(data?['plataform']);
+  1011     add(data?['platforms']);
+  1012     add(data?['plataforms']);
+  1013     add(data?['type']);
+  1014 
+  1016       return true;
+  1019       return false;
+  1021 
+  1022     final String? marker = _markerUrlFromData(data, isTaxi: true);
+  1023     if (marker != null) return true;
+  1024     return false;
+  1026 
+  1027   String? _markerUrlFromData(Map<String, dynamic>? data,
+  1029     final List<String> priority = isTaxi
+  1030         ? <String>['ride taxi', 'taxi', 'vehicle', 'car']
+  1031         : <String>['ride driver', 'driver', 'default', 'principal'];
+  1032 
+  1033     String? selected;
+  1034 
+  1036       if (value == null) return;
+  1038         final String trimmed = value.trim();
+  1039         if (trimmed.isEmpty) return;
+  1041           selected = trimmed;
+  1044             if (trimmed.toLowerCase().contains(token) &&
+  1046               selected = trimmed;
+  1047               return;
+  1051         return;
+  1055           consider(item, key);
+  1057         return;
+  1061           consider(v, k?.toString());
+  1065 
+  1067       if (source == null) return;
+  1070           consider(v, k?.toString());
+  1074           inspect(item);
+  1077         consider(source);
+  1080 
+  1081     inspect(data?['markersUrls']);
+  1082     inspect(data?['markerUrls']);
+  1083     if (selected != null) return selected;
+  1084 
+  1086       final dynamic raw = data?[key];
+  1088         return raw.trim();
+  1091     final List<String?> fallback = <String?>[
+  1092       data?['markerUrl']?.toString(),
+  1093       data?['marker_url']?.toString(),
+  1094       data?['marker']?.toString(),
+  1095       data?['markerIcon']?.toString(),
+  1096       data?['marker_icon']?.toString(),
+  1097     ];
+  1100         return raw.trim();
+  1103     return null;
+  1105 
+  1106   // ------------- Versão robusta de resolução (como no PickerMap) -------------
+  1109 
+  1111       if (value == null) return;
+  1113         final String trimmed = value.trim();
+  1114         if (trimmed.isEmpty) return;
+  1115         result[(key ?? 'default').toLowerCase()] = trimmed;
+  1116         return;
+  1121             final dynamic innerKey = item['key'] ?? item['name'] ?? key;
+  1122             final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+  1124               absorb(innerKey?.toString() ?? key, innerValue);
+  1126               absorb(key, item);
+  1129             absorb(key, item);
+  1132         return;
+  1136           final dynamic innerKey = value['key'] ?? value['name'] ?? key;
+  1137           final dynamic innerValue = value['url'] ?? value['value'];
+  1138           absorb(innerKey?.toString() ?? key, innerValue);
+  1139           return;
+  1142           absorb(k?.toString(), v);
+  1146 
+  1148       if (source == null) return;
+  1151           absorb(k?.toString(), v);
+  1156             final dynamic innerKey = item['key'] ?? item['name'];
+  1157             final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+  1158             absorb(innerKey?.toString(), innerValue);
+  1160             absorb(null, item);
+  1164         absorb(null, source);
+  1167 
+  1168     readField(data?['markersUrls']);
+  1169     readField(data?['markerUrls']);
+  1170 
+  1171     // Alguns atalhos comuns
+  1172     final Map<String, dynamic>? users =
+  1173         (data?['users'] is Map) ? (data?['users'] as Map<String, dynamic>) : null;
+  1175       readField(users['markersUrls']);
+  1176       readField(users['markerUrls']);
+  1178 
+  1179     return result;
+  1181 
+  1184       final String? v = urls[k.toLowerCase()];
+  1185       if (v != null && v.trim().isNotEmpty) return v.trim();
+  1187     return null;
+  1189 
+  1191     final String s = (url ?? '').trim();
+  1192     return s.isEmpty ? null : s;
+  1194 
+  1197       if (v == null) continue;
+  1198       final String s = v.toString().trim();
+  1199       if (s.isNotEmpty) return s;
+  1201     return null;
+  1203 
+  1204   
+  1205 
+  1209       if (source == null) return;
+  1211         final String trimmed = source.trim();
+  1212         if (trimmed.isNotEmpty) values.add(trimmed);
+  1215           add(item);
+  1219 
+  1221       final Map users = data?['users'] as Map;
+  1222       add(users['plataform']);
+  1223       add(users['plataforms']);
+  1224       add(users['platform']);
+  1225       add(users['platforms']);
+  1226       add(users['type']);
+  1228     add(data?['plataform']);
+  1229     add(data?['plataforms']);
+  1230     add(data?['platform']);
+  1231     add(data?['platforms']);
+  1232     add(data?['type']);
+  1233 
+  1234     return _PlatformInfo(values.toList());
+  1236 
+  1237   
+  1238 
+  1240     final _PlatformInfo info = _platformInfoFromData(data);
+  1241     final Map<String, String> markerUrls = _markerUrlsFromData(data);
+  1242     final Map<String, dynamic>? usersMap =
+  1243         (data?['users'] is Map<String, dynamic>)
+  1244             ? (data?['users'] as Map<String, dynamic>?)
+  1245             : null;
+  1246 
+  1247     final String? driverFallback = _cleanUrl(widget.driverDriverIconUrl);
+  1248     final String? taxiFallback = _cleanUrl(widget.driverTaxiIconUrl) ?? driverFallback;
+  1249 
+  1251       return _DriverVisualChoice(
+  1252         url: driverFallback,
+  1253         fallback: driverFallback ?? taxiFallback,
+  1254         isTaxi: false,
+  1255         forceBrandIcon: true,
+  1256       );
+  1258 
+  1260       String? url = _markerUrlForKeys(markerUrls, const <String>[
+  1261         'ride taxi',
+  1262         'ride_taxi',
+  1263         'taxi',
+  1264         'car',
+  1265         'vehicle',
+  1266       ]);
+  1267       url ??= _firstNonEmpty(<dynamic>[
+  1268         data?['markerUrl'],
+  1269         data?['marker_url'],
+  1270         usersMap?['markerUrl'],
+  1271         usersMap?['marker_url'],
+  1272         data?['vehiclePhoto'],
+  1273         data?['vehicle_photo'],
+  1274         data?['carPhoto'],
+  1275         data?['car_photo'],
+  1276         data?['photoVehicle'],
+  1277         data?['photo_vehicle'],
+  1278         data?['photoCar'],
+  1279         data?['photo_car'],
+  1280         data?['vehicleImage'],
+  1281         data?['vehicle_image'],
+  1282         data?['carImage'],
+  1283         data?['car_image'],
+  1284         usersMap?['vehiclePhoto'],
+  1285         usersMap?['carPhoto'],
+  1286       ]);
+  1287       return _DriverVisualChoice(
+  1288         url: url,
+  1289         fallback: taxiFallback ?? driverFallback,
+  1290         isTaxi: true,
+  1291         forceBrandIcon: info.isRideTaxi,
+  1292       );
+  1294 
+  1295     String? url = _markerUrlForKeys(markerUrls, const <String>[
+  1296       'ride driver',
+  1297       'driver',
+  1298       'default',
+  1299       'principal',
+  1300       'main',
+  1301       'primary',
+  1302     ]);
+  1303     url ??= _firstNonEmpty(<dynamic>[
+  1304       data?['markerUrl'],
+  1305       data?['marker_url'],
+  1306       usersMap?['markerUrl'],
+  1307       usersMap?['marker_url'],
+  1308     ]);
+  1309 
+  1310     return _DriverVisualChoice(
+  1311       url: url,
+  1312       fallback: driverFallback ?? taxiFallback,
+  1313       isTaxi: false,
+  1314       forceBrandIcon: false,
+  1315     );
+  1317 
+  1319     if (!widget.enableDriverFocus) return;
+  1320     final List<String> drivers =
+  1321         _markerIds.where((id) => id.startsWith('driver_')).toList();
+  1323       _focusTimer?.cancel();
+  1324       _focusTimer = null;
+  1325       _focusIndex = 0;
+  1326       return;
+  1329       return;
+  1331     final int interval = widget.focusIntervalMs.clamp(2500, 12000);
+  1333       _focusNextDriver();
+  1336       if (!mounted) return;
+  1337       _focusNextDriver();
+  1340 
+  1342     if (_focusInFlight || _controller == null) return;
+  1343     final List<String> drivers =
+  1344         _markerIds.where((id) => id.startsWith('driver_')).toList();
+  1346       return;
+  1349       _focusIndex = 0;
+  1351     final String id = drivers[_focusIndex];
+  1352     _focusIndex = (_focusIndex + 1) % drivers.length;
+  1353     final nmap.LatLng? pos = _markerPos[id];
+  1355       return;
+  1357     _focusInFlight = true;
+  1358     _suspendAutoFitFor(Duration(milliseconds: widget.focusHoldMs + 1600));
+  1359     await _animateCameraTo(
+  1360       target: pos,
+  1361       zoom: 15.6,
+  1362       durationMs: 900,
+  1363     );
+  1364     await Future<void>.delayed(
+  1365         Duration(milliseconds: widget.focusHoldMs.clamp(900, 4000)));
+  1367       _focusInFlight = false;
+  1368       return;
+  1370     await _animateCameraTo(
+  1371       target: _gm(widget.userLocation),
+  1372       zoom: 14.2,
+  1373       durationMs: 920,
+  1374     );
+  1375     _focusInFlight = false;
+  1377 
+  1379     required nmap.LatLng target,
+  1380     double? zoom,
+  1381     int durationMs = 900,
+  1383     if (_controller == null) return;
+  1385       final dynamic dc = _controller;
+  1386       await dc.animateCameraTo(
+  1387         target: target,
+  1388         zoom: zoom ?? 14.5,
+  1389         durationMs: durationMs,
+  1390       );
+  1393 
+  1395     _autoFitResumeAt = DateTime.now().add(duration);
+  1397 
+  1399     final DateTime? resume = _autoFitResumeAt;
+  1400     if (resume == null) return true;
+  1402       _autoFitResumeAt = null;
+  1403       return true;
+  1405     return false;
+  1407 
+  1409     if (a == null && b == null) return true;
+  1410     if (a == null || b == null) return false;
+  1411     if (a.length != b.length) return false;
+  1413       if (a[i].path != b[i].path) return false;
+  1415     return true;
+  1418 
+  1419 // Pequenas classes de apoio (fora do State para evitar conflitos de sintaxe)
+  1421   _PlatformInfo(this.values);
+  1422   final List<String> values;
+  1423   bool get isRideTaxi => values.any((v) => v.toLowerCase().contains('taxi'));
+  1424   bool get hasTaxiKeyword => values.any((v) => v.toLowerCase().contains('taxi'));
+  1425   bool get isRideDriver => values.any((v) => v.toLowerCase().contains('driver'));
+  1427 
+  1430     required this.url,
+  1431     required this.fallback,
+  1432     required this.isTaxi,
+  1433     required this.forceBrandIcon,
+  1435   final String? url;
+  1436   final String? fallback;
+  1437   final bool isTaxi;
+  1438   final bool forceBrandIcon;
+

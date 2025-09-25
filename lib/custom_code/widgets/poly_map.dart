@@ -20,6 +20,8 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:characters/characters.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:firebase_auth/firebase_auth.dart' as fa;
 
 import '/flutter_flow/lat_lng.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -91,6 +93,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   int _focusIndex = 0;
   bool _focusInFlight = false;
   final Map<String, Uint8List> _iconCache = {};
+  final Map<String, Future<Uint8List?>> _iconInFlight = {};
+  static final Map<String, Uint8List> _iconMemCache = {};
   DateTime? _autoFitResumeAt;
 
   static const _darkMapStyle =
@@ -508,43 +512,63 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     required String? photoUrl,
     required int size,
   }) async {
-    final recorder = ui.PictureRecorder();
-    final canvas = ui.Canvas(recorder);
-    final rect = ui.Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble());
-    final center = ui.Offset(size / 2.0, size / 2.0);
-    final double radius = size / 2.0;
+    // Visual alinhado com PickerMap: fundo escuro, sombra suave e foto/iniciais.
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final ui.Canvas canvas = ui.Canvas(recorder);
+    final double s = size.toDouble();
+    final ui.Offset center = ui.Offset(s / 2, s / 2);
 
-    if (photoUrl != null) {
-      final Uint8List? raw = await _download(photoUrl);
-      if (raw != null) {
-        final ui.Codec codec = await ui.instantiateImageCodec(raw,
-            targetWidth: size, targetHeight: size);
-        final ui.FrameInfo frame = await codec.getNextFrame();
-        final ui.Image img = frame.image;
-        final ui.Path clip = ui.Path()
-          ..addOval(ui.Rect.fromCircle(center: center, radius: radius));
-        canvas.save();
-        canvas.clipPath(clip);
-        canvas.drawImageRect(
-          img,
-          ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
-          rect,
-          ui.Paint()..isAntiAlias = true,
-        );
-        canvas.restore();
-      } else {
-        _drawInitialsAvatar(canvas, rect, name);
+    // Sombra suave por baixo
+    canvas.drawCircle(
+      center,
+      s * 0.50,
+      ui.Paint()
+        ..color = Colors.black.withOpacity(0.35)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 8),
+    );
+
+    // Base escura
+    final ui.Paint bg = ui.Paint()..color = const Color(0xFF30343C);
+    canvas.drawCircle(center, s * 0.46, bg);
+
+    // Foto ou iniciais recortadas no círculo
+    Uint8List? photo;
+    try {
+      if ((photoUrl ?? '').trim().isNotEmpty && !_looksSvg(photoUrl)) {
+        photo = await _downloadAndResize(_massageUrl(photoUrl!.trim()), size);
       }
-    } else {
-      _drawInitialsAvatar(canvas, rect, name);
-    }
+    } catch (_) {}
 
-    final border = ui.Paint()
-      ..style = ui.PaintingStyle.stroke
-      ..strokeWidth = math.max(4.0, size * 0.08)
-      ..color = const Color(0xFFFFC107)
-      ..isAntiAlias = true;
-    canvas.drawCircle(center, radius - border.strokeWidth / 2, border);
+    if (photo != null) {
+      final ui.Codec codec =
+          await ui.instantiateImageCodec(photo, targetWidth: size, targetHeight: size);
+      final ui.FrameInfo frame = await codec.getNextFrame();
+      final ui.Image img = frame.image;
+      final ui.Rect rect = ui.Rect.fromCircle(center: center, radius: s * 0.46);
+      canvas.save();
+      canvas.clipPath(ui.Path()..addOval(rect));
+      canvas.drawImageRect(
+        img,
+        ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+        rect,
+        ui.Paint(),
+      );
+      canvas.restore();
+    } else {
+      final String initials = _initialsFromName(name);
+      final ui.ParagraphBuilder builder = ui.ParagraphBuilder(
+        ui.ParagraphStyle(textAlign: TextAlign.center),
+      )
+        ..pushStyle(ui.TextStyle(
+          fontSize: s * 0.38,
+          color: Colors.white,
+          fontWeight: ui.FontWeight.w700,
+        ))
+        ..addText(initials);
+      final ui.Paragraph paragraph = builder.build()
+        ..layout(ui.ParagraphConstraints(width: s));
+      canvas.drawParagraph(paragraph, ui.Offset(0, center.dy - paragraph.height / 2));
+    }
 
     final ui.Image image = await recorder.endRecording().toImage(size, size);
     return image;
@@ -693,25 +717,34 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     required Map<String, dynamic>? data,
     required String photoUrl,
   }) async {
-    final bool isTaxi = _isTaxi(data);
-    final String? preferred = _markerUrlFromData(data, isTaxi: isTaxi);
-    final String fallback =
-        isTaxi ? widget.driverTaxiIconUrl : widget.driverDriverIconUrl;
+    // Escolha robusta parecida com PickerMap: tenta markersUrls, cai para os
+    // icons padroes (driver/taxi), depois foto e por fim um ponto.
     final int size = widget.driverIconWidth.clamp(48, 220);
+    final _DriverVisualChoice visual = _resolveDriverVisual(data);
 
-    final Uint8List? brandBytes =
-        await _loadMarkerIcon(preferred ?? fallback, size);
-    if (brandBytes != null) {
-      return brandBytes;
+    Future<Uint8List?> tryLoad(String? url) async {
+      if (url == null) return null;
+      // Tenta asset primeiro
+      final Uint8List? a = await _tryLoadAssetPng(url, size);
+      if (a != null) return a;
+      // Depois rede com melhorias
+      return await _downloadAndResize(_massageUrl(url), size);
     }
 
-    if (photoUrl.trim().isNotEmpty) {
-      final Uint8List? circle =
-          await _circleImagePng(photoUrl.trim(), size: size);
-      if (circle != null) return circle;
+    // Preferido
+    Uint8List? bytes = await tryLoad(visual.url);
+
+    // Fallback brand
+    bytes ??= await tryLoad(visual.fallback);
+
+    // Foto do motorista
+    if (bytes == null && photoUrl.trim().isNotEmpty && !_looksSvg(photoUrl)) {
+      bytes = await _circleImagePng(photoUrl.trim(), size: size);
     }
 
-    return _buildDotPng(color: const Color(0xFFFFC107), size: 32);
+    // Último recurso
+    bytes ??= await _buildDotPng(color: const Color(0xFFFFC107), size: 32);
+    return bytes;
   }
 
   Future<Uint8List?> _loadMarkerIcon(String? url, int size) async {
@@ -720,37 +753,72 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     if (_iconCache.containsKey(key)) {
       return _iconCache[key];
     }
-    final String normalized = url.trim();
-    Uint8List? raw;
-    if (normalized.startsWith('data:image/')) {
-      raw = _decodeDataUrl(normalized);
-    } else {
+    final String cleaned = url.trim();
+
+    // Data URL
+    if (cleaned.toLowerCase().startsWith('data:image/')) {
+      final Uint8List? raw = _decodeDataUrl(cleaned);
+      if (raw == null) return null;
       try {
-        final http.Response resp = await http.get(Uri.parse(normalized));
-        if (resp.statusCode == 200) {
-          raw = resp.bodyBytes;
-        }
-      } catch (_) {}
+        final ui.Codec codec = await ui.instantiateImageCodec(raw,
+            targetWidth: size, targetHeight: size);
+        final ui.FrameInfo frame = await codec.getNextFrame();
+        final ui.Image image = frame.image;
+        final ByteData? data =
+            await image.toByteData(format: ui.ImageByteFormat.png);
+        if (data == null) return null;
+        final Uint8List bytes = data.buffer.asUint8List();
+        _iconCache[key] = bytes;
+        return bytes;
+      } catch (_) {
+        return null;
+      }
     }
-    if (raw == null) return null;
+
+    // Asset local (heurística): aceita 'asset://...' ou nomes/paths termina .png
+    final String lower = cleaned.toLowerCase();
+    if (lower.startsWith('asset://') ||
+        (!lower.startsWith('http') && !lower.startsWith('gs://'))) {
+      final String candidate = lower.startsWith('asset://')
+          ? cleaned.substring('asset://'.length)
+          : cleaned;
+      final Uint8List? assetBytes =
+          await _tryLoadAssetPng(candidate, size);
+      if (assetBytes != null) {
+        _iconCache[key] = assetBytes;
+        return assetBytes;
+      }
+    }
+
+    // SVG não suportado como bitmap
+    if (_looksSvg(cleaned)) return null;
+
+    // HTTP/GS com melhorias (alt=media / auth)
     try {
+      final Uri uri = Uri.parse(_massageUrl(cleaned));
+      Future<http.Response> doGet([Map<String, String>? extra]) {
+        final headers = <String, String>{
+          'accept': 'image/*,*/*;q=0.8',
+          'user-agent': 'PolyMap/1.0',
+        };
+        if (extra != null) headers.addAll(extra);
+        return http.get(uri, headers: headers).timeout(const Duration(seconds: 8));
+      }
+
+      http.Response resp = await doGet();
+      if ((resp.statusCode == 401 || resp.statusCode == 403) &&
+          _looksFirebaseStorageUrl(uri.toString())) {
+        final auth = await _authHeadersForFirebaseIfAny();
+        if (auth.isNotEmpty) resp = await doGet(auth);
+      }
+      if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
+      final Uint8List raw = resp.bodyBytes;
       final ui.Codec codec = await ui.instantiateImageCodec(raw,
           targetWidth: size, targetHeight: size);
       final ui.FrameInfo frame = await codec.getNextFrame();
       final ui.Image image = frame.image;
-      final ui.PictureRecorder recorder = ui.PictureRecorder();
-      final ui.Canvas canvas = ui.Canvas(recorder);
-      final ui.Rect rect =
-          ui.Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble());
-      canvas.drawImageRect(
-        image,
-        ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-        rect,
-        ui.Paint()..isAntiAlias = true,
-      );
-      final ui.Image out = await recorder.endRecording().toImage(size, size);
       final ByteData? data =
-          await out.toByteData(format: ui.ImageByteFormat.png);
+          await image.toByteData(format: ui.ImageByteFormat.png);
       if (data == null) return null;
       final Uint8List bytes = data.buffer.asUint8List();
       _iconCache[key] = bytes;
@@ -760,12 +828,157 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     }
   }
 
+  Future<Uint8List?> _downloadAndResize(String? url, int targetWidthPx) async {
+    final String clean = (url ?? '').trim();
+    if (clean.isEmpty || _looksSvg(clean)) return null;
+    final hit = _iconMemCache[clean];
+    if (hit != null) return hit;
+    if (_iconInFlight.containsKey(clean)) return await _iconInFlight[clean]!;
+
+    Future<Uint8List?> task() async {
+      try {
+        final Uri uri = Uri.parse(_massageUrl(clean));
+        Future<http.Response> doGet([Map<String, String>? extra]) {
+          final headers = <String, String>{
+            'accept': 'image/*,*/*;q=0.8',
+            'user-agent': 'PolyMap/1.0',
+          };
+          if (extra != null) headers.addAll(extra);
+          return http.get(uri, headers: headers).timeout(const Duration(seconds: 8));
+        }
+
+        http.Response resp = await doGet();
+        if ((resp.statusCode == 401 || resp.statusCode == 403) &&
+            _looksFirebaseStorageUrl(uri.toString())) {
+          final auth = await _authHeadersForFirebaseIfAny();
+          if (auth.isNotEmpty) resp = await doGet(auth);
+        }
+        if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
+        final Uint8List bytes = resp.bodyBytes;
+        final ui.Codec codec = await ui.instantiateImageCodec(bytes,
+            targetWidth: targetWidthPx);
+        final ui.FrameInfo frame = await codec.getNextFrame();
+        final ui.Image img = frame.image;
+        final ByteData? out =
+            await img.toByteData(format: ui.ImageByteFormat.png);
+        if (out == null) return null;
+        final Uint8List result = out.buffer.asUint8List();
+        _iconMemCache[clean] = result;
+        return result;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    final fut = task();
+    _iconInFlight[clean] = fut;
+    final res = await fut;
+    _iconInFlight.remove(clean);
+    return res;
+  }
+
   Uint8List? _decodeDataUrl(String url) {
     final int comma = url.indexOf(',');
     if (comma <= 0) return null;
     final String data = url.substring(comma + 1);
     try {
       return base64Decode(data);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ---------- URL helpers (compatíveis com PickerMap) ----------
+  String _massageUrl(String url) {
+    String s = url.trim();
+    if (s.startsWith('http://')) s = 'https://${s.substring(7)}';
+
+    if (s.startsWith('gs://')) {
+      final noGs = s.substring(5);
+      final slash = noGs.indexOf('/');
+      if (slash > 0) {
+        final bucket = noGs.substring(0, slash);
+        final path = noGs.substring(slash + 1);
+        final encodedPath = Uri.encodeComponent(path);
+        s =
+            'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$encodedPath?alt=media';
+      }
+    }
+
+    if (s.contains('firebasestorage.googleapis.com') && !s.contains('alt=media')) {
+      s += s.contains('?') ? '&alt=media' : '?alt=media';
+    }
+
+    if (s.contains('storage.googleapis.com') && !s.contains('%')) {
+      try {
+        final u = Uri.parse(s);
+        final fixed = Uri(
+          scheme: u.scheme.isEmpty ? 'https' : u.scheme,
+          host: u.host,
+          port: u.hasPort ? u.port : null,
+          pathSegments: u.pathSegments.map(Uri.encodeComponent).toList(),
+          query: u.query.isEmpty ? null : u.query,
+        );
+        s = fixed.toString();
+      } catch (_) {
+        s = Uri.encodeFull(s);
+      }
+    }
+    return s;
+  }
+
+  bool _looksSvg(String? url) {
+    final u = (url ?? '').toLowerCase();
+    return u.endsWith('.svg') || u.contains('image/svg');
+  }
+
+  bool _looksFirebaseStorageUrl(String s) {
+    final u = s.toLowerCase();
+    return u.contains('firebasestorage.googleapis.com') ||
+        u.contains('storage.googleapis.com');
+  }
+
+  Future<Map<String, String>> _authHeadersForFirebaseIfAny() async {
+    try {
+      final user = fa.FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final String? token = await user.getIdToken();
+        if ((token ?? '').isNotEmpty) {
+          return {'Authorization': 'Bearer ${token!}'};
+        }
+      }
+    } catch (_) {}
+    return const {};
+  }
+
+  String? _assetPathFromUrlOrName(String? urlOrName) {
+    final s = (urlOrName ?? '').trim();
+    if (s.isEmpty) return null;
+    try {
+      final uri = Uri.parse(s);
+      final seg = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : s;
+      final decoded = Uri.decodeComponent(seg);
+      final name = decoded.endsWith('.png') ? decoded : '$decoded.png';
+      return 'assets/images/$name';
+    } catch (_) {
+      final base = s.endsWith('.png') ? s : '$s.png';
+      return 'assets/images/$base';
+    }
+  }
+
+  Future<Uint8List?> _tryLoadAssetPng(String? urlOrName, int targetWidthPx) async {
+    final String? asset = _assetPathFromUrlOrName(urlOrName);
+    if (asset == null) return null;
+    try {
+      final data = await rootBundle.load(asset);
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        data.buffer.asUint8List(),
+        targetWidth: targetWidthPx,
+      );
+      final ui.FrameInfo frame = await codec.getNextFrame();
+      final ui.Image img = frame.image;
+      final ByteData? out = await img.toByteData(format: ui.ImageByteFormat.png);
+      return out?.buffer.asUint8List();
     } catch (_) {
       return null;
     }
@@ -890,6 +1103,218 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     return null;
   }
 
+  // ------------- Versão robusta de resolução (como no PickerMap) -------------
+  Map<String, String> _markerUrlsFromData(Map<String, dynamic>? data) {
+    final Map<String, String> result = <String, String>{};
+
+    void absorb(String? key, dynamic value) {
+      if (value == null) return;
+      if (value is String) {
+        final String trimmed = value.trim();
+        if (trimmed.isEmpty) return;
+        result[(key ?? 'default').toLowerCase()] = trimmed;
+        return;
+      }
+      if (value is Iterable) {
+        for (final dynamic item in value) {
+          if (item is Map) {
+            final dynamic innerKey = item['key'] ?? item['name'] ?? key;
+            final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString() ?? key, innerValue);
+            } else {
+              absorb(key, item);
+            }
+          } else {
+            absorb(key, item);
+          }
+        }
+        return;
+      }
+      if (value is Map) {
+        if (value.containsKey('url') || value.containsKey('value')) {
+          final dynamic innerKey = value['key'] ?? value['name'] ?? key;
+          final dynamic innerValue = value['url'] ?? value['value'];
+          absorb(innerKey?.toString() ?? key, innerValue);
+          return;
+        }
+        value.forEach((dynamic k, dynamic v) {
+          absorb(k?.toString(), v);
+        });
+      }
+    }
+
+    void readField(dynamic source) {
+      if (source == null) return;
+      if (source is Map) {
+        source.forEach((dynamic k, dynamic v) {
+          absorb(k?.toString(), v);
+        });
+      } else if (source is Iterable) {
+        for (final dynamic item in source) {
+          if (item is Map) {
+            final dynamic innerKey = item['key'] ?? item['name'];
+            final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+            absorb(innerKey?.toString(), innerValue);
+          } else {
+            absorb(null, item);
+          }
+        }
+      } else {
+        absorb(null, source);
+      }
+    }
+
+    readField(data?['markersUrls']);
+    readField(data?['markerUrls']);
+
+    // Alguns atalhos comuns
+    final Map<String, dynamic>? users =
+        (data?['users'] is Map) ? (data?['users'] as Map<String, dynamic>) : null;
+    if (users != null) {
+      readField(users['markersUrls']);
+      readField(users['markerUrls']);
+    }
+
+    return result;
+  }
+
+  String? _markerUrlForKeys(Map<String, String> urls, List<String> keys) {
+    for (final String k in keys) {
+      final String? v = urls[k.toLowerCase()];
+      if (v != null && v.trim().isNotEmpty) return v.trim();
+    }
+    return null;
+  }
+
+  String? _cleanUrl(String? url) {
+    final String s = (url ?? '').trim();
+    return s.isEmpty ? null : s;
+  }
+
+  String? _firstNonEmpty(Iterable<dynamic> items) {
+    for (final dynamic v in items) {
+      if (v == null) continue;
+      final String s = v.toString().trim();
+      if (s.isNotEmpty) return s;
+    }
+    return null;
+  }
+
+  
+
+  _PlatformInfo _platformInfoFromData(Map<String, dynamic>? data) {
+    final Set<String> values = <String>{};
+    void add(dynamic source) {
+      if (source == null) return;
+      if (source is String) {
+        final String trimmed = source.trim();
+        if (trimmed.isNotEmpty) values.add(trimmed);
+      } else if (source is Iterable) {
+        for (final dynamic item in source) {
+          add(item);
+        }
+      }
+    }
+
+    if (data?['users'] is Map) {
+      final Map users = data?['users'] as Map;
+      add(users['plataform']);
+      add(users['plataforms']);
+      add(users['platform']);
+      add(users['platforms']);
+      add(users['type']);
+    }
+    add(data?['plataform']);
+    add(data?['plataforms']);
+    add(data?['platform']);
+    add(data?['platforms']);
+    add(data?['type']);
+
+    return _PlatformInfo(values.toList());
+  }
+
+  
+
+  _DriverVisualChoice _resolveDriverVisual(Map<String, dynamic>? data) {
+    final _PlatformInfo info = _platformInfoFromData(data);
+    final Map<String, String> markerUrls = _markerUrlsFromData(data);
+    final Map<String, dynamic>? usersMap =
+        (data?['users'] is Map<String, dynamic>)
+            ? (data?['users'] as Map<String, dynamic>?)
+            : null;
+
+    final String? driverFallback = _cleanUrl(widget.driverDriverIconUrl);
+    final String? taxiFallback = _cleanUrl(widget.driverTaxiIconUrl) ?? driverFallback;
+
+    if (info.isRideDriver) {
+      return _DriverVisualChoice(
+        url: driverFallback,
+        fallback: driverFallback ?? taxiFallback,
+        isTaxi: false,
+        forceBrandIcon: true,
+      );
+    }
+
+    if (info.isRideTaxi || info.hasTaxiKeyword) {
+      String? url = _markerUrlForKeys(markerUrls, const <String>[
+        'ride taxi',
+        'ride_taxi',
+        'taxi',
+        'car',
+        'vehicle',
+      ]);
+      url ??= _firstNonEmpty(<dynamic>[
+        data?['markerUrl'],
+        data?['marker_url'],
+        usersMap?['markerUrl'],
+        usersMap?['marker_url'],
+        data?['vehiclePhoto'],
+        data?['vehicle_photo'],
+        data?['carPhoto'],
+        data?['car_photo'],
+        data?['photoVehicle'],
+        data?['photo_vehicle'],
+        data?['photoCar'],
+        data?['photo_car'],
+        data?['vehicleImage'],
+        data?['vehicle_image'],
+        data?['carImage'],
+        data?['car_image'],
+        usersMap?['vehiclePhoto'],
+        usersMap?['carPhoto'],
+      ]);
+      return _DriverVisualChoice(
+        url: url,
+        fallback: taxiFallback ?? driverFallback,
+        isTaxi: true,
+        forceBrandIcon: info.isRideTaxi,
+      );
+    }
+
+    String? url = _markerUrlForKeys(markerUrls, const <String>[
+      'ride driver',
+      'driver',
+      'default',
+      'principal',
+      'main',
+      'primary',
+    ]);
+    url ??= _firstNonEmpty(<dynamic>[
+      data?['markerUrl'],
+      data?['marker_url'],
+      usersMap?['markerUrl'],
+      usersMap?['marker_url'],
+    ]);
+
+    return _DriverVisualChoice(
+      url: url,
+      fallback: driverFallback ?? taxiFallback,
+      isTaxi: false,
+      forceBrandIcon: false,
+    );
+  }
+
   void _onDriverMarkersChanged() {
     if (!widget.enableDriverFocus) return;
     final List<String> drivers =
@@ -989,4 +1414,26 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     }
     return true;
   }
+}
+
+// Pequenas classes de apoio (fora do State para evitar conflitos de sintaxe)
+class _PlatformInfo {
+  _PlatformInfo(this.values);
+  final List<String> values;
+  bool get isRideTaxi => values.any((v) => v.toLowerCase().contains('taxi'));
+  bool get hasTaxiKeyword => values.any((v) => v.toLowerCase().contains('taxi'));
+  bool get isRideDriver => values.any((v) => v.toLowerCase().contains('driver'));
+}
+
+class _DriverVisualChoice {
+  const _DriverVisualChoice({
+    required this.url,
+    required this.fallback,
+    required this.isTaxi,
+    required this.forceBrandIcon,
+  });
+  final String? url;
+  final String? fallback;
+  final bool isTaxi;
+  final bool forceBrandIcon;
 }

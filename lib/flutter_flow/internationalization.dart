@@ -4537,7 +4537,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': '',
       'es': '',
       'fr': '',
-      'pt': '',
+      'pt': 'Confirmar',
     },
   },
   // erronopagamento
@@ -5518,7 +5518,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': '',
       'es': '',
       'fr': '',
-      'pt': '',
+      'pt': 'Salvar cartão',
     },
   },
   // emergency

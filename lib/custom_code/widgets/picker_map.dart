@@ -58,7 +58,7 @@ class PickerMap extends StatefulWidget {
 
     // Tweaks
     this.refreshMs = 8000,
-    this.traceThrottleMs = 90,
+    this.traceThrottleMs = 140,
     this.routeColor = const Color(0xFFFFC107),
     this.routeWidth = 8,
     this.liveTraceColor = const Color(0xFF00E5FF),
@@ -168,6 +168,7 @@ class _PickerMapState extends State<PickerMap>
   double _snakeT = 0.0;
   int _snakeDurationMs = 9000; // mais rÃ¡pido por padrÃ£o
   int _lastCamUpdateMs = 0;
+  int _lastSnakeDrawMs = 0; // throttle snake polyline updates
 
   // Idle camera quando destination == null
   Timer? _idleCamTimer;
@@ -189,21 +190,21 @@ class _PickerMapState extends State<PickerMap>
   double get _adaptiveSnakePadding {
     final double dist = _totalDist;
     if (dist <= 0) {
-      return 320.0;
+      return 180.0;
     }
     if (dist < 800) {
-      return 340.0;
+      return 200.0;
     }
     if (dist < 2500) {
-      return 360.0;
+      return 220.0;
     }
     if (dist < 8000) {
-      return 420.0;
+      return 250.0;
     }
     if (dist < 16000) {
-      return 470.0;
+      return 280.0;
     }
-    return 520.0;
+    return 300.0;
   }
 
   int _boostedDriverIconSize({bool forDestination = false}) {
@@ -242,24 +243,30 @@ class _PickerMapState extends State<PickerMap>
           ? (List<nmap.LatLng>.from(_route.getRange(0, k))..add(headPos))
           : <nmap.LatLng>[_route.first, headPos];
 
-      // Contorno preto embaixo + amarelo por cima
-      final double mainW = widget.routeWidth.toDouble().clamp(6.0, 20.0);
-      final double outlineW = (mainW + 8.0).clamp(mainW + 6.0, mainW + 16.0);
+      // Throttle desenho das polylines para aliviar UI
+      if (DateTime.now().millisecondsSinceEpoch - _lastSnakeDrawMs >
+          (widget.ultraLowSpecMode ? 72 : 48)) {
+        _lastSnakeDrawMs = DateTime.now().millisecondsSinceEpoch;
+        // Contorno preto embaixo + amarelo por cima
+        final double mainW = widget.routeWidth.toDouble().clamp(6.0, 20.0);
+        final double outlineW =
+            (mainW + 8.0).clamp(mainW + 6.0, mainW + 16.0);
 
-      await _updatePolyline(
-        id: _kSnakeOutline,
-        points: vis,
-        width: outlineW,
-        color: const Color(0xFF0A0A0A),
-        geodesic: true,
-      );
-      await _updatePolyline(
-        id: _kSnakeMain,
-        points: vis,
-        width: mainW,
-        color: widget.routeColor,
-        geodesic: true,
-      );
+        await _updatePolyline(
+          id: _kSnakeOutline,
+          points: vis,
+          width: outlineW,
+          color: const Color(0xFF0A0A0A),
+          geodesic: true,
+        );
+        await _updatePolyline(
+          id: _kSnakeMain,
+          points: vis,
+          width: mainW,
+          color: widget.routeColor,
+          geodesic: true,
+        );
+      }
 
       // Follow de cÃ¢mera mais amplo
       final int now = DateTime.now().millisecondsSinceEpoch;
@@ -556,7 +563,7 @@ class _PickerMapState extends State<PickerMap>
     }
 
     final List<nmap.LatLng> pts = List<nmap.LatLng>.from(_route);
-    const int steps = 7;
+    const int steps = 5; // menos passos para aliviar CPU
     for (int i = 1; i <= steps; i++) {
       final double t = i / steps;
       final double fade = math.pow(1.0 - t, 1.2).toDouble();
@@ -924,11 +931,13 @@ class _PickerMapState extends State<PickerMap>
       } catch (_) {}
     } else {
       try {
+        // Sempre inicia com ícone transparente para nunca mostrar o pin vermelho
+        final String transparentUrl = _bytesToDataUrl(_transparentPixel);
         await _controller!.addMarker(nmap.MarkerOptions(
           id: id,
           position: position,
           title: title,
-          iconUrl: resolvedIconUrl,
+          iconUrl: transparentUrl,
           anchorU: anchorU,
           anchorV: anchorV,
           zIndex: zIndex,
@@ -952,7 +961,54 @@ class _PickerMapState extends State<PickerMap>
           anchorV: anchorV,
         );
       } catch (_) {}
+    } else if ((resolvedIconUrl ?? '').isNotEmpty) {
+      // Carrega bytes do asset/URL em background e atualiza quando pronto
+      try {
+        Uint8List? fetched;
+        final int target = _iconSizeHintForMarkerId(id);
+        final String url = resolvedIconUrl!;
+        final String lower = url.toLowerCase();
+        if (lower.startsWith('asset://')) {
+          final String asset = url.substring('asset://'.length);
+          try {
+            final data = await rootBundle.load(asset);
+            final ui.Codec codec = await ui.instantiateImageCodec(
+              data.buffer.asUint8List(),
+              targetWidth: target,
+            );
+            final ui.FrameInfo frame = await codec.getNextFrame();
+            final ui.Image img = frame.image;
+            final ByteData? out =
+                await img.toByteData(format: ui.ImageByteFormat.png);
+            fetched = out?.buffer.asUint8List();
+          } catch (_) {}
+        } else if (!lower.startsWith('data:')) {
+          fetched = await _downloadAndResize(url, target);
+        }
+        if (fetched != null) {
+          final dynamic dc = _controller;
+          await dc.setMarkerIconBytes(
+            id: id,
+            bytes: fetched,
+            anchorU: anchorU,
+            anchorV: anchorV,
+          );
+        }
+      } catch (_) {}
     }
+  }
+
+  int _iconSizeHintForMarkerId(String id) {
+    if (id == 'user') {
+      return widget.userMarkerSize.clamp(48, 168).toInt();
+    }
+    if (id == 'dest') {
+      return _boostedDriverIconSize(forDestination: true);
+    }
+    if (id.startsWith('driver_')) {
+      return _boostedDriverIconSize();
+    }
+    return 112;
   }
 
   void _subscribeDrivers() {
@@ -1469,8 +1525,8 @@ class _PickerMapState extends State<PickerMap>
 
     _route = _decimate(
       _route,
-      minStepMeters: widget.ultraLowSpecMode ? 8.0 : 4.0,
-      maxPoints: widget.ultraLowSpecMode ? 200 : 360,
+      minStepMeters: widget.ultraLowSpecMode ? 10.0 : 6.0,
+      maxPoints: widget.ultraLowSpecMode ? 180 : 280,
     );
 
     _cumDist = List<double>.filled(_route.length, 0.0);
