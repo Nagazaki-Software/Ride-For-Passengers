@@ -14,6 +14,14 @@ subprojects {
     }
 }
 
+// Globally exclude CardinalCommerce SDK to prevent 3DS dependency resolution
+// in all modules, including plugin subprojects like :braintree_flutter_plus.
+subprojects {
+    configurations.all {
+        exclude group: 'org.jfrog.cardinalcommerce.gradle', module: 'cardinalmobilesdk'
+    }
+}
+
 subprojects {
     afterEvaluate { project ->
         if (project.plugins.hasPlugin("com.android.application") ||
