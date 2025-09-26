@@ -17,9 +17,15 @@ const K_TEST_MERCHANT_ID = "brg8dhjg5tqpw496";
 const K_TEST_PUBLIC_KEY  = "syt9g3c79t58wk82";
 const K_TEST_PRIVATE_KEY = "0f7de713fa2bbb810f183f628f51d86d";
 
-// Produção (lidas do functions:config, ou vazias por padrão)
-const functions = require("firebase-functions");
-const CFG = (functions.config && functions.config().braintree) || {};
+// Produção (lidas do functions:config, se disponíveis)
+let CFG = {};
+try {
+  const functions = require("firebase-functions");
+  // Em alguns ambientes sem config setado, chamar config() pode lançar.
+  CFG = (functions.config && functions.config().braintree) || {};
+} catch (_) {
+  CFG = {};
+}
 const K_PROD_MERCHANT_ID = CFG.prod_merchant_id || "";
 const K_PROD_PUBLIC_KEY  = CFG.prod_public_key  || "";
 const K_PROD_PRIVATE_KEY = CFG.prod_private_key || "";
@@ -206,13 +212,15 @@ exports.payAndReturnPaymentMethod = onCall({ region: "us-central1", timeoutSecon
  * data: { paymentNonce: string, deviceData?: string, isProd?: boolean }
  * retorna: { success, paymentMethod?, error? }
  */
-exports.saveCardPayment = functions.https.onCall(async (data, context) => {
+exports.saveCardPayment = onCall({ region: "us-central1", timeoutSeconds: 60, memory: "256MiB" }, async (request) => {
+  const data = request.data || {};
+  const context = request;
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+    throw new HttpsError("unauthenticated", "Faca login primeiro.");
   }
   const { paymentNonce, deviceData, isProd = false } = data || {};
   if (!paymentNonce) {
-    throw new functions.https.HttpsError("invalid-argument", "paymentNonce e obrigatorio.");
+    throw new HttpsError("invalid-argument", "paymentNonce e obrigatorio.");
   }
 
   const uid = context.auth.uid;
@@ -250,13 +258,15 @@ exports.saveCardPayment = functions.https.onCall(async (data, context) => {
  * data: { amount: string|number, paymentMethodToken: string, deviceData?: string, isProd?: boolean }
  * retorna: { success, transactionId?, error? }
  */
-exports.payWithSavedPaymentMethod = functions.https.onCall(async (data, context) => {
+exports.payWithSavedPaymentMethod = onCall({ region: "us-central1", timeoutSeconds: 60, memory: "256MiB" }, async (request) => {
+  const data = request.data || {};
+  const context = request;
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+    throw new HttpsError("unauthenticated", "Faca login primeiro.");
   }
   const { amount, paymentMethodToken, deviceData, isProd = false } = data || {};
   if (amount == null || !paymentMethodToken) {
-    throw new functions.https.HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
+    throw new HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
   }
 
   const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);
@@ -281,13 +291,15 @@ exports.payWithSavedPaymentMethod = functions.https.onCall(async (data, context)
  * data: { amount: string|number, paymentMethodToken: string, deviceData?: string, isProd?: boolean, rideId?: string, driverId?: string }
  * retorna: { success, transactionId?, error? }
  */
-exports.tipDriver = functions.https.onCall(async (data, context) => {
+exports.tipDriver = onCall({ region: "us-central1", timeoutSeconds: 60, memory: "256MiB" }, async (request) => {
+  const data = request.data || {};
+  const context = request;
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "Faca login primeiro.");
+    throw new HttpsError("unauthenticated", "Faca login primeiro.");
   }
   const { amount, paymentMethodToken, deviceData, isProd = false, rideId, driverId } = data || {};
   if (amount == null || !paymentMethodToken) {
-    throw new functions.https.HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
+    throw new HttpsError("invalid-argument", "amount e paymentMethodToken sao obrigatorios.");
   }
 
   const amtStr = typeof amount === "string" ? amount : Number(amount).toFixed(2);

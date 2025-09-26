@@ -6,6 +6,9 @@ import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '/flutter_flow/lat_lng.dart';
 import 'profile15_model.dart';
 export 'profile15_model.dart';
 
@@ -23,6 +26,70 @@ class _Profile15WidgetState extends State<Profile15Widget> {
   late Profile15Model _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  String? _zoneName; // "bairro" curto para exibir em Zone
+
+  Future<void> _loadZoneFromLatLng() async {
+    try {
+      final LatLng? ll = FFAppState().latlngAtual;
+      if (ll == null) return;
+
+      // Usa a mesma Google API Key já utilizada em outras telas
+      const String apiKey = 'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ';
+      final uri = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json'
+        '?latlng=${ll.latitude},${ll.longitude}'
+        '&language=en-US'
+        '&key=$apiKey',
+      );
+
+      final resp = await http.get(uri).timeout(const Duration(seconds: 8));
+      if (resp.statusCode != 200) return;
+      final data = json.decode(resp.body) as Map<String, dynamic>;
+      if ((data['status'] ?? '') != 'OK') return;
+
+      String? bairro;
+      final results = (data['results'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+      for (final r in results) {
+        final comps = (r['address_components'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+        for (final c in comps) {
+          final types = (c['types'] as List?)?.cast<String>() ?? const [];
+          final longName = (c['long_name'] ?? '').toString();
+          if (longName.isEmpty) continue;
+          if (types.contains('neighborhood')) {
+            bairro = longName;
+            break;
+          }
+          if (bairro == null && (types.contains('sublocality') || types.contains('sublocality_level_1'))) {
+            bairro = longName;
+          }
+        }
+        if (bairro != null) break;
+      }
+
+      // Fallback: usa a cidade/locality
+      if (bairro == null) {
+        for (final r in results) {
+          final comps = (r['address_components'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+          for (final c in comps) {
+            final types = (c['types'] as List?)?.cast<String>() ?? const [];
+            if (types.contains('locality') || types.contains('postal_town')) {
+              bairro = (c['long_name'] ?? '').toString();
+              break;
+            }
+          }
+          if (bairro != null) break;
+        }
+      }
+
+      if (bairro != null && bairro.trim().isNotEmpty) {
+        // Apenas o primeiro nome se for composto
+        final first = bairro.trim().split(RegExp(r'\s+')).first;
+        if (mounted) setState(() => _zoneName = first);
+      }
+    } catch (_) {
+      // silencioso: mantemos o texto padrão
+    }
+  }
 
   @override
   void initState() {
@@ -30,6 +97,11 @@ class _Profile15WidgetState extends State<Profile15Widget> {
     _model = createModel(context, () => Profile15Model());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'Profile15'});
+    // Calcula Zone a partir do bairro do usuário
+    // (executa após primeiro frame para garantir FFAppState carregado)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadZoneFromLatLng();
+    });
   }
 
   @override
@@ -316,10 +388,7 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Text(
-                                                    FFLocalizations.of(context)
-                                                        .getText(
-                                                      'ty0dxium' /* Zone: Nassau */,
-                                                    ),
+                                                    'Zone: ' + (_zoneName ?? '...'),
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium

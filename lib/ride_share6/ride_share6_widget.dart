@@ -14,6 +14,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'ride_share6_model.dart';
 export 'ride_share6_model.dart';
 
@@ -136,6 +137,55 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
 
   @override
   Widget build(BuildContext context) {
+    // Early guard: avoid null-driven crashes from missing inputs.
+    final double safeValue = widget.value ?? 0.0;
+    final hasLatLngs = widget.latlngOrigem != null && widget.latlngDestino != null;
+    final String safeEstilo = widget.estilo ?? '';
+
+    if (!hasLatLngs || safeEstilo.isEmpty) {
+      return Scaffold(
+        backgroundColor: FlutterFlowTheme.of(context).primary,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    FFLocalizations.of(context).getText('rideshare_params_missing_msg') == 'rideshare_params_missing_msg'
+                        ? 'Parâmetros do Ride Share ausentes. Volte e tente novamente.'
+                        : FFLocalizations.of(context).getText('rideshare_params_missing_msg'),
+                    textAlign: TextAlign.center,
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          font: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                          ),
+                          color: FlutterFlowTheme.of(context).alternate,
+                          fontSize: 14.0,
+                          letterSpacing: 0.0,
+                          fontWeight: FontWeight.w500,
+                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => context.safePop(),
+                  child: Text(
+                    FFLocalizations.of(context).getText('rideshare_params_back') == 'rideshare_params_back'
+                        ? 'Voltar'
+                        : FFLocalizations.of(context).getText('rideshare_params_back'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -146,6 +196,53 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
         backgroundColor: FlutterFlowTheme.of(context).primary,
         body: Stack(
           children: [
+            // Background map with drivers and visual effects (pulse + viewing dots)
+            PointerInterceptor(
+              intercepting: isWeb,
+              child: StreamBuilder<List<UsersRecord>>(
+                stream: queryUsersRecord(
+                  queryBuilder: (users) => users
+                      .where('driver', isEqualTo: true)
+                      .where('driverOnline', isEqualTo: true),
+                ),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const SizedBox.shrink();
+                  }
+                  final drivers = snapshot.data!;
+                  final LatLng userLoc = widget.latlngOrigem ??
+                      FFAppState().latlngAtual ??
+                      const LatLng(0.0, 0.0);
+                  return SizedBox.expand(
+                    child: custom_widgets.PolyMap(
+                      width: double.infinity,
+                      height: double.infinity,
+                      refreshMs: 8000,
+                      userLocation: userLoc,
+                      driversRefs:
+                          drivers.map((e) => e.reference).toList(),
+                      userName: currentUserDisplayName,
+                      userPhotoUrl: currentUserPhoto,
+                      // Visual tweaks similar to PickerMap / Finding screen
+                      userMarkerSize: 96,
+                      driverIconWidth: 96,
+                      driverDriverIconUrl:
+                          'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/bgmclb0d2bsd/ChatGPT_Image_3_de_set._de_2025%2C_19_17_48.png',
+                      driverTaxiIconUrl:
+                          'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/hlhwt7mbve4j/ChatGPT_Image_3_de_set._de_2025%2C_15_02_50.png',
+                      // HUD off to focus on pulse and viewing bubble
+                      searchMessage: '',
+                      showSearchHud: false,
+                      focusIntervalMs: 4000,
+                      focusHoldMs: 3500,
+                      enableDriverFocus: true,
+                      showPulseHalo: true,
+                      showViewingBubble: true,
+                    ),
+                  );
+                },
+              ),
+            ),
             Align(
               alignment: AlignmentDirectional(0.0, 0.0),
               child: Column(
@@ -409,14 +506,24 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                             var rideOrdersRecordReference =
                                                 RideOrdersRecord.collection
                                                     .doc();
-                                            await rideOrdersRecordReference
-                                                .set({
+                                            if (!hasLatLngs || safeEstilo.isEmpty) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Defina origem, destino e estilo antes de gerar o QR.',
+                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            await rideOrdersRecordReference.set({
                                               ...createRideOrdersRecordData(
                                                 rideShare: true,
-                                                rideValue: widget.value,
+                                                rideValue: safeValue,
                                                 latlngAtual: widget.latlngOrigem,
                                                 latlng: widget.latlngDestino,
-                                                option: widget.estilo,
+                                                option: safeEstilo,
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -431,10 +538,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                     .getDocumentFromData({
                                               ...createRideOrdersRecordData(
                                                 rideShare: true,
-                                                rideValue: widget.value,
+                                                rideValue: safeValue,
                                                 latlngAtual: widget.latlngOrigem,
                                                 latlng: widget.latlngDestino,
-                                                option: widget.estilo,
+                                                option: safeEstilo,
                                               ),
                                               ...mapToFirestore(
                                                 {
@@ -554,14 +661,24 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                               var rideOrdersRecordReference =
                                                   RideOrdersRecord.collection
                                                       .doc();
-                                              await rideOrdersRecordReference
-                                                  .set({
+                                              if (!hasLatLngs || safeEstilo.isEmpty) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Defina origem, destino e estilo antes de compartilhar.',
+                                                      style: FlutterFlowTheme.of(context).bodyMedium,
+                                                    ),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              await rideOrdersRecordReference.set({
                                                 ...createRideOrdersRecordData(
                                                   rideShare: true,
-                                                  rideValue: widget.value,
+                                                  rideValue: safeValue,
                                                   latlngAtual: widget.latlngOrigem,
                                                   latlng: widget.latlngDestino,
-                                                  option: widget.estilo,
+                                                  option: safeEstilo,
                                                 ),
                                                 ...mapToFirestore(
                                                   {
@@ -576,10 +693,10 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                       .getDocumentFromData({
                                                 ...createRideOrdersRecordData(
                                                   rideShare: true,
-                                                  rideValue: widget.value,
+                                                  rideValue: safeValue,
                                                   latlngAtual: widget.latlngOrigem,
                                                   latlng: widget.latlngDestino,
-                                                  option: widget.estilo,
+                                                  option: safeEstilo,
                                                 ),
                                                 ...mapToFirestore(
                                                   {
