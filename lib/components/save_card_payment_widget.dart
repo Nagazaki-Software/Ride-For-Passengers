@@ -357,7 +357,6 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                               expirationMonth: expParts.isNotEmpty ? expParts.first : '',
                               expirationYear: expParts.length > 1 ? expParts.last : '',
                               cvv: cc.cvvCode,
-                              amount: '1.00',
                             );
                             if (tokenized == null || tokenized.isEmpty) {
                               showSnackbar(context, 'Failed to tokenize card.');

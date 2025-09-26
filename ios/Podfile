@@ -75,13 +75,8 @@ post_install do |installer|
       ]
     end
 
-    # If you don't use google_maps_native_sdk on iOS, exclude only implementation files
-    # to prevent Swift API mismatches, but keep the public header visible for registration.
-    if target.name == 'google_maps_native_sdk'
-      target.build_configurations.each do |config|
-        config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = 'Classes/*.m Classes/*.mm Classes/*.swift'
-      end
-    end
+    # Ensure google_maps_native_sdk iOS sources are included so the native picker works
+    # (no EXCLUDED_SOURCE_FILE_NAMES for the plugin target)
   end
 
   # Also enforce iOS 15.0 on the Runner project targets

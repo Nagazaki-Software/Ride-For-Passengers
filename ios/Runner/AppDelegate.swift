@@ -74,6 +74,10 @@ import GoogleMaps
 
   // Handle app switch returns (PayPal, etc.)
   override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    // Let Braintree handle returns from app/browser switches (PayPal, 3DS, etc.)
+    if BTAppContextSwitcher.handleOpenURL(url) {
+      return true
+    }
     return super.application(app, open: url, options: options)
   }
 }

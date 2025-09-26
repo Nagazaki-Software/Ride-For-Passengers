@@ -466,7 +466,7 @@ class _PickerMapState extends State<PickerMap>
 
   Future<void> _snapToUser() async {
     if (!_mapReady || _controller == null) return;
-    final nmap.LatLng user = _gm(widget.userLocation);
+    final nmap.LatLng user = _targetForUserWithPadding(17.2);
     try {
       final dynamic dc = _controller;
       await dc.animateCameraTo(
@@ -624,41 +624,37 @@ class _PickerMapState extends State<PickerMap>
     } catch (_) {}
     final bool hadRoute = _route.length >= 2;
     final bool hadDest = _markerIds.contains('dest');
-    final nmap.LatLng user = _gm(widget.userLocation);
+    final nmap.LatLng userCentered16 = _targetForUserWithPadding(16.1);
+    final nmap.LatLng userCentered17 = _targetForUserWithPadding(17.2);
 
-    if (false) {
-      final double baseZoom =
-          hadRoute ? math.max(13.8, _zoomForDistance(_totalDist) - 0.9) : 15.4;
+    // Remove destination marker early to prevent residual flash
+    if (hadDest) {
+      await _removeDestMarker();
+    }
+
+    // Small wide shot first (when there was a route), similar to when
+    // destination is present, then fade lines away.
+    if (hadRoute && _mapReady && _controller != null) {
       await _playCameraSequence(<_CameraMove>[
         _CameraMove(
-          target: user,
-          zoom: baseZoom,
-          bearing: (_idleBearing + 96) % 360,
-          tilt: hadRoute ? 50.0 : 46.0,
-          durationMs: hadRoute ? 620 : 520,
-          pauseAfterMs: 140,
-        ),
-        _CameraMove(
-          target: user,
-          zoom: math.min(18.3, baseZoom + 1.4),
+          target: userCentered16,
+          zoom: 16.1,
           bearing: (_idleBearing + 12) % 360,
-          tilt: 64.0,
-          durationMs: 720,
+          tilt: 50.0,
+          durationMs: 520,
+          pauseAfterMs: 60,
         ),
       ]);
     }
 
     await _fadeOutPolylines(base: true, snake: true);
     await _clearRoute();
-    if (hadDest) {
-      await _removeDestMarker();
-    }
     if (mounted) setState(() {});
 
     if (_mapReady && _controller != null) {
       await _playCameraSequence(<_CameraMove>[
         _CameraMove(
-          target: user,
+          target: userCentered16,
           zoom: 16.1,
           bearing: 6.0,
           tilt: 50.0,
@@ -666,7 +662,7 @@ class _PickerMapState extends State<PickerMap>
           pauseAfterMs: 120,
         ),
         _CameraMove(
-          target: user,
+          target: userCentered17,
           zoom: 17.2,
           bearing: 0.0,
           tilt: 64.0,
@@ -675,7 +671,7 @@ class _PickerMapState extends State<PickerMap>
       ]);
     } else {
       try {
-        await _controller?.moveCamera(user, zoom: 17.0);
+        await _controller?.moveCamera(userCentered17, zoom: 17.0);
       } catch (_) {}
     }
 
@@ -1932,6 +1928,24 @@ class _PickerMapState extends State<PickerMap>
   }
 
   // ================= HELPERS & MATH =================
+
+  // Computes a slightly south-shifted target so the user marker is not
+  // visually cut by bottom padding/overlays when tilting. Uses zoom to
+  // estimate meters-per-pixel for a consistent offset.
+  nmap.LatLng _targetForUserWithPadding(double zoom) {
+    final double lat = widget.userLocation.latitude;
+    final double lng = widget.userLocation.longitude;
+    final double latRad = lat * math.pi / 180.0;
+    final double metersPerPixel =
+        156543.03392 * math.cos(latRad) / math.pow(2.0, zoom);
+    final double pxBottom = math.max(0.0, widget.brandSafePaddingBottom);
+    final double pxMarker = widget.userMarkerSize.toDouble().clamp(32.0, 240.0);
+    // push up: 70% of bottom padding + 30% of marker + small margin
+    final double pxShift = pxBottom * 0.70 + pxMarker * 0.30 + 20.0;
+    final double metersShift = pxShift * metersPerPixel;
+    final double latDelta = metersShift / 111320.0; // ~meters per deg lat
+    return nmap.LatLng(lat - latDelta, lng);
+  }
 
   Future<void> _fitRouteBounds({double padding = 64.0}) async {
     if (_controller == null || _route.isEmpty) return;

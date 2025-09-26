@@ -10,7 +10,7 @@ class BraintreeNativeBridge {
     required String expirationMonth,
     required String expirationYear,
     required String cvv,
-    required String amount,
+    String? amount,
   }) async {
     final req = BraintreeCreditCardRequest(
       cardNumber: number,

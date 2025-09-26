@@ -73,6 +73,14 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 
+	<!-- Allow Braintree to query for PayPal/Venmo apps during app switch -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>com.paypal.ppclient.touch.v1</string>
+		<string>com.paypal.ppclient.touch.v2</string>
+		<string>com.venmo.touch.v2</string>
+	</array>
+
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>We use your location to find nearby rides, show accurate pickup points and improve safety features.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

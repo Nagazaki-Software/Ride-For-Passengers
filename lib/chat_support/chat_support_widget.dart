@@ -268,62 +268,60 @@ class _ChatSupportWidgetState extends State<ChatSupportWidget>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            if (columnChatHistoryRecord.msg !=
-                                                    '')
-                                              Text(
-                                                columnChatHistoryRecord.msg,
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font: GoogleFonts.poppins(
-                                                        fontWeight:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
-                                                      ),
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .alternate,
-                                                      fontSize: 15.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
-                                              ),
-                                            if (columnChatHistoryRecord.foto !=
-                                                    '')
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                                child: CachedNetworkImage(
-                                                  fadeInDuration: Duration(
-                                                      milliseconds: 500),
-                                                  fadeOutDuration: Duration(
-                                                      milliseconds: 500),
-                                                  imageUrl:
-                                                      columnChatHistoryRecord
-                                                          .foto,
-                                                  width: 200.0,
-                                                  height: 200.0,
-                                                  fit: BoxFit.cover,
+                                            AnimatedSwitcher(
+                                              duration: Duration(milliseconds: 200),
+                                              transitionBuilder: (child, anim) => FadeTransition(
+                                                opacity: anim,
+                                                child: ScaleTransition(
+                                                  scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                                                    CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+                                                  ),
+                                                  child: child,
                                                 ),
                                               ),
+                                              child: (columnChatHistoryRecord.msg != '')
+                                                  ? Text(
+                                                      columnChatHistoryRecord.msg,
+                                                      key: ValueKey('msg_${columnChatHistoryRecord.msg}'),
+                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                            font: GoogleFonts.poppins(
+                                                              fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                            ),
+                                                            color: FlutterFlowTheme.of(context).alternate,
+                                                            fontSize: 15.0,
+                                                            letterSpacing: 0.0,
+                                                            fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                          ),
+                                                    )
+                                                  : SizedBox.shrink(key: ValueKey('msg_empty')),
+                                            ),
+                                            AnimatedSwitcher(
+                                              duration: Duration(milliseconds: 200),
+                                              transitionBuilder: (child, anim) => FadeTransition(
+                                                opacity: anim,
+                                                child: ScaleTransition(
+                                                  scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                                                    CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+                                                  ),
+                                                  child: child,
+                                                ),
+                                              ),
+                                              child: (columnChatHistoryRecord.foto != '')
+                                                  ? ClipRRect(
+                                                      borderRadius: BorderRadius.circular(8.0),
+                                                      child: CachedNetworkImage(
+                                                        fadeInDuration: Duration(milliseconds: 500),
+                                                        fadeOutDuration: Duration(milliseconds: 500),
+                                                        imageUrl: columnChatHistoryRecord.foto,
+                                                        width: 200.0,
+                                                        height: 200.0,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    )
+                                                  : SizedBox.shrink(key: ValueKey('foto_empty')),
+                                            ),
                                             Padding(
                                               padding: EdgeInsetsDirectional
                                                   .fromSTEB(0.0, 4.0, 0.0, 0.0),
@@ -435,62 +433,70 @@ class _ChatSupportWidgetState extends State<ChatSupportWidget>
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.end,
                                             children: [
-                                              if (columnChatHistoryRecord
-                                                          .foto !=
-                                                      '')
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child: CachedNetworkImage(
-                                                    fadeInDuration: Duration(
-                                                        milliseconds: 500),
-                                                    fadeOutDuration: Duration(
-                                                        milliseconds: 500),
-                                                    imageUrl:
-                                                        columnChatHistoryRecord
-                                                            .foto,
-                                                    width: 200.0,
-                                                    height: 200.0,
-                                                    fit: BoxFit.cover,
+                                              AnimatedSwitcher(
+                                                duration: Duration(milliseconds: 200),
+                                                transitionBuilder: (child, anim) => FadeTransition(
+                                                  opacity: anim,
+                                                  child: ScaleTransition(
+                                                    scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                                                      CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+                                                    ),
+                                                    child: child,
                                                   ),
                                                 ),
-                                              if (columnChatHistoryRecord.msg !=
-                                                      '')
-                                                Text(
-                                                  columnChatHistoryRecord.msg,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        font:
-                                                            GoogleFonts.poppins(
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
+                                                child: (columnChatHistoryRecord.foto != '')
+                                                    ? ClipRRect(
+                                                        borderRadius: BorderRadius.circular(8.0),
+                                                        child: CachedNetworkImage(
+                                                          fadeInDuration: Duration(milliseconds: 500),
+                                                          fadeOutDuration: Duration(milliseconds: 500),
+                                                          imageUrl: columnChatHistoryRecord.foto,
+                                                          width: 200.0,
+                                                          height: 200.0,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      )
+                                                    : SizedBox.shrink(key: ValueKey('foto_empty')),
+                                              ),
+                                              AnimatedSwitcher(
+                                                duration: Duration(milliseconds: 200),
+                                                transitionBuilder: (child, anim) => FadeTransition(
+                                                  opacity: anim,
+                                                  child: ScaleTransition(
+                                                    scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                                                      CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+                                                    ),
+                                                    child: child,
+                                                  ),
+                                                ),
+                                                child: (columnChatHistoryRecord.msg != '')
+                                                    ? Text(
+                                                        columnChatHistoryRecord.msg,
+                                                        key: ValueKey('msg_${columnChatHistoryRecord.msg}'),
+                                                        style: FlutterFlowTheme.of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts.poppins(
+                                                                fontWeight: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: Colors.white,
+                                                              fontSize: 15.0,
+                                                              letterSpacing: 0.0,
+                                                              fontWeight: FlutterFlowTheme.of(context)
                                                                   .bodyMedium
                                                                   .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
+                                                              fontStyle: FlutterFlowTheme.of(context)
                                                                   .bodyMedium
                                                                   .fontStyle,
-                                                        ),
-                                                        color: Colors.white,
-                                                        fontSize: 15.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
-                                                      ),
-                                                ),
+                                                            ),
+                                                      )
+                                                    : SizedBox.shrink(key: ValueKey('msg_empty')),
+                                              ),
                                               Padding(
                                                 padding: EdgeInsetsDirectional
                                                     .fromSTEB(
