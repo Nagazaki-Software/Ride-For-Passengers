@@ -202,6 +202,20 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
+    // Keep selected card in sync with app state (default/newly-added)
+    final methods = FFAppState().paymentMethods;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final selectedToken = _model.selectCard?.paymentMethodToken;
+      final exists = selectedToken != null &&
+          methods.any((e) => e.paymentMethodToken == selectedToken);
+      if (!exists) {
+        final newDefault = methods.where((e) => e.isDefault).toList().firstOrNull;
+        _model.selectCard = newDefault ?? (methods.isNotEmpty ? methods.first : null);
+        safeSetState(() {});
+      }
+    });
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();

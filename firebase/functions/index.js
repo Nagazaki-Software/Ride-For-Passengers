@@ -212,7 +212,7 @@ exports.saveCardPayment = onCall({ region: "us-central1", timeoutSeconds: 60, me
   if (!context.auth) {
     throw new HttpsError("unauthenticated", "Faca login primeiro.");
   }
-  const { paymentNonce, deviceData, isProd = false } = data || {};
+  const { paymentNonce, deviceData, isProd = false, makeDefault } = data || {};
   if (!paymentNonce) {
     throw new HttpsError("invalid-argument", "paymentNonce e obrigatorio.");
   }
@@ -236,7 +236,7 @@ exports.saveCardPayment = onCall({ region: "us-central1", timeoutSeconds: 60, me
       deviceData,
       options: {
         verifyCard: true,
-        makeDefault: existingCount === 0,
+        makeDefault: (makeDefault !== undefined) ? !!makeDefault : (existingCount === 0),
       },
     });
 

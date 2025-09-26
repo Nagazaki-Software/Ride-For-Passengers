@@ -228,6 +228,7 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                                   isDefault: isDefault,
                                 ),
                               );
+                              FFAppState().update(() {});
 
                               showSnackbar(context, 'Card saved.');
                               Navigator.of(context).pop(true);
@@ -354,6 +355,7 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                                   isDefault: isDefault,
                                 ),
                               );
+                              FFAppState().update(() {});
 
                               showSnackbar(context, 'Card saved.');
                               Navigator.of(context).pop(true);
@@ -553,6 +555,7 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                                 isDefault: isDefault,
                               ),
                             );
+                            FFAppState().update(() {});
 
                             showSnackbar(context, 'Card saved.');
                             // Close bottom sheet and signal success to caller

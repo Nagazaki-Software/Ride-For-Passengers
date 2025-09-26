@@ -226,6 +226,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                       isDefault: isDefault,
                                     ),
                                   );
+                                  FFAppState().update(() {});
                                 }
                               }
                               showSnackbar(context, 'Success!');
@@ -334,6 +335,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                       isDefault: isDefault,
                                     ),
                                   );
+                                  FFAppState().update(() {});
                                 }
                               }
                               showSnackbar(context, 'Success!');
@@ -535,6 +537,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                     isDefault: isDefault,
                                   ),
                                 );
+                                FFAppState().update(() {});
                               }
                             }
                             showSnackbar(context, 'Success!');
