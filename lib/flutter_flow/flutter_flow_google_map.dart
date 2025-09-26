@@ -89,6 +89,7 @@ class FlutterFlowGoogleMap extends StatefulWidget {
     // This is useful when the map is inside a scrolling Widget, and you want
     // the gestures within the map to not affect the surrounding page.
     this.mapTakesGesturePreference = false,
+    this.liteModeEnabled = false,
     super.key,
   });
 
@@ -110,6 +111,8 @@ class FlutterFlowGoogleMap extends StatefulWidget {
   final bool showTraffic;
   final bool centerMapOnMarkerTap;
   final bool mapTakesGesturePreference;
+  // Android-only: renders a static, low-cost map. Ignored on iOS/Web.
+  final bool liteModeEnabled;
 
   @override
   State<StatefulWidget> createState() => _FlutterFlowGoogleMapState();
@@ -229,6 +232,7 @@ class _FlutterFlowGoogleMapState extends State<FlutterFlowGoogleMap>
           zoom: initialZoom,
         ),
         mapType: widget.mapType,
+        liteModeEnabled: widget.liteModeEnabled,
         zoomGesturesEnabled: widget.allowZoom,
         zoomControlsEnabled: widget.showZoomControls,
         myLocationEnabled: widget.showLocation,

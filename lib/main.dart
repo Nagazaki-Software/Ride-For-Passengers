@@ -175,8 +175,8 @@ class _MyAppState extends State<MyApp> {
                     child: SizedBox(
                       width: 2,
                       height: 2,
-                      child: Opacity(
-                        opacity: 0.0,
+                      child: Offstage(
+                        offstage: true,
                         child: _GlobalWarmupHolder(),
                       ),
                     ),

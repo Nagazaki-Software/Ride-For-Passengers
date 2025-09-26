@@ -108,8 +108,8 @@ class _MapWarmupPermanentState extends State<MapWarmupPermanent>
         child: SizedBox(
           width: 2,
           height: 2,
-          child: Opacity(
-            opacity: 0.0,
+          child: Offstage(
+            offstage: true,
             child: nmap.GoogleMapView(
               initialCameraPosition: const nmap.CameraPosition(
                 target: nmap.LatLng(0, 0),

@@ -408,7 +408,13 @@ class _PaymentMothods16WidgetState extends State<PaymentMothods16Widget> {
                                 ),
                               );
                             },
-                          ).then((value) => safeSetState(() {}));
+                          ).then((result) {
+                            // If a card was saved, go back to the previous screen
+                            if (result == true) {
+                              context.safePop();
+                            }
+                            safeSetState(() {});
+                          });
                         },
                         child: Container(
                           height: 50.0,

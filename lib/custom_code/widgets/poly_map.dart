@@ -20,6 +20,8 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:characters/characters.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:firebase_auth/firebase_auth.dart' as fa;
 
 import '/flutter_flow/lat_lng.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -103,6 +105,109 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
 
   String _bytesToDataUrl(Uint8List bytes) =>
       'data:image/png;base64,' + base64Encode(bytes);
+
+  // ===== Helpers para URLs/Assets (alinhado com PickerMap) =====
+  String? _cleanUrl(String? url) {
+    if (url == null) return null;
+    final String trimmed = url.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  bool _looksSvg(String? url) {
+    final u = (url ?? '').toLowerCase();
+    return u.endsWith('.svg') || u.contains('image/svg');
+  }
+
+  String _massageUrl(String url) {
+    String s = url.trim();
+    if (s.startsWith('http://')) s = 'https://${s.substring(7)}';
+
+    if (s.startsWith('gs://')) {
+      final noGs = s.substring(5);
+      final slash = noGs.indexOf('/');
+      if (slash > 0) {
+        final bucket = noGs.substring(0, slash);
+        final path = noGs.substring(slash + 1);
+        final encodedPath = Uri.encodeComponent(path);
+        s =
+            'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$encodedPath?alt=media';
+      }
+    }
+
+    if (s.contains('firebasestorage.googleapis.com') &&
+        !s.contains('alt=media')) {
+      s += s.contains('?') ? '&alt=media' : '?alt=media';
+    }
+
+    if (s.contains('storage.googleapis.com') && !s.contains('%')) {
+      try {
+        final u = Uri.parse(s);
+        final fixed = Uri(
+          scheme: u.scheme.isEmpty ? 'https' : u.scheme,
+          host: u.host,
+          port: u.hasPort ? u.port : null,
+          pathSegments: u.pathSegments.map(Uri.encodeComponent).toList(),
+          query: u.query.isEmpty ? null : u.query,
+        );
+        s = fixed.toString();
+      } catch (_) {
+        s = Uri.encodeFull(s);
+      }
+    }
+    return s;
+  }
+
+  String? _assetPathFromUrlOrName(String? urlOrName) {
+    final s = (urlOrName ?? '').trim();
+    if (s.isEmpty) return null;
+    try {
+      final uri = Uri.parse(s);
+      final seg = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : s;
+      final decoded = Uri.decodeComponent(seg);
+      final name = decoded.endsWith('.png') ? decoded : '$decoded.png';
+      return 'assets/images/$name';
+    } catch (_) {
+      final base = s.endsWith('.png') ? s : '$s.png';
+      return 'assets/images/$base';
+    }
+  }
+
+  Future<Uint8List?> _tryLoadAssetPng(String? urlOrName, int targetWidthPx) async {
+    final String? asset = _assetPathFromUrlOrName(urlOrName);
+    if (asset == null) return null;
+    try {
+      final data = await rootBundle.load(asset);
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        data.buffer.asUint8List(),
+        targetWidth: targetWidthPx,
+      );
+      final ui.FrameInfo frame = await codec.getNextFrame();
+      final ui.Image img = frame.image;
+      final ByteData? out = await img.toByteData(format: ui.ImageByteFormat.png);
+      return out?.buffer.asUint8List();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _looksFirebaseStorageUrl(String s) {
+    final u = s.toLowerCase();
+    return u.contains('firebasestorage.googleapis.com') ||
+        u.contains('storage.googleapis.com');
+  }
+
+  Future<Map<String, String>> _authHeadersForFirebaseIfAny() async {
+    try {
+      final user = fa.FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final String? token = await user.getIdToken();
+        if ((token ?? '').isNotEmpty) {
+          return {'Authorization': 'Bearer ${token!}'};
+        }
+      }
+    } catch (_) {}
+    return const {};
+  }
 
   static const _darkMapStyle =
       '[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#2b2b2b"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#2f2f2f"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]}]';
@@ -190,7 +295,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
               initialCameraPosition: initialCamera,
               myLocationEnabled: false,
               trafficEnabled: false,
-              buildingsEnabled: true,
+              buildingsEnabled: false,
               mapStyleJson: _darkMapStyle,
               onMapCreated: (nmap.GoogleMapController c) async {
                 _controller = c;
@@ -811,22 +916,65 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     if (_iconCache.containsKey(key)) {
       return _iconCache[key];
     }
-    final String normalized = url.trim();
-    Uint8List? raw;
-    if (normalized.startsWith('data:image/')) {
-      raw = _decodeDataUrl(normalized);
-    } else {
-      try {
-        final http.Response resp = await http.get(Uri.parse(normalized));
-        if (resp.statusCode == 200) {
-          raw = resp.bodyBytes;
-        }
-      } catch (_) {}
+
+    final String rawUrl = url.trim();
+
+    // 1) Data URL inline
+    if (rawUrl.startsWith('data:image/')) {
+      final Uint8List? d = _decodeDataUrl(rawUrl);
+      if (d != null) {
+        _iconCache[key] = d;
+        return d;
+      }
     }
-    if (raw == null) return null;
+
+    // 2) Asset shorthand or explicit asset://
+    final String lower = rawUrl.toLowerCase();
+    if (lower.startsWith('asset://')) {
+      final String asset = rawUrl.substring('asset://'.length);
+      final Uint8List? bytes = await _tryLoadAssetPng(asset, size);
+      if (bytes != null) {
+        _iconCache[key] = bytes;
+        return bytes;
+      }
+    } else {
+      final String? assetPath = _assetPathFromUrlOrName(rawUrl);
+      if (assetPath != null) {
+        final Uint8List? bytes = await _tryLoadAssetPng(assetPath, size);
+        if (bytes != null) {
+          _iconCache[key] = bytes;
+          return bytes;
+        }
+      }
+    }
+
+    // 3) Network (http/https/gs/firebasestorage/storage.googleapis)
+    if (_looksSvg(rawUrl)) return null; // não renderiza SVG
+    final String net = _massageUrl(rawUrl);
     try {
-      final ui.Codec codec = await ui.instantiateImageCodec(raw,
-          targetWidth: size, targetHeight: size);
+      final Uri uri = Uri.parse(net);
+      final Map<String, String> baseHeaders = {
+        'accept': 'image/*,*/*;q=0.8',
+        'user-agent': 'PolyMap/1.0',
+      };
+      Future<http.Response> doGet([Map<String, String>? extra]) {
+        final headers = Map<String, String>.from(baseHeaders);
+        if (extra != null) headers.addAll(extra);
+        return http.get(uri, headers: headers).timeout(const Duration(seconds: 8));
+      }
+
+      http.Response resp = await doGet();
+      if ((resp.statusCode == 401 || resp.statusCode == 403) &&
+          _looksFirebaseStorageUrl(uri.toString())) {
+        final auth = await _authHeadersForFirebaseIfAny();
+        if (auth.isNotEmpty) {
+          resp = await doGet(auth);
+        }
+      }
+      if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
+      final Uint8List raw = resp.bodyBytes;
+      final ui.Codec codec =
+          await ui.instantiateImageCodec(raw, targetWidth: size, targetHeight: size);
       final ui.FrameInfo frame = await codec.getNextFrame();
       final ui.Image image = frame.image;
       final ui.PictureRecorder recorder = ui.PictureRecorder();
@@ -840,8 +988,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         ui.Paint()..isAntiAlias = true,
       );
       final ui.Image out = await recorder.endRecording().toImage(size, size);
-      final ByteData? data =
-          await out.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? data = await out.toByteData(format: ui.ImageByteFormat.png);
       if (data == null) return null;
       final Uint8List bytes = data.buffer.asUint8List();
       _iconCache[key] = bytes;
@@ -902,76 +1049,132 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     return false;
   }
 
-  String? _markerUrlFromData(Map<String, dynamic>? data,
-      {required bool isTaxi}) {
-    final List<String> priority = isTaxi
-        ? <String>['ride taxi', 'taxi', 'vehicle', 'car']
-        : <String>['ride driver', 'driver', 'default', 'principal'];
+  // Robust reader similar to PickerMap
+  Map<String, String> _markerUrlsFromData(Map<String, dynamic>? data) {
+    final Map<String, String> result = <String, String>{};
 
-    String? selected;
-
-    void consider(dynamic value, [String? key]) {
+    void absorb(String? key, dynamic value) {
       if (value == null) return;
       if (value is String) {
         final String trimmed = value.trim();
         if (trimmed.isEmpty) return;
-        if (selected == null) {
-          selected = trimmed;
-        } else {
-          for (final String token in priority) {
-            if (trimmed.toLowerCase().contains(token) &&
-                (key == null || key.toLowerCase().contains(token))) {
-              selected = trimmed;
-              return;
-            }
-          }
-        }
+        result[key ?? 'default'] = trimmed;
         return;
       }
       if (value is Iterable) {
         for (final dynamic item in value) {
-          consider(item, key);
+          if (item is Map) {
+            final dynamic innerKey = item['key'] ?? item['name'] ?? key;
+            final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString() ?? key, innerValue);
+            } else {
+              absorb(key, item);
+            }
+          } else {
+            absorb(key, item);
+          }
         }
         return;
       }
       if (value is Map) {
+        if (value.containsKey('url') || value.containsKey('value')) {
+          final dynamic innerKey = value['key'] ?? value['name'] ?? key;
+          final dynamic innerValue = value['url'] ?? value['value'];
+          absorb(innerKey?.toString() ?? key, innerValue);
+          return;
+        }
         value.forEach((dynamic k, dynamic v) {
-          consider(v, k?.toString());
+          absorb(k?.toString(), v);
         });
       }
     }
 
-    void inspect(dynamic source) {
+    void readField(dynamic source) {
       if (source == null) return;
       if (source is Map) {
         source.forEach((dynamic k, dynamic v) {
-          consider(v, k?.toString());
+          absorb(k?.toString(), v);
         });
       } else if (source is Iterable) {
         for (final dynamic item in source) {
-          inspect(item);
+          if (item is Map) {
+            final dynamic innerKey = item['key'] ?? item['name'];
+            final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+            if (innerKey != null || innerValue != null) {
+              absorb(innerKey?.toString(), innerValue);
+            } else {
+              absorb(null, item);
+            }
+          } else {
+            absorb(null, item);
+          }
         }
-      } else {
-        consider(source);
+      } else if (source is String) {
+        absorb(null, source);
       }
     }
 
-    inspect(data?['markersUrls']);
-    inspect(data?['markerUrls']);
-    if (selected != null) return selected;
+    readField(data?['markersUrls']);
+    readField(data?['markerUrls']);
+    readField(data?['markers_url']);
+    readField(data?['marker_url']);
+    readField(data?['markers']);
 
-    for (final String key in priority) {
-      final dynamic raw = data?[key];
-      if (raw is String && raw.trim().isNotEmpty) {
-        return raw.trim();
+    final dynamic users = data?['users'];
+    if (users is Map<String, dynamic>) {
+      readField(users['markersUrls']);
+      readField(users['markerUrls']);
+      readField(users['markers_url']);
+      readField(users['marker_url']);
+    }
+
+    return result;
+  }
+
+  String? _markerUrlForKeys(Map<String, String> map, List<String> keys) {
+    if (map.isEmpty) return null;
+    String normalize(String value) =>
+        value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
+    final Map<String, String> normalized = <String, String>{};
+    map.forEach((String key, String value) {
+      final String norm = normalize(key);
+      if (norm.isNotEmpty && value.trim().isNotEmpty) {
+        normalized[norm] = value.trim();
+      }
+    });
+    for (final String key in keys) {
+      final String normKey = normalize(key);
+      final String? candidate = normalized[normKey];
+      if (candidate != null && candidate.isNotEmpty) {
+        return candidate;
       }
     }
+    return null;
+  }
+
+  String? _markerUrlFromData(Map<String, dynamic>? data,
+      {required bool isTaxi}) {
+    final Map<String, String> urls = _markerUrlsFromData(data);
+    final List<String> keys = isTaxi
+        ? <String>['ride taxi', 'ride_taxi', 'taxi', 'car', 'vehicle']
+        : <String>['ride driver', 'driver', 'default', 'principal', 'main', 'primary'];
+
+    String? url = _markerUrlForKeys(urls, keys);
+    if (url != null && url.trim().isNotEmpty) return url.trim();
+
+    // Fallbacks comuns
+    final Map<String, dynamic>? usersMap =
+        (data?['users'] is Map<String, dynamic>) ? (data?['users'] as Map<String, dynamic>?) : null;
     final List<String?> fallback = <String?>[
       data?['markerUrl']?.toString(),
       data?['marker_url']?.toString(),
-      data?['marker']?.toString(),
-      data?['markerIcon']?.toString(),
-      data?['marker_icon']?.toString(),
+      usersMap?['markerUrl']?.toString(),
+      usersMap?['marker_url']?.toString(),
+      data?['vehiclePhoto']?.toString(),
+      data?['carPhoto']?.toString(),
+      usersMap?['vehiclePhoto']?.toString(),
+      usersMap?['carPhoto']?.toString(),
     ];
     for (final String? raw in fallback) {
       if (raw != null && raw.trim().isNotEmpty) {

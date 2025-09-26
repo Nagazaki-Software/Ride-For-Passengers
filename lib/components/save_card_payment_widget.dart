@@ -404,7 +404,8 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                             );
 
                             showSnackbar(context, 'Card saved.');
-                            Navigator.of(context).pop();
+                            // Close bottom sheet and signal success to caller
+                            Navigator.of(context).pop(true);
                           } catch (e) {
                             showSnackbar(context, 'Failed to save card: $e');
                           }

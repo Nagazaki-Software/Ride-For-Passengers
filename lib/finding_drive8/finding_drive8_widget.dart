@@ -176,28 +176,7 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
         backgroundColor: FlutterFlowTheme.of(context).primary,
         body: Stack(
           children: [
-            Opacity(
-              opacity: 0.0,
-              child: FlutterFlowGoogleMap(
-                controller: _model.googleMapsController,
-                onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
-                initialLocation: _model.googleMapsCenter ??=
-                    LatLng(13.106061, -59.613158),
-                markerColor: GoogleMarkerColor.violet,
-                mapType: MapType.normal,
-                style: GoogleMapStyle.standard,
-                initialZoom: 14.0,
-                allowInteraction: true,
-                allowZoom: true,
-                showZoomControls: true,
-                showLocation: true,
-                showCompass: false,
-                showMapToolbar: false,
-                showTraffic: false,
-                centerMapOnMarkerTap: true,
-                mapTakesGesturePreference: false,
-              ),
-            ),
+            // Removed hidden Flutter GoogleMap to prevent running two map engines simultaneously.
             PointerInterceptor(
               intercepting: isWeb,
               child: AuthUserStreamWidget(

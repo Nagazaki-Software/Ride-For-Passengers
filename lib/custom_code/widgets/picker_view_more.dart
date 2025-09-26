@@ -171,7 +171,7 @@ class _PickerViewMoreState extends State<PickerViewMore>
 
       // follow-cam leve
       final int now = DateTime.now().millisecondsSinceEpoch;
-      if (now - _lastCamUpdateMs > 120) {
+      if (now - _lastCamUpdateMs > 200) {
         _lastCamUpdateMs = now;
         final nmap.LatLng ref = _posAt((_headDist - 80).clamp(0.0, _totalDist));
         final double br = _bearing(ref, headPos);
@@ -181,8 +181,8 @@ class _PickerViewMoreState extends State<PickerViewMore>
             target: headPos,
             zoom: 16.5,
             bearing: br,
-            tilt: 50.0,
-            durationMs: 180,
+            tilt: 40.0,
+            durationMs: 220,
           );
         } catch (_) {}
       }
@@ -265,7 +265,7 @@ class _PickerViewMoreState extends State<PickerViewMore>
               ),
               myLocationEnabled: false,
               trafficEnabled: false,
-              buildingsEnabled: true,
+              buildingsEnabled: false,
               mapStyleJson: _darkMapStyle,
               padding: const nmap.MapPadding(),
               onMapCreated: (nmap.GoogleMapController c) async {
@@ -594,10 +594,10 @@ class _PickerViewMoreState extends State<PickerViewMore>
       final dynamic dc = _controller;
       await dc.animateCameraTo(
         target: end,
-        zoom: 16.0,
+        zoom: 15.5,
         bearing: br,
-        tilt: 55.0,
-        durationMs: 800,
+        tilt: 42.0,
+        durationMs: 900,
       );
     } catch (_) {}
   }

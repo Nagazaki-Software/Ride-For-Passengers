@@ -10,6 +10,12 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Boost URLCache to improve HTTP response caching (Directions, icons, etc.).
+    URLCache.shared = URLCache(
+      memoryCapacity: 64 * 1024 * 1024,
+      diskCapacity: 256 * 1024 * 1024,
+      diskPath: "urlCache"
+    )
     GMSServices.provideAPIKey("AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ")
     GeneratedPluginRegistrant.register(with: self)
     BTAppContextSwitcher.setReturnURLScheme("com.quicky.ridebahamas.braintree")

@@ -47,8 +47,8 @@ class _MapWarmupOverlayState extends State<MapWarmupOverlay> {
         child: SizedBox(
           width: kIsWeb ? 2 : 2,
           height: kIsWeb ? 2 : 2,
-          child: Opacity(
-            opacity: 0.0,
+          child: Offstage(
+            offstage: true,
             child: Stack(
               children: [
                 // Native SDK warmup (Android/iOS)
@@ -95,4 +95,3 @@ class _MapWarmupOverlayState extends State<MapWarmupOverlay> {
     );
   }
 }
-

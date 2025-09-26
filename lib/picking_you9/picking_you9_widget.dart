@@ -56,6 +56,74 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
   var hasContainerTriggered7 = false;
   final animationsMap = <String, AnimationInfo>{};
 
+  // --- Auto-advance guards (proximity + dwell) ---
+  DateTime? _nearPickupSince;
+  DateTime? _nearDestinationSince;
+  // Tunable thresholds (meters/seconds)
+  static const int _pickupEnterMeters = 70; // when driver gets close to user
+  static const int _destEnterMeters = 80; // when driver gets close to destination
+  static const int _dwellSeconds = 8; // must remain inside for this long
+
+  double _haversineMeters(LatLng a, LatLng b) {
+    const double R = 6371000.0; // Earth radius (m)
+    final double dLat = (b.latitude - a.latitude) * (pi / 180.0);
+    final double dLon = (b.longitude - a.longitude) * (pi / 180.0);
+    final double la1 = a.latitude * (pi / 180.0);
+    final double la2 = b.latitude * (pi / 180.0);
+    final double h =
+        sin(dLat / 2) * sin(dLat / 2) + cos(la1) * cos(la2) * sin(dLon / 2) * sin(dLon / 2);
+    final double c = 2 * atan2(sqrt(h), sqrt(1.0 - h));
+    return R * c;
+  }
+
+  void _maybeAutoAdvance(RideOrdersRecord order, UsersRecord driver) {
+    try {
+      final String mode = FFAppState().pickingPage;
+      final LatLng? driverLoc = driver.location ?? FFAppState().latlngAtual ?? currentUserLocationValue;
+      if (driverLoc == null) return;
+
+      // Coordinates from order
+      final LatLng? pickup = order.latlngAtual; // pickup/user point at request time
+      final LatLng? dest = order.latlng; // destination of the ride
+
+      final DateTime now = DateTime.now();
+
+      if (mode == 'pickingyou' && pickup != null) {
+        final double d = _haversineMeters(driverLoc, pickup);
+        if (d <= _pickupEnterMeters) {
+          _nearPickupSince ??= now;
+          if (now.difference(_nearPickupSince!).inSeconds >= _dwellSeconds) {
+            // Advance to 'progress' once, with notify
+            if (FFAppState().pickingPage != 'progress') {
+              FFAppState().update(() => FFAppState().pickingPage = 'progress');
+              // Reflect on notifications
+              RideStepNotifications.showInProgress();
+            }
+          }
+        } else {
+          _nearPickupSince = null; // reset if we left the proximity
+        }
+      }
+
+      if (mode == 'progress' && dest != null) {
+        final double d = _haversineMeters(driverLoc, dest);
+        if (d <= _destEnterMeters) {
+          _nearDestinationSince ??= now;
+          if (now.difference(_nearDestinationSince!).inSeconds >= _dwellSeconds) {
+            if (FFAppState().pickingPage != 'finish') {
+              FFAppState().update(() => FFAppState().pickingPage = 'finish');
+              RideStepNotifications.showFinished();
+            }
+          }
+        } else {
+          _nearDestinationSince = null;
+        }
+      }
+    } catch (_) {
+      // best-effort; do not crash UI
+    }
+  }
+
   String _initials(String? name) {
     if (name == null || name.trim().isEmpty) return '';
     final parts = name.trim().split(RegExp(r"\s+")).where((s) => s.isNotEmpty);
@@ -399,6 +467,13 @@ class _PickingYou9WidgetState extends State<PickingYou9Widget>
                           pickingYou9RideOrdersRecord,
                           pickingYouMapUsersRecord,
                         );
+                        // Evaluate guarded auto-advance between pickingyou -> progress -> finish
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _maybeAutoAdvance(
+                            pickingYou9RideOrdersRecord,
+                            pickingYouMapUsersRecord,
+                          );
+                        });
 
                         return Container(
                           width: double.infinity,

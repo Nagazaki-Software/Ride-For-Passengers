@@ -1,0 +1,31 @@
+0184:             body: Container(
+0185:               width: MediaQuery.sizeOf(context).width * 1.0,
+0186:               height: MediaQuery.sizeOf(context).height * 1.0,
+0187:               child: Stack(
+0188:                 children: [
+0189:                   // Removed hidden Flutter GoogleMap to avoid double map engines.
+0190:                   // This significantly reduces CPU/GPU usage on map-heavy screens.
+0191:                   PointerInterceptor(
+0192:                     intercepting: isWeb,
+0193:                     child: AuthUserStreamWidget(
+0194:                       builder: (context) => Container(
+0195:                         width: double.infinity,
+0196:                         height: double.infinity,
+0197:                         child: custom_widgets.PickerViewMore(
+0198:                           width: double.infinity,
+0199:                           height: double.infinity,
+0200:                           googleApiKey:
+0201:                               'AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ',
+0202:                           fitPadding: 60.0,
+0203:                           strokeWidth: 2.0,
+0204:                           strokeColor:
+0205:                               FlutterFlowTheme.of(context).secondaryBackground,
+0206:                           interactive: true,
+0207:                           borderRadius: 0.0,
+0208:                           latlngOrigem:
+0209:                               viewDetalhesRideOrdersRecord.latlngAtual!,
+0210:                           latlngDestino: viewDetalhesRideOrdersRecord.latlng!,
+0211:                           userName: currentUserDisplayName,
+0212:                           userPhotoUrl: currentUserPhoto,
+0213:                           destinationMarkerPngUrl:
+0214:                               'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/ride-899y4i/assets/qvt0qjxl02os/ChatGPT_Image_16_de_ago._de_2025%2C_16_36_59.png',
