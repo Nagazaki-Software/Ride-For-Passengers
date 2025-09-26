@@ -376,8 +376,14 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                   ),
                                                 ),
                                                 Container(
-                                                  width: 80.0,
-                                                  height: 24.0,
+                                                  // Auto-size width to fit text
+                                                  // keep a minimum height like before
+                                                  constraints: BoxConstraints(
+                                                    minHeight: 24.0,
+                                                  ),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 8.0,
+                                                  ),
                                                   decoration: BoxDecoration(
                                                     color: Color(0xFFDC7F02),
                                                     borderRadius:

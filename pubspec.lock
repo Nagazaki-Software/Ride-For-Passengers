@@ -785,11 +785,9 @@ packages:
   google_maps_native_sdk:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: "5ee859b9a1bd3a529d5237b28f6a84f06fb05957"
-      url: "https://github.com/Nagazaki-Software/google_maps_native_sdk"
-    source: git
+      path: "plugins/google_maps_native_sdk"
+      relative: true
+    source: path
     version: "0.7.1"
   google_sign_in:
     dependency: "direct main"

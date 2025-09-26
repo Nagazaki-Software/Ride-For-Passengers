@@ -897,8 +897,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                       ),
                                 ),
                                 StreamBuilder<RideOrdersRecord>(
-                                  stream: RideOrdersRecord.getDocument(
-                                      _model.rideOrderQR!.reference),
+                                  stream: (_model.session ?? _model.rideOrderQR?.reference) != null
+                                      ? RideOrdersRecord.getDocument((_model.session ?? _model.rideOrderQR!.reference))
+                                      : Stream<RideOrdersRecord>.empty(),
                                   builder: (context, snapshot) {
                                     // Customize what your widget looks like when it's loading.
                                     if (!snapshot.hasData) {

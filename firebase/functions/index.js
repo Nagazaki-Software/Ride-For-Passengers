@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+// Backwards-compatible alias so existing references to functions.https.HttpsError still work
+var functions = { https: { HttpsError } };
 const admin = require("firebase-admin");
 admin.initializeApp();
 
