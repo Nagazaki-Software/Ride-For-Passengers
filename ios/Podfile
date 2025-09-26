@@ -75,10 +75,11 @@ post_install do |installer|
       ]
     end
 
-    # If you don't use google_maps_native_sdk on iOS, exclude its sources to avoid Swift API mismatches
+    # If you don't use google_maps_native_sdk on iOS, exclude only implementation files
+    # to prevent Swift API mismatches, but keep the public header visible for registration.
     if target.name == 'google_maps_native_sdk'
       target.build_configurations.each do |config|
-        config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = 'Classes/*'
+        config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = 'Classes/*.m Classes/*.mm Classes/*.swift'
       end
     end
   end

@@ -33,6 +33,9 @@ dependencyResolutionManagement {
         mavenCentral()
         // Flutter engine artifacts
         maven { url 'https://storage.googleapis.com/download.flutter.io' }
+        // CardinalCommerce 3DS SDK (required by Braintree 3DS)
+        maven { url 'https://cardinalcommerce.jfrog.io/artifactory/android' }
+        maven { url 'https://maven.cardinalcommerce.com' }
     }
 }
 
