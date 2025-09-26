@@ -64,7 +64,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
           await widget.session!.update({
             'participantes': FieldValue.arrayUnion([
               currentUserReference
-            ].whereType<DocumentReference>())
+            ].whereType<DocumentReference>().toList().cast<dynamic>())
           });
         } catch (_) {}
         if (mounted) safeSetState(() {});
@@ -411,7 +411,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                     .doc();
                                             await rideOrdersRecordReference
                                                 .set({
-                                              ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
+                                              ...createRideOrdersRecordData(
+                                                rideShare: true,
+                                                rideValue: widget.value,
+                                                latlngAtual: widget.latlngOrigem,
+                                                latlng: widget.latlngDestino,
+                                                option: widget.estilo,
+                                              ),
                                               ...mapToFirestore(
                                                 {
                                                   'participantes': [
@@ -423,7 +429,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                             _model.rideOrderQR =
                                                 RideOrdersRecord
                                                     .getDocumentFromData({
-                                              ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
+                                              ...createRideOrdersRecordData(
+                                                rideShare: true,
+                                                rideValue: widget.value,
+                                                latlngAtual: widget.latlngOrigem,
+                                                latlng: widget.latlngDestino,
+                                                option: widget.estilo,
+                                              ),
                                               ...mapToFirestore(
                                                 {
                                                   'participantes': [
@@ -544,7 +556,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                       .doc();
                                               await rideOrdersRecordReference
                                                   .set({
-                                                ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
+                                                ...createRideOrdersRecordData(
+                                                  rideShare: true,
+                                                  rideValue: widget.value,
+                                                  latlngAtual: widget.latlngOrigem,
+                                                  latlng: widget.latlngDestino,
+                                                  option: widget.estilo,
+                                                ),
                                                 ...mapToFirestore(
                                                   {
                                                     'participantes': [
@@ -556,7 +574,13 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                               _model.rideOrderQRCopy =
                                                   RideOrdersRecord
                                                       .getDocumentFromData({
-                                                ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
+                                                ...createRideOrdersRecordData(
+                                                  rideShare: true,
+                                                  rideValue: widget.value,
+                                                  latlngAtual: widget.latlngOrigem,
+                                                  latlng: widget.latlngDestino,
+                                                  option: widget.estilo,
+                                                ),
                                                 ...mapToFirestore(
                                                   {
                                                     'participantes': [

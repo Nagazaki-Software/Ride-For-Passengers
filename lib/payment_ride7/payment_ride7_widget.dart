@@ -1751,7 +1751,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                     nomeDestino: LatlngToStringCall.shrotName(
                                       (_model.latlngDestino?.jsonBody ?? ''),
                                     )?.firstOrNull,
-                                    rideValue: amt,
+                                    rideValue: widget.value,
                                     paid: true,
                                     status: 'Paid',
                                     id: _model.rideID,
@@ -1774,7 +1774,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                               (_model.latlngDestino?.jsonBody ??
                                                   ''),
                                             )?.firstOrNull,
-                                            rideValue: amt,
+                                            rideValue: widget.value,
                                             paid: true,
                                             status: 'Paid',
                                             id: _model.rideID,

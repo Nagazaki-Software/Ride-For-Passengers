@@ -76,6 +76,7 @@ class BraintreeNativeBridge {
         ApplePaySummaryItem(
           label: displayName,
           amount: double.tryParse(amount) ?? 0.0,
+          type: ApplePaySummaryItemType.final_,
         ),
       ],
     );

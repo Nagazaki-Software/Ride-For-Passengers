@@ -325,7 +325,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                 }
                               }
                               showSnackbar(context, 'Success!');
-                              _model.transactionId2 =
+                              _model.transactionId =
                                   paymentResponse.transactionId!;
 
                               safeSetState(() {});
