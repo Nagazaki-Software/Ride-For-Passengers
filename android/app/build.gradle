@@ -91,10 +91,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
     implementation 'io.card:android-sdk:5.5.1'
 
-    // Braintree Android SDK pinned versions for stable APIs
-    implementation 'com.braintreepayments.api:card:4.20.0'
-    implementation 'com.braintreepayments.api:paypal:4.20.0'
-    implementation 'com.braintreepayments.api:google-pay:4.20.0'
+    // Braintree Android SDK v5 (deprecates v4)
+    implementation 'com.braintreepayments.api:card:5.14.0'
+    implementation 'com.braintreepayments.api:paypal:5.14.0'
+    implementation 'com.braintreepayments.api:google-pay:5.14.0'
 
     // Google Pay dependency
     implementation 'com.google.android.gms:play-services-wallet:19.4.0'

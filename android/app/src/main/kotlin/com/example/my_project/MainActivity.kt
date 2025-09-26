@@ -8,22 +8,17 @@ import io.flutter.plugin.common.MethodChannel
 
 // Braintree Android SDK
 import com.braintreepayments.api.BraintreeClient
-import com.braintreepayments.api.Card
 import com.braintreepayments.api.CardClient
 import com.braintreepayments.api.CardNonce
-import com.braintreepayments.api.CardTokenizeCallback
+import com.braintreepayments.api.CardRequest
 // v4 API uses Card object tokenization
 import com.braintreepayments.api.PayPalClient
 import com.braintreepayments.api.PayPalCheckoutRequest
 import com.braintreepayments.api.PayPalAccountNonce
-import com.braintreepayments.api.PayPalFlowStartedCallback
-import com.braintreepayments.api.PayPalTokenizeCallback
 import com.braintreepayments.api.PayPalAccountNonce
 import com.braintreepayments.api.PayPalTokenizeCallback
 import com.braintreepayments.api.GooglePayClient
 import com.braintreepayments.api.GooglePayRequest
-import com.braintreepayments.api.GooglePayRequestPaymentCallback
-import com.braintreepayments.api.PaymentMethodNonce
 
 class MainActivity: FlutterFragmentActivity() {
 
@@ -56,23 +51,21 @@ class MainActivity: FlutterFragmentActivity() {
 
         val client = braintreeClient(auth)
         val cardClient = CardClient(client)
-        val card = Card()
-        card.number = number
-        card.expirationMonth = expirationMonth
-        card.expirationYear = expirationYear
-        if (!cvv.isNullOrBlank()) card.cvv = cvv
+        val request = CardRequest()
+            .cardNumber(number)
+            .expirationMonth(expirationMonth)
+            .expirationYear(expirationYear)
+        if (!cvv.isNullOrBlank()) request.cvv(cvv)
 
-        cardClient.tokenize(card, object : CardTokenizeCallback {
-            override fun onResult(cardNonce: CardNonce?, error: java.lang.Exception?) {
-                if (error != null) {
-                    result.error("bt", error.message, null)
-                } else if (cardNonce != null) {
-                    result.success(cardNonce.string)
-                } else {
-                    result.success(null)
-                }
+        cardClient.tokenize(request) { cardNonce: CardNonce?, error: java.lang.Exception? ->
+            if (error != null) {
+                result.error("bt", error.message, null)
+            } else if (cardNonce != null) {
+                result.success(cardNonce.string)
+            } else {
+                result.success(null)
             }
-        })
+        }
     }
 
     private fun handlePayPalCheckout(call: MethodCall, result: MethodChannel.Result) {
@@ -82,22 +75,18 @@ class MainActivity: FlutterFragmentActivity() {
 
         val client = braintreeClient(auth)
         val payPalClient = PayPalClient(this, client)
-        val request = PayPalCheckoutRequest(amount)
-        request.currencyCode = currencyCode
-        payPalClient.tokenizePayPalAccount(
-            this,
-            request,
-            PayPalFlowStartedCallback { /* no-op */ },
-            PayPalTokenizeCallback { nonce: PayPalAccountNonce?, error: java.lang.Exception? ->
-                if (error != null) {
-                    result.error("bt", error.message, null)
-                } else if (nonce != null) {
-                    result.success(nonce.string)
-                } else {
-                    result.success(null)
-                }
+        val request = PayPalCheckoutRequest(amount).apply {
+            this.currencyCode = currencyCode
+        }
+        payPalClient.tokenizePayPalAccount(this, request) { nonce: PayPalAccountNonce?, error: java.lang.Exception? ->
+            if (error != null) {
+                result.error("bt", error.message, null)
+            } else if (nonce != null) {
+                result.success(nonce.string)
+            } else {
+                result.success(null)
             }
-        )
+        }
     }
 
     private fun handleGooglePay(call: MethodCall, result: MethodChannel.Result) {
@@ -107,17 +96,18 @@ class MainActivity: FlutterFragmentActivity() {
 
         val client = braintreeClient(auth)
         val googlePayClient = GooglePayClient(this, client)
-        val request = GooglePayRequest()
-        request.amount = amount
-        request.currencyCode = currencyCode
-        googlePayClient.requestPayment(this, request, object : GooglePayRequestPaymentCallback {
-            override fun onGooglePaySuccess(nonce: PaymentMethodNonce) {
-                result.success(nonce.string)
-            }
-
-            override fun onGooglePayFailure(error: java.lang.Exception) {
+        val request = GooglePayRequest().apply {
+            this.amount = amount
+            this.currencyCode = currencyCode
+        }
+        googlePayClient.requestPayment(this, request) { nonce, error ->
+            if (error != null) {
                 result.error("bt", error.message, null)
+            } else if (nonce != null) {
+                result.success(nonce.string)
+            } else {
+                result.success(null)
             }
-        })
+        }
     }
 }
