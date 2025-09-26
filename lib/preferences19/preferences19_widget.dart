@@ -1,6 +1,7 @@
 import '/components/component_accessibility_widget.dart';
 import '/components/component_language_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/accessible_ink_well.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';

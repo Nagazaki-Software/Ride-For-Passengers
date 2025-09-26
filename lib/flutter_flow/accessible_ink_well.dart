@@ -78,7 +78,7 @@ class AccessibleInkWell extends StatelessWidget {
       focusNode: focusNode,
       canRequestFocus: canRequestFocus,
       autofocus: autofocus,
-      enableFeedback: enableFeedback,
+      enableFeedback: enableFeedback ?? true,
       excludeFromSemantics: excludeFromSemantics,
       splashFactory: splashFactory,
       onTapDown: (details) {
