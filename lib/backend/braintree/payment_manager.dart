@@ -22,9 +22,11 @@ String appleMerchantId() =>
     isProdPayments ? kProdAppleMerchantId : kTestAppleMerchantId;
 
 class PaymentResponse {
-  const PaymentResponse({this.transactionId, this.errorMessage});
+  const PaymentResponse({this.transactionId, this.errorMessage, this.paymentMethodMeta});
   final String? transactionId;
   final String? errorMessage;
+  // Optional metadata returned by cloud function (e.g., token/brand/last4)
+  final Map<String, dynamic>? paymentMethodMeta;
 }
 
 Future<PaymentResponse> processBraintreePayment(
@@ -43,11 +45,18 @@ Future<PaymentResponse> processBraintreePayment(
     },
   );
   final ok = response['success'] == true || response['ok'] == true;
+  final pmMeta = response['paymentMethod'];
   if (ok && response['transactionId'] != null) {
-    return PaymentResponse(transactionId: response['transactionId']);
+    return PaymentResponse(
+      transactionId: response['transactionId'],
+      paymentMethodMeta: pmMeta is Map ? Map<String, dynamic>.from(pmMeta as Map) : null,
+    );
   }
   if (response['error'] != null) {
-    return PaymentResponse(errorMessage: response['error'].toString());
+    return PaymentResponse(
+      errorMessage: response['error'].toString(),
+      paymentMethodMeta: pmMeta is Map ? Map<String, dynamic>.from(pmMeta as Map) : null,
+    );
   }
   return const PaymentResponse(errorMessage: 'Unknown error occured');
 }

@@ -111,8 +111,12 @@ Future<dynamic> processCardPayload(
       );
     }
     if (apple) {
-      // Not implemented in this project yet; return null to indicate unsupported
-      return null;
+      return await BraintreeNativeBridge.applePay(
+        authorization: tokenizationKey,
+        amount: amount.toStringAsFixed(2),
+        currencyCode: currencyCode,
+        merchantIdentifier: merchantIdentifier,
+      );
     }
     return null;
   }

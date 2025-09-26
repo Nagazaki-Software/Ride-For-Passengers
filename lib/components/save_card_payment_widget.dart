@@ -155,8 +155,80 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                     children: [
                       if (isAndroid)
                         FFButtonWidget(
-                          onPressed: () {
-                            print('Button pressed ...');
+                          onPressed: () async {
+                            logFirebaseEvent(
+                                'SAVE_CARD_PAYMENT_GPAY_BTN_ON_TAP');
+                            logFirebaseEvent('Button_braintree_payment');
+                            if (kIsWeb) {
+                              showSnackbar(context,
+                                  'Payments not yet supported on web.');
+                              return;
+                            }
+                            try {
+                              // Use a nominal amount just to obtain a Google Pay nonce for vaulting
+                              final nonce = await BraintreeNativeBridge.googlePay(
+                                authorization: braintreeClientToken(),
+                                amount: 1.00.toStringAsFixed(2),
+                                currencyCode: 'USD',
+                              );
+                              if (nonce == null || nonce.isEmpty) return;
+                              showSnackbar(
+                                context,
+                                'Saving payment method...',
+                                duration: 10,
+                                loading: true,
+                              );
+                              final shouldMakeDefault = FFAppState()
+                                      .paymentMethods
+                                      .isEmpty ||
+                                  !FFAppState()
+                                      .paymentMethods
+                                      .any((e) => e.isDefault);
+                              final resp = await saveBraintreePaymentMethod(
+                                nonce,
+                                makeDefault: shouldMakeDefault,
+                              );
+                              final ok =
+                                  (resp['success'] == true) || (resp['ok'] == true);
+                              if (!ok) {
+                                final err = resp['error'] ??
+                                    'Failed to save payment method.';
+                                showSnackbar(context, 'Error: $err');
+                                return;
+                              }
+
+                              final pm = (resp['paymentMethod'] ?? {}) as Map;
+                              final brand = (pm['brand'] ?? '') as String;
+                              final last4 =
+                                  (pm['last4Numbers'] ?? pm['last4'] ?? '') as String;
+                              final token = (pm['paymentMethodToken'] ??
+                                      pm['token'] ??
+                                      '')
+                                  as String;
+                              final isDefault =
+                                  (pm['isDefault'] ?? pm['default'] ?? false) as bool;
+
+                              if (token.isEmpty) {
+                                showSnackbar(context,
+                                    'Error: Missing payment method token.');
+                                return;
+                              }
+
+                              FFAppState().addToPaymentMethods(
+                                createPaymentMethodSaveStruct(
+                                  brand: brand.isNotEmpty ? brand : 'Card',
+                                  last4Numbers: last4,
+                                  paymentMethodToken: token,
+                                  isDefault: isDefault,
+                                ),
+                              );
+
+                              showSnackbar(context, 'Card saved.');
+                              Navigator.of(context).pop(true);
+                            } catch (e) {
+                              showSnackbar(
+                                  context, 'Google Pay failed: ${e.toString()}');
+                            }
                           },
                           text: FFLocalizations.of(context).getText(
                             '3hwrt0xn' /* Pay with Google Pay */,
@@ -208,8 +280,81 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                     children: [
                       if (isiOS)
                         FFButtonWidget(
-                          onPressed: () {
-                            print('Button pressed ...');
+                          onPressed: () async {
+                            logFirebaseEvent(
+                                'SAVE_CARD_PAYMENT_APPLE_PAY_BTN_ON_TAP');
+                            logFirebaseEvent('Button_braintree_payment');
+                            if (kIsWeb) {
+                              showSnackbar(context,
+                                  'Payments not yet supported on web.');
+                              return;
+                            }
+                            try {
+                              final nonce = await BraintreeNativeBridge.applePay(
+                                authorization: braintreeClientToken(),
+                                amount: 1.00.toStringAsFixed(2),
+                                currencyCode: 'USD',
+                                merchantIdentifier: appleMerchantId(),
+                                displayName: 'Ride Bahamas',
+                              );
+                              if (nonce == null || nonce.isEmpty) return;
+                              showSnackbar(
+                                context,
+                                'Saving payment method...',
+                                duration: 10,
+                                loading: true,
+                              );
+                              final shouldMakeDefault = FFAppState()
+                                      .paymentMethods
+                                      .isEmpty ||
+                                  !FFAppState()
+                                      .paymentMethods
+                                      .any((e) => e.isDefault);
+                              final resp = await saveBraintreePaymentMethod(
+                                nonce,
+                                makeDefault: shouldMakeDefault,
+                              );
+                              final ok =
+                                  (resp['success'] == true) || (resp['ok'] == true);
+                              if (!ok) {
+                                final err = resp['error'] ??
+                                    'Failed to save payment method.';
+                                showSnackbar(context, 'Error: $err');
+                                return;
+                              }
+
+                              final pm = (resp['paymentMethod'] ?? {}) as Map;
+                              final brand = (pm['brand'] ?? '') as String;
+                              final last4 =
+                                  (pm['last4Numbers'] ?? pm['last4'] ?? '') as String;
+                              final token = (pm['paymentMethodToken'] ??
+                                      pm['token'] ??
+                                      '')
+                                  as String;
+                              final isDefault =
+                                  (pm['isDefault'] ?? pm['default'] ?? false) as bool;
+
+                              if (token.isEmpty) {
+                                showSnackbar(context,
+                                    'Error: Missing payment method token.');
+                                return;
+                              }
+
+                              FFAppState().addToPaymentMethods(
+                                createPaymentMethodSaveStruct(
+                                  brand: brand.isNotEmpty ? brand : 'Card',
+                                  last4Numbers: last4,
+                                  paymentMethodToken: token,
+                                  isDefault: isDefault,
+                                ),
+                              );
+
+                              showSnackbar(context, 'Card saved.');
+                              Navigator.of(context).pop(true);
+                            } catch (e) {
+                              showSnackbar(
+                                  context, 'Apple Pay failed: ${e.toString()}');
+                            }
                           },
                           text: FFLocalizations.of(context).getText(
                             'q3lwkya8' /* Pay with Apple Pay */,

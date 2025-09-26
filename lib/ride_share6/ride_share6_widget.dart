@@ -24,12 +24,14 @@ class RideShare6Widget extends StatefulWidget {
     required this.latlngOrigem,
     required this.latlngDestino,
     required this.estilo,
+    this.session,
   });
 
   final double? value;
   final LatLng? latlngOrigem;
   final LatLng? latlngDestino;
   final String? estilo;
+  final DocumentReference? session;
 
   static String routeName = 'RideShare6';
   static String routePath = '/rideShare6';
@@ -53,6 +55,21 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
     _model = createModel(context, () => RideShare6Model());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'RideShare6'});
+    // If launched via deep link with a session, attach and join as participant.
+    if (widget.session != null) {
+      _model.session = widget.session;
+      // Join the participantes array safely.
+      SchedulerBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await widget.session!.update({
+            'participantes': FieldValue.arrayUnion([
+              currentUserReference
+            ].whereType<DocumentReference>())
+          });
+        } catch (_) {}
+        if (mounted) safeSetState(() {});
+      });
+    }
     animationsMap.addAll({
       'containerOnActionTriggerAnimation1': AnimationInfo(
         trigger: AnimationTrigger.onActionTrigger,
@@ -110,6 +127,11 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
     _model.dispose();
 
     super.dispose();
+  }
+
+  String _buildInviteLink(DocumentReference ref) {
+    final encoded = serializeParam(ref, ParamType.DocumentReference) ?? '';
+    return 'ridebahamas://ridebahamas.com${RideShare6Widget.routePath}?session=$encoded';
   }
 
   @override
@@ -373,7 +395,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                     child: ShareQRCodeWidget(
                                                       rideDoc: _model.session!,
                                                       linkCurrentPage:
-                                                          'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                          _buildInviteLink(_model.session!),
                                                     ),
                                                   ),
                                                 );
@@ -389,9 +411,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                     .doc();
                                             await rideOrdersRecordReference
                                                 .set({
-                                              ...createRideOrdersRecordData(
-                                                rideShare: true,
-                                              ),
+                                              ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
                                               ...mapToFirestore(
                                                 {
                                                   'participantes': [
@@ -403,9 +423,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                             _model.rideOrderQR =
                                                 RideOrdersRecord
                                                     .getDocumentFromData({
-                                              ...createRideOrdersRecordData(
-                                                rideShare: true,
-                                              ),
+                                              ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
                                               ...mapToFirestore(
                                                 {
                                                   'participantes': [
@@ -444,8 +462,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                       rideDoc: _model
                                                           .rideOrderQR!
                                                           .reference,
-                                                      linkCurrentPage:
-                                                          'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                      linkCurrentPage: _buildInviteLink(_model.rideOrderQR!.reference),
                                                     ),
                                                   ),
                                                 );
@@ -513,7 +530,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                               logFirebaseEvent(
                                                   'Container_share');
                                               await Share.share(
-                                                'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                _buildInviteLink(_model.session!),
                                                 sharePositionOrigin:
                                                     getWidgetBoundingBox(
                                                         context),
@@ -527,9 +544,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                                       .doc();
                                               await rideOrdersRecordReference
                                                   .set({
-                                                ...createRideOrdersRecordData(
-                                                  rideShare: true,
-                                                ),
+                                                ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
                                                 ...mapToFirestore(
                                                   {
                                                     'participantes': [
@@ -541,9 +556,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                               _model.rideOrderQRCopy =
                                                   RideOrdersRecord
                                                       .getDocumentFromData({
-                                                ...createRideOrdersRecordData(
-                                                  rideShare: true,
-                                                ),
+                                                ...createRideOrdersRecordData(\n                                                rideShare: true,\n                                                rideValue: widget.value,\n                                                latlngAtual: widget.latlngOrigem,\n                                                latlng: widget.latlngDestino,\n                                                option: widget.estilo,\n                                              ),
                                                 ...mapToFirestore(
                                                   {
                                                     'participantes': [
@@ -560,7 +573,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                               logFirebaseEvent(
                                                   'Container_share');
                                               await Share.share(
-                                                'ridebahamas://ridebahamas.com${GoRouterState.of(context).uri.toString()}',
+                                                _buildInviteLink(_model.rideOrderQRCopy!.reference),
                                                 sharePositionOrigin:
                                                     getWidgetBoundingBox(
                                                         context),
@@ -1286,7 +1299,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                         children: [
                                           Text(
                                             'of ${formatNumber(
-                                              widget.value,
+                                              (widget.value ?? 0),
                                               formatType: FormatType.decimal,
                                               decimalType:
                                                   DecimalType.commaDecimal,
@@ -1530,6 +1543,48 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                     .controller
                                     .forward(from: 0.0));
                           }
+                          // Proceed only when there are at least 2 participants.
+                          int participants = 0;
+                          double total = (widget.value ?? 0).toDouble();
+                          if (_model.session != null) {
+                            try {
+                              final doc = await RideOrdersRecord.getDocumentOnce(_model.session!);
+                              participants = (doc.participantes).length;
+                              if (doc.hasRideValue()) {
+                                total = (doc.rideValue).toDouble();
+                              }
+                            } catch (_) {
+                              participants = 0;
+                            }
+                          }
+                          if (participants < 2) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Aguardando outro participante confirmar...')),
+                            );
+                            return;
+                          }
+                          final split = participants > 0 ? total / participants : total;
+                          context.pushNamed(
+                            PaymentRide7Widget.routeName,
+                            queryParameters: {
+                              'estilo': serializeParam(
+                                widget.estilo,
+                                ParamType.String,
+                              ),
+                              'latlngAtual': serializeParam(
+                                widget.latlngOrigem,
+                                ParamType.LatLng,
+                              ),
+                              'latlngWhereTo': serializeParam(
+                                widget.latlngDestino,
+                                ParamType.LatLng,
+                              ),
+                              'value': serializeParam(
+                                split,
+                                ParamType.double,
+                              ),
+                            }.withoutNulls,
+                          );
                         },
                         child: Container(
                           width: 320.0,
@@ -1606,7 +1661,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                 ParamType.LatLng,
                               ),
                               'value': serializeParam(
-                                widget.value,
+                                              (widget.value ?? 0),
                                 ParamType.double,
                               ),
                             }.withoutNulls,
@@ -1697,3 +1752,7 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
     );
   }
 }
+
+
+
+

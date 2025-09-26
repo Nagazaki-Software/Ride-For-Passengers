@@ -16,6 +16,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'dart:math' as math;
 import 'finding_drive8_model.dart';
 export 'finding_drive8_model.dart';
 
@@ -43,6 +44,125 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
   var hasContainerTriggered1 = false;
   var hasContainerTriggered2 = false;
   final animationsMap = <String, AnimationInfo>{};
+  bool _matchStarted = false;
+
+  // --- Simple Haversine distance helper (km) ---
+  double _deg2rad(double deg) => deg * (3.141592653589793 / 180.0);
+  double _haversineKm(LatLng a, LatLng b) {
+    const double R = 6371.0;
+    final double dLat = _deg2rad(b.latitude - a.latitude);
+    final double dLon = _deg2rad(b.longitude - a.longitude);
+    final double lat1 = _deg2rad(a.latitude);
+    final double lat2 = _deg2rad(b.latitude);
+    final double h =
+        (math.sin(dLat / 2) * math.sin(dLat / 2)) +
+        (math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) * math.sin(dLon / 2));
+    final double c = 2 * math.atan2(math.sqrt(h), math.sqrt(1.0 - h));
+    return R * c;
+  }
+
+  Future<bool> _assignDriverTransaction(
+    DocumentReference orderRef,
+    DocumentReference driverRef,
+  ) async {
+    bool success = false;
+    try {
+      await FirebaseFirestore.instance.runTransaction((txn) async {
+        final oSnap = await txn.get(orderRef);
+        final oData = oSnap.data() as Map<String, dynamic>?;
+        if (oData == null) return;
+        // already assigned?
+        if (oData['driver'] != null) {
+          success = true;
+          return;
+        }
+
+        final dSnap = await txn.get(driverRef);
+        final dData = dSnap.data() as Map<String, dynamic>?;
+        if (dData == null) return;
+        final bool isDriver = (dData['driver'] == true);
+        final bool isOnline = (dData['driverOnline'] == true);
+        if (!isDriver || !isOnline) return;
+
+        txn.update(orderRef, {
+          'driver': driverRef,
+          'status': 'Assigned',
+        });
+        // Reserve driver by toggling offline
+        txn.update(driverRef, {
+          'driverOnline': false,
+        });
+        success = true;
+      });
+    } catch (_) {
+      // ignore and report false
+    }
+    return success;
+  }
+
+  Future<bool> _tryAssignNearestDriver() async {
+    try {
+      if (widget.rideOrder == null) return false;
+      final RideOrdersRecord order =
+          await RideOrdersRecord.getDocumentOnce(widget.rideOrder!);
+      if (order.driver != null) return true; // already assigned
+
+      // Prefer pickup/current location from order, then user current
+      final LatLng? pickup =
+          order.latlngAtual ?? order.latlng ?? currentUserLocationValue;
+      if (pickup == null) return false;
+
+      final List<UsersRecord> candidates = await queryUsersRecordOnce(
+        queryBuilder: (q) => q
+            .where('driver', isEqualTo: true)
+            .where('driverOnline', isEqualTo: true),
+      );
+      if (candidates.isEmpty) return false;
+
+      UsersRecord? chosen;
+      double? chosenKm;
+      for (final d in candidates) {
+        final LatLng? loc = d.location;
+        if (loc == null) continue;
+        final double km = _haversineKm(pickup, loc);
+        if (chosenKm == null || km < chosenKm) {
+          chosenKm = km;
+          chosen = d;
+        }
+      }
+      if (chosen == null) return false;
+
+      logFirebaseEvent('FindingDrive8_backend_call');
+      final ok = await _assignDriverTransaction(
+        widget.rideOrder!,
+        chosen!.reference,
+      );
+      return ok;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _startMatching() {
+    if (_matchStarted) return;
+    _matchStarted = true;
+    // Try immediately once, then retry every few seconds until success
+    () async {
+      final ok = await _tryAssignNearestDriver();
+      if (ok) return;
+      // periodic retry
+      _model.matchTimer = InstantTimer.periodic(
+        duration: const Duration(seconds: 5),
+        startImmediately: true,
+        callback: (t) async {
+          final assigned = await _tryAssignNearestDriver();
+          if (assigned) {
+            t.cancel();
+          }
+        },
+      );
+    }();
+  }
 
   @override
   void initState() {
@@ -84,6 +204,8 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
         },
         startImmediately: true,
       );
+      // Kick off matching logic
+      _startMatching();
     });
 
     getCurrentUserLocation(defaultLocation: LatLng(0.0, 0.0), cached: true)

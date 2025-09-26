@@ -10,6 +10,8 @@ class FindingDrive8Model extends FlutterFlowModel<FindingDrive8Widget> {
   ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
+  // Periodic matcher to assign a driver when none is set yet.
+  InstantTimer? matchTimer;
   // Stores action output result for [Backend Call - Read Document] action in FindingDrive8 widget.
   RideOrdersRecord? order;
   // State field(s) for GoogleMap widget.
@@ -22,5 +24,6 @@ class FindingDrive8Model extends FlutterFlowModel<FindingDrive8Widget> {
   @override
   void dispose() {
     instantTimer?.cancel();
+    matchTimer?.cancel();
   }
 }

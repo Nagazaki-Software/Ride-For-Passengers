@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:braintree_flutter_plus/braintree_flutter_plus.dart';
+import 'payment_manager.dart';
 
 class BraintreeNativeBridge {
   static const MethodChannel _ch = MethodChannel('com.quicky.ridebahamas/braintree');
@@ -47,6 +48,43 @@ class BraintreeNativeBridge {
         currencyCode: currencyCode,
         billingAddressRequired: false,
       ),
+    );
+    final result = await BraintreeDropIn.start(dropInReq);
+    return result?.paymentMethodNonce.nonce;
+  }
+
+  static Future<String?> applePay({
+    required String authorization,
+    required String amount,
+    String currencyCode = 'USD',
+    String countryCode = 'US',
+    String? merchantIdentifier,
+    String displayName = 'Ride Bahamas',
+  }) async {
+    final appleReq = BraintreeApplePayRequest(
+      merchantIdentifier: merchantIdentifier ?? appleMerchantId(),
+      displayName: displayName,
+      currencyCode: currencyCode,
+      countryCode: countryCode,
+      supportedNetworks: const [
+        ApplePaySupportedNetworks.visa,
+        ApplePaySupportedNetworks.masterCard,
+        ApplePaySupportedNetworks.amex,
+        ApplePaySupportedNetworks.discover,
+      ],
+      paymentSummaryItems: [
+        ApplePaySummaryItem(
+          label: displayName,
+          amount: double.tryParse(amount) ?? 0.0,
+        ),
+      ],
+    );
+
+    final dropInReq = BraintreeDropInRequest(
+      clientToken: authorization,
+      collectDeviceData: false,
+      cardEnabled: false,
+      applePayRequest: appleReq,
     );
     final result = await BraintreeDropIn.start(dropInReq);
     return result?.paymentMethodNonce.nonce;

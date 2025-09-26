@@ -598,7 +598,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                     children: [
                                                       Text(
                                                         formatNumber(
-                                                          widget.value,
+                                                          widget.value ?? 0,
                                                           formatType: FormatType
                                                               .decimal,
                                                           decimalType:
@@ -700,11 +700,12 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                                         MainAxisSize.max,
                                                     children: [
                                                       Text(
-                                                        functions.estimativeTime(
-                                                            widget
-                                                                .latlngAtual!,
-                                                            widget
-                                                                .latlngWhereTo!),
+                                                        (widget.latlngAtual != null && widget.latlngWhereTo != null)
+                                                            ? functions.estimativeTime(
+                                                                widget.latlngAtual!,
+                                                                widget.latlngWhereTo!,
+                                                              )
+                                                            : '-',
                                                         style:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1750,8 +1751,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                     nomeDestino: LatlngToStringCall.shrotName(
                                       (_model.latlngDestino?.jsonBody ?? ''),
                                     )?.firstOrNull,
-                                    rideValue:
-                                        random_data.randomDouble(5.0, 100.0),
+                                    rideValue: amt,
                                     paid: true,
                                     status: 'Paid',
                                     id: _model.rideID,
@@ -1774,8 +1774,7 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                               (_model.latlngDestino?.jsonBody ??
                                                   ''),
                                             )?.firstOrNull,
-                                            rideValue: random_data.randomDouble(
-                                                5.0, 100.0),
+                                            rideValue: amt,
                                             paid: true,
                                             status: 'Paid',
                                             id: _model.rideID,

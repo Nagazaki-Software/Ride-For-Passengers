@@ -39,6 +39,7 @@ target 'Runner' do
   pod 'Braintree/Core'
   pod 'Braintree/Card'
   pod 'Braintree/PayPal'
+  pod 'Braintree/ApplePay'
   # Pin Google Maps iOS SDK to a version compatible with google_maps_native_sdk
   pod 'GoogleMaps', '9.0.0'
 end

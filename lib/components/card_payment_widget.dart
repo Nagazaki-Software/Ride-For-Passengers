@@ -4,6 +4,8 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/random_data_util.dart' as random_data;
+import '/backend/schema/structs/payment_method_save_struct.dart';
+import '/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 // Using native platform channel bridge (Android: Kotlin, iOS: Swift)
@@ -202,6 +204,24 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                     'Error: ${paymentResponse.errorMessage}');
                                 return;
                               }
+                              // Persist saved payment method locally if provided by server
+                              final pm = paymentResponse.paymentMethodMeta;
+                              if (pm != null && pm.isNotEmpty) {
+                                final brand = (pm['brand'] ?? '') as String;
+                                final last4 = (pm['last4Numbers'] ?? pm['last4'] ?? '') as String;
+                                final token = (pm['paymentMethodToken'] ?? pm['token'] ?? '') as String;
+                                final isDefault = (pm['isDefault'] ?? pm['default'] ?? false) as bool;
+                                if (token.isNotEmpty) {
+                                  FFAppState().addToPaymentMethods(
+                                    createPaymentMethodSaveStruct(
+                                      brand: brand.isNotEmpty ? brand : 'Card',
+                                      last4Numbers: last4,
+                                      paymentMethodToken: token,
+                                      isDefault: isDefault,
+                                    ),
+                                  );
+                                }
+                              }
                               showSnackbar(context, 'Success!');
                               _model.transactionId =
                                   paymentResponse.transactionId!;
@@ -251,8 +271,70 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                     children: [
                       if (widget.pagamento && isiOS)
                         FFButtonWidget(
-                          onPressed: () {
-                            print('Button pressed ...');
+                          onPressed: () async {
+                            logFirebaseEvent(
+                                'CARD_PAYMENT_PAY_WITH_APPLE_PAY_BTN_ON_');
+                            logFirebaseEvent('Button_braintree_payment');
+                            final transacAmount = widget.value!;
+                            if (kIsWeb) {
+                              showSnackbar(context,
+                                  'Payments not yet supported on web.');
+                              return;
+                            }
+
+                            try {
+                              final nonce = await BraintreeNativeBridge.applePay(
+                                authorization: braintreeClientToken(),
+                                amount: transacAmount.toStringAsFixed(2),
+                                currencyCode: 'USD',
+                                merchantIdentifier: appleMerchantId(),
+                                displayName: 'Ride Bahamas',
+                              );
+                              if (nonce == null || nonce.isEmpty) return;
+                              showSnackbar(
+                                context,
+                                'Processing payment...',
+                                duration: 10,
+                                loading: true,
+                              );
+                              final paymentResponse = await processBraintreePayment(
+                                transacAmount,
+                                nonce,
+                              );
+                              if (paymentResponse.errorMessage != null) {
+                                showSnackbar(context,
+                                    'Error: ${paymentResponse.errorMessage}');
+                                return;
+                              }
+                              // Persist saved payment method locally if provided by server
+                              final pm = paymentResponse.paymentMethodMeta;
+                              if (pm != null && pm.isNotEmpty) {
+                                final brand = (pm['brand'] ?? '') as String;
+                                final last4 = (pm['last4Numbers'] ?? pm['last4'] ?? '') as String;
+                                final token = (pm['paymentMethodToken'] ?? pm['token'] ?? '') as String;
+                                final isDefault = (pm['isDefault'] ?? pm['default'] ?? false) as bool;
+                                if (token.isNotEmpty) {
+                                  FFAppState().addToPaymentMethods(
+                                    createPaymentMethodSaveStruct(
+                                      brand: brand.isNotEmpty ? brand : 'Card',
+                                      last4Numbers: last4,
+                                      paymentMethodToken: token,
+                                      isDefault: isDefault,
+                                    ),
+                                  );
+                                }
+                              }
+                              showSnackbar(context, 'Success!');
+                              _model.transactionId2 =
+                                  paymentResponse.transactionId!;
+
+                              safeSetState(() {});
+                            } catch (e) {
+                              showSnackbar(
+                                context,
+                                'Apple Pay not available or failed: $e',
+                              );
+                            }
                           },
                           text: FFLocalizations.of(context).getText(
                             '0cdaev13' /* Pay with Apple Pay */,
@@ -421,6 +503,24 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                               showSnackbar(context,
                                   'Error: ${paymentResponse.errorMessage}');
                               return;
+                            }
+                            // If server returned saved payment method metadata, persist locally for reuse
+                            final pm = paymentResponse.paymentMethodMeta;
+                            if (pm != null && pm.isNotEmpty) {
+                              final brand = (pm['brand'] ?? '') as String;
+                              final last4 = (pm['last4Numbers'] ?? pm['last4'] ?? '') as String;
+                              final token = (pm['paymentMethodToken'] ?? pm['token'] ?? '') as String;
+                              final isDefault = (pm['isDefault'] ?? pm['default'] ?? false) as bool;
+                              if (token.isNotEmpty) {
+                                FFAppState().addToPaymentMethods(
+                                  createPaymentMethodSaveStruct(
+                                    brand: brand.isNotEmpty ? brand : 'Card',
+                                    last4Numbers: last4,
+                                    paymentMethodToken: token,
+                                    isDefault: isDefault,
+                                  ),
+                                );
+                              }
                             }
                             showSnackbar(context, 'Success!');
                             _model.transactionId3 =

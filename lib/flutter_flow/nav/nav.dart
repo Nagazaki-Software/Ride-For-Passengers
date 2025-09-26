@@ -148,6 +148,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               'estilo',
               ParamType.String,
             ),
+            session: params.getParam(
+              'session',
+              ParamType.DocumentReference,
+              collectionNamePath: ['rideOrders'],
+            ),
           ),
         ),
         FFRoute(

@@ -320,7 +320,10 @@ class _PickerViewMoreState extends State<PickerViewMore>
     if (_controller == null) return;
 
     // origem (avatar: foto ou iniciais)
-    final int size = widget.userMarkerSize.clamp(36, 128);
+    // iOS tends to render markers visually larger; apply a slight downscale.
+    final double _platformScale = Platform.isIOS ? 0.85 : 1.0;
+    final int size =
+        (widget.userMarkerSize * _platformScale).round().clamp(36, 128);
     final Uint8List userBytes = await _makeUserAvatarBytes(
       name: widget.userName ?? 'Você',
       photoUrl: widget.userPhotoUrl,
@@ -348,7 +351,8 @@ class _PickerViewMoreState extends State<PickerViewMore>
       anchorV: 1.0,
       zIndex: 25,
       urlIcon: widget.destinationMarkerPngUrl,
-      targetW: widget.destMarkerWidth.clamp(24, 128),
+      targetW:
+          (widget.destMarkerWidth * _platformScale).round().clamp(24, 128),
     );
   }
 
