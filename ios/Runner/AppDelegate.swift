@@ -1,6 +1,7 @@
 import UIKit
 import UserNotifications
 import Flutter
+import Braintree
 import GoogleMaps
 
 @main
@@ -11,6 +12,7 @@ import GoogleMaps
   ) -> Bool {
     GMSServices.provideAPIKey("AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ")
     GeneratedPluginRegistrant.register(with: self)
+    BTAppContextSwitcher.setReturnURLScheme("com.quicky.ridebahamas.braintree")
 
     // Flutter <-> iOS native Braintree channel
     if let controller = window?.rootViewController as? FlutterViewController {
