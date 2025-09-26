@@ -47,7 +47,8 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
+      # Ensure min iOS target is 15.0 for all Pods to match Braintree SDK
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
 
@@ -69,6 +70,15 @@ post_install do |installer|
     if target.name == 'google_maps_native_sdk'
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = 'Classes/*'
+      end
+    end
+  end
+
+  # Also enforce iOS 15.0 on the Runner project targets
+  installer.aggregate_targets.each do |aggregate|
+    aggregate.user_project.targets.each do |t|
+      t.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       end
     end
   end
