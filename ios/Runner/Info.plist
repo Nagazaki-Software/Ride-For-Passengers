@@ -74,13 +74,17 @@
 	<true/>
 
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>In order to search nearby, this app requires access to your current location.</string>
+    <string>We use your location to find nearby rides, show accurate pickup points and improve safety features.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We use your location in the background to keep ride updates accurate and ensure safe pickups and drop-offs.</string>
 	<key>NSCameraUsageDescription</key>
     <string>In order to take a picture or video, this app requires permission to access the camera.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>In order to upload data, this app requires permission to access the photo library.</string>
 	<key>NSMicrophoneUsageDescription</key>
-    <string>Add mycrofiome</string>
+    <string>We use the microphone to capture your voice for voice commands and support features.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+    <string>We use speech recognition for accessibility and hands-free commands, such as requesting rides by voice.</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>fetch</string>
