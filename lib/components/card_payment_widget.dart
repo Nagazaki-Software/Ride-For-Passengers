@@ -404,6 +404,7 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                               expirationMonth: _model.creditCardInfo.expiryDate.split('/').first,
                               expirationYear: _model.creditCardInfo.expiryDate.split('/').last,
                               cvv: _model.creditCardInfo.cvvCode,
+                              amount: transacAmount.toStringAsFixed(2),
                             );
                             if (nonce == null || nonce.isEmpty) return;
                             showSnackbar(

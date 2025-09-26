@@ -9,16 +9,18 @@ class BraintreeNativeBridge {
     required String number,
     required String expirationMonth,
     required String expirationYear,
-    String? cvv,
+    required String cvv,
+    required String amount,
   }) async {
     final req = BraintreeCreditCardRequest(
       cardNumber: number,
       expirationMonth: expirationMonth,
       expirationYear: expirationYear,
       cvv: cvv,
+      amount: amount,
     );
     final result = await Braintree.tokenizeCreditCard(authorization, req);
-    return result.nonce;
+    return result?.nonce;
   }
 
   static Future<String?> paypalCheckout({
@@ -28,7 +30,7 @@ class BraintreeNativeBridge {
   }) async {
     final request = BraintreePayPalRequest(amount: amount);
     final result = await Braintree.requestPaypalNonce(authorization, request);
-    return result.nonce;
+    return result?.nonce;
   }
 
   static Future<String?> googlePay({
