@@ -54,7 +54,8 @@ class _ShareQRCodeWidgetState extends State<ShareQRCodeWidget> {
         padding: EdgeInsetsDirectional.fromSTEB(24.0, 24.0, 24.0, 24.0),
         child: Container(
           decoration: BoxDecoration(
-            color: FlutterFlowTheme.of(context).primaryText,
+            // Make the modal card use a surface background, not text color
+            color: FlutterFlowTheme.of(context).secondaryBackground,
             boxShadow: [
               BoxShadow(
                 blurRadius: 8.0,

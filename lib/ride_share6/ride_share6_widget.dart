@@ -236,8 +236,9 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                       focusIntervalMs: 4000,
                       focusHoldMs: 3500,
                       enableDriverFocus: true,
-                      showPulseHalo: true,
-                      showViewingBubble: true,
+                      // Less visual noise for this page
+                      showPulseHalo: false,
+                      showViewingBubble: false,
                     ),
                   );
                 },
@@ -1399,89 +1400,72 @@ class _RideShare6WidgetState extends State<RideShare6Widget>
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 12.0, 0.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
+                                  child: StreamBuilder<RideOrdersRecord>(
+                                    stream: (_model.session ?? _model.rideOrderQR?.reference) != null
+                                        ? RideOrdersRecord.getDocument((_model.session ?? _model.rideOrderQR!.reference))
+                                        : Stream<RideOrdersRecord>.empty(),
+                                    builder: (context, snapshot) {
+                                      final RideOrdersRecord? rideDoc = snapshot.data;
+                                      final int participants = (rideDoc?.participantes.length ?? 0);
+                                      final double total = rideDoc?.hasRideValue() == true
+                                          ? (rideDoc!.rideValue).toDouble()
+                                          : (widget.value ?? 0).toDouble();
+                                      final double share = (participants > 0 ? total / participants : total);
+
+                                      return Row(
                                         mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            FFLocalizations.of(context).getText(
-                                              'm8s3ygc5' /* $6.50 */,
-                                            ),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .alternate,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Text(
+                                                formatNumber(
+                                                  share,
+                                                  formatType: FormatType.decimal,
+                                                  decimalType: DecimalType.commaDecimal,
+                                                  currency: '\$ ',
                                                 ),
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight: FontWeight.w500,
+                                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                      ),
+                                                      color: FlutterFlowTheme.of(context).alternate,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight: FontWeight.w500,
+                                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Text(
+                                                'of ${formatNumber(
+                                                  total,
+                                                  formatType: FormatType.decimal,
+                                                  decimalType: DecimalType.commaDecimal,
+                                                  currency: '\$ ',
+                                                )} total',
+                                                style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                      font: GoogleFonts.poppins(
+                                                        fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                      ),
+                                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                                      fontSize: 10.0,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
                                         ],
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Text(
-                                            'of ${formatNumber(
-                                              (widget.value ?? 0),
-                                              formatType: FormatType.decimal,
-                                              decimalType:
-                                                  DecimalType.commaDecimal,
-                                              currency: '\$ ',
-                                            )} total',
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts.poppins(
-                                                    fontWeight:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontWeight,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .secondaryText,
-                                                  fontSize: 10.0,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontWeight,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
                                 ),
                               ],

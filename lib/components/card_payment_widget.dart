@@ -188,7 +188,13 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                 amount: transacAmount.toStringAsFixed(2),
                                 currencyCode: 'USD',
                               );
-                              if (nonce == null || nonce.isEmpty) return;
+                              if (nonce == null || nonce.isEmpty) {
+                                showSnackbar(
+                                  context,
+                                  'Google Pay cancelado ou sem método retornado.',
+                                );
+                                return;
+                              }
                               showSnackbar(
                                 context,
                                 'Processing payment...',
@@ -290,7 +296,13 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                                 merchantIdentifier: appleMerchantId(),
                                 displayName: 'Ride Bahamas',
                               );
-                              if (nonce == null || nonce.isEmpty) return;
+                              if (nonce == null || nonce.isEmpty) {
+                                showSnackbar(
+                                  context,
+                                  'Apple Pay cancelado ou sem método retornado.',
+                                );
+                                return;
+                              }
                               showSnackbar(
                                 context,
                                 'Processing payment...',
@@ -488,7 +500,10 @@ class _CardPaymentWidgetState extends State<CardPaymentWidget> {
                               cvv: _model.creditCardInfo.cvvCode,
                               amount: transacAmount.toStringAsFixed(2),
                             );
-                            if (nonce == null || nonce.isEmpty) return;
+                            if (nonce == null || nonce.isEmpty) {
+                              showSnackbar(context, 'Falha ao tokenizar o cartão.');
+                              return;
+                            }
                             showSnackbar(
                               context,
                               'Processing payment...',

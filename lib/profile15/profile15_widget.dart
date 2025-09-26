@@ -297,10 +297,12 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
+                                            Wrap(
+                                              spacing: 6.0,
+                                              runSpacing: 6.0,
+                                              alignment: WrapAlignment.start,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
                                               children: [
                                                 AuthUserStreamWidget(
                                                   builder: (context) =>
@@ -564,8 +566,8 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                               ),
                                                         ),
                                                       ),
-                                                    ],
-                                                  ),
+                                              ],
+                                            ),
                                                 ),
                                               ].divide(SizedBox(width: 10.0)),
                                             ),

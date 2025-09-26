@@ -13,13 +13,24 @@ Future<Map<String, dynamic>> makeCloudCall(
         : {};
   } on FirebaseFunctionsException catch (e) {
     print(
-      'Cloud call error!\n ${callName}'
+      'Cloud call error!\n$callName\n'
       'Code: ${e.code}\n'
       'Details: ${e.details}\n'
       'Message: ${e.message}',
     );
+    final Map<String, dynamic> err = {
+      'error': e.message ?? e.code,
+      if (e.details != null && e.details is Map) ...{
+        'details': Map<String, dynamic>.from(e.details as Map),
+      } else if (e.details != null) ...{
+        'details': {'info': e.details.toString()},
+      }
+    };
+    return err;
   } catch (e) {
-    print('Cloud call error:${callName} $e');
+    print('Cloud call error:$callName $e');
+    return {
+      'error': e.toString(),
+    };
   }
-  return {};
 }

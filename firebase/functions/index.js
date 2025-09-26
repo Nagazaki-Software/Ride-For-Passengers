@@ -19,18 +19,10 @@ const K_TEST_MERCHANT_ID = "brg8dhjg5tqpw496";
 const K_TEST_PUBLIC_KEY  = "syt9g3c79t58wk82";
 const K_TEST_PRIVATE_KEY = "0f7de713fa2bbb810f183f628f51d86d";
 
-// Produção (lidas do functions:config, se disponíveis)
-let CFG = {};
-try {
-  const functions = require("firebase-functions");
-  // Em alguns ambientes sem config setado, chamar config() pode lançar.
-  CFG = (functions.config && functions.config().braintree) || {};
-} catch (_) {
-  CFG = {};
-}
-const K_PROD_MERCHANT_ID = CFG.prod_merchant_id || "";
-const K_PROD_PUBLIC_KEY  = CFG.prod_public_key  || "";
-const K_PROD_PRIVATE_KEY = CFG.prod_private_key || "";
+// Produção (para Gen2 use variáveis de ambiente do Cloud Run)
+const K_PROD_MERCHANT_ID = process.env.BRAINTREE_PROD_MERCHANT_ID || "";
+const K_PROD_PUBLIC_KEY  = process.env.BRAINTREE_PROD_PUBLIC_KEY  || "";
+const K_PROD_PRIVATE_KEY = process.env.BRAINTREE_PROD_PRIVATE_KEY || "";
 
 /** Gateway por ambiente */
 function getGateway(isProd) {
@@ -225,34 +217,40 @@ exports.saveCardPayment = onCall({ region: "us-central1", timeoutSeconds: 60, me
     throw new HttpsError("invalid-argument", "paymentNonce e obrigatorio.");
   }
 
-  const uid = context.auth.uid;
-  const email = context.auth.token?.email;
-  const gateway = getGateway(isProd);
-
-  // garante customer e verifica se ja possui metodos
-  await ensureCustomer(gateway, uid, email);
-  let existingCount = 0;
   try {
-    const found = await gateway.customer.find(uid);
-    existingCount = Array.isArray(found && found.paymentMethods) ? found.paymentMethods.length : 0;
-  } catch (_) {}
+    const uid = context.auth.uid;
+    const email = context.auth.token?.email;
+    const gateway = getGateway(isProd);
 
-  const res = await gateway.paymentMethod.create({
-    customerId: uid,
-    paymentMethodNonce: paymentNonce,
-    deviceData,
-    options: {
-      verifyCard: true,
-      makeDefault: existingCount === 0,
-    },
-  });
+    // garante customer e verifica se ja possui metodos
+    await ensureCustomer(gateway, uid, email);
+    let existingCount = 0;
+    try {
+      const found = await gateway.customer.find(uid);
+      existingCount = Array.isArray(found && found.paymentMethods) ? found.paymentMethods.length : 0;
+    } catch (_) {}
 
-  if (!res.success) {
-    return { success: false, error: res.message || "Falha ao salvar metodo." };
+    const res = await gateway.paymentMethod.create({
+      customerId: uid,
+      paymentMethodNonce: paymentNonce,
+      deviceData,
+      options: {
+        verifyCard: true,
+        makeDefault: existingCount === 0,
+      },
+    });
+
+    if (!res.success) {
+      return { success: false, error: res.message || "Falha ao salvar metodo." };
+    }
+
+    const meta = methodMetaFF(res.paymentMethod);
+    return { success: true, paymentMethod: meta };
+  } catch (e) {
+    const msg = (e && e.message) || String(e);
+    console.warn("[saveCardPayment] error:", msg);
+    return { success: false, error: msg };
   }
-
-  const meta = methodMetaFF(res.paymentMethod);
-  return { success: true, paymentMethod: meta };
 });
 
 /**

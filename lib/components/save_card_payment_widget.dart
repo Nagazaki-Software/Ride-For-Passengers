@@ -171,7 +171,13 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                                 amount: 1.00.toStringAsFixed(2),
                                 currencyCode: 'USD',
                               );
-                              if (nonce == null || nonce.isEmpty) return;
+                              if (nonce == null || nonce.isEmpty) {
+                                showSnackbar(
+                                  context,
+                                  'Google Pay cancelado ou sem método retornado.',
+                                );
+                                return;
+                              }
                               showSnackbar(
                                 context,
                                 'Saving payment method...',
@@ -505,7 +511,7 @@ class _SaveCardPaymentWidgetState extends State<SaveCardPaymentWidget> {
                               amount: '0.00',
                             );
                             if (tokenized == null || tokenized.isEmpty) {
-                              showSnackbar(context, 'Failed to tokenize card.');
+                              showSnackbar(context, 'Falha ao tokenizar o cartão.');
                               return;
                             }
 
