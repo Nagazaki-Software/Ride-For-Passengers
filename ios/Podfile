@@ -64,6 +64,13 @@ post_install do |installer|
         'PERMISSION_MICROPHONE=1',
       ]
     end
+
+    # If you don't use google_maps_native_sdk on iOS, exclude its sources to avoid Swift API mismatches
+    if target.name == 'google_maps_native_sdk'
+      target.build_configurations.each do |config|
+        config.build_settings['EXCLUDED_SOURCE_FILE_NAMES'] = 'Classes/*'
+      end
+    end
   end
 end
 
