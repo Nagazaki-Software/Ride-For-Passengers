@@ -1,7 +1,5 @@
 import UIKit
 import UserNotifications
-import Braintree
-
 import Flutter
 import GoogleMaps
 
@@ -13,7 +11,6 @@ import GoogleMaps
   ) -> Bool {
     GMSServices.provideAPIKey("AIzaSyCFBfcNHFg97sM7EhKnAP4OHIoY3Q8Y_xQ")
     GeneratedPluginRegistrant.register(with: self)
-    BTAppContextSwitcher.setReturnURLScheme("com.quicky.ridebahamas.braintree")
 
     // Flutter <-> iOS native Braintree channel
     if let controller = window?.rootViewController as? FlutterViewController {
@@ -34,19 +31,8 @@ import GoogleMaps
             return
           }
           let cvv = args["cvv"] as? String
-          guard let apiClient = BTAPIClient(authorization: authorization) else {
-            result(FlutterError(code: "bt", message: "Invalid authorization", details: nil))
-            return
-          }
-          let cardClient = BTCardClient(apiClient: apiClient)
-          let card = BTCard(number: number, expirationMonth: expirationMonth, expirationYear: expirationYear, cvv: cvv)
-          cardClient.tokenize(card) { tokenized, error in
-            if let e = error {
-              result(FlutterError(code: "bt", message: e.localizedDescription, details: nil))
-            } else {
-              result(tokenized?.nonce)
-            }
-          }
+          // iOS Braintree bridge disabled in this build; return unsupported
+          result(FlutterError(code: "unsupported", message: "Braintree not implemented on iOS build", details: nil))
 
         case "paypalCheckout":
           guard let args = call.arguments as? [String: Any],
@@ -56,20 +42,8 @@ import GoogleMaps
             return
           }
           let currencyCode = (args["currencyCode"] as? String) ?? "USD"
-          guard let apiClient = BTAPIClient(authorization: authorization) else {
-            result(FlutterError(code: "bt", message: "Invalid authorization", details: nil))
-            return
-          }
-          let payPalDriver = BTPayPalDriver(apiClient: apiClient)
-          let request = BTPayPalCheckoutRequest(amount: amount)
-          request.currencyCode = currencyCode
-          payPalDriver.tokenizePayPalAccount(with: request) { tokenized, error in
-            if let e = error {
-              result(FlutterError(code: "bt", message: e.localizedDescription, details: nil))
-            } else {
-              result(tokenized?.nonce)
-            }
-          }
+          // iOS Braintree bridge disabled in this build; return unsupported
+          result(FlutterError(code: "unsupported", message: "Braintree not implemented on iOS build", details: nil))
 
         case "googlePay":
           result(FlutterError(code: "unsupported", message: "Google Pay not supported on iOS", details: nil))
@@ -92,9 +66,6 @@ import GoogleMaps
 
   // Handle app switch returns (PayPal, etc.)
   override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    if url.scheme?.localizedCaseInsensitiveCompare("com.quicky.ridebahamas.braintree") == .orderedSame {
-      return BTAppContextSwitcher.handleOpenURL(url)
-    }
     return super.application(app, open: url, options: options)
   }
 }
