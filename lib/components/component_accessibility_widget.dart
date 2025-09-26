@@ -4,6 +4,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'component_accessibility_model.dart';
+import '../services/tts_service.dart';
 export 'component_accessibility_model.dart';
 
 /// Create a component acessibility
@@ -30,10 +31,12 @@ class _ComponentAccessibilityWidgetState
     super.initState();
     _model = createModel(context, () => ComponentAccessibilityModel());
 
-    _model.switchValue1 = false;
-    _model.switchValue2 = false;
-    _model.switchValue3 = false;
-    _model.switchValue4 = false;
+    // Initialize switches from persisted app state
+    final appState = FFAppState();
+    _model.switchValue1 = appState.accessibilityLowStimulation;
+    _model.switchValue2 = appState.accessibilitySpeakStreets;
+    _model.switchValue3 = appState.accessibilityAudioFeedback;
+    _model.switchValue4 = appState.accessibilityVoiceRequest;
   }
 
   @override
@@ -161,6 +164,14 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue1!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue1 = newValue);
+                          FFAppState().accessibilityLowStimulation = newValue;
+                          // Announce toggle state
+                          TtsService.instance.speak(
+                            newValue
+                                ? 'Modo de baixa estimulação ativado'
+                                : 'Modo de baixa estimulação desativado',
+                            context: context,
+                          );
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -240,6 +251,13 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue2!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue2 = newValue);
+                          FFAppState().accessibilitySpeakStreets = newValue;
+                          TtsService.instance.speak(
+                            newValue
+                                ? 'Nomes de ruas em áudio ativados'
+                                : 'Nomes de ruas em áudio desativados',
+                            context: context,
+                          );
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -319,6 +337,15 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue3!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue3 = newValue);
+                          FFAppState().accessibilityAudioFeedback = newValue;
+                          // Force announce when turning on; also announce when turning off
+                          TtsService.instance.speak(
+                            newValue
+                                ? 'Feedback de áudio ativado'
+                                : 'Feedback de áudio desativado',
+                            force: true,
+                            context: context,
+                          );
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -398,6 +425,13 @@ class _ComponentAccessibilityWidgetState
                         value: _model.switchValue4!,
                         onChanged: (newValue) async {
                           safeSetState(() => _model.switchValue4 = newValue);
+                          FFAppState().accessibilityVoiceRequest = newValue;
+                          TtsService.instance.speak(
+                            newValue
+                                ? 'Solicitação de corrida por voz ativada'
+                                : 'Solicitação de corrida por voz desativada',
+                            context: context,
+                          );
                         },
                         activeColor: FlutterFlowTheme.of(context).accent1,
                         activeTrackColor:
@@ -412,8 +446,27 @@ class _ComponentAccessibilityWidgetState
                 ].divide(SizedBox(height: 12.0)),
               ),
               FFButtonWidget(
-                onPressed: () {
-                  print('Button pressed ...');
+                onPressed: () async {
+                  // Persist current states explicitly
+                  final appState = FFAppState();
+                  appState.accessibilityLowStimulation =
+                      _model.switchValue1 ?? false;
+                  appState.accessibilitySpeakStreets =
+                      _model.switchValue2 ?? false;
+                  appState.accessibilityAudioFeedback =
+                      _model.switchValue3 ?? false;
+                  appState.accessibilityVoiceRequest =
+                      _model.switchValue4 ?? false;
+
+                  // Announce and close the bottom sheet
+                  await TtsService.instance.speak(
+                    'Configurações de acessibilidade aplicadas',
+                    force: true,
+                    context: context,
+                  );
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
                 },
                 text: FFLocalizations.of(context).getText(
                   '0vrkyi4m' /* Confirm */,

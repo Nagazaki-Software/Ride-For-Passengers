@@ -96,6 +96,26 @@ class FFAppState extends ChangeNotifier {
               .toList() ??
           _paymentMethods;
     });
+    _safeInit(() {
+      _accessibilityLowStimulation =
+          prefs.getBool('ff_accessibilityLowStimulation') ??
+              _accessibilityLowStimulation;
+    });
+    _safeInit(() {
+      _accessibilitySpeakStreets =
+          prefs.getBool('ff_accessibilitySpeakStreets') ??
+              _accessibilitySpeakStreets;
+    });
+    _safeInit(() {
+      _accessibilityAudioFeedback =
+          prefs.getBool('ff_accessibilityAudioFeedback') ??
+              _accessibilityAudioFeedback;
+    });
+    _safeInit(() {
+      _accessibilityVoiceRequest =
+          prefs.getBool('ff_accessibilityVoiceRequest') ??
+              _accessibilityVoiceRequest;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -351,6 +371,35 @@ class FFAppState extends ChangeNotifier {
   String get pickingPage => _pickingPage;
   set pickingPage(String value) {
     _pickingPage = value;
+  }
+
+  // Accessibility preferences
+  bool _accessibilityLowStimulation = false;
+  bool get accessibilityLowStimulation => _accessibilityLowStimulation;
+  set accessibilityLowStimulation(bool value) {
+    _accessibilityLowStimulation = value;
+    prefs.setBool('ff_accessibilityLowStimulation', value);
+  }
+
+  bool _accessibilitySpeakStreets = false;
+  bool get accessibilitySpeakStreets => _accessibilitySpeakStreets;
+  set accessibilitySpeakStreets(bool value) {
+    _accessibilitySpeakStreets = value;
+    prefs.setBool('ff_accessibilitySpeakStreets', value);
+  }
+
+  bool _accessibilityAudioFeedback = false;
+  bool get accessibilityAudioFeedback => _accessibilityAudioFeedback;
+  set accessibilityAudioFeedback(bool value) {
+    _accessibilityAudioFeedback = value;
+    prefs.setBool('ff_accessibilityAudioFeedback', value);
+  }
+
+  bool _accessibilityVoiceRequest = false;
+  bool get accessibilityVoiceRequest => _accessibilityVoiceRequest;
+  set accessibilityVoiceRequest(bool value) {
+    _accessibilityVoiceRequest = value;
+    prefs.setBool('ff_accessibilityVoiceRequest', value);
   }
 
   final _recentTripsManager = StreamRequestManager<List<RideOrdersRecord>>();

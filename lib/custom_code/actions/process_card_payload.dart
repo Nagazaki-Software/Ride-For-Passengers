@@ -220,6 +220,7 @@ Future<dynamic> processCardPayload(
             expirationMonth: mm,
             expirationYear: yy,
             cvv: cvv,
+            amount: amt.toStringAsFixed(2),
           );
           if (tokenized == null || tokenized.isEmpty) {
             result['error'] = 'Tokenization failed.';

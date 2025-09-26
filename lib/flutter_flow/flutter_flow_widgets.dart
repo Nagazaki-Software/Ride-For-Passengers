@@ -1,6 +1,7 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import '../services/tts_service.dart';
 
 class FFButtonOptions {
   const FFButtonOptions({
@@ -117,6 +118,10 @@ class _FFButtonWidgetState extends State<FFButtonWidget> {
                 if (loading) {
                   return;
                 }
+                // Announce the action for accessibility if enabled.
+                try {
+                  TtsService.instance.announceAction(widget.text, context: context);
+                } catch (_) {}
                 setState(() => loading = true);
                 try {
                   await widget.onPressed!();
@@ -371,9 +376,24 @@ class _FFFocusIndicatorState extends State<FFFocusIndicator> {
         hoverColor: Colors.transparent,
         highlightColor: Colors.transparent,
         focusNode: _focusNode,
-        onTap: widget.onTap,
-        onLongPress: widget.onLongPress,
-        onDoubleTap: widget.onDoubleTap,
+        onTap: () {
+          try {
+            TtsService.instance.announceAction('Selecionado', context: context);
+          } catch (_) {}
+          widget.onTap?.call();
+        },
+        onLongPress: () {
+          try {
+            TtsService.instance.announceAction('Pressionado', context: context);
+          } catch (_) {}
+          widget.onLongPress?.call();
+        },
+        onDoubleTap: () {
+          try {
+            TtsService.instance.announceAction('Toque duplo', context: context);
+          } catch (_) {}
+          widget.onDoubleTap?.call();
+        },
         child: widget.child,
       ),
     );

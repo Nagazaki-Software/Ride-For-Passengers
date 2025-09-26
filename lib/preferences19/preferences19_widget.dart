@@ -71,11 +71,12 @@ class _Preferences19WidgetState extends State<Preferences19Widget> {
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              InkWell(
+                              AccessibleInkWell(
                                 splashColor: Colors.transparent,
                                 focusColor: Colors.transparent,
                                 hoverColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
+                                announceLabel: FFLocalizations.of(context).getText('f1e7nb6y'),
                                 onTap: () async {
                                   logFirebaseEvent(
                                       'PREFERENCES19_PAGE_Text_vwjjyhxa_ON_TAP');
@@ -127,11 +128,12 @@ class _Preferences19WidgetState extends State<Preferences19Widget> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        InkWell(
+                        AccessibleInkWell(
                           splashColor: Colors.transparent,
                           focusColor: Colors.transparent,
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
+                          announceLabel: FFLocalizations.of(context).getText('znurfslv'),
                           onTap: () async {
                             logFirebaseEvent(
                                 'PREFERENCES19_Container_klk1dio6_ON_TAP');
@@ -282,11 +284,12 @@ class _Preferences19WidgetState extends State<Preferences19Widget> {
                             ),
                           ),
                         ),
-                        InkWell(
+                        AccessibleInkWell(
                           splashColor: Colors.transparent,
                           focusColor: Colors.transparent,
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
+                          announceLabel: FFLocalizations.of(context).getText('ssumpo16'),
                           onTap: () async {
                             logFirebaseEvent(
                                 'PREFERENCES19_Container_d3if46z6_ON_TAP');
