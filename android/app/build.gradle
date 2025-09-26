@@ -96,3 +96,10 @@ dependencies {
     // Google Pay dependency
     implementation 'com.google.android.gms:play-services-wallet:19.4.0'
 }
+
+// Exclude Braintree 3DS (Cardinal SDK) to avoid failing repository resolution.
+// This disables 3D Secure on Android builds.
+configurations.configureEach {
+    exclude group: 'org.jfrog.cardinalcommerce.gradle', module: 'cardinalmobilesdk'
+    exclude group: 'com.braintreepayments.api', module: 'three-d-secure'
+}
