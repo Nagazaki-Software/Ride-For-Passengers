@@ -1,5 +1,6 @@
 ﻿import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/cloud_functions/cloud_functions.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -1020,8 +1021,25 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                                   .controller
                                   .forward(from: 0.0));
                         }
+                        try {
+                          showSnackbar(context, 'Canceling...', loading: true, duration: 8);
+                          final resp = await cancelRideAndRefund(
+                            orderPath: widget.rideOrder!.path,
+                            reason: 'User canceled while matching',
+                            allowRefund: true,
+                            isProd: false,
+                          );
+                          final ok = (resp['success'] == true) || (resp['ok'] == true);
+                          if (ok) {
+                            showSnackbar(context, resp['refunded'] == true ? 'Ride canceled and refunded.' : 'Ride canceled.');
+                          } else {
+                            showSnackbar(context, 'Cancel failed: ${resp['error'] ?? 'Unknown error'}');
+                          }
+                        } catch (e) {
+                          showSnackbar(context, 'Cancel failed: $e');
+                        }
                         logFirebaseEvent('ContainerCancel_navigate_back');
-                        context.safePop();
+                        context.goNamed(Home5Widget.routeName);
                       },
                       child: Container(
                         width: 332.0,

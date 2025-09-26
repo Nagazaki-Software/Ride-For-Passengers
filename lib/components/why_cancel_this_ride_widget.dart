@@ -17,9 +17,11 @@ class WhyCancelThisRideWidget extends StatefulWidget {
   const WhyCancelThisRideWidget({
     super.key,
     required this.order,
+    this.allowRefund,
   });
 
   final DocumentReference? order;
+  final bool? allowRefund;
 
   @override
   State<WhyCancelThisRideWidget> createState() =>

@@ -125,6 +125,11 @@ class RideOrdersRecord extends FirestoreRecord {
   String get id => _id ?? '';
   bool hasId() => _id != null;
 
+  // "transactionId" field.
+  String? _transactionId;
+  String get transactionId => _transactionId ?? '';
+  bool hasTransactionId() => _transactionId != null;
+
   void _initializeFields() {
     _user = snapshotData['user'] as DocumentReference?;
     _latlng = snapshotData['latlng'] as LatLng?;
@@ -148,6 +153,7 @@ class RideOrdersRecord extends FirestoreRecord {
     _sos = snapshotData['sos'] as bool?;
     _passangers = snapshotData['passangers'] as String?;
     _id = snapshotData['id'] as String?;
+    _transactionId = snapshotData['transactionId'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -206,6 +212,7 @@ Map<String, dynamic> createRideOrdersRecordData({
   bool? sos,
   String? passangers,
   String? id,
+  String? transactionId,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -230,6 +237,7 @@ Map<String, dynamic> createRideOrdersRecordData({
       'sos': sos,
       'passangers': passangers,
       'id': id,
+      'transactionId': transactionId,
     }.withoutNulls,
   );
 
@@ -263,7 +271,8 @@ class RideOrdersRecordDocumentEquality implements Equality<RideOrdersRecord> {
         e1?.faster == e2?.faster &&
         e1?.sos == e2?.sos &&
         e1?.passangers == e2?.passangers &&
-        e1?.id == e2?.id;
+        e1?.id == e2?.id &&
+        e1?.transactionId == e2?.transactionId;
   }
 
   @override
@@ -289,7 +298,8 @@ class RideOrdersRecordDocumentEquality implements Equality<RideOrdersRecord> {
         e?.faster,
         e?.sos,
         e?.passangers,
-        e?.id
+        e?.id,
+        e?.transactionId
       ]);
 
   @override

@@ -1769,6 +1769,10 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                     paid: true,
                                     status: 'Paid',
                                     id: _model.rideID,
+                                    transactionId: getJsonField(
+                                      _model.processPayment,
+                                      r'$.transactionId',
+                                    )?.toString(),
                                   ));
                                   _model.order =
                                       RideOrdersRecord.getDocumentFromData(

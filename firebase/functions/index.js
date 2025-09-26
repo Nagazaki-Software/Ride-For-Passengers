@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 // Backwards-compatible alias so existing references to functions.https.HttpsError still work
 var functions = { https: { HttpsError } };
 const admin = require("firebase-admin");
@@ -202,6 +203,98 @@ exports.payAndReturnPaymentMethod = onCall({ region: "us-central1", timeoutSecon
 });
 
 /**
+ * Refund a transaction by id. Tries void first (if not settled), otherwise refunds.
+ * data: { transactionId: string, amount?: string|number, isProd?: boolean }
+ * returns: { success, refundTransactionId?, voided?, error? }
+ */
+exports.refundTransaction = onCall({ region: "us-central1", timeoutSeconds: 60, memory: "256MiB" }, async (request) => {
+  const data = request.data || {};
+  const context = request;
+  if (!context.auth) {
+    throw new HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { transactionId, amount, isProd = false } = data || {};
+  if (!transactionId) {
+    throw new HttpsError("invalid-argument", "transactionId e obrigatorio.");
+  }
+  const gateway = getGateway(isProd);
+  try {
+    // Try to void first
+    const voidRes = await gateway.transaction.void(transactionId).catch(() => null);
+    if (voidRes && voidRes.success) {
+      return { success: true, voided: true };
+    }
+    // Fallback to refund (full or partial)
+    const amtStr = amount == null ? undefined : (typeof amount === 'string' ? amount : Number(amount).toFixed(2));
+    const refundRes = await gateway.transaction.refund(transactionId, amtStr);
+    if (!refundRes.success) {
+      return { success: false, error: refundRes.message || 'Falha ao reembolsar' };
+    }
+    return { success: true, refundTransactionId: refundRes.transaction.id };
+  } catch (e) {
+    return { success: false, error: (e && e.message) || String(e) };
+  }
+});
+
+/**
+ * Cancel a ride and (optionally) refund.
+ * data: { orderPath: string, reason?: string, allowRefund?: boolean, isProd?: boolean }
+ * returns: { success, refunded?, refundTransactionId?, error? }
+ */
+exports.cancelRideAndRefund = onCall({ region: "us-central1", timeoutSeconds: 60, memory: "256MiB" }, async (request) => {
+  const data = request.data || {};
+  const context = request;
+  if (!context.auth) {
+    throw new HttpsError("unauthenticated", "Faca login primeiro.");
+  }
+  const { orderPath, reason, allowRefund = true, isProd = false } = data || {};
+  if (!orderPath || typeof orderPath !== 'string' || orderPath.indexOf('/') < 0) {
+    throw new HttpsError("invalid-argument", "orderPath invalido.");
+  }
+  try {
+    const ref = admin.firestore().doc(orderPath);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      return { success: false, error: 'Pedido nao encontrado.' };
+    }
+    const order = snap.data() || {};
+    if (!order.user || order.user.id !== context.auth.uid) {
+      // Only owner can cancel
+      return { success: false, error: 'Nao autorizado.' };
+    }
+
+    // Update order status first
+    await ref.update({
+      status: 'Canceled',
+      whyCanceled: reason || 'User canceled',
+      canceledAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const txId = order.transactionId;
+    if (!allowRefund || !txId) {
+      return { success: true, refunded: false };
+    }
+
+    const gateway = getGateway(isProd);
+    // Try void, else refund full
+    const voidRes = await gateway.transaction.void(txId).catch(() => null);
+    if (voidRes && voidRes.success) {
+      await ref.update({ refundSuccess: true, refundVoided: true });
+      return { success: true, refunded: true };
+    }
+    const refundRes = await gateway.transaction.refund(txId).catch(() => null);
+    if (refundRes && refundRes.success) {
+      const refundTxId = refundRes.transaction.id;
+      await ref.update({ refundSuccess: true, refundTransactionId: refundTxId });
+      return { success: true, refunded: true, refundTransactionId: refundTxId };
+    }
+    return { success: true, refunded: false };
+  } catch (e) {
+    return { success: false, error: (e && e.message) || String(e) };
+  }
+});
+
+/**
  * Salva um cartao (saveCardPayment) a partir de um paymentNonce, sem cobrar.
  * data: { paymentNonce: string, deviceData?: string, isProd?: boolean }
  * retorna: { success, paymentMethod?, error? }
@@ -336,4 +429,40 @@ exports.tipDriver = onCall({ region: "us-central1", timeoutSeconds: 60, memory: 
   }
 
   return { success: true, transactionId: txId };
+});
+
+// Firestore trigger: auto-refund on order cancel within short window or before driver assignment
+exports.onRideOrderCancel = onDocumentUpdated({ document: 'rideOrders/{orderId}', region: 'us-central1' }, async (event) => {
+  const before = event.data?.before?.data();
+  const after = event.data?.after?.data();
+  try {
+    if (!before || !after) return;
+    if (before.status === 'Canceled') return;
+    if (after.status !== 'Canceled') return;
+    if (after.refundSuccess) return;
+
+    const txId = after.transactionId;
+    if (!txId) return;
+
+    // allow if driver not assigned or canceled within 5 minutes
+    const driverAssigned = !!after.driver;
+    const dia = after.dia && after.dia.toDate ? after.dia.toDate() : (after.dia?._seconds ? new Date(after.dia._seconds * 1000) : null);
+    const now = new Date();
+    const within5min = dia ? ((now - dia) <= 5 * 60 * 1000) : true;
+    const allow = !driverAssigned || within5min;
+    if (!allow) return;
+
+    const gateway = getGateway(false);
+    const voidRes = await gateway.transaction.void(txId).catch(() => null);
+    if (voidRes && voidRes.success) {
+      await event.data.after.ref.update({ refundSuccess: true, refundVoided: true });
+      return;
+    }
+    const refundRes = await gateway.transaction.refund(txId).catch(() => null);
+    if (refundRes && refundRes.success) {
+      await event.data.after.ref.update({ refundSuccess: true, refundTransactionId: refundRes.transaction.id });
+    }
+  } catch (e) {
+    console.warn('onRideOrderCancel error:', (e && e.message) || e);
+  }
 });

@@ -34,3 +34,29 @@ Future<Map<String, dynamic>> makeCloudCall(
     };
   }
 }
+
+Future<Map<String, dynamic>> cancelRideAndRefund({
+  required String orderPath,
+  String? reason,
+  bool allowRefund = true,
+  bool isProd = false,
+}) async {
+  return await makeCloudCall('cancelRideAndRefund', {
+    'orderPath': orderPath,
+    if (reason != null) 'reason': reason,
+    'allowRefund': allowRefund,
+    'isProd': isProd,
+  });
+}
+
+Future<Map<String, dynamic>> refundTransaction({
+  required String transactionId,
+  double? amount,
+  bool isProd = false,
+}) async {
+  return await makeCloudCall('refundTransaction', {
+    'transactionId': transactionId,
+    if (amount != null) 'amount': amount,
+    'isProd': isProd,
+  });
+}

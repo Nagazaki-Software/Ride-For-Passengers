@@ -2137,6 +2137,17 @@ for pickup */,
                                                                                             ),
                                                                                             child: WhyCancelThisRideWidget(
                                                                                               order: widget!.order!,
+                                                                                              allowRefund: (() {
+                                                                                                try {
+                                                                                                  final txt = functions.tempoCancelamento(
+                                                                                                    rowUsersRecord.location!,
+                                                                                                    currentUserLocationValue!,
+                                                                                                  );
+                                                                                                  return txt != '0 min';
+                                                                                                } catch (_) {
+                                                                                                  return true;
+                                                                                                }
+                                                                                              })(),
                                                                                             ),
                                                                                           ),
                                                                                         );
