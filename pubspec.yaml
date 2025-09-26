@@ -90,9 +90,7 @@ dependencies:
   google_maps_flutter_platform_interface: 2.14.0
   google_maps_flutter_web: 0.5.14+2
   google_maps_native_sdk:
-    git:
-      url: https://github.com/Nagazaki-Software/google_maps_native_sdk
-      ref: main
+    path: plugins/google_maps_native_sdk
   google_sign_in: 6.3.0
   google_sign_in_android: 6.2.1
   google_sign_in_ios: 5.9.0
