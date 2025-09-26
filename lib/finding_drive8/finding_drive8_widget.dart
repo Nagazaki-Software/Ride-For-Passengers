@@ -17,6 +17,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'dart:async';
 import 'dart:math' as math;
 import 'finding_drive8_model.dart';
 export 'finding_drive8_model.dart';
@@ -46,6 +47,8 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
   var hasContainerTriggered2 = false;
   final animationsMap = <String, AnimationInfo>{};
   bool _matchStarted = false;
+  DateTime? _fakeViewingUntil;
+  Timer? _fakeViewingTimer;
 
   // --- Simple Haversine distance helper (km) ---
   double _deg2rad(double deg) => deg * (3.141592653589793 / 180.0);
@@ -170,6 +173,17 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
     super.initState();
     _model = createModel(context, () => FindingDrive8Model());
 
+    _fakeViewingUntil = DateTime.now().add(const Duration(seconds: 6));
+    _fakeViewingTimer?.cancel();
+    _fakeViewingTimer = Timer(const Duration(seconds: 6), () {
+      if (!mounted) {
+        return;
+      }
+      safeSetState(() {
+        _fakeViewingUntil = null;
+      });
+    });
+
     logFirebaseEvent('screen_view',
         parameters: {'screen_name': 'FindingDrive8'});
     // Show persistent notification while searching for driver
@@ -265,6 +279,7 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
 
   @override
   void dispose() {
+    _fakeViewingTimer?.cancel();
     _model.dispose();
 
     super.dispose();
@@ -332,6 +347,29 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                     List<UsersRecord> polyMapUsersRecordList = snapshot.data!;
 
                     final int onlineDrivers = polyMapUsersRecordList.length;
+                    final bool hasDrivers = onlineDrivers > 0;
+                    final bool isSimulatedViewing =
+                        _fakeViewingUntil != null &&
+                            DateTime.now().isBefore(_fakeViewingUntil!);
+                    final int viewersCount = hasDrivers
+                        ? onlineDrivers
+                        : isSimulatedViewing
+                            ? math.max(onlineDrivers, 4)
+                            : onlineDrivers;
+                    final String viewerTerm = viewersCount == 1
+                        ? 'motorista está'
+                        : 'motoristas estão';
+                    final String viewingLabel =
+                        (hasDrivers || isSimulatedViewing)
+                            ? '$viewersCount $viewerTerm vendo seu pedido'
+                            : 'Buscando motoristas disponíveis…';
+                    final String availabilityLabel = hasDrivers
+                        ? (onlineDrivers == 1
+                            ? '1 motorista disponível na sua área'
+                            : '$onlineDrivers motoristas disponíveis na sua área')
+                        : 'Aguardando motoristas por perto';
+                    final List<UsersRecord> displayDrivers =
+                        polyMapUsersRecordList.take(3).toList();
 
                     return Container(
                       width: double.infinity,
@@ -362,6 +400,7 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                         enableDriverFocus: true,
                         showPulseHalo: true,
                         showViewingBubble: true,
+                        simulateViewingSeconds: 6,
                       ),
                     );
                   },
@@ -527,15 +566,13 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    FFLocalizations.of(context).getText(
-                                      '1ws76v5h' /* 7 free cars avaliable in your ... */,
-                                    ),
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.poppins(
-                                            fontWeight:
+                          Text(
+                            availabilityLabel,
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.poppins(
+                                    fontWeight:
                                                 FlutterFlowTheme.of(context)
                                                     .bodyMedium
                                                     .fontWeight,
@@ -567,6 +604,143 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                     ),
                   ),
                   Spacer(),
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                        16.0, 0.0, 16.0, 16.0),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xC61C1D20),
+                        borderRadius: BorderRadius.circular(20.0),
+                        border: Border.all(
+                          color: const Color(0x26FFFFFF),
+                          width: 1.0,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x33000000),
+                            blurRadius: 12.0,
+                            offset: Offset(0.0, 8.0),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            16.0, 12.0, 16.0, 12.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 32.0,
+                              height: 32.0,
+                              decoration: BoxDecoration(
+                                color: const Color(0x33FFC107),
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: AlignmentDirectional(0.0, 0.0),
+                              child: const Icon(
+                                Icons.remove_red_eye_outlined,
+                                color: Color(0xFFFFC107),
+                                size: 18.0,
+                              ),
+                            ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Text(
+                                viewingLabel,
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                              ),
+                            ),
+                            if (displayDrivers.isNotEmpty)
+                              SizedBox(
+                                height: 32.0,
+                                width: 32.0 +
+                                    (displayDrivers.length - 1)
+                                        .clamp(0, 3)
+                                        .toDouble() *
+                                        18.0,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: List.generate(
+                                    displayDrivers.length,
+                                    (index) {
+                                      final driver = displayDrivers[index];
+                                      final double offset = index * 18.0;
+                                      final photo = driver.photoUrl;
+                                      return Positioned(
+                                        left: offset,
+                                        child: Container(
+                                          width: 32.0,
+                                          height: 32.0,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                FlutterFlowTheme.of(context)
+                                                    .primary,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: const Color(0x4DFFFFFF),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            child: (photo != null &&
+                                                    photo.isNotEmpty)
+                                                ? CachedNetworkImage(
+                                                    imageUrl: photo,
+                                                    width: 32.0,
+                                                    height: 32.0,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : Container(
+                                                    color:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .secondaryText
+                                                            .withOpacity(0.1),
+                                                    alignment:
+                                                        AlignmentDirectional(
+                                                            0.0, 0.0),
+                                                    child: Icon(
+                                                      Icons.person,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .alternate,
+                                                      size: 16.0,
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                          ].divide(const SizedBox(width: 12.0)),
+                        ),
+                      ),
+                    ),
+                  ),
                   Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 12.0),

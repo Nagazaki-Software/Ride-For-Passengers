@@ -50,6 +50,7 @@ class PolyMap extends StatefulWidget {
     this.enableDriverFocus = true,
     this.showPulseHalo = true,
     this.showViewingBubble = true,
+    this.simulateViewingSeconds = 0,
   });
 
   final double? width;
@@ -70,6 +71,7 @@ class PolyMap extends StatefulWidget {
   final bool enableDriverFocus;
   final bool showPulseHalo; // aneis de pulso grandes em volta do usuario
   final bool showViewingBubble; // balÃ£o "..." acima do usuÃ¡rio
+  final int simulateViewingSeconds; // simula motoristas vendo o pedido
 
   @override
   State<PolyMap> createState() => _PolyMapState();
@@ -98,6 +100,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   bool _focusInFlight = false;
   final Map<String, Uint8List> _iconCache = {};
   DateTime? _autoFitResumeAt;
+  int _simulateViewingDeadlineMs = 0;
 
   // Pixel transparente para evitar o pin vermelho enquanto carrega ícone real
   static final Uint8List _transparentPixel = base64Decode(
@@ -227,6 +230,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         _ellipsisDots = (_ellipsisDots + 1) % 4;
       });
     });
+    _armSimulatedViewing(reset: true);
     _autoFitTimer =
         Timer.periodic(Duration(milliseconds: widget.refreshMs), (_) async {
       await _fitToContent(padding: 60);
@@ -257,6 +261,9 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         await _fitToContent(padding: 60);
       });
     }
+    if (oldWidget.simulateViewingSeconds != widget.simulateViewingSeconds) {
+      _armSimulatedViewing(reset: true);
+    }
     if (oldWidget.userName != widget.userName ||
         oldWidget.userPhotoUrl != widget.userPhotoUrl) {
       _userAvatarImage = null;
@@ -269,6 +276,24 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     if (!_listEquals(oldWidget.driversRefs, widget.driversRefs)) {
       _subscribeDriversRefs();
     }
+  }
+
+  void _armSimulatedViewing({bool reset = false}) {
+    final int secs = widget.simulateViewingSeconds;
+    if (secs <= 0) {
+      _simulateViewingDeadlineMs = 0;
+      return;
+    }
+    final int now = DateTime.now().millisecondsSinceEpoch;
+    if (reset || _simulateViewingDeadlineMs <= now) {
+      _simulateViewingDeadlineMs = now + secs * 1000;
+    }
+  }
+
+  bool get _isSimulatingViewers {
+    if (widget.simulateViewingSeconds <= 0) return false;
+    if (_simulateViewingDeadlineMs == 0) return false;
+    return DateTime.now().millisecondsSinceEpoch < _simulateViewingDeadlineMs;
   }
 
   @override
@@ -816,7 +841,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
 
     // BalÃ£o de "..." indicando motoristas visualizando
     final bool anyDriver = _markerIds.any((id) => id.startsWith('driver_'));
-    if (widget.showViewingBubble && anyDriver) {
+    final bool simulateViewers = _isSimulatingViewers;
+    if (widget.showViewingBubble && (anyDriver || simulateViewers)) {
       final double bob = math.sin(progress * 2 * math.pi) * (baseSize * 0.04);
       final double bw = baseSize * 0.9;
       final double bh = baseSize * 0.42;
