@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_braintree/flutter_braintree.dart';
+import 'package:braintree_flutter_plus/flutter_braintree.dart';
 
 class BraintreeNativeBridge {
   static const MethodChannel _ch = MethodChannel('com.quicky.ridebahamas/braintree');
