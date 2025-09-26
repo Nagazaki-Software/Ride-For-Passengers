@@ -1,4 +1,4 @@
-﻿// Automatic FlutterFlow imports
+﻿﻿// Automatic FlutterFlow imports
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/actions/actions.dart' as action_blocks;
@@ -50,6 +50,7 @@ class PolyMap extends StatefulWidget {
     this.enableDriverFocus = true,
     this.showPulseHalo = true,
     this.showViewingBubble = true,
+    this.simulateViewingSeconds = 0,
   });
 
   final double? width;
@@ -70,6 +71,7 @@ class PolyMap extends StatefulWidget {
   final bool enableDriverFocus;
   final bool showPulseHalo; // aneis de pulso grandes em volta do usuario
   final bool showViewingBubble; // balÃ£o "..." acima do usuÃ¡rio
+  final int simulateViewingSeconds; // simula motoristas vendo o pedido
 
   @override
   State<PolyMap> createState() => _PolyMapState();
@@ -98,6 +100,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
   bool _focusInFlight = false;
   final Map<String, Uint8List> _iconCache = {};
   DateTime? _autoFitResumeAt;
+  int _simulateViewingDeadlineMs = 0;
 
   // Pixel transparente para evitar o pin vermelho enquanto carrega ícone real
   static final Uint8List _transparentPixel = base64Decode(
@@ -129,8 +132,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         final bucket = noGs.substring(0, slash);
         final path = noGs.substring(slash + 1);
         final encodedPath = Uri.encodeComponent(path);
-        s =
-            'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$encodedPath?alt=media';
+        s = 'https://firebasestorage.googleapis.com/v0/b/$bucket/o/$encodedPath?alt=media';
       }
     }
 
@@ -172,7 +174,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     }
   }
 
-  Future<Uint8List?> _tryLoadAssetPng(String? urlOrName, int targetWidthPx) async {
+  Future<Uint8List?> _tryLoadAssetPng(
+      String? urlOrName, int targetWidthPx) async {
     final String? asset = _assetPathFromUrlOrName(urlOrName);
     if (asset == null) return null;
     try {
@@ -183,7 +186,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
       );
       final ui.FrameInfo frame = await codec.getNextFrame();
       final ui.Image img = frame.image;
-      final ByteData? out = await img.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? out =
+          await img.toByteData(format: ui.ImageByteFormat.png);
       return out?.buffer.asUint8List();
     } catch (_) {
       return null;
@@ -227,6 +231,7 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         _ellipsisDots = (_ellipsisDots + 1) % 4;
       });
     });
+    _armSimulatedViewing(reset: true);
     _autoFitTimer =
         Timer.periodic(Duration(milliseconds: widget.refreshMs), (_) async {
       await _fitToContent(padding: 60);
@@ -257,6 +262,9 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         await _fitToContent(padding: 60);
       });
     }
+    if (oldWidget.simulateViewingSeconds != widget.simulateViewingSeconds) {
+      _armSimulatedViewing(reset: true);
+    }
     if (oldWidget.userName != widget.userName ||
         oldWidget.userPhotoUrl != widget.userPhotoUrl) {
       _userAvatarImage = null;
@@ -269,6 +277,24 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     if (!_listEquals(oldWidget.driversRefs, widget.driversRefs)) {
       _subscribeDriversRefs();
     }
+  }
+
+  void _armSimulatedViewing({bool reset = false}) {
+    final int secs = widget.simulateViewingSeconds;
+    if (secs <= 0) {
+      _simulateViewingDeadlineMs = 0;
+      return;
+    }
+    final int now = DateTime.now().millisecondsSinceEpoch;
+    if (reset || _simulateViewingDeadlineMs <= now) {
+      _simulateViewingDeadlineMs = now + secs * 1000;
+    }
+  }
+
+  bool get _isSimulatingViewers {
+    if (widget.simulateViewingSeconds <= 0) return false;
+    if (_simulateViewingDeadlineMs == 0) return false;
+    return DateTime.now().millisecondsSinceEpoch < _simulateViewingDeadlineMs;
   }
 
   @override
@@ -816,19 +842,22 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
 
     // BalÃ£o de "..." indicando motoristas visualizando
     final bool anyDriver = _markerIds.any((id) => id.startsWith('driver_'));
-    if (widget.showViewingBubble && anyDriver) {
+    final bool simulateViewers = _isSimulatingViewers;
+    if (widget.showViewingBubble && (anyDriver || simulateViewers)) {
       final double bob = math.sin(progress * 2 * math.pi) * (baseSize * 0.04);
       final double bw = baseSize * 0.9;
       final double bh = baseSize * 0.42;
       final double tail = baseSize * 0.14;
-      final ui.Offset bCenter = center.translate(0, -baseSize / 2 - bh / 2 - 10 - tail + bob);
+      final ui.Offset bCenter =
+          center.translate(0, -baseSize / 2 - bh / 2 - 10 - tail + bob);
       final ui.Rect bRect = ui.Rect.fromCenter(
         center: bCenter,
         width: bw,
         height: bh,
       );
 
-      final ui.RRect rrect = ui.RRect.fromRectAndRadius(bRect, ui.Radius.circular(bh * 0.5));
+      final ui.RRect rrect =
+          ui.RRect.fromRectAndRadius(bRect, ui.Radius.circular(bh * 0.5));
       final ui.Paint bubblePaint = ui.Paint()
         ..color = const Color(0xFF1F1F1F).withOpacity(0.88)
         ..isAntiAlias = true;
@@ -960,7 +989,9 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
       Future<http.Response> doGet([Map<String, String>? extra]) {
         final headers = Map<String, String>.from(baseHeaders);
         if (extra != null) headers.addAll(extra);
-        return http.get(uri, headers: headers).timeout(const Duration(seconds: 8));
+        return http
+            .get(uri, headers: headers)
+            .timeout(const Duration(seconds: 8));
       }
 
       http.Response resp = await doGet();
@@ -973,8 +1004,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
       }
       if (resp.statusCode < 200 || resp.statusCode >= 300) return null;
       final Uint8List raw = resp.bodyBytes;
-      final ui.Codec codec =
-          await ui.instantiateImageCodec(raw, targetWidth: size, targetHeight: size);
+      final ui.Codec codec = await ui.instantiateImageCodec(raw,
+          targetWidth: size, targetHeight: size);
       final ui.FrameInfo frame = await codec.getNextFrame();
       final ui.Image image = frame.image;
       final ui.PictureRecorder recorder = ui.PictureRecorder();
@@ -988,7 +1019,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         ui.Paint()..isAntiAlias = true,
       );
       final ui.Image out = await recorder.endRecording().toImage(size, size);
-      final ByteData? data = await out.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? data =
+          await out.toByteData(format: ui.ImageByteFormat.png);
       if (data == null) return null;
       final Uint8List bytes = data.buffer.asUint8List();
       _iconCache[key] = bytes;
@@ -1065,7 +1097,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         for (final dynamic item in value) {
           if (item is Map) {
             final dynamic innerKey = item['key'] ?? item['name'] ?? key;
-            final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+            final dynamic innerValue =
+                item['url'] ?? item['value'] ?? item['src'];
             if (innerKey != null || innerValue != null) {
               absorb(innerKey?.toString() ?? key, innerValue);
             } else {
@@ -1100,7 +1133,8 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
         for (final dynamic item in source) {
           if (item is Map) {
             final dynamic innerKey = item['key'] ?? item['name'];
-            final dynamic innerValue = item['url'] ?? item['value'] ?? item['src'];
+            final dynamic innerValue =
+                item['url'] ?? item['value'] ?? item['src'];
             if (innerKey != null || innerValue != null) {
               absorb(innerKey?.toString(), innerValue);
             } else {
@@ -1158,14 +1192,23 @@ class _PolyMapState extends State<PolyMap> with SingleTickerProviderStateMixin {
     final Map<String, String> urls = _markerUrlsFromData(data);
     final List<String> keys = isTaxi
         ? <String>['ride taxi', 'ride_taxi', 'taxi', 'car', 'vehicle']
-        : <String>['ride driver', 'driver', 'default', 'principal', 'main', 'primary'];
+        : <String>[
+            'ride driver',
+            'driver',
+            'default',
+            'principal',
+            'main',
+            'primary'
+          ];
 
     String? url = _markerUrlForKeys(urls, keys);
     if (url != null && url.trim().isNotEmpty) return url.trim();
 
     // Fallbacks comuns
     final Map<String, dynamic>? usersMap =
-        (data?['users'] is Map<String, dynamic>) ? (data?['users'] as Map<String, dynamic>?) : null;
+        (data?['users'] is Map<String, dynamic>)
+            ? (data?['users'] as Map<String, dynamic>?)
+            : null;
     final List<String?> fallback = <String?>[
       data?['markerUrl']?.toString(),
       data?['marker_url']?.toString(),

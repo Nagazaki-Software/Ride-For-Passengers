@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '/flutter_flow/lat_lng.dart';
+import 'dart:math' as math;
 import 'profile15_model.dart';
 export 'profile15_model.dart';
 
@@ -297,12 +298,12 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Wrap(
-                                              spacing: 6.0,
-                                              runSpacing: 6.0,
-                                              alignment: WrapAlignment.start,
+                                            Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
                                               crossAxisAlignment:
-                                                  WrapCrossAlignment.center,
+                                                  CrossAxisAlignment.center,
                                               children: [
                                                 AuthUserStreamWidget(
                                                   builder: (context) =>
@@ -377,54 +378,49 @@ class _Profile15WidgetState extends State<Profile15Widget> {
                                                     ),
                                                   ),
                                                 ),
-                                                Container(
-                                                  // Auto-size width to fit text
-                                                  // keep a minimum height like before
-                                                  constraints: BoxConstraints(
-                                                    minHeight: 24.0,
-                                                  ),
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 8.0,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xFFDC7F02),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16.0),
-                                                  ),
-                                                  alignment:
-                                                      AlignmentDirectional(
-                                                          0.0, 0.0),
-                                                  child: Text(
-                                                    'Zone: ' + (_zoneName ?? '...'),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .poppins(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
+                                                LayoutBuilder(
+                                                  builder: (context, cns) {
+                                                    final maxW = math.min(cns.maxWidth * 0.45, 180.0);
+                                                    return ConstrainedBox(
+                                                      constraints: BoxConstraints(
+                                                        minHeight: 24.0,
+                                                        maxWidth: maxW,
+                                                      ),
+                                                      child: Container(
+                                                        padding: EdgeInsets.symmetric(
+                                                          horizontal: 8.0,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: Color(0xFFDC7F02),
+                                                          borderRadius: BorderRadius.circular(16.0),
+                                                        ),
+                                                        alignment: AlignmentDirectional(0.0, 0.0),
+                                                        child: Text(
+                                                          'Zone: ' + (_zoneName ?? '...'),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                          softWrap: false,
+                                                          style: FlutterFlowTheme.of(context)
+                                                              .bodyMedium
+                                                              .override(
+                                                                font: GoogleFonts.poppins(
+                                                                  fontWeight: FontWeight.w500,
+                                                                  fontStyle: FlutterFlowTheme.of(context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                ),
+                                                                color: FlutterFlowTheme.of(context).alternate,
+                                                                fontSize: 10.0,
+                                                                letterSpacing: 0.0,
+                                                                fontWeight: FontWeight.w500,
+                                                                fontStyle: FlutterFlowTheme.of(context)
                                                                     .bodyMedium
                                                                     .fontStyle,
-                                                          ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .alternate,
-                                                          fontSize: 10.0,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
+                                                              ),
                                                         ),
-                                                  ),
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                                 Container(
                                                   width: 68.0,
