@@ -98,10 +98,7 @@ class AccessibleInkWell extends StatelessWidget {
       onTap: () {
         _announce(context);
         // Fire original tap handler
-        final res = onTap?.call();
-        if (res is Future) {
-          // ignore, for compatibility
-        }
+        onTap?.call();
       },
       child: child,
     );
