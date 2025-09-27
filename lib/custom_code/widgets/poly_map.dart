@@ -22,10 +22,12 @@ import 'package:characters/characters.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:firebase_auth/firebase_auth.dart' as fa;
+import 'package:flutter/scheduler.dart';
 
 import '/flutter_flow/lat_lng.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_native_sdk/google_maps_native_sdk.dart' as nmap;
+import 'icon_global_cache.dart';
 
 class PolyMap extends StatefulWidget {
   const PolyMap({
@@ -66,6 +68,14 @@ class PolyMap extends StatefulWidget {
     this.driverTweenMs = 320,
     this.ultraLowSpecMode = false,
     this.traceMinStepMeters = 1.5,
+    this.searchMessage = 'Buscando motoristas disponíveis…',
+    this.showSearchHud = true,
+    this.enableDriverFocus = false,
+    this.focusIntervalMs = 5200,
+    this.focusHoldMs = 3600,
+    this.showPulseHalo = false,
+    this.showViewingBubble = false,
+    this.simulateViewingSeconds = 0,
   }) : super(key: key);
 
   final double? width;
@@ -105,6 +115,14 @@ class PolyMap extends StatefulWidget {
   final double traceMinStepMeters;
 
   final int fadeInMs;
+  final String searchMessage;
+  final bool showSearchHud;
+  final bool enableDriverFocus;
+  final int focusIntervalMs;
+  final int focusHoldMs;
+  final bool showPulseHalo;
+  final bool showViewingBubble;
+  final int simulateViewingSeconds;
 
   @override
   State<PolyMap> createState() => _PolyMapState();
@@ -166,6 +184,15 @@ class _PolyMapState extends State<PolyMap>
 
   final Map<String, bool> _polylineCanInplaceUpdate = {};
 
+  Timer? _pulseTimer;
+  Timer? _driverFocusTimer;
+  Timer? _driverFocusHoldTimer;
+  String? _viewingDriverId;
+  DateTime? _simulateViewingUntil;
+  static Uint8List? _viewingBubbleIcon;
+  final math.Random _random = math.Random();
+  bool _driverFocusPending = false;
+
   static const String _darkMapStyle =
       '[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#2b2b2b"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#1e1e1e"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#2f2f2f"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]}]';
 
@@ -203,6 +230,11 @@ class _PolyMapState extends State<PolyMap>
   @override
   void initState() {
     super.initState();
+
+    if (widget.simulateViewingSeconds > 0) {
+      _simulateViewingUntil = DateTime.now()
+          .add(Duration(seconds: widget.simulateViewingSeconds));
+    }
 
     _ticker = createTicker((elapsed) async {
       if (!_snaking || !_mapReady || _controller == null || _totalDist <= 0)
@@ -289,7 +321,7 @@ class _PolyMapState extends State<PolyMap>
   }
 
   @override
-  void didUpdateWidget(covariant PickerMap oldWidget) {
+  void didUpdateWidget(covariant PolyMap oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     // If any marker icon URLs changed, try to refresh markers (will no-op if map not ready)
@@ -299,6 +331,34 @@ class _PolyMapState extends State<PolyMap>
       // attempt async update but don't await here
       SchedulerBinding.instance
           .addPostFrameCallback((_) => _placeCoreMarkers());
+    }
+
+    if (oldWidget.showPulseHalo != widget.showPulseHalo) {
+      if (widget.showPulseHalo) {
+        _startPulseTimer(immediate: true);
+      } else {
+        _stopPulseTimer();
+      }
+    }
+
+    if (oldWidget.simulateViewingSeconds != widget.simulateViewingSeconds) {
+      _simulateViewingUntil = widget.simulateViewingSeconds > 0
+          ? DateTime.now()
+              .add(Duration(seconds: widget.simulateViewingSeconds))
+          : null;
+    }
+
+    final bool focusChanged =
+        oldWidget.enableDriverFocus != widget.enableDriverFocus ||
+            oldWidget.focusIntervalMs != widget.focusIntervalMs ||
+            oldWidget.focusHoldMs != widget.focusHoldMs ||
+            oldWidget.showViewingBubble != widget.showViewingBubble;
+    if (focusChanged) {
+      if (!widget.enableDriverFocus || !_mapReady) {
+        _clearDriverFocus();
+      } else {
+        _scheduleDriverFocus(immediate: true);
+      }
     }
 
     // Mudou o destino? alterna modos e (re)planeja
@@ -338,6 +398,8 @@ class _PolyMapState extends State<PolyMap>
     _driverTween.clear();
     _ticker.dispose();
     _stopIdleCam();
+    _stopPulseTimer();
+    _clearDriverFocus();
     super.dispose();
   }
 
@@ -394,10 +456,40 @@ class _PolyMapState extends State<PolyMap>
                   } else {
                     _snapToUser();
                   }
+                  if (widget.showPulseHalo) {
+                    _startPulseTimer(immediate: true);
+                  }
+                  if (widget.enableDriverFocus) {
+                    _scheduleDriverFocus(immediate: true);
+                  }
                   if (mounted) setState(() => _veilVisible = false);
                 });
               },
             ),
+            if (widget.showSearchHud &&
+                widget.searchMessage.trim().isNotEmpty)
+              IgnorePointer(
+                child: Align(
+                  alignment: AlignmentDirectional(0.0, -0.92),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18.0, vertical: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.65),
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    child: Text(
+                      widget.searchMessage,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Positioned(
               right: 0,
               bottom: 0,
@@ -446,6 +538,37 @@ class _PolyMapState extends State<PolyMap>
   void _stopIdleCam() {
     _idleCamTimer?.cancel();
     _idleCamTimer = null;
+  }
+
+  void _startPulseTimer({bool immediate = false}) {
+    if (!widget.showPulseHalo) return;
+    _pulseTimer?.cancel();
+    if (immediate) {
+      unawaited(_pulseUserOnce());
+    }
+    _pulseTimer =
+        Timer.periodic(const Duration(milliseconds: 2400), (_) async {
+      if (!mounted || !widget.showPulseHalo) return;
+      if (!_markerIds.contains('user')) return;
+      await _pulseUserOnce();
+    });
+  }
+
+  void _stopPulseTimer() {
+    _pulseTimer?.cancel();
+    _pulseTimer = null;
+  }
+
+  void _clearDriverFocus() {
+    _driverFocusTimer?.cancel();
+    _driverFocusTimer = null;
+    _driverFocusHoldTimer?.cancel();
+    _driverFocusHoldTimer = null;
+    _driverFocusPending = false;
+    if (_viewingDriverId != null) {
+      unawaited(_removeViewingBubble());
+    }
+    _viewingDriverId = null;
   }
 
   Future<void> _snapToUser() async {
@@ -799,6 +922,12 @@ class _PolyMapState extends State<PolyMap>
       _markerTitle['user'] = widget.userName ?? 'VocÃª';
     }
 
+    if (widget.showPulseHalo) {
+      _startPulseTimer();
+    } else {
+      _stopPulseTimer();
+    }
+
     if (widget.destination != null) {
       final nmap.LatLng dest = _gm(widget.destination!);
       if (!_markerIds.contains('dest')) {
@@ -966,6 +1095,7 @@ class _PolyMapState extends State<PolyMap>
           _driverTween.remove(id)?.dispose();
           _markerPos.remove('driver_$id');
           _markerTitle.remove('driver_$id');
+          _onDriverRemoved(id);
           return;
         }
 
@@ -1083,6 +1213,7 @@ class _PolyMapState extends State<PolyMap>
           _markerTitle['driver_$id'] = title;
 
           await _updateDriverTrace(id, p, force: true);
+          _onDriverDataUpdated(id);
           return;
         }
 
@@ -1098,6 +1229,7 @@ class _PolyMapState extends State<PolyMap>
           _markerPos['driver_$id'] = p;
           _markerTitle['driver_$id'] = title;
           await _updateDriverTrace(id, p);
+          _onDriverDataUpdated(id);
           return;
         }
 
@@ -1124,10 +1256,242 @@ class _PolyMapState extends State<PolyMap>
             _markerPos['driver_$id'] = pos;
             _markerTitle['driver_$id'] = title;
             await _updateDriverTrace(id, pos);
+            _onDriverDataUpdated(id);
           },
         )..start();
       });
     }
+  }
+
+  void _onDriverRemoved(String id) {
+    if (_viewingDriverId == id) {
+      _clearDriverFocus();
+      if (widget.enableDriverFocus) {
+        _scheduleDriverFocus();
+      }
+    } else if (widget.enableDriverFocus) {
+      _scheduleDriverFocus();
+    }
+  }
+
+  void _onDriverDataUpdated(String id) {
+    if (widget.showViewingBubble && _viewingDriverId == id) {
+      unawaited(_updateViewingBubblePosition());
+    }
+    if (widget.enableDriverFocus) {
+      _scheduleDriverFocus();
+    }
+  }
+
+  void _scheduleDriverFocus({bool immediate = false}) {
+    if (!widget.enableDriverFocus) return;
+    if (widget.destination != null) return;
+    if (!_mapReady || _controller == null) return;
+
+    final bool hasDrivers = _driverPos.isNotEmpty;
+    final bool allowSimNow = _simulateViewingUntil != null &&
+        DateTime.now().isBefore(_simulateViewingUntil!);
+
+    if (!hasDrivers && !allowSimNow) {
+      _clearDriverFocus();
+      return;
+    }
+
+    if (_driverFocusPending && !immediate) {
+      return;
+    }
+
+    _driverFocusTimer?.cancel();
+    _driverFocusPending = true;
+    if (immediate) {
+      unawaited(_pickDriverForFocus());
+    } else {
+      final int delayMs = math.max(1200, widget.focusIntervalMs);
+      _driverFocusTimer =
+          Timer(Duration(milliseconds: delayMs), () {
+        unawaited(_pickDriverForFocus());
+      });
+    }
+  }
+
+  Future<void> _pickDriverForFocus() async {
+    _driverFocusTimer?.cancel();
+    _driverFocusPending = false;
+    if (!widget.enableDriverFocus || !_mapReady || _controller == null) {
+      return;
+    }
+
+    final bool allowSim = _simulateViewingUntil != null &&
+        DateTime.now().isBefore(_simulateViewingUntil!);
+
+    final List<String> ids = _driverPos.keys.toList();
+    if (ids.isEmpty) {
+      if (!allowSim) {
+        await _removeViewingBubble();
+        _viewingDriverId = null;
+      }
+      if (allowSim) {
+        _scheduleDriverFocus();
+      }
+      return;
+    }
+
+    String next = ids[_random.nextInt(ids.length)];
+    if (_viewingDriverId != null && ids.length > 1) {
+      int attempts = 0;
+      while (next == _viewingDriverId && attempts < 6) {
+        next = ids[_random.nextInt(ids.length)];
+        attempts++;
+      }
+    }
+
+    await _focusOnDriver(next);
+  }
+
+  Future<void> _focusOnDriver(String id) async {
+    if (!mounted || !_mapReady || _controller == null) return;
+    final nmap.LatLng? pos = _driverPos[id];
+    if (pos == null) return;
+
+    _viewingDriverId = id;
+    _stopIdleCam();
+
+    if (widget.showViewingBubble) {
+      await _ensureViewingBubble(pos);
+    }
+
+    await _animateCameraToDriver(pos);
+
+    _driverFocusHoldTimer?.cancel();
+    final int holdMs = math.max(800, widget.focusHoldMs);
+    _driverFocusHoldTimer = Timer(Duration(milliseconds: holdMs), () async {
+      if (!mounted) return;
+      if (widget.showViewingBubble) {
+        await _removeViewingBubble();
+      }
+      _viewingDriverId = null;
+      if (widget.destination == null) {
+        await _snapToUser();
+      }
+      _scheduleDriverFocus();
+    });
+  }
+
+  Future<void> _animateCameraToDriver(nmap.LatLng target) async {
+    if (!_mapReady || _controller == null) return;
+    try {
+      final dynamic dc = _controller;
+      await dc.animateCameraTo(
+        target: target,
+        zoom: 16.6,
+        tilt: 60.0,
+        durationMs: 680,
+      );
+    } catch (_) {
+      try {
+        await _controller?.moveCamera(target, zoom: 16.6);
+      } catch (_) {}
+    }
+  }
+
+  Future<void> _ensureViewingBubble(nmap.LatLng position) async {
+    if (_controller == null) return;
+    final Uint8List icon = await _viewingBubbleBytes();
+    await _addOrUpdateMarker(
+      id: 'viewing_bubble',
+      position: position,
+      title: 'Motorista visualizando',
+      anchorU: 0.5,
+      anchorV: 1.0,
+      zIndex: 90.0,
+      bytesIcon: icon,
+    );
+  }
+
+  Future<void> _updateViewingBubblePosition() async {
+    if (_viewingDriverId == null || _controller == null) return;
+    final nmap.LatLng? pos = _driverPos[_viewingDriverId!];
+    if (pos == null) return;
+    if (_markerIds.contains('viewing_bubble')) {
+      try {
+        await _controller?.updateMarker('viewing_bubble', position: pos);
+      } catch (_) {}
+      _markerPos['viewing_bubble'] = pos;
+    } else if (widget.showViewingBubble) {
+      await _ensureViewingBubble(pos);
+    }
+  }
+
+  Future<void> _removeViewingBubble() async {
+    if (!_markerIds.contains('viewing_bubble')) return;
+    try {
+      await _controller?.removeMarker('viewing_bubble');
+    } catch (_) {}
+    _markerIds.remove('viewing_bubble');
+    _markerPos.remove('viewing_bubble');
+    _markerTitle.remove('viewing_bubble');
+  }
+
+  Future<Uint8List> _viewingBubbleBytes() async {
+    if (_viewingBubbleIcon != null) return _viewingBubbleIcon!;
+
+    const double width = 148;
+    const double height = 128;
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final ui.Canvas canvas = ui.Canvas(recorder);
+
+    final ui.Paint shadowPaint = ui.Paint()
+      ..color = Colors.black.withOpacity(0.28)
+      ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 16);
+    final ui.Rect bubbleRect =
+        ui.Rect.fromLTWH(18, 12, width - 36, height - 58);
+    final ui.RRect bubble =
+        ui.RRect.fromRectAndRadius(bubbleRect, const ui.Radius.circular(28));
+
+    canvas.drawRRect(bubble, shadowPaint);
+
+    final ui.Paint fillPaint = ui.Paint()
+      ..color = const Color(0xFFF4F5F7).withOpacity(0.96);
+    canvas.drawRRect(bubble, fillPaint);
+
+    final ui.Path pointer = ui.Path()
+      ..moveTo(width / 2 - 18, height - 58)
+      ..lineTo(width / 2, height - 8)
+      ..lineTo(width / 2 + 18, height - 58)
+      ..close();
+    canvas.drawPath(pointer, fillPaint);
+
+    final ui.Paint border = ui.Paint()
+      ..color = Colors.white.withOpacity(0.92)
+      ..style = ui.PaintingStyle.stroke
+      ..strokeWidth = 3;
+    canvas.drawRRect(bubble, border);
+    canvas.drawPath(pointer, border);
+
+    final ui.ParagraphBuilder pb = ui.ParagraphBuilder(ui.ParagraphStyle(
+      textAlign: TextAlign.center,
+      fontSize: 40,
+      fontWeight: FontWeight.w600,
+    ))
+      ..pushStyle(ui.TextStyle(
+        color: const Color(0xFF1F2025),
+      ))
+      ..addText('...');
+    final ui.Paragraph paragraph = pb.build()
+      ..layout(const ui.ParagraphConstraints(width: width - 72));
+    final double textWidth = paragraph.longestLine;
+    final double textX =
+        bubbleRect.left + (bubbleRect.width - textWidth) / 2;
+    final double textY = bubbleRect.top +
+        (bubbleRect.height - paragraph.height) / 2;
+    canvas.drawParagraph(paragraph, ui.Offset(textX, textY));
+
+    final ui.Image image =
+        await recorder.endRecording().toImage(width.round(), height.round());
+    final ByteData? bytes =
+        await image.toByteData(format: ui.ImageByteFormat.png);
+    _viewingBubbleIcon = bytes!.buffer.asUint8List();
+    return _viewingBubbleIcon!;
   }
 
   String _driverTypeFromData(Map<String, dynamic>? data) {
