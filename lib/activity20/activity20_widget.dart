@@ -1300,27 +1300,23 @@ class _Activity20WidgetState extends State<Activity20Widget>
                       StreamBuilder<List<RideOrdersRecord>>(
                         stream: FFAppState().recentTrips(
                           requestFn: () => queryRideOrdersRecord(
-                            queryBuilder: (rideOrdersRecord) => rideOrdersRecord
-                                .where(
-                              'user',
-                              isEqualTo: currentUserReference,
-                            )
-                                .where(
-                              'status',
-                              isEqualTo: () {
-                                if (_model.choiceChip == 'All') {
-                                  return '';
-                                } else if (_model.choiceChip == 'Upcoming') {
-                                  return 'Upcoming';
-                                } else if (_model.choiceChip == 'Completed') {
-                                  return 'Completed';
-                                } else if (_model.choiceChip == 'Cancelled') {
-                                  return 'Cancelled';
-                                } else {
-                                  return '';
-                                }
-                              }(),
-                            ),
+                            queryBuilder: (rideOrdersRecord) {
+                              var q = rideOrdersRecord.where(
+                                'user',
+                                isEqualTo: currentUserReference,
+                              );
+                              final chip = _model.choiceChip;
+                              final statusForQuery = chip == 'Cancelled' ? 'Canceled' : chip;
+                              if (chip == 'Upcoming' ||
+                                  chip == 'Completed' ||
+                                  chip == 'Cancelled') {
+                                q = q.where(
+                                  'status',
+                                  isEqualTo: statusForQuery,
+                                );
+                              }
+                              return q;
+                            },
                           ),
                         ),
                         builder: (context, snapshot) {
