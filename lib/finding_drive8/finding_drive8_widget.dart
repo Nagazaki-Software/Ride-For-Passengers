@@ -450,8 +450,6 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                   return Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                mainAxisSize: MainAxisSize.max,
-                children: [
                   Container(
                     width: double.infinity,
                     height: 141.8,
@@ -928,7 +926,6 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                   ],
                 );
               },
-              ),
                                         ],
                                       ),
                                       StreamBuilder<List<UsersRecord>>(

@@ -1145,10 +1145,14 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                             final creditCardsItem =
                                 creditCards[creditCardsIndex];
                             return InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
+                              splashColor:
+                                  FlutterFlowTheme.of(context).accent1.withOpacity(0.12),
+                              focusColor:
+                                  FlutterFlowTheme.of(context).accent1.withOpacity(0.06),
+                              hoverColor:
+                                  FlutterFlowTheme.of(context).accent1.withOpacity(0.06),
+                              highlightColor:
+                                  FlutterFlowTheme.of(context).accent1.withOpacity(0.08),
                               onTap: () async {
                                 logFirebaseEvent(
                                     'PAYMENT_RIDE7_Container_jdcd9urd_ON_TAP');
@@ -1164,24 +1168,28 @@ class _PaymentRide7WidgetState extends State<PaymentRide7Widget>
                                   safeSetState(() {});
                                 }
                               },
-                              child: Container(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                curve: Curves.easeOutCubic,
                                 width: MediaQuery.sizeOf(context).width * 0.7,
                                 decoration: BoxDecoration(
-                                  color: creditCardsItem.isDefault
-                                      ? FlutterFlowTheme.of(context)
-                                          .secondaryBackground
+                                  color: (_model.selectCard == creditCardsItem)
+                                      ? FlutterFlowTheme.of(context).secondaryBackground
                                       : FlutterFlowTheme.of(context).primary,
                                   boxShadow: [
                                     BoxShadow(
-                                      blurRadius: 1.0,
+                                      blurRadius: (_model.selectCard == creditCardsItem) ? 4.0 : 1.0,
                                       color: Color(0x33000000),
-                                      offset: Offset(
-                                        0.0,
-                                        1.0,
-                                      ),
+                                      offset: const Offset(0.0, 1.0),
                                     )
                                   ],
-                                  borderRadius: BorderRadius.only(
+                                  border: Border.all(
+                                    color: (_model.selectCard == creditCardsItem)
+                                        ? FlutterFlowTheme.of(context).accent1
+                                        : Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: const BorderRadius.only(
                                     bottomLeft: Radius.circular(8.0),
                                     bottomRight: Radius.circular(8.0),
                                     topLeft: Radius.circular(8.0),
