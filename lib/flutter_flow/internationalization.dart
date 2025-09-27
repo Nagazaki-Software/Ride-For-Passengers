@@ -559,7 +559,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     'iv1ii278': {
       'en': 'Confirm Ride  ',
-      'de': 'Fahrt bestätigen',
+      'de': 'bestätigen',
       'es': 'Confirmar viaje',
       'fr': 'Confirmer',
       'pt': 'Confirmar',
@@ -567,7 +567,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     'nzvn5ujp': {
       'en': 'Ride Share',
       'de': 'Mitfahrgelegenheit',
-      'es': 'Viaje compartido',
+      'es': 'Compartido',
       'fr': 'Covoiturage',
       'pt': 'Compartilhar',
     },
@@ -934,7 +934,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Bezahlung für diese Fahrt',
       'es': 'Pago por este viaje',
       'fr': 'Paiement pour ce trajet',
-      'pt': 'Pagamento por esta viagem',
+      'pt': 'Pagamento desta viagem',
     },
     'p8t3hsvx': {
       'en': 'Tourist pass: Week (\$8)',
@@ -969,7 +969,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': 'Zeitreiten',
       'es': 'Montar en el tiempo',
       'fr': 'Le temps à cheval',
-      'pt': 'Cavalgando no Tempo',
+      'pt': 'Tempo estimado',
     },
     'lpcumiyr': {
       'en': 'Pay in app (Recommendad)',
@@ -990,7 +990,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': '',
       'es': '',
       'fr': '',
-      'pt': '',
+      'pt': 'Notas para o driver(opcional',
     },
     'vse9hbic': {
       'en': 'e.g., meet at Hotel lobby',
@@ -4909,10 +4909,10 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     'hxpv6ouk': {
       'en': 'Confirm',
-      'de': '',
-      'es': '',
-      'fr': '',
-      'pt': '',
+      'de': 'Bestätigen',
+      'es': 'Confirmar',
+      'fr': 'Confirmer',
+      'pt': 'Confirmar',
     },
   },
   // erronopagamento
@@ -5288,17 +5288,17 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
     },
     '43r7ws5u': {
       'en': 'Ride',
-      'de': 'Fahrt',
-      'es': 'Conducir',
-      'fr': 'Monter',
-      'pt': 'Andar de',
+      'de': 'Ride',
+      'es': 'Ride',
+      'fr': 'Ride',
+      'pt': 'Ride',
     },
     '35k8wmyh': {
       'en': 'XL',
       'de': 'XL',
-      'es': 'SG',
+      'es': 'XL',
       'fr': 'XL',
-      'pt': 'GG',
+      'pt': 'XL',
     },
     'pxgch01i': {
       'en': 'Luxury',
@@ -5893,7 +5893,7 @@ final kTranslationsMap = <Map<String, Map<String, String>>>[
       'de': '',
       'es': '',
       'fr': '',
-      'pt': '',
+      'pt': 'Salvar Cartão de Crédito',
     },
   },
   // emergency

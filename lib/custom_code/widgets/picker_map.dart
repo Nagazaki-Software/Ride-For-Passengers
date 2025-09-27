@@ -157,7 +157,8 @@ class _PickerMapState extends State<PickerMap>
   final Map<String, int> _lastTraceUpdateMs = {};
 
   // Cache de rotas simples (origem|destino) para evitar recomputo frequente.
-  static final Map<String, List<nmap.LatLng>> _routeCache = <String, List<nmap.LatLng>>{};
+  static final Map<String, List<nmap.LatLng>> _routeCache =
+      <String, List<nmap.LatLng>>{};
 
   List<nmap.LatLng> _route = <nmap.LatLng>[];
   List<double> _cumDist = <double>[];
@@ -193,18 +194,18 @@ class _PickerMapState extends State<PickerMap>
       return 80.0;
     }
     if (dist < 800) {
-      return 90.0;
-    }
-    if (dist < 2500) {
       return 100.0;
     }
-    if (dist < 8000) {
+    if (dist < 2500) {
       return 120.0;
     }
-    if (dist < 16000) {
+    if (dist < 8000) {
       return 140.0;
     }
-    return 160.0;
+    if (dist < 16000) {
+      return 160.0;
+    }
+    return 180.0;
   }
 
   int _boostedDriverIconSize({bool forDestination = false}) {
@@ -499,9 +500,9 @@ class _PickerMapState extends State<PickerMap>
     // ForÃ§a um "redraw" do mapa com micro-nudge para garantir remoÃ§Ã£o visual
     try {
       final dynamic dc = _controller;
-                  await dc.animateCameraBy(dx: 0.0, dy: 0.0);
+      await dc.animateCameraBy(dx: 0.0, dy: 0.0);
       await Future<void>.delayed(const Duration(milliseconds: 24));
-                  await dc.animateCameraBy(dx: 0.0, dy: 0.0);
+      await dc.animateCameraBy(dx: 0.0, dy: 0.0);
     } catch (_) {}
   }
 
