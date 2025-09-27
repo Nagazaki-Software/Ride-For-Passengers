@@ -1364,7 +1364,7 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                       ),
                     ],
                   );
-                ],
+                },
               ),
             ),
           ],
