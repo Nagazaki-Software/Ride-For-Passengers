@@ -1,4 +1,4 @@
-﻿﻿import '/auth/firebase_auth/auth_util.dart';
+﻿import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/cloud_functions/cloud_functions.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
@@ -410,7 +410,46 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
             ),
             PointerInterceptor(
               intercepting: isWeb,
-              child: Column(
+              child: StreamBuilder<List<UsersRecord>>(
+                stream: queryUsersRecord(
+                  queryBuilder: (usersRecord) => usersRecord
+                      .where(
+                        'driverOnline',
+                        isEqualTo: true,
+                      )
+                      .where(
+                        'driver',
+                        isEqualTo: true,
+                      ),
+                ),
+                builder: (context, overlaySnapshot) {
+                  final List<UsersRecord> overlayUsers =
+                      overlaySnapshot.data ?? <UsersRecord>[];
+                  final int onlineDrivers = overlayUsers.length;
+                  final bool hasDrivers = onlineDrivers > 0;
+                  final bool isSimulatedViewing = _fakeViewingUntil != null &&
+                      DateTime.now().isBefore(_fakeViewingUntil!);
+                  final int viewersCount = hasDrivers
+                      ? onlineDrivers
+                      : (isSimulatedViewing
+                          ? math.max(onlineDrivers, 4)
+                          : onlineDrivers);
+                  final String viewerTerm = viewersCount == 1
+                      ? 'motorista está'
+                      : 'motoristas estão';
+                  final String viewingLabel = (hasDrivers || isSimulatedViewing)
+                      ? '$viewersCount $viewerTerm vendo seu pedido'
+                      : 'Buscando motoristas disponíveis.';
+                  final String availabilityLabel = hasDrivers
+                      ? (onlineDrivers == 1
+                          ? '1 motorista disponível na sua área'
+                          : '$onlineDrivers motoristas disponíveis na sua área')
+                      : 'Aguardando motoristas por perto';
+                  final List<UsersRecord> displayDrivers =
+                      overlayUsers.take(3).toList();
+                  return Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Container(
@@ -885,10 +924,11 @@ class _FindingDrive8WidgetState extends State<FindingDrive8Widget>
                                                                 .bodyMedium
                                                                 .fontStyle,
                                                       ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                    ),
+                  ],
+                );
+              },
+              ),
                                         ],
                                       ),
                                       StreamBuilder<List<UsersRecord>>(
